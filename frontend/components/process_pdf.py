@@ -48,18 +48,26 @@ async def check_backend():
     Returns a dictionary with service names and their health status.m
     """
     services = {
-        "PDF Processor": os.getenv("PDF_PROCESSOR_URL", "http://localhost:8080/pdf_processor"),
-        "PDF Extractor": os.getenv("PDF_EXTRACTOR_URL", "http://localhost:8080/pdf_extraction"),
-        "Chat Service": os.getenv("CHAT_URL", "http://localhost:8080/chat"),
-        "Translation Service": os.getenv("DOCLING_TRANSLATION_URL", "http://localhost:8080/docling_translation"),
-        "Embedder Service": os.getenv("EMBEDDER_URL", "http://localhost:8080/embedder")
+        "PDF Processor": os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000"),
+        "PDF Extractor": os.getenv("PDF_EXTRACTOR_URL", "http://pdf_extraction_service:8000"),
+        "Chat Service": os.getenv("CHAT_URL", "http://chat_service:8000"),
+        "Translation Service": os.getenv("DOCLING_TRANSLATION_URL", "http://docling_translation_service:8000"),
+        "Embedder Service": os.getenv("EMBEDDER_URL", "http://embedder_service:8000")
     }
 
     async def check_service(service_name, url):
         health_url = f"{url}/health"
         try:
-            async with httpx.AsyncClient(timeout=1) as client:
+            async with httpx.AsyncClient(timeout=5) as client:
                 response = await client.get(health_url)
+                import logging
+
+                # Set up logging at the top of your file
+                logging.basicConfig(level=logging.INFO)
+                logger = logging.getLogger(__name__)
+
+                # In your async function
+                logger.error(f"Health check failed: {response.text}")
                 if response.status_code == 200:
                     return service_name, {"status": "Healthy", "url": url}
                 else:
