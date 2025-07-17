@@ -2,7 +2,7 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-ENV PYTHONPATH=/app/pdf_processor_service:/app/shared_utils
+ENV PYTHONPATH=/app/frontend:/app/shared_utils
 
 RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
 
@@ -19,4 +19,4 @@ COPY frontend ./frontend
 
 EXPOSE 8000
 
-CMD ["streamlit", "run", "app.py", "--server.port=8504", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "frontend/main.py", "--server.port=8504", "--server.address=0.0.0.0"]
