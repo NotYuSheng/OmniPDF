@@ -67,10 +67,12 @@ async def check_backend():
                 logger = logging.getLogger(__name__)
 
                 # In your async function
-                logger.error(f"Health check failed: {response.text}")
                 if response.status_code == 200:
+                    logger.info(f'{service_name}, "status": {response.text}, "url": {url}')
                     return service_name, {"status": "Healthy", "url": url}
                 else:
+                    logger.error(f'{service_name}, "status": {response.text}, "url": {url}')
+                    logger.error(f"Health check: {response.text}")
                     return service_name, {"status": f"HTTP {response.status_code}", "url": url}
         except httpx.ConnectError:
             return service_name, {"status": "Connection Error", "url": url}
