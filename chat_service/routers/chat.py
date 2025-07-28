@@ -56,7 +56,7 @@ async def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     # Group chunks by doc_id
     doc_chunks = {}
     for chunk in chunks:
-        doc_id = chunk.get('doc_id', 'unknown')
+        doc_id = chunk.get('doc_id')
         if doc_id not in doc_chunks:
             doc_chunks[doc_id] = []
         doc_chunks[doc_id].append(chunk)
