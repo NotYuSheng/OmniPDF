@@ -4,10 +4,12 @@ import io
 import uuid
 import time
 import requests
+import httpx
+import fitz
 from PyPDF2 import PdfReader, PdfWriter
 from collections import defaultdict
-from fastapi import APIRouter, HTTPException
-from models.render import DocumentRendererResponse
+from fastapi import APIRouter, HTTPException, Body
+from models.render import DocumentRendererResponse, AnnotationResponse
 
 from shared_utils.s3_utils import (
     upload_fileobj,
@@ -18,17 +20,16 @@ router = APIRouter(prefix="/render", tags=["render"])
 logger = logging.getLogger(__name__)
 
 @router.post("/{doc_id}")
-async def pdf_render(doc_url: str,
-               json_url: str):
+async def pdf_render(
+                doc_id: str,
+                doc_url: str,
+                json_data: AnnotationResponse = Body(...)
+                ):
 
     start_time = time.time()
-
-    response = requests.get(json_url)
-    response.raise_for_status()
-    json_data = response.json()
-
-    pdf_response = requests.get(doc_url)
-    pdf_response.raise_for_status()
+    async with httpx.AsyncClient() as client:
+        pdf_response = await client.get(doc_url)
+        pdf_response.raise_for_status()
 
     content_length = pdf_response.headers.get("Content-Length")
     if content_length:
@@ -38,7 +39,7 @@ async def pdf_render(doc_url: str,
         size_bytes = len(pdf_response.content)
         original_size = size_bytes / 1024 #in kb
 
-
+    json_data = json_data.model_dump()
     doc = pymupdf.open(stream=pdf_response.content, filetype="pdf")
     trans_text_data = defaultdict(list)
     texts = json_data.get("docling", {}).get("texts", [])
@@ -60,21 +61,21 @@ async def pdf_render(doc_url: str,
 
     ### This section is supposed to handle table rendering but has been excluded due to autoscaling issues
     
-    # tables = json_data.get("docling", {}).get("tables", [])
+    tables = json_data.get("docling", {}).get("tables", [])
 
-    # for table in tables:
-    #     table_cells = table.get("data", {}).get("table_cells", [])
-    #     page_no = table.get("prov", [])[0].get("page_no")
+    for table in tables:
+        table_cells = table.get("data", {}).get("table_cells", [])
+        page_no = table.get("prov", [])[0].get("page_no")
 
-    #     for cell in table_cells:
-    #         translated = cell.get("translated_text")
-    #         bbox = cell.get("bbox")
+        for cell in table_cells:
+            translated = cell.get("translated_text")
+            bbox = cell.get("bbox")
 
-    #         if page_no is not None and bbox:
-    #             trans_text_data[page_no].append({
-    #                 "translated_text": translated,
-    #                 "bbox": bbox
-    #             })
+            if page_no is not None and bbox:
+                trans_text_data[page_no].append({
+                    "translated_text": translated,
+                    "bbox": bbox
+                })
 
     data = dict(trans_text_data)
 
@@ -83,11 +84,12 @@ async def pdf_render(doc_url: str,
         blocks = page.get_text("blocks") 
         for block in blocks:
             rect = block[:4] 
-
             page.add_redact_annot(rect)
 
         page.apply_redactions()
         page.clean_contents()
+
+
         data_lst = data[page.number + 1]
         for trans_data in data_lst:
             trans_text = trans_data["translated_text"]
@@ -98,7 +100,7 @@ async def pdf_render(doc_url: str,
             logger.info(f"Text: {trans_text}")
             logger.info(f"Bbox: {coords}")
 
-            if type(trans_text) is str:
+            if isinstance(trans_text, str):
                 try:
                     page.insert_htmlbox(coords, trans_text)
                 except Exception as e:
@@ -161,13 +163,3 @@ async def pdf_render(doc_url: str,
                                     download_url=presigned_url,
                                     )
                                 )
-
-
-
-
-
-
-
-
-
-

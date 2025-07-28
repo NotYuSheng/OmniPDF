@@ -1,8 +1,9 @@
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, UploadFile, HTTPException
 import logging
 from typing import Literal
 from models.bypass import BypassResponse
 import io
+
 
 from shared_utils.s3_utils import (
     upload_fileobj,
@@ -34,5 +35,5 @@ async def dump_files(
         )
 
     except Exception as e:
-        logger.warning(f"❌ Upload failed: {e}")
-        return {"error": "Error"}
+        logger.warning(f"Upload failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Upload failed: {e}")
