@@ -23,7 +23,7 @@ OPENAI_MODEL_NAME = os.getenv("OPENAI_MODEL", _OPENAI_MODEL_DEFAULT)
 
 
 def prepare_retrieval_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Convert ChromaDB results to structured chunks for RAG"""
+    """Convert ChromaDB results to structured chunks for RAG using OPENAI_MODEL"""
     chunks = []
     
     if not results or not results.get('documents'):
@@ -50,6 +50,46 @@ def prepare_retrieval_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:
         chunks = [chunk for chunk in chunks if chunk['similarity_score'] >= qwen_config.min_similarity_score]
     
     return chunks
+
+
+async def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Simple reranking based on document diversity and relevance
+    """
+    try:
+        # Group chunks by doc_id
+        doc_chunks = {}
+        for chunk in chunks:
+            doc_id = chunk.get('doc_id', 'unknown')
+            if doc_id not in doc_chunks:
+                doc_chunks[doc_id] = []
+            doc_chunks[doc_id].append(chunk)
+        
+        # Sort chunks within each doc_id by similarity score
+        for doc_id in doc_chunks:
+            doc_chunks[doc_id].sort(key=lambda x: x['similarity_score'], reverse=True)
+        
+        logger.info(f"doc_chunks: {doc_chunks}")
+        reranked_chunks = []
+        
+        # Determine the number of rounds based on the document with the most chunks
+        if doc_chunks:
+            max_depth = max(len(chunks) for chunks in doc_chunks.values())
+        else:
+            max_depth = 0
+
+        # Interleave by taking one chunk from each document per round to ensure diversity of sources
+        for i in range(max_depth):
+            for doc_id in doc_chunks:
+                if i < len(doc_chunks[doc_id]):
+                    reranked_chunks.append(doc_chunks[doc_id][i])
+        
+        logger.info(f"Reranked {len(chunks)} chunks from {len(doc_chunks)} documents")
+        return reranked_chunks
+        
+    except Exception as e:
+        logger.warning(f"Reranking failed, using original order: {e}")
+        return chunks
 
 
 async def perform_rag_query(
@@ -89,7 +129,7 @@ async def perform_rag_query(
             logger.warning(f"No relevant chunks found for query: {query}")
             return "I couldn't find any relevant information in the document collection to answer your question.", [], ""
         
-        # Step 3: Optional reranking for better results across multiple documents
+        # Step 3: Rerank chunks for more diverse results across multiple documents
         if enable_reranking and len(chunks) > 1:
             chunks = await rerank_chunks(chunks)
         
@@ -99,8 +139,10 @@ async def perform_rag_query(
             max_context_length=qwen_config.max_context_length
         )
 
-        number_of_docs = len(set(chunk.get('doc_id') for chunk in optimized_chunks if chunk.get('doc_id')))
-        logger.info(f"Relevant chunks from {number_of_docs} documents")
+        logger.info(f"Optimized chunks: {optimized_chunks}")
+
+        num_of_docs = len(set(chunk.get('doc_id') for chunk in optimized_chunks if chunk.get('doc_id')))
+        logger.info(f"Relevant chunks from {num_of_docs} documents")
         logger.info(f"Using {len(optimized_chunks)} chunks for context (total length: {len(context)} chars)")
         
         logger.info(f"Query type: {query_type}")
@@ -121,55 +163,6 @@ async def perform_rag_query(
     except Exception as e:
         logger.error(f"RAG query failed: {e}")
         raise HTTPException(status_code=500, detail="RAG query failed")
-
-
-async def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Simple reranking based on document diversity and relevance
-    """
-    try:
-        # Group chunks by document
-        doc_chunks = {}
-        for chunk in chunks:
-            doc_id = chunk.get('doc_id', 'unknown')
-            if doc_id not in doc_chunks:
-                doc_chunks[doc_id] = []
-            doc_chunks[doc_id].append(chunk)
-        
-        # Sort chunks within each document by similarity score
-        for doc_id in doc_chunks:
-            doc_chunks[doc_id].sort(key=lambda x: x['similarity_score'], reverse=True)
-        
-        # # Interleave chunks from different documents to ensure diversity
-        # reranked_chunks = []
-        # max_chunks_per_doc = max(1, len(chunks) // max(1, len(doc_chunks)))
-        
-        # # Take top chunks from each document
-        # for doc_id, doc_chunk_list in doc_chunks.items():
-        #     selected_chunks = doc_chunk_list[:max_chunks_per_doc]
-        #     reranked_chunks.extend(selected_chunks)
-
-        reranked_chunks = []
-        
-        # Determine the number of rounds based on the document with the most chunks
-        max_depth = max(len(chunks) for chunks in doc_chunks.values()) if doc_chunks else 0
-
-        # Interleave by taking one chunk from each document per round
-        for i in range(max_depth):
-            for doc_id in doc_chunks:
-                if i < len(doc_chunks[doc_id]):
-                    reranked_chunks.append(doc_chunks[doc_id][i])
-        
-        # Sort final list by similarity score
-        reranked_chunks.sort(key=lambda x: x['similarity_score'], reverse=True)
-        
-        logger.info(f"Reranked {len(chunks)} chunks from {len(doc_chunks)} documents")
-        return reranked_chunks
-        
-    except Exception as e:
-        logger.warning(f"Reranking failed, using original order: {e}")
-        return chunks
-
 
 
 @router.post("/", status_code=201, response_model=ChatResponse)

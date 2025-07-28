@@ -147,14 +147,14 @@ class QwenRAGOptimizer:
             return [], ""
         
         # Sort by similarity score
-        sorted_chunks = sorted(chunks, key=lambda x: x.get('similarity_score', 0), reverse=True)
+        # sorted_chunks = sorted(chunks, key=lambda x: x.get('similarity_score', 0), reverse=True)
         
         # Build context with length management
         selected_chunks = []
         context_parts = []
         current_length = 0
         
-        for i, chunk in enumerate(sorted_chunks):
+        for i, chunk in enumerate(chunks):
             content = chunk.get('content', '')
             
             # Format chunk for Qwen-2.5
