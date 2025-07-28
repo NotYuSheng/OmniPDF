@@ -1,3 +1,4 @@
+from typing import List, Dict, Any
 import os
 
 FACTUAL_KEYWORDS = ['what is', 'when did', 'where is', 'who is', 'how many', 'list', 'define']
@@ -146,7 +147,7 @@ class QwenRAGOptimizer:
         return "general"
     
     @staticmethod
-    def optimize_chunks_for_qwen(chunks: list, max_context_length: int = 4000) -> tuple[list, str]:
+    def optimize_chunks_for_qwen(chunks: List[Dict[str, Any]], max_context_length: int = 4000) -> tuple[List[Dict[str, Any]], str]:
         """Optimize chunk selection and formatting specifically for Qwen-2.5"""
         
         if not chunks:
