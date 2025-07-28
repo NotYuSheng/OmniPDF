@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-from openai import OpenAI, APIError
+from openai import AsyncOpenAI, APIError
 from typing import List, Dict, Any, Optional
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chroma_client
@@ -156,7 +156,7 @@ async def perform_rag_query(
 @router.post("/", status_code=201, response_model=ChatResponse)
 async def handle_chat(
     chat_request: ChatRequest,
-    client: OpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI = Depends(get_openai_client),
 ):
     """
     Handle incoming chat requests and return AI responses.
