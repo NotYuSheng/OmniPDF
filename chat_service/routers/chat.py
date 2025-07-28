@@ -240,7 +240,7 @@ async def handle_chat(
     metadata = {
         "query_type": chat_request.query_type,
         "chunks_used": len(relevant_chunks),
-        "documents_searched": len(doc_ids) if doc_ids else 0,
+        "documents_searched_count": len(doc_ids) if doc_ids else 0,
         "document_ids": list(doc_ids) if doc_ids else [],
         "total_context_length": len(user_prompt),
         "model_used": OPENAI_MODEL_NAME,
