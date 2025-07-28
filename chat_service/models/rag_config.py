@@ -1,9 +1,9 @@
 from typing import List, Dict, Any
 import os
 
-FACTUAL_KEYWORDS = ['what is', 'when did', 'where is', 'who is', 'how many', 'list', 'define']
-ANALYTICAL_KEYWORDS = ['why', 'how does', 'analyze', 'compare', 'evaluate', 'assess', 'examine']
-SUMMARY_KEYWORDS = ['summarize', 'summary', 'overview', 'main points', 'key findings']
+FACTUAL_KEYWORDS = ('what is', 'when did', 'where is', 'who is', 'how many', 'list', 'define')
+ANALYTICAL_KEYWORDS = ('why', 'how does', 'analyze', 'compare', 'evaluate', 'assess', 'examine')
+SUMMARY_KEYWORDS = ('summarize', 'summary', 'overview', 'main points', 'key findings')
 _OPENAI_MODEL_DEFAULT = "qwen2.5-0.5b-instruct"
 
 class QwenRAGConfig:
