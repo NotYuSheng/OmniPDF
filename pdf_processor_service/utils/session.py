@@ -1,6 +1,7 @@
 # Original code from https://github.com/duyixian1234/fastapi-redis-session
 # Updated for package versions listed in requirements.txt
 
+from datetime import timedelta
 from typing import Callable, Generator
 from uuid import uuid4
 
@@ -10,17 +11,18 @@ import shared_utils.redis
 
 
 SESSION_COOKIE_NAME: str = "OmniPDFSession"
+SESSION_REDIS_PREFIX = "Session_Files"
+SESSION_FLAG_PREFIX = "SessionHeader"
 
+class SessionStorage(shared_utils.redis.RedisSetWithFlagExpiry):
+    def __init__(self, redis_client=None, prefix=SESSION_REDIS_PREFIX, flag_prefix=SESSION_FLAG_PREFIX, default_expiry=timedelta(days=1)):
+        super().__init__(redis_client, prefix, flag_prefix, default_expiry)
 
-class SessionStorage(shared_utils.redis.RedisSetStorage):
     def generate_session(self) -> str:
         session_id = uuid4().hex
-        while session_id in self:
+        while not self.client.set(self.flag_prefixed(session_id), 1, ex=self.flag_expiry, nx=True):
             session_id = uuid4().hex
-        # create an empty list
-        self.add(session_id, "")
         return session_id
-
 
 def get_session_storage() -> Generator[SessionStorage]:
     storage = SessionStorage()
