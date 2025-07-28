@@ -1,5 +1,9 @@
 import os
 
+FACTUAL_KEYWORDS = ['what is', 'when did', 'where is', 'who is', 'how many', 'list', 'define']
+ANALYTICAL_KEYWORDS = ['why', 'how does', 'analyze', 'compare', 'evaluate', 'assess', 'examine']
+SUMMARY_KEYWORDS = ['summarize', 'summary', 'overview', 'main points', 'key findings']
+
 class QwenRAGConfig:
     """Configuration class for Qwen-2.5 RAG optimization"""
     
@@ -127,18 +131,15 @@ class QwenRAGOptimizer:
         question_lower = question.lower()
         
         # Factual indicators
-        factual_keywords = ['what is', 'when did', 'where is', 'who is', 'how many', 'list', 'define']
-        if any(keyword in question_lower for keyword in factual_keywords):
+        if any(keyword in question_lower for keyword in FACTUAL_KEYWORDS):
             return "factual"
         
         # Analytical indicators
-        analytical_keywords = ['why', 'how does', 'analyze', 'compare', 'evaluate', 'assess', 'examine']
-        if any(keyword in question_lower for keyword in analytical_keywords):
+        if any(keyword in question_lower for keyword in ANALYTICAL_KEYWORDS):
             return "analytical"
         
         # Summarization indicators
-        summary_keywords = ['summarize', 'summary', 'overview', 'main points', 'key findings']
-        if any(keyword in question_lower for keyword in summary_keywords):
+        if any(keyword in question_lower for keyword in SUMMARY_KEYWORDS):
             return "summarization"
         
         return "general"
