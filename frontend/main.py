@@ -1,3 +1,4 @@
+from multiprocessing import process
 from streamlit.components.v1 import html
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
@@ -11,9 +12,17 @@ import base64
 import json
 import time
 import os
+import httpx
+import asyncio
+
+# Logger
+import logging
+logging.basicConfig(level=logging.INFO)
+# Set up logger
+logger = logging.getLogger(__name__)
 
 # local imports
-from components.process_pdf import is_pdf, display_backend_status
+from components.process_pdf import display_backend_status
 
 # Page configuration
 st.set_page_config(
@@ -24,7 +33,8 @@ st.set_page_config(
 )
 
 # Backend
-BACKEND_URL = os.getenv("BACKEND_URL", "http://omnipdf-backend:8003")
+PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000")
+CHAT_URL = os.getenv("CHAT_URL", "http://chat_service:8000")
 
 def process_pdf(uploaded_file):
     """
@@ -51,63 +61,128 @@ def process_pdf(uploaded_file):
     status_text.empty()
     # Process pdf through PDF_processor endpoint
     try:
-        # Get the PDF processor URL from environment
-        pdf_processor_url = os.getenv("PDF_PROCESSOR_URL", "http://localhost:8080/pdf_processor")
-        
         # Step 1: Upload the PDF document
-        files = {"file": ("document.pdf", uploaded_file.getvalue(), "application/pdf")}
-        upload_response = requests.post(f"{pdf_processor_url}/documents/", files=files)
-        
-        if upload_response.status_code != 201:
-            st.error(f"Failed to upload PDF: {upload_response.text}")
-            return None
-            
+        logger.info(f"Uploading PDF: {uploaded_file}")
+
+        # string($binary)
+#         INFO:__main__:Uploading PDF: UploadedFile(file_id='824a1dc9-f613-4019-824f-093cfe9d73e1', name='testomni.pdf', type='application/pdf', size=150813, _file_urls=file_id: "824a1dc9-f613-4019-824f-093cfe9d73e1"
+# upload_url: "/_stcore/upload_file/00487169-7f0f-4602-9d6d-f9e3c527d55f/824a1dc9-f613-4019-824f-093cfe9d73e1"
+# delete_url: "/_stcore/upload_file/00487169-7f0f-4602-9d6d-f9e3c527d55f/824a1dc9-f613-4019-824f-093cfe9d73e1"
+# )
+        bytes_data = uploaded_file.getvalue() # bytes
+        files = {'file': (uploaded_file.name, 
+                                  bytes_data, 
+                                  'application/pdf')}
+        upload_response = requests.post(
+            url=f"{PDF_PROCESSOR_URL}/documents/",
+            files=files,
+            )
+        logger.info(f"Upload PDF response: {upload_response.text}")   
+                
         upload_data = upload_response.json()
         doc_id = upload_data["doc_id"]
+        filename = upload_data["filename"]
+        download_url = upload_data["download_url"]
         
-        # Step 2: Process images (if requested)
-        images_data = []
-        try:
-            images_response = requests.get(f"{pdf_processor_url}/images/{doc_id}")
-            if images_response.status_code == 200:
-                images_data = images_response.json()["images"]
-            elif images_response.status_code == 202:
-                st.info("Images are still being processed. Please check back later.")
-        except Exception as e:
-            st.warning(f"Could not process images: {e}")
-        
-        # Step 3: Process tables (if requested)
-        tables_data = []
-        try:
-            tables_response = requests.get(f"{pdf_processor_url}/tables/{doc_id}")
-            if tables_response.status_code == 200:
-                tables_data = tables_response.json()["tables"]
-            elif tables_response.status_code == 202:
-                st.info("Tables are still being processed. Please check back later.")
-        except Exception as e:
-            st.warning(f"Could not process tables: {e}")
-        
+        st.text(f"Document uploaded successfully: {filename}")
+        st.text(f"Document ID: {doc_id}")
+        st.text(f"Download URL: {download_url}")
+
+
         # Return processed data
-        return {
-            'doc_id': doc_id,
-            'translated_pdf': upload_data["download_url"],
-            'images': images_data,
-            'tables': tables_data,
-            'metadata': {
-                'authors': ['Auto-detected'],
-                'exec_summary': 'Document processed successfully through PDF processor service.',
-                'short_description': 'PDF document with extracted content',
-                'keywords': ['pdf', 'document', 'processed'],
-                'image_keywords': ['extracted', 'images']
-            }
-        }
-        
-    except requests.exceptions.ConnectionError:
+        # return {
+        #     "doc_id": "string",
+        #     "status": "string",
+        #     "result": {
+        #         "schema_name": "string",
+        #         "version": "string",
+        #         "name": "string",
+        #         "origin": "string",
+        #         "furniture": "string",
+        #         "texts": [
+        #         "string"
+        #         ],
+        #         "pictures": [
+        #         "string"
+        #         ],
+        #         "tables": [
+        #         "string"
+        #         ],
+        #         "key_value_items": [
+        #         "string"
+        #         ],
+        #         "form_items": [
+        #         "string"
+        #         ],
+        #         "pages": "string"
+        #     }
+        # }
+    except requests.exceptions.ConnectionError as e:
         st.error("Could not connect to PDF processor service. Please check if the service is running.")
-        return None
+        logger.error(f"Error processing PDF: {e}")
+    
     except Exception as e:
         st.error(f"Error processing PDF: {e}")
-        return None
+        logger.error(f"Error processing PDF: {e}")
+
+    
+    # {
+    #     "doc_id": "string",
+    #     "status": "string",
+    #     "result": {
+    #         "schema_name": "string",
+    #         "version": "string",
+    #         "name": "string",
+    #         "origin": "string",
+    #         "furniture": "string",
+    #         "texts": [
+    #         "string"
+    #         ],
+    #         "pictures": [
+    #         "string"
+    #         ],
+    #         "tables": [
+    #         "string"
+    #         ],
+    #         "key_value_items": [
+    #         "string"
+    #         ],
+    #         "form_items": [
+    #         "string"
+    #         ],
+    #         "pages": "string"
+    #     }
+    # }
+    # Step 2: Extract images
+    try:
+        # get pdf status
+        async def get_doc_status(doc_id):
+            data = {
+                "doc_id":doc_id,
+            }
+            async with httpx.AsyncClient() as client:
+                response = await client.get(f"{PDF_PROCESSOR_URL}/documents/", params=data)
+                st.text(f"Document status: {response}")
+                if response.status_code == 200:
+                    status_placeholder.text(f"Document processing completed successfully. {response.json()}")
+                    return response.json()  # Job done, return result
+                
+                elif response.status_code == 202:
+                    await asyncio.sleep(1)  # Job not done, wait and retry
+
+        try:
+            status_result = asyncio.run(get_doc_status(doc_id))
+            status_placeholder = st.empty()  # Clear the placeholder
+            status_placeholder.text(f"Document status: {status_result}")
+        except Exception as e:
+            status_placeholder.error(f"Error getting document status: {e}")
+
+        if st.processed_docs.status_code == 200:
+            results = st.processed_docs.json()
+        elif st.processed_docs.status_code == 202:
+            st.info("Images are still being processed. Please check back later.")
+    except Exception as e:
+        st.warning(f"Could not process images: {e}")
 
 def generate_wordcloud(text_data):
     """Generate word cloud from text data"""
@@ -128,17 +203,6 @@ def translate_file(uploaded_file):
 
 def generate_metadata(uploaded_file):
     pass
-
-def check_backend():
-    try:
-        response = requests.get(f"{BACKEND_URL}/health")
-        if response.status_code == 200:
-            return True
-        else:
-            return False
-    except Exception as e:
-        st.error(f"Error checking backend: {e}")
-        return False
 
 def upload_pdf_UI():
     st.header("📁 Upload PDF")
@@ -164,6 +228,7 @@ def upload_pdf_UI():
         
         if st.button("🚀 Process PDF", type="primary"):
             with st.spinner("Processing PDF..."):
+                # st.text(uploaded_file)
                 st.session_state.processed_data = process_pdf(uploaded_file)
             st.success("Processing completed!")
             st.rerun()
@@ -175,45 +240,72 @@ def start_chat_UI():
     # Initialize chat history
     if "messages" not in st.session_state:
         st.session_state.messages = []
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
 
     # Chat interface
     chat_container = st.container(height=350)
-    if "chat_history" in st.session_state:
-        with chat_container:
-            # Display chat history
-            for i, (question, answer) in enumerate(st.session_state.chat_history):
-                st.markdown(f'<div class="chat-container">', unsafe_allow_html=True)
-                st.markdown(f"You: {question}")
-                st.markdown(f"Assistant: {answer}")
-                st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Display chat messages from history
+    # with chat_container:
+    #     # Display chat history
+    #     for i, (question, answer) in enumerate(st.session_state.chat_history):
+    #         st.markdown(f'<div class="chat-container">', unsafe_allow_html=True)
+    #         st.markdown(f"You: {question}")
+    #         st.markdown(f"Assistant: {answer}")
+    #         st.markdown('</div>', unsafe_allow_html=True)
+
+    # Chat interface
     with chat_container:
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
+    
+    # Suggested questions
+    st.text("💡 Suggested Questions")
+    col1, col2 = st.columns(2)
+    async def chat_with_rag(prompt):
+        """
+        Simulate a RAG response for the given prompt.
+        Replace this with actual RAG implementation.
+        """
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{CHAT_URL}/documents/")
+            if response.status_code == 200:
+                return response.json()  # Job done, return result
+            elif response.status_code == 202:
+                await asyncio.sleep(1)
+    
 
-    # React to user input
-    if prompt := st.chat_input("What is up?"):
+    def simulate_rag_response(prompt, document_content):
+        # Placeholder response - replace with your actual RAG implementation
+        return f"Response to: {prompt[:50]}..." if len(prompt) > 50 else f"Response to: {prompt}"
+        
+    with col1:
+        if st.button("What is the main topic?"):
+            response = simulate_rag_response("What is the main topic?", "document content")
+            st.session_state.chat_history.append(("What is the main topic?", response))
+        
+        if st.button("Who are the authors?"):
+            response = simulate_rag_response("Who are the authors?", "document content")
+            st.session_state.chat_history.append(("Who are the authors?", response))
+    
+    with col2:
+        if st.button("Summarize the document"):
+            response = simulate_rag_response("Summarize the document", "document content")
+            st.session_state.chat_history.append(("Summarize the document", response))
+        
+        if st.button("What are the key findings?"):
+            response = simulate_rag_response("What are the key findings?", "document content")
+            st.session_state.chat_history.append(("What are the key findings?", response))
+
+
+    # Chat input
+    if prompt := st.chat_input("Ask about the document"):
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
     
-        def simulate_rag_response(prompt, document_content):
-            # Placeholder response - replace with your actual RAG implementation
-            return f"Response to: {prompt[:50]}..." if len(prompt) > 50 else f"Response to: {prompt}"
-        
         # Generate and display assistant response
         response = simulate_rag_response(prompt, "document content")
         
-        def query_rag_response(prompt, document_content):
-            try:
-                response = requests.post(
-                    url="http://localhost:8080/chat",
-                    data="test"
-                )
-                return response
-            except:
-                return "The server is not responding" 
 
         # Add assistant response to chat history
         st.session_state.messages.append({"role": "assistant", "content": response})
@@ -245,11 +337,12 @@ def extract_images_UI():
                             )
                         except Exception as e:
                             # Fallback to placeholder if image loading fails
-                            st.image(
-                                "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Image+{}".format(i+1),
-                                caption=f"Image {i+1} (placeholder)",
-                                use_column_width=True
-                            )
+                            # st.image(
+                            #     "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Image+{}".format(i+1),
+                            #     caption=f"Image {i+1} (placeholder)",
+                            #     use_column_width=True
+                            # )
+                            st.error(f"Error loading image: {e}")
                     
                     with col2:
                         st.markdown(f"**Image Key:** {img_data['image_key']}")
@@ -263,10 +356,14 @@ def extract_images_UI():
 
 def extract_tables_UI():
     st.write("📋 Extract Tables")
+    if 'tables' not in st.session_state:
+        st.info("No tables found in the document.")
+        return
     if "processed_data" in st.session_state and st.session_state.processed_data:
         data = st.session_state.processed_data
-        if data.get('tables'):
-            for i, table_data in enumerate(data['tables']):
+        tables = data.get('tables', [])
+        if tables:
+            for i, table_data in enumerate(tables):
                 with st.container():
                     st.markdown(f'<div class="image-container">', unsafe_allow_html=True)
                     
@@ -294,9 +391,11 @@ def extract_tables_UI():
     else:
         st.info("Please upload and process a PDF first")
 
-
 def metadata_UI():
     st.write("📊 PDF Metadata")
+    if 'metadata' not in st.session_state:
+        st.info("No metadata found in the document.")
+        return
     if "processed_data" in st.session_state and st.session_state.processed_data:
         data = st.session_state.processed_data
         metadata = data['metadata']
@@ -341,6 +440,9 @@ def metadata_UI():
 
 def wordcloud_UI():
     st.write("☁️ Word Cloud")
+    if 'metadata' not in st.session_state:
+        st.info("No metadata found in the document.")
+        return
     if "processed_data" in st.session_state and st.session_state.processed_data:
         # Generate word cloud from keywords
         all_keywords = st.session_state.processed_data['metadata']['keywords'] + st.session_state.processed_data['metadata']['image_keywords']
@@ -351,7 +453,7 @@ def wordcloud_UI():
             buf = io.BytesIO()
             fig.savefig(buf, format="png", bbox_inches='tight')
             buf.seek(0)
-            return base64.b64encode(buf.read()).decode("utf-8")
+            encoded = base64.b64encode(buf.read()).decode("utf-8")
             # Custom HTML for zoomable image
             html_code = f"""
             <style>
@@ -379,7 +481,6 @@ def wordcloud_UI():
             }}
             </script>
             """
-
             # Display the image using custom HTML
             html(html_code, height=600)
             st.pyplot(fig)
@@ -463,6 +564,10 @@ def main():
             start_chat_UI()
         elif selected_key == "upload":
             upload_pdf_UI()
+        global status_placeholder
+        status_placeholder = st.empty()
+        status_placeholder.text("Waiting for document upload...")
+        
         # Add other sidebar-only functions here
 
     # Render each tab
