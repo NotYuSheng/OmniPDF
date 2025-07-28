@@ -89,7 +89,6 @@ async def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     except Exception as e:
         logger.warning(f"Reranking failed, using original order: {e}")
         raise HTTPException(status_code=500, detail="Reranking failed, using original order")
-        return chunks
 
 
 async def perform_rag_query(
