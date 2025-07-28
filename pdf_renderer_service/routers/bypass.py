@@ -36,4 +36,4 @@ async def dump_files(
 
     except Exception as e:
         logger.warning(f"Upload failed: {e}")
-        raise HTTPException(status_code=500, detail=f"Upload failed: {e}")
+        raise HTTPException(status_code=500, detail="Upload failed due to an internal error.")

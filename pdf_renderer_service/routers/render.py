@@ -63,6 +63,10 @@ async def pdf_render(
 
     for table in tables:
         table_cells = table.get("data", {}).get("table_cells", [])
+        prov_list   = table.get("prov", [])
+        if not prov_list:
+            continue
+
         page_no = table.get("prov", [])[0].get("page_no")
 
         for cell in table_cells:
@@ -88,7 +92,7 @@ async def pdf_render(
         page.clean_contents()
 
 
-        data_lst = data[page.number + 1]
+        data_lst = data.get(page.number + 1, [])
         for trans_data in data_lst:
             trans_text = trans_data["translated_text"]
             bbox = trans_data['bbox']
@@ -140,8 +144,8 @@ async def pdf_render(
     logger.info(f"File size: {original_size:.2f} => {file_size / 1024:.2f} KB")
     logger.info(f"File size: {original_size / 1024:.2f} => {file_size / (1024 * 1024):.2f} MB")
 
-    doc_id = str(uuid.uuid4())
-    key = f"{doc_id}/rendered.pdf"
+    new_doc_id = str(uuid.uuid4())
+    key = f"{new_doc_id}/rendered.pdf"
 
     try:
         success = upload_fileobj(
@@ -156,7 +160,7 @@ async def pdf_render(
         logger.error(f"Unexpected error during upload: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
     
-    return(DocumentRendererResponse(doc_id=doc_id,
+    return(DocumentRendererResponse(doc_id=new_doc_id,
                                     filename=key,
                                     download_url=presigned_url,
                                     )
