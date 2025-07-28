@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Optional
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chroma_client
 import logging
+import os
 from models.chat import ChatRequest, ChatResponse
 from models.rag_config import QwenRAGConfig, QwenPromptTemplates, QwenRAGOptimizer
 
@@ -50,7 +51,7 @@ def prepare_retrieval_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:
     return chunks
 
 
-def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+async def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Simple reranking based on document diversity and relevance
     """
