@@ -22,6 +22,10 @@ class QwenRAGConfig:
         self.min_similarity_score = float(os.getenv("QWEN_MIN_SIMILARITY", "0.1"))
         self.enable_reranking = os.getenv("QWEN_ENABLE_RERANKING", "true").lower() == "true"
 
+        # RAG Optimization flags
+        self.enable_query_type_detection = os.getenv("ENABLE_QUERY_TYPE_DETECTION", "true").lower() == "true"
+        self.enable_response_post_processing = os.getenv("ENABLE_RESPONSE_POST_PROCESSING", "true").lower() == "true"
+
 class QwenPromptTemplates:
     """Specialized prompt templates for different types of RAG queries with Qwen-2.5"""
     

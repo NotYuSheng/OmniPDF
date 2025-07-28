@@ -148,9 +148,9 @@ async def perform_rag_query(
         logger.info(f"Query type: {query_type}")
 
         # Step 5: Auto-detect query type if not provided
-        if query_type == "general":
-            query_type = qwen_optimizer.detect_query_type(query)
-            logger.info(f"Auto-detected query type: {query_type}")
+        if qwen_config.enable_query_type_detection and query_type == "general":
+                query_type = qwen_optimizer.detect_query_type(query)
+                logger.info(f"Auto-detected query type: {query_type}")
         
         # Step 6: Prepare system and user prompts
         system_prompt = prompt_templates.get_system_prompt(query_type)
@@ -228,7 +228,10 @@ async def handle_chat(
         )
     
     # Post-process the response
-    processed_response = qwen_optimizer.post_process_qwen_response(first_choice.message.content)
+    if qwen_config.enable_response_post_processing:
+        processed_response = qwen_optimizer.post_process_qwen_response(first_choice.message.content)
+    else:
+        processed_response = first_choice.message.content
 
     # Analyze document diversity in results
     doc_ids = set(chunk.get('doc_id') for chunk in relevant_chunks if chunk.get('doc_id'))
