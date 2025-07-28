@@ -173,6 +173,9 @@ async def handle_chat(
             query_type=chat_request.query_type or "general",
             enable_reranking=qwen_config.enable_reranking
         )
+        if not relevant_chunks:
+            logger.error("No relevant chunks found!")
+            raise HTTPException(status_code=500, detail="No relevant chunks found!")
         
         # Prepare messages for Qwen-2.5
         messages = [
