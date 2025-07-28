@@ -89,6 +89,7 @@ async def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         
     except Exception as e:
         logger.warning(f"Reranking failed, using original order: {e}")
+        raise HTTPException(status_code=500, detail="Reranking failed, using original order")
         return chunks
 
 
@@ -206,17 +207,17 @@ async def handle_chat(
         )
     except APIError as e:
         logger.error(f"Unexpected error during upload: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Unexpected error during upload")
 
     except Exception as e:
         logger.error(f"Unexpected error during upload: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Unexpected error during upload")
 
     if not response.choices:
         logger.error("No choices found in OpenAI response: %s", response)
         raise HTTPException(
             status_code=500,
-            detail="AI service returned no choices or an unexpected response format.",
+            detail="No choices found in OpenAI response",
         )
 
     first_choice = response.choices[0]
@@ -224,7 +225,7 @@ async def handle_chat(
         logger.error("Malformed choice in OpenAI response: %s", first_choice)
         raise HTTPException(
             status_code=500,
-            detail="AI service response choice is malformed or lacks content.",
+            detail="Malformed choice in OpenAI response",
         )
     
     # Post-process the response
