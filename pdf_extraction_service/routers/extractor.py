@@ -3,6 +3,7 @@ import logging
 import time
 from datetime import timedelta
 import io
+import json
 
 from models.extractor import ExtractResponse
 from shared_utils.s3_utils import (
@@ -67,11 +68,9 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
             else:
                 continue
             
-            pages = data.get("pages", {})
-            for page in pages.values():
-                image = page.get("image", {})
-                if isinstance(image, dict):
-                    image.pop("uri", None)
+        pages = data.get("pages", {})
+        for page in pages.values():
+            page.get("image", {}).pop("uri", None)
         
 
         job_data = {
@@ -93,6 +92,11 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
         }
 
         redis_image_sets[doc_id] = img_files
+        json_bytes = io.BytesIO(json.dumps(job_data).encode('utf-8'))
+        json_key = f"{doc_id}/original.json"
+        if not upload_fileobj(json_bytes, json_key, "application/json"):
+            raise IOError(f"Failed to upload original JSON to S3 for doc_id={doc_id}")
+
         save_job(doc_id = doc_id, 
                  job_data = job_data, 
                  status = "completed", 
