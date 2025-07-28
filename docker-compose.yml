@@ -7,6 +7,16 @@ services:
     env_file:
       - ./pdf_processor_service/.env
 
+  cleaner:
+      build:
+        context: .
+        dockerfile: ./cleaner/Dockerfile
+      container_name: cleaner
+      env_file:
+        - ./cleaner/.env
+      depends_on:
+        - redis
+        
   chat_service:
     build:
       context: .

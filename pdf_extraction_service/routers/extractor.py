@@ -1,6 +1,7 @@
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 import logging
 import time
+from datetime import timedelta
 import io
 import json
 
@@ -16,10 +17,11 @@ from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling.datamodel.accelerator_options import AcceleratorDevice, AcceleratorOptions
-
+from shared_utils.redis import RedisSetWithFlagExpiry
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 logger = logging.getLogger(__name__)
+redis_image_sets = RedisSetWithFlagExpiry(prefix="ImageFiles", flag_prefix="S3Key", default_expiry=timedelta(hours=1))
 
 def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
     start_time = time.time()
@@ -40,6 +42,7 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
         )
         result = converter.convert(presign_url)
         data = result.document.export_to_dict()
+        img_files = set()
 
         for ref in ['body', 'groups']:
             data.pop(ref, None)
@@ -55,6 +58,7 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
                 buffer.seek(0)
 
                 success = upload_fileobj(buffer, key, content_type="image/png")
+                img_files.add(key)
                 if not success:
                     logger.warning(detail=f"Failed to upload picture {pic_cnt} to S3")
 
@@ -87,6 +91,7 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
             }
         }
 
+        redis_image_sets[doc_id] = img_files
         json_bytes = io.BytesIO(json.dumps(job_data).encode('utf-8'))
         json_key = f"{doc_id}/original.json"
         if not upload_fileobj(json_bytes, json_key, "application/json"):
