@@ -102,15 +102,11 @@ async def vectorize_chromadb(chunk_data: List[Dict[str, Any]], config: Processin
     embedding_model = get_embedding_model(config.embedding_model)
 
     try:
-        try:
-            # Connect to ChromaDB AsyncHTTPClient instance and retrieve/create specified database collection
-            logger.info("Getting collection...")
-            chroma_client = await get_chroma_client()
-            collection = await chroma_client.get_or_create_collection(name=config.collection_name, embedding_function=embedding_model)
-            logger.info(f"Using existing collection: {config.collection_name}")
-        except Exception as e:
-            logger.error(f"Collection retrieval failed: {e}")
-            raise HTTPException(status_code=500, detail="Collection retrieval failed.")
+        # Connect to ChromaDB AsyncHTTPClient instance and retrieve/create specified database collection
+        logger.info("Getting collection...")
+        chroma_client = await get_chroma_client()
+        collection = await chroma_client.get_or_create_collection(name=config.collection_name, embedding_function=embedding_model)
+        logger.info(f"Using existing collection: {config.collection_name}")
 
         # Split each chunk based on 'chunk_id', 'content' and 'metadata' keys 
         # and append the values into 3 distinct lists to be embedded into ChromaDB
