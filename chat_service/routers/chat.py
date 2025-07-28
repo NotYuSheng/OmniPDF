@@ -175,7 +175,11 @@ async def handle_chat(
         )
         if not relevant_chunks:
             logger.error("No relevant chunks found!")
-            raise HTTPException(status_code=500, detail="No relevant chunks found!")
+            return ChatResponse(
+                response=user_prompt,
+                relevant_chunks=[],
+                metadata={}
+            )
         
         # Prepare messages for Qwen-2.5
         messages = [
