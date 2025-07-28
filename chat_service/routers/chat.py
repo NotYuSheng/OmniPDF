@@ -175,23 +175,22 @@ async def handle_chat(
         )
         
         # Prepare messages for Qwen-2.5
-        if relevant_chunks:
-            messages = [
-                {
-                    "role": "system",
-                    "content": system_prompt
-                },
-                {
-                    "role": "user", 
-                    "content": user_prompt
-                }
-            ]
+        messages = [
+            {
+                "role": "system",
+                "content": system_prompt
+            },
+            {
+                "role": "user", 
+                "content": user_prompt
+            }
+        ]
 
-            response = await client.chat.completions.create(
-                model=OPENAI_MODEL_NAME,
-                messages=messages,
-                **qwen_config.generation_params,
-            )
+        response = await client.chat.completions.create(
+            model=OPENAI_MODEL_NAME,
+            messages=messages,
+            **qwen_config.generation_params,
+        )
     except APIError as e:
         logger.error(f"Unexpected error during chat completion: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Unexpected error during chat completion")
