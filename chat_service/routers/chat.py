@@ -18,8 +18,7 @@ qwen_config = QwenRAGConfig()
 prompt_templates = QwenPromptTemplates()
 qwen_optimizer = QwenRAGOptimizer()
 
-_OPENAI_MODEL_DEFAULT = "qwen2.5-0.5b-instruct"
-OPENAI_MODEL_NAME = os.getenv("OPENAI_MODEL", _OPENAI_MODEL_DEFAULT)
+OPENAI_MODEL_NAME = qwen_config.model_name
 
 
 def prepare_retrieval_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:

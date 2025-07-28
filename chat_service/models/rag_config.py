@@ -3,12 +3,13 @@ import os
 FACTUAL_KEYWORDS = ['what is', 'when did', 'where is', 'who is', 'how many', 'list', 'define']
 ANALYTICAL_KEYWORDS = ['why', 'how does', 'analyze', 'compare', 'evaluate', 'assess', 'examine']
 SUMMARY_KEYWORDS = ['summarize', 'summary', 'overview', 'main points', 'key findings']
+_OPENAI_MODEL_DEFAULT = "qwen2.5-0.5b-instruct"
 
 class QwenRAGConfig:
     """Configuration class for Qwen-2.5 RAG optimization"""
     
     def __init__(self):
-        self.model_name = os.getenv("QWEN_MODEL", "qwen2.5-0.5b-instruct")
+        self.model_name = os.getenv("OPENAI_MODEL", _OPENAI_MODEL_DEFAULT)
         
         # Qwen-2.5 generation parameters optimized for RAG
         self.generation_params = {
