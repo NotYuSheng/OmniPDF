@@ -69,7 +69,6 @@ async def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         for doc_id in doc_chunks:
             doc_chunks[doc_id].sort(key=lambda x: x['similarity_score'], reverse=True)
         
-        logger.info(f"doc_chunks: {doc_chunks}")
         reranked_chunks = []
         
         # Determine the number of rounds based on the document with the most chunks
@@ -140,15 +139,12 @@ async def perform_rag_query(
             max_context_length=qwen_config.max_context_length
         )
 
-        logger.info(f"Optimized chunks: {optimized_chunks}")
-
         num_of_docs = len(set(chunk.get('doc_id') for chunk in optimized_chunks if chunk.get('doc_id')))
         logger.info(f"Relevant chunks from {num_of_docs} documents")
         logger.info(f"Using {len(optimized_chunks)} chunks for context (total length: {len(context)} chars)")
-        
-        logger.info(f"Query type: {query_type}")
 
         # Step 5: Auto-detect query type if not provided
+        logger.info(f"Query type: {query_type}")
         if qwen_config.enable_query_type_detection and query_type == "general":
                 query_type = qwen_optimizer.detect_query_type(query)
                 logger.info(f"Auto-detected query type: {query_type}")
@@ -206,12 +202,8 @@ async def handle_chat(
             **qwen_config.generation_params,
         )
     except APIError as e:
-        logger.error(f"Unexpected error during upload: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Unexpected error during upload")
-
-    except Exception as e:
-        logger.error(f"Unexpected error during upload: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Unexpected error during upload")
+        logger.error(f"Unexpected error during chat completion: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Unexpected error during chat completion")
 
     if not response.choices:
         logger.error("No choices found in OpenAI response: %s", response)
