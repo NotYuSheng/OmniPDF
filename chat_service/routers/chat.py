@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi.concurrency import run_in_threadpool
 from openai import OpenAI, APIError
 from typing import List, Dict, Any, Optional
 from shared_utils.openai_client import get_openai_client
@@ -188,8 +187,7 @@ async def handle_chat(
                 }
             ]
 
-            response = await run_in_threadpool(
-                client.chat.completions.create,
+            response = await client.chat.completions.create(
                 model=OPENAI_MODEL_NAME,
                 messages=messages,
                 **qwen_config.generation_params,
