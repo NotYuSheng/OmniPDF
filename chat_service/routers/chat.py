@@ -56,39 +56,34 @@ async def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Simple reranking based on document diversity and relevance
     """
-    try:
-        # Group chunks by doc_id
-        doc_chunks = {}
-        for chunk in chunks:
-            doc_id = chunk.get('doc_id', 'unknown')
-            if doc_id not in doc_chunks:
-                doc_chunks[doc_id] = []
-            doc_chunks[doc_id].append(chunk)
-        
-        # Sort chunks within each doc_id by similarity score
-        for doc_id in doc_chunks:
-            doc_chunks[doc_id].sort(key=lambda x: x['similarity_score'], reverse=True)
-        
-        reranked_chunks = []
-        
-        # Determine the number of rounds based on the document with the most chunks
-        if doc_chunks:
-            max_depth = max(len(chunks) for chunks in doc_chunks.values())
-        else:
-            max_depth = 0
+    # Group chunks by doc_id
+    doc_chunks = {}
+    for chunk in chunks:
+        doc_id = chunk.get('doc_id', 'unknown')
+        if doc_id not in doc_chunks:
+            doc_chunks[doc_id] = []
+        doc_chunks[doc_id].append(chunk)
+    
+    # Sort chunks within each doc_id by similarity score
+    for doc_id in doc_chunks:
+        doc_chunks[doc_id].sort(key=lambda x: x['similarity_score'], reverse=True)
+    
+    reranked_chunks = []
+    
+    # Determine the number of rounds based on the document with the most chunks
+    if doc_chunks:
+        max_depth = max(len(chunks) for chunks in doc_chunks.values())
+    else:
+        max_depth = 0
 
-        # Interleave by taking one chunk from each document per round to ensure diversity of sources
-        for i in range(max_depth):
-            for doc_id in doc_chunks:
-                if i < len(doc_chunks[doc_id]):
-                    reranked_chunks.append(doc_chunks[doc_id][i])
-        
-        logger.info(f"Reranked {len(chunks)} chunks from {len(doc_chunks)} documents")
-        return reranked_chunks
-        
-    except Exception as e:
-        logger.warning(f"Reranking failed, using original order: {e}")
-        raise HTTPException(status_code=500, detail="Reranking failed, using original order")
+    # Interleave by taking one chunk from each document per round to ensure diversity of sources
+    for i in range(max_depth):
+        for doc_id in doc_chunks:
+            if i < len(doc_chunks[doc_id]):
+                reranked_chunks.append(doc_chunks[doc_id][i])
+    
+    logger.info(f"Reranked {len(chunks)} chunks from {len(doc_chunks)} documents")
+    return reranked_chunks
 
 
 async def perform_rag_query(
