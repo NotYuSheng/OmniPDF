@@ -3,9 +3,7 @@ import logging
 import io
 import uuid
 import time
-import requests
 import httpx
-import fitz
 from PyPDF2 import PdfReader, PdfWriter
 from collections import defaultdict
 from fastapi import APIRouter, HTTPException, Body
