@@ -91,37 +91,14 @@ Your summarization strategy:
     def format_user_prompt(question: str, context: str, query_type: str) -> str:
         """Format user prompt with context and question"""
         
-        if query_type == "factual":
-            return f"""**DOCUMENT CONTEXT:**
-{context}
-
-**FACTUAL QUERY:** {question}
-
-**INSTRUCTIONS:** Extract and present only the factual information from the document that directly answers this question. Use exact quotes where appropriate and clearly indicate if the requested information is not available."""
-
-        elif query_type == "analytical":
-            return f"""**DOCUMENT CONTEXT:**
-{context}
-
-**ANALYTICAL QUERY:** {question}
-
-**INSTRUCTIONS:** Analyze the document context to provide a comprehensive answer. Consider relationships between different parts of the document and provide reasoned interpretations based on the evidence presented."""
-
-        elif query_type == "summarization":
-            return f"""**DOCUMENT CONTEXT:**
-{context}
-
-**SUMMARIZATION REQUEST:** {question}
-
-**INSTRUCTIONS:** Create a well-structured summary addressing the request. Organize the information logically and maintain the document's key insights and perspective."""
-
-        else:  # general
-            return f"""**DOCUMENT CONTEXT:**
-{context}
-
-**QUESTION:** {question}
-
-**INSTRUCTIONS:** Based on the document context provided above, give a comprehensive and accurate answer to the question. If the context doesn't contain sufficient information, clearly explain what information is missing."""
+        prompt_formats = {
+            "factual": f"""**DOCUMENT CONTEXT:**\n{context}\n\n**FACTUAL QUERY:** {question}\n\n**INSTRUCTIONS:** Extract and present only the factual information from the document that directly answers this question. Use exact quotes where appropriate and clearly indicate if the requested information is not available.""",
+            "analytical": f"""**DOCUMENT CONTEXT:**\n{context}\n\n**ANALYTICAL QUERY:** {question}\n\n**INSTRUCTIONS:** Analyze the document context to provide a comprehensive answer. Consider relationships between different parts of the document and provide reasoned interpretations based on the evidence presented.""",
+            "summarization": f"""**DOCUMENT CONTEXT:**\n{context}\n\n**SUMMARIZATION REQUEST:** {question}\n\n**INSTRUCTIONS:** Create a well-structured summary addressing the request. Organize the information logically and maintain the document's key insights and perspective.""",
+            "general": f"""**DOCUMENT CONTEXT:**\n{context}\n\n**QUESTION:** {question}\n\n**INSTRUCTIONS:** Based on the document context provided above, give a comprehensive and accurate answer to the question. If the context doesn't contain sufficient information, clearly explain what information is missing."""
+        }
+        
+        return prompt_formats.get(query_type, prompt_formats["general"])
 
 class QwenRAGOptimizer:
     """Advanced optimization techniques for Qwen-2.5 RAG"""
@@ -137,11 +114,11 @@ class QwenRAGOptimizer:
             return "factual"
         
         # Analytical indicators
-        if any(keyword in question_lower for keyword in ANALYTICAL_KEYWORDS):
+        elif any(keyword in question_lower for keyword in ANALYTICAL_KEYWORDS):
             return "analytical"
         
         # Summarization indicators
-        if any(keyword in question_lower for keyword in SUMMARY_KEYWORDS):
+        elif any(keyword in question_lower for keyword in SUMMARY_KEYWORDS):
             return "summarization"
         
         return "general"
