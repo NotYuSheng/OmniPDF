@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
 
 async def data_chunking(request:DataRequest) -> List[Dict[str, Any]]:
     """Perform chunking / splitting of data via Semantic Chunking using LangChain's SemanticChunker,
-    and reject by returning empty list if PDF document has no content"""
+    and reject by returning empty list if PDF document has no textual content"""
 
     logger.info("Starting chunking process...")
     chunker = get_chunking_model(request.config)
 
     try:
         if not request.text.strip():
-            raise HTTPException(status_code=400, detail="No text content found in PDF")
+            raise HTTPException(status_code=400, detail="No textual content found in PDF")
 
         # Create a Document object for textual data to be chunked
         doc = Document(page_content=request.text.strip())
@@ -91,8 +91,8 @@ async def data_chunking(request:DataRequest) -> List[Dict[str, Any]]:
         logger.info(chunk_data)
         return chunk_data
     except Exception as e:
-        logger.error(f"Semantic chunking failed: {e}")
-        raise HTTPException(status_code=500, detail="Data chunking failed.")
+        logger.error(f"Chunking failed: {e}")
+        raise HTTPException(status_code=500, detail="Chunking failed.")
 
 
 async def vectorize_chromadb(chunk_data: List[Dict[str, Any]], config: ProcessingConfig):
@@ -136,7 +136,7 @@ async def vectorize_chromadb(chunk_data: List[Dict[str, Any]], config: Processin
         }
 
     except Exception as e:
-        logger.error(f"Embedding process failed: {e}")
+        logger.error(f"Embedding failed: {e}")
         raise HTTPException(status_code=500, detail="Embedding failed")
 
 
