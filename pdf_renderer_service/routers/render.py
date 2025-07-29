@@ -4,10 +4,10 @@ import io
 import uuid
 import time
 import httpx
-from PyPDF2 import PdfReader, PdfWriter
 from collections import defaultdict
 from fastapi import APIRouter, HTTPException, Body
 from models.render import DocumentRendererResponse, AnnotationResponse
+from botocore.exceptions import ClientError
 
 from shared_utils.s3_utils import (
     upload_fileobj,
@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 
 @router.post("/{doc_id}")
 async def pdf_render(
-                doc_id: str,
                 doc_url: str,
                 json_data: AnnotationResponse = Body(...)
                 ):
@@ -32,10 +31,9 @@ async def pdf_render(
     content_length = pdf_response.headers.get("Content-Length")
     if content_length:
         size_bytes = int(content_length)
-        original_size = size_bytes / 1024 #in kb
     else:
         size_bytes = len(pdf_response.content)
-        original_size = size_bytes / 1024 #in kb
+    original_size = size_bytes / 1024
 
     json_data = json_data.model_dump()
     doc = pymupdf.open(stream=pdf_response.content, filetype="pdf")
@@ -94,8 +92,11 @@ async def pdf_render(
 
         data_lst = data.get(page.number + 1, [])
         for trans_data in data_lst:
-            trans_text = trans_data["translated_text"]
-            bbox = trans_data['bbox']
+            trans_text = trans_data.get("translated_text")
+            bbox = trans_data.get('bbox')
+            if not trans_text or not bbox:
+                continue
+
 
             coords = (bbox["l"], bbox["t"], bbox["r"], bbox["b"])
 
@@ -112,28 +113,16 @@ async def pdf_render(
                     logger.error(f"Converted Coords: {coords}")
                     logger.error(f"Page size: {page.rect}")
                     logger.exception(e)
-                    raise e
+                    raise
             else:
                 page.insert_htmlbox(coords, "Error")
 
-    original_buffer = io.BytesIO()
+    buffer = io.BytesIO()
     doc.subset_fonts()
-    doc.save(original_buffer, garbage=4, deflate=True, clean=True)
-    original_buffer.seek(0)
+    doc.save(buffer, garbage=4, deflate=True, clean=True)
+    buffer.seek(0)
 
-    compressed_buffer = io.BytesIO()
-
-    reader = PdfReader(original_buffer)
-    writer = PdfWriter()
-
-    for page in reader.pages:
-        writer.add_page(page)
-
-    compressed_buffer = io.BytesIO()
-    writer.write(compressed_buffer)
-    compressed_buffer.seek(0)
-
-    file_size = len(compressed_buffer.getvalue())
+    file_size = len(buffer.getvalue())
 
     rendered_size = file_size / 1024
 
@@ -149,16 +138,25 @@ async def pdf_render(
 
     try:
         success = upload_fileobj(
-            compressed_buffer, key, content_type="application/pdf"
+            buffer, key, content_type="application/pdf"
         )
         if not success:
             raise HTTPException(status_code=500, detail="Failed to upload file to S3")
 
         presigned_url = generate_presigned_url(key)
 
+    except ClientError as e:
+        code = e.response.get("Error", {}).get("Code", "Unknown")
+        logger.error(f"S3 ClientError {code}", exc_info=True)
+        raise HTTPException(
+            status_code=502,
+            detail=f"S3 service error ({code})"
+        )
+
     except Exception as e:
         logger.error(f"Unexpected error during upload: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
+
     
     return(DocumentRendererResponse(doc_id=new_doc_id,
                                     filename=key,
