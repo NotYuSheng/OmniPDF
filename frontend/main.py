@@ -31,6 +31,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+status_placeholder = st.empty()  # Placeholder for status updates
+if "processed_data" not in st.session_state:
+    st.session_state.processed_data = None
 
 # Backend
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000")
@@ -83,11 +86,14 @@ def process_pdf(uploaded_file):
         doc_id = upload_data["doc_id"]
         filename = upload_data["filename"]
         download_url = upload_data["download_url"]
-        
-        st.text(f"Document uploaded successfully: {filename}")
-        st.text(f"Document ID: {doc_id}")
-        st.text(f"Download URL: {download_url}")
-
+        st.session_state.processed_data = {
+            "doc_id": doc_id,
+            "filename": filename,
+            "download_url": download_url
+        }
+        status_placeholder.write(f"Document uploaded successfully: {filename}")  
+        logger.info(f"Processed data: {st.session_state.processed_data}")
+        st.rerun()
 
         # Return processed data
         # return {
@@ -154,36 +160,7 @@ def process_pdf(uploaded_file):
     #     }
     # }
     # Step 2: Extract images
-    try:
-        # get pdf status
-        async def get_doc_status(doc_id):
-            data = {
-                "doc_id":doc_id,
-            }
-            async with httpx.AsyncClient() as client:
-                response = await client.get(f"{PDF_PROCESSOR_URL}/documents/", params=data)
-                st.text(f"Document status: {response}")
-                if response.status_code == 200:
-                    status_placeholder.text(f"Document processing completed successfully. {response.json()}")
-                    return response.json()  # Job done, return result
-                
-                elif response.status_code == 202:
-                    await asyncio.sleep(1)  # Job not done, wait and retry
-
-        try:
-            status_result = asyncio.run(get_doc_status(doc_id))
-            status_placeholder = st.empty()  # Clear the placeholder
-            status_placeholder.text(f"Document status: {status_result}")
-        except Exception as e:
-            status_placeholder.error(f"Error getting document status: {e}")
-
-        if st.processed_docs.status_code == 200:
-            results = st.processed_docs.json()
-        elif st.processed_docs.status_code == 202:
-            st.info("Images are still being processed. Please check back later.")
-    except Exception as e:
-        st.warning(f"Could not process images: {e}")
-
+  
 def generate_wordcloud(text_data):
     """Generate word cloud from text data"""
     wordcloud = WordCloud(
@@ -230,8 +207,8 @@ def upload_pdf_UI():
             with st.spinner("Processing PDF..."):
                 # st.text(uploaded_file)
                 st.session_state.processed_data = process_pdf(uploaded_file)
-            st.success("Processing completed!")
-            st.rerun()
+                st.success("Processing completed!")
+                st.rerun()
 
 def start_chat_UI():
     st.header("Chat")
@@ -318,42 +295,101 @@ def translate_UI():
 
 def extract_images_UI():
     st.write("🖼️ Image Extraction")
+       
+    async def get_images(doc_id, max_retries=60, delay=1):
+        for attempt in range(max_retries):
+            async with httpx.AsyncClient() as client:
+                try:
+                    response = await client.get(f"{PDF_PROCESSOR_URL}/images/{doc_id}")
+                    logger.info(f"Image extraction response status: {response.status_code}")
+                    logger.info(f"Image extraction response: {response.text}")
+                   
+                    if response.status_code == 200:
+                        return response.json()  # Success - return the actual data
+                    elif response.status_code == 202:
+                        # Still processing, continue polling
+                        if attempt < max_retries - 1:
+                            st.info(f"Document still processing... (attempt {attempt + 1}/{max_retries})")
+                            await asyncio.sleep(delay)
+                            continue
+                        else:
+                            raise TimeoutError("Document processing timed out after maximum retries")
+                    else:
+                        # Handle other HTTP errors
+                        logger.error(f"HTTP error {response.status_code}: {response.text}")
+                        response.raise_for_status()
+                       
+                except httpx.RequestError as e:
+                    logger.error(f"Request error on attempt {attempt + 1}: {e}")
+                    if attempt == max_retries - 1:
+                        raise
+                    await asyncio.sleep(delay)
+       
+        raise TimeoutError("Max retries exceeded")
+   
     if "processed_data" in st.session_state and st.session_state.processed_data:
-        data = st.session_state.processed_data
-        if data.get('images'):
-            for i, img_data in enumerate(data['images']):
-                with st.container():
-                    st.markdown(f'<div class="image-container">', unsafe_allow_html=True)
-                    
-                    col1, col2 = st.columns([1, 2])
-                    
-                    with col1:
-                        # Display actual image from URL
-                        try:
-                            st.image(
-                                img_data['url'],
-                                caption=f"Image {i+1}",
-                                use_column_width=True
-                            )
-                        except Exception as e:
-                            # Fallback to placeholder if image loading fails
-                            # st.image(
-                            #     "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Image+{}".format(i+1),
-                            #     caption=f"Image {i+1} (placeholder)",
-                            #     use_column_width=True
-                            # )
-                            st.error(f"Error loading image: {e}")
-                    
-                    with col2:
-                        st.markdown(f"**Image Key:** {img_data['image_key']}")
-                        st.markdown(f"**Image ID:** IMG_{i+1:03d}")
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            st.info("No images found in the document")
-    else:
-        st.info("Please upload and process a PDF first")
+        doc_id = st.session_state.processed_data["doc_id"]
+        
+        try:
+            # Show loading message
+            with st.spinner("Extracting images from document..."):
+                image_data = asyncio.run(get_images(doc_id=doc_id))
+            
+            logger.info(f"Image data received: {image_data}")
+            logger.info(f"[Cookie] Image data: {image_data.cookies}")
 
+            
+            # Check if we have images in the response
+            if "images" in image_data and image_data["images"]:
+                st.success(f"Found {len(image_data['images'])} images in the document")
+                
+                # if "cookies" not in st.session_state:
+                #     st.session_state.cookies = image_data.get("cookies", {})
+
+                # Display each image
+                for i, (img_key, img_url) in enumerate(image_data["images"]):
+                    with st.container():
+                        st.markdown(f'<div class="image-container">', unsafe_allow_html=True)
+                       
+                        col1, col2 = st.columns([1, 2])
+                        
+                        with col1:
+                            # Display actual image from URL
+                            try:
+                                st.image(
+                                    img_url,
+                                    caption=f"Image {i+1} (from {img_key})",
+                                    use_column_width=True
+                                )
+                            except Exception as e:
+                                logger.error(f"Error loading image {i+1}: {e}")
+                                st.error(f"Error loading image {i+1}: {e}")
+                       
+                        with col2:
+                            st.markdown(f"**Image Key:** {img_key}")
+                            st.markdown(f"**Image ID:** IMG_{i+1:03d}")
+                            st.markdown(f"**Image URL:** {img_url}")
+                       
+                        st.markdown('</div>', unsafe_allow_html=True)
+                        st.divider()  # Add separator between images
+            else:
+                st.info("No images found in the document")
+                
+        except TimeoutError as e:
+            st.error(f"Timeout error: {e}")
+            st.info("The document is taking longer than expected to process. Please try again later.")
+            
+        except httpx.RequestError as e:
+            st.error(f"Network error: {e}")
+            st.info("There was a problem connecting to the server. Please check your connection and try again.")
+            
+        except Exception as e:
+            logger.error(f"Unexpected error in image extraction: {e}")
+            st.error(f"An unexpected error occurred: {e}")
+            
+    else:
+        st.info("Please upload and process a PDF first to extract images")
+        
 def extract_tables_UI():
     st.write("📋 Extract Tables")
     if 'tables' not in st.session_state:
@@ -564,7 +600,6 @@ def main():
             start_chat_UI()
         elif selected_key == "upload":
             upload_pdf_UI()
-        global status_placeholder
         status_placeholder = st.empty()
         status_placeholder.text("Waiting for document upload...")
         
