@@ -22,10 +22,8 @@ async def dump_files(
 
     try:
         key = f"{doc_id}/{json_name}.json"
-        file_content = await json_file.read()
-        file_like = io.BytesIO(file_content)
-
-        upload_fileobj(file_like, key, "application/json")
+        await json_file.seek(0)
+        upload_fileobj(json_file.file, key, "application/json")
         logger.info(f"✅ Uploaded {key} to S3")
 
         return BypassResponse(

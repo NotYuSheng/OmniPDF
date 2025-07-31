@@ -55,48 +55,27 @@ async def pdf_render(
                     "bbox": bbox
                 })
 
-    ### This section is supposed to handle table rendering but has been excluded due to autoscaling issues
-    
-    tables = json_data.get("docling", {}).get("tables", [])
-
-    for table in tables:
-        table_cells = table.get("data", {}).get("table_cells", [])
-        prov_list   = table.get("prov", [])
-        if not prov_list:
-            continue
-
-        page_no = table.get("prov", [])[0].get("page_no")
-
-        for cell in table_cells:
-            translated = cell.get("translated_text")
-            bbox = cell.get("bbox")
-
-            if page_no is not None and bbox:
-                trans_text_data[page_no].append({
-                    "translated_text": translated,
-                    "bbox": bbox
-                })
-
-    data = dict(trans_text_data)
+    logger.info(f"Text data: \n{trans_text_data}")
 
     for page in doc:
         logger.info(f"{page.number}\n") 
-        blocks = page.get_text("blocks") 
-        for block in blocks:
-            rect = block[:4] 
-            page.add_redact_annot(rect)
-
+        for cell in trans_text_data.get(page.number + 1, []):
+            bbox = cell.get('bbox')
+            rect_bbox = pymupdf.Rect(bbox["l"],
+                                bbox["t"],
+                                bbox["r"],
+                                bbox["b"]
+                            )
+            page.add_redact_annot(rect_bbox)
         page.apply_redactions()
         page.clean_contents()
 
-
-        data_lst = data.get(page.number + 1, [])
+        data_lst = trans_text_data.get(page.number + 1, [])
         for trans_data in data_lst:
             trans_text = trans_data.get("translated_text")
             bbox = trans_data.get('bbox')
             if not trans_text or not bbox:
                 continue
-
 
             coords = (bbox["l"], bbox["t"], bbox["r"], bbox["b"])
 
@@ -157,7 +136,6 @@ async def pdf_render(
         logger.error(f"Unexpected error during upload: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
 
-    
     return(DocumentRendererResponse(doc_id=new_doc_id,
                                     filename=key,
                                     download_url=presigned_url,

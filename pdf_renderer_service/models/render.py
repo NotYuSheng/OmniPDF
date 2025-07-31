@@ -24,3 +24,4 @@ class AnnotationResponse(BaseModel):
     docling: Optional[DoclingTranslationResponse] = None
     source_lang: str
     target_lang: str
+    
