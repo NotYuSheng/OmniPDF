@@ -262,5 +262,3 @@ if __name__ == "__main__":
                               translate_UI,
                               settings_UI])
     pg.run()
-
-    st.sidebar = st
