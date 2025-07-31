@@ -2,8 +2,6 @@ from fastapi import APIRouter, File, UploadFile, HTTPException
 import logging
 from typing import Literal
 from models.bypass import BypassResponse
-import io
-
 
 from shared_utils.s3_utils import (
     upload_fileobj,
