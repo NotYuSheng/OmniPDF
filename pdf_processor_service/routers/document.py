@@ -57,6 +57,7 @@ async def upload_document(
 
     append_doc(doc_id)
     presigned_url = get_external_minio_uri(presigned_url)
+
     return DocumentUploadResponse(
         doc_id=doc_id, filename=key, download_url=presigned_url
     )
