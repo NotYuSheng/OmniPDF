@@ -3,5 +3,6 @@ uvicorn==0.34.3
 boto3==1.38.34
 python-multipart==0.0.20
 docling==2.36.1
+redis==6.2.0
 pymupdf==1.26.1
 pypdf==5.6.0
