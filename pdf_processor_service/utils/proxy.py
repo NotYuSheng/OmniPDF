@@ -10,17 +10,9 @@ from shared_utils.s3_utils import load_job, generate_presigned_url
 logger = logging.getLogger(__name__)
 
 S3_ENDPOINT = os.getenv("MINIO_ENDPOINT", "http://minio:9000")  # MinIO-compatible
-EXTERNAL_S3_ENDPOINT = os.getenv("EXTERNAL_S3_ENDPOINT")
-if not EXTERNAL_S3_ENDPOINT:
-    raise ValueError("EXTERNAL_S3_ENDPOINT is not set")
 EXTRACTION_URL = os.getenv("EXTRACTION_URL")
 if not EXTRACTION_URL:
     raise ValueError("EXTRACTION_URL is not set")
-
-
-def get_external_minio_uri(uri: str):
-    new_uri = uri.replace(S3_ENDPOINT, EXTERNAL_S3_ENDPOINT)
-    return new_uri
 
 
 async def proxy_post(url: str, body: dict):
@@ -59,5 +51,5 @@ async def load_or_create_job(doc_id: str) -> dict | Response:
             status_code=202,
             detail="The document is still being processed. Please try again later.",
         )
-    
+
     return job

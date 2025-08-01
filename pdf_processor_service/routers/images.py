@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, Response
 
 from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_job, get_external_minio_uri
-from shared_utils.s3_utils import s3_client, S3_BUCKET, generate_presigned_url
+from utils.proxy import load_or_create_job
+from shared_utils.s3_utils import s3_client, S3_BUCKET, generate_external_presigned_url
 
 router = APIRouter(prefix="/images", tags=["images"])
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ async def get_pdf_images(
     keys = [obj['Key'] for page in pages for obj in page.get('Contents', [])]
     
     for key in keys:
-        url = generate_presigned_url(key)
-        url_list.append(ImageData(image_key=key, url=get_external_minio_uri(url)))
+        url = generate_external_presigned_url(key)
+        url_list.append(ImageData(image_key=key, url=url))
 
     return ImageResponse(doc_id=doc_id, filename=f"{doc_id}.pdf", images=url_list)
