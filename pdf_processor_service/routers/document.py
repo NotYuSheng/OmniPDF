@@ -62,7 +62,7 @@ async def upload_document(
 
 @router.get("/{doc_id}", response_model=DocumentUploadResponse)
 async def get_document(
-    doc_id: str, valid_request: bool = Depends(validate_session_doc_pair)
+    doc_id: str, _validated: bool = Depends(validate_session_doc_pair)
 ):
     key = f"{doc_id}/original.pdf"
 
@@ -83,7 +83,7 @@ async def get_document(
 @router.delete("/{doc_id}", status_code=204)
 async def delete_document(
     doc_id: str,
-    valid_request: bool = Depends(validate_session_doc_pair),
+    _validated: bool = Depends(validate_session_doc_pair),
     remove_doc=Depends(get_doc_list_remove_function),
 ):
     key = f"{doc_id}/original.pdf"

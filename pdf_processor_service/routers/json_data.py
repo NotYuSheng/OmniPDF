@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 @router.get("/{doc_id}", status_code=200)
 async def get_json(doc_id: str,
                   json_name: str,
-                  valid_request: bool = Depends(validate_session_doc_pair)
+                  _validated: bool = Depends(validate_session_doc_pair)
                   ):
 
     key = f"{doc_id}/{json_name}.json"
