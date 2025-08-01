@@ -62,7 +62,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
         """
         # Display the image using custom HTML
         html(html_code, height=600)
-        st.pyplot(fig)
     else:
         st.info("No keywords available for word cloud generation")
 else:
