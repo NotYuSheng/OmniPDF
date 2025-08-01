@@ -62,14 +62,17 @@ def process_pdf(uploaded_file):
             logger.info(f"Set-Cookie: {set_cookie}")
             st.session_state.set_cookie = set_cookie
 
+        return upload_response
 
     except requests.exceptions.ConnectionError as e:
         st.error("Could not connect to PDF processor service. Please check if the service is running.")
         logger.error(f"Error processing PDF: {e}")
-    
+        return None
+
     except Exception as e:
         st.error(f"Error processing PDF: {e}")
         logger.error(f"Error processing PDF: {e}")
+        return None
 
 st.markdown('<h1 class="main-header">🦸 OmniPDF</h1>', unsafe_allow_html=True)
 st.header("📁 Upload PDF")
