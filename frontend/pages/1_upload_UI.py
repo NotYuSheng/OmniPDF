@@ -58,7 +58,7 @@ def process_pdf(uploaded_file):
         # Check Set-Cookie header
         set_cookie = upload_response.headers.get('Set-Cookie')
         if set_cookie:
-            print(f"Set-Cookie: {set_cookie}")
+            logger.info(f"Set-Cookie: {set_cookie}")
             logger.info(f"Set-Cookie: {set_cookie}")
             st.session_state.set_cookie = set_cookie
 
