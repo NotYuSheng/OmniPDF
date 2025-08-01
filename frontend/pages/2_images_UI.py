@@ -50,9 +50,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
         with st.spinner("Extracting images from document..."):
             image_data = asyncio.run(get_images(doc_id=doc_id))
         
-        logger.info(f"Image data received: {image_data}")
-        logger.info(f"[Cookie] Image data: {image_data.cookies}")
-
         
         # Check if we have images in the response
         if "images" in image_data and image_data["images"]:
