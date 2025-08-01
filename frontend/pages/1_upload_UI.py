@@ -1,14 +1,16 @@
-import streamlit as st
+import asyncio
 import logging
-import requests
 import time
 import os
+import httpx
+
+import streamlit as st
 
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def process_pdf(uploaded_file):
+async def process_pdf(uploaded_file):
     """
     Placeholder function for PDF processing
     In real implementation, this would call your backend API
@@ -39,10 +41,13 @@ def process_pdf(uploaded_file):
         files = {'file': (uploaded_file.name, 
                                   bytes_data, 
                                   'application/pdf')}
-        upload_response = requests.post(
-            url=f"{PDF_PROCESSOR_URL}/documents/",
-            files=files,
-            )
+        async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
+            upload_response = await client.post(f"{PDF_PROCESSOR_URL}/documents/", files=files)
+            st.session_state.httpx_cookies = upload_response.cookies
+        # upload_response = requests.post(
+        #     url=f"{PDF_PROCESSOR_URL}/documents/",
+        #     files=files,
+        #     )
         logger.info(f"Upload PDF response: {upload_response.text}")   
                 
         upload_data = upload_response.json()
@@ -56,18 +61,18 @@ def process_pdf(uploaded_file):
         }
 
         # Check Set-Cookie header
-        set_cookie = upload_response.headers.get('Set-Cookie')
-        if set_cookie:
-            logger.info(f"Set-Cookie: {set_cookie}")
-            logger.info(f"Set-Cookie: {set_cookie}")
-            st.session_state.set_cookie = set_cookie
+        # set_cookie = upload_response.headers.get('Set-Cookie')
+        # if set_cookie:
+        #     logger.info(f"Set-Cookie: {set_cookie}")
+        #     logger.info(f"Set-Cookie: {set_cookie}")
+        #     st.session_state.set_cookie = set_cookie
 
         return upload_response
 
-    except requests.exceptions.ConnectionError as e:
-        st.error("Could not connect to PDF processor service. Please check if the service is running.")
-        logger.error(f"Error processing PDF: {e}")
-        return None
+    # except requests.exceptions.ConnectionError as e:
+    #     st.error("Could not connect to PDF processor service. Please check if the service is running.")
+    #     logger.error(f"Error processing PDF: {e}")
+    #     return None
 
     except Exception as e:
         st.error(f"Error processing PDF: {e}")
@@ -98,7 +103,7 @@ if uploaded_file is not None:
     
     if st.button("🚀 Process PDF", type="primary"):
         with st.spinner("Processing PDF..."):
-            st.session_state.processed_data = process_pdf(uploaded_file)
+            asyncio.run(process_pdf(uploaded_file))
             st.success("Processing completed!")
             st.rerun()
     

@@ -61,7 +61,7 @@ async def check_backend():
     async def check_service(service_name, url):
         health_url = f"{url}/health"
         try:
-            async with httpx.AsyncClient(timeout=5) as client:
+            async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
                 response = await client.get(health_url)
                 import logging
 

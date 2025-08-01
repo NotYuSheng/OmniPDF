@@ -13,7 +13,7 @@ st.write("🖼️ Image Extraction")
        
 async def get_images(doc_id, max_retries=60, delay=1):
     for attempt in range(max_retries):
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
             try:
                 response = await client.get(f"{PDF_PROCESSOR_URL}/images/{doc_id}")
                 logger.info(f"Image extraction response status: {response.status_code}")

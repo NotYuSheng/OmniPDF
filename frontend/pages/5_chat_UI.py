@@ -41,7 +41,7 @@ with chat_container:
         Simulate a RAG response for the given prompt.
         Replace this with actual RAG implementation.
         """
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
             response = await client.get(f"{CHAT_URL}/documents/")
             if response.status_code == 200:
                 return response.json()  # Job done, return result

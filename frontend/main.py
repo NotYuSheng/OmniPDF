@@ -3,6 +3,8 @@ import logging
 import json
 import os
 
+from httpx import Cookies
+
 # Logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,6 +20,8 @@ status_placeholder = st.empty()  # Placeholder for status updates
 if "processed_data" not in st.session_state:
     st.session_state.processed_data = None
 
+if "httpx_cookies" not in st.session_state:
+    st.session_state.httpx_cookies = Cookies()
 # Backend
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000")
 CHAT_URL = os.getenv("CHAT_URL", "http://chat_service:8000")
