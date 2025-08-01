@@ -63,13 +63,7 @@ async def check_backend():
         try:
             async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
                 response = await client.get(health_url)
-                import logging
 
-                # Set up logging at the top of your file
-                logging.basicConfig(level=logging.INFO)
-                logger = logging.getLogger(__name__)
-
-                # In your async function
                 if response.status_code == 200:
                     logger.info(f'{service_name}, "status": {response.text}, "url": {url}')
                     return service_name, {"status": "Healthy", "url": url}
