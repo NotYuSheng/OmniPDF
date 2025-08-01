@@ -2,9 +2,13 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import os
 import streamlit as st
+import logging
 import httpx
 import asyncio
 import base64
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Check if the uploaded file is a valid PDF by checking the magic number
 def is_pdf(file_obj):

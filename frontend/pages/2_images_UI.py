@@ -61,7 +61,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
             # Display each image
             for i, (img_key, img_url) in enumerate(image_data["images"]):
                 with st.container():
-                    st.markdown(f'<div class="image-container">', unsafe_allow_html=True)
+                    st.markdown('<div class="image-container">', unsafe_allow_html=True)
                     
                     col1, col2 = st.columns([1, 2])
                     

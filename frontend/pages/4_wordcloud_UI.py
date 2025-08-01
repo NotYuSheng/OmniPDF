@@ -1,8 +1,12 @@
 import streamlit as st
+import logging
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from streamlit.components.v1 import html
 import base64
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def generate_wordcloud(text_data):
     """Generate word cloud from text data"""

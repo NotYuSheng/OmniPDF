@@ -1,9 +1,12 @@
 import streamlit as st
+import logging
 import asyncio
 import httpx
 import os
 
 CHAT_URL = os.getenv("CHAT_URL", "http://chat_service:8000")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 st.header("Chat")
 st.markdown("💬 Ask questions about the document content")
