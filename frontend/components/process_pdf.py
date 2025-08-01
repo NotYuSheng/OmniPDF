@@ -1,7 +1,6 @@
 from wordcloud import WordCloud
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import os
-import requests
 import streamlit as st
 import httpx
 import asyncio
