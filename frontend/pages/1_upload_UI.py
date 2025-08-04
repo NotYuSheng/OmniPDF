@@ -59,6 +59,7 @@ async def process_pdf(uploaded_file):
             "filename": filename,
             "download_url": download_url
         }
+        status_text.success(f"PDF uploaded successfully! Document ID: {doc_id}")
 
         # Check Set-Cookie header
         # set_cookie = upload_response.headers.get('Set-Cookie')
@@ -67,17 +68,14 @@ async def process_pdf(uploaded_file):
         #     logger.info(f"Set-Cookie: {set_cookie}")
         #     st.session_state.set_cookie = set_cookie
 
-        return upload_response
 
     # except requests.exceptions.ConnectionError as e:
     #     st.error("Could not connect to PDF processor service. Please check if the service is running.")
     #     logger.error(f"Error processing PDF: {e}")
-    #     return None
 
     except Exception as e:
         st.error(f"Error processing PDF: {e}")
         logger.error(f"Error processing PDF: {e}")
-        return None
 
 st.markdown('<h1 class="main-header">🦸 OmniPDF</h1>', unsafe_allow_html=True)
 st.header("📁 Upload PDF")
@@ -104,5 +102,21 @@ if uploaded_file is not None:
     if st.button("🚀 Process PDF", type="primary"):
         with st.spinner("Processing PDF..."):
             asyncio.run(process_pdf(uploaded_file))
-    
-    # Display Metadata here
+            
+    # Always show metadata if available
+    if "processed_data" in st.session_state:
+        st.subheader("File Metadata")
+        st.markdown(f"**Filename:** {uploaded_file.name}")
+        size_unit = st.selectbox("File Size Unit", ["MB", "KB", "B"], index=0)
+        if size_unit == "MB":
+            size_val = uploaded_file.size / (1024 * 1024)
+            size_str = f"{size_val:.2f} MB"
+        elif size_unit == "KB":
+            size_val = uploaded_file.size / 1024
+            size_str = f"{size_val:.2f} KB"
+        else:
+            size_val = uploaded_file.size
+            size_str = f"{size_val} B"
+        st.markdown(f"**Size:** {size_str}")
+        st.markdown(f"**Document ID:** {uploaded_file["processed_data"]["doc_id"]}")
+        st.markdown(f"**Download URL:** {uploaded_file["processed_data"]["download_url"]}")
