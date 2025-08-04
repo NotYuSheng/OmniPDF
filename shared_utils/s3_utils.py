@@ -8,6 +8,8 @@ from pydantic import BaseModel
 import json
 from io import BytesIO
 
+from shared_utils.redis import RedisSimpleFileFlag
+
 logger = logging.getLogger(__name__)
 
 # Load from environment
@@ -23,9 +25,10 @@ s3_client = boto3.client(
     "s3",
     endpoint_url=S3_ENDPOINT,
     aws_access_key_id=S3_ACCESS_KEY,
-    aws_secret_access_key=S3_SECRET_KEY,
+    aws_secret_access_key=S3_SECRET_KEY,message.content.strip().lower()
     region_name=REGION_NAME,
 )
+redis_flag_store = RedisSimpleFileFlag()
 
 
 def upload_fileobj(file_obj, key: str, content_type: str = "application/pdf") -> bool:
@@ -110,10 +113,12 @@ def save_job(
             "data": payload,
         }
         file_obj = BytesIO(json.dumps(wrapped).encode("utf-8"))
+        
+        redis_flag_store.set(f"jobs/{job_type}/{doc_id}.json")
         return upload_fileobj(
-            file_obj,
-            key=f"jobs/{job_type}/{doc_id}.json",
-            content_type="application/json",
+            file_obj, 
+            key=f"jobs/{job_type}/{doc_id}.json", 
+            content_type="application/json"
         )
     except Exception as e:
         logger.exception(f"Failed to save job for doc_id: {doc_id} - {e}")
@@ -128,6 +133,7 @@ def load_job(doc_id: str, job_type: str) -> Optional[dict]:
         key = f"jobs/{job_type}/{doc_id}.json"
         response = s3_client.get_object(Bucket=S3_BUCKET, Key=key)
         job = json.loads(response["Body"].read().decode("utf-8"))
+        redis_flag_store.set(f"jobs/{job_type}/{doc_id}.json")
         return {
             "doc_id": doc_id,
             "status": job.get("status", "unknown"),
