@@ -5,6 +5,6 @@ from components.process_pdf import display_backend_status
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-st.write("📄 Settings")
+st.header("📄 Settings")
 
 display_backend_status()

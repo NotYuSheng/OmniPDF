@@ -23,7 +23,7 @@ def generate_wordcloud(text_data):
     return fig
 
 
-st.write("☁️ Word Cloud")
+st.header("☁️ Word Cloud")
 if 'metadata' not in st.session_state:
     st.info("No metadata found in the document.")
 if "processed_data" in st.session_state and st.session_state.processed_data:

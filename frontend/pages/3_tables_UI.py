@@ -6,7 +6,7 @@ from io import StringIO
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-st.write("📋 Extract Tables")
+st.header("📋 Extract Tables")
 
 if 'tables' not in st.session_state:
     st.info("No tables found in the document.")
