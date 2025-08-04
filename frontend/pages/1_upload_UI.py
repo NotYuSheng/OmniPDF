@@ -104,7 +104,5 @@ if uploaded_file is not None:
     if st.button("🚀 Process PDF", type="primary"):
         with st.spinner("Processing PDF..."):
             asyncio.run(process_pdf(uploaded_file))
-            st.success("Processing completed!")
-            st.rerun()
     
     # Display Metadata here
