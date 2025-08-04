@@ -104,7 +104,7 @@ if uploaded_file is not None:
             asyncio.run(process_pdf(uploaded_file))
             
     # Always show metadata if available
-    if "processed_data" in st.session_state:
+    if "processed_data" in uploaded_file:
         st.subheader("File Metadata")
         st.markdown(f"**Filename:** {uploaded_file.name}")
         size_unit = st.selectbox("File Size Unit", ["MB", "KB", "B"], index=0)
