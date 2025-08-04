@@ -103,20 +103,3 @@ if uploaded_file is not None:
         with st.spinner("Processing PDF..."):
             asyncio.run(process_pdf(uploaded_file))
             
-    # Always show metadata if available
-    if "processed_data" in uploaded_file:
-        st.subheader("File Metadata")
-        st.markdown(f"**Filename:** {uploaded_file.name}")
-        size_unit = st.selectbox("File Size Unit", ["MB", "KB", "B"], index=0)
-        if size_unit == "MB":
-            size_val = uploaded_file.size / (1024 * 1024)
-            size_str = f"{size_val:.2f} MB"
-        elif size_unit == "KB":
-            size_val = uploaded_file.size / 1024
-            size_str = f"{size_val:.2f} KB"
-        else:
-            size_val = uploaded_file.size
-            size_str = f"{size_val} B"
-        st.markdown(f"**Size:** {size_str}")
-        st.markdown(f"**Document ID:** {uploaded_file["processed_data"]["doc_id"]}")
-        st.markdown(f"**Download URL:** {uploaded_file["processed_data"]["download_url"]}")
