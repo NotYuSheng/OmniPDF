@@ -9,23 +9,34 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-st.write("🖼️ Image Extraction")
-       
 st.header("🖼️ Image Extraction")
+image_status = st.empty()
+server_status = st.empty()
+
 async def get_images(doc_id, max_retries=60, delay=1):
     for attempt in range(max_retries):
         async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
             try:
                 response = await client.get(f"{PDF_PROCESSOR_URL}/images/{doc_id}")
                 logger.info(f"Image extraction response status: {response.status_code}")
-                logger.info(f"Image extraction response: {response.text}")
+                if "detail" in response.json():
+                    server_status.info(response.json()["detail"])
+                    logger.info(f"Info details: {response.json()['detail']}")
+                else:
+                    server_status.info(f"Response: {response.text}")
+                    logger.info(f"Image extraction response: {response}")
                 
                 if response.status_code == 200:
                     return response.json()  # Success - return the actual data
                 elif response.status_code == 202:
                     # Still processing, continue polling
                     if attempt < max_retries - 1:
-                        st.info(f"Document still processing... (attempt {attempt + 1}/{max_retries})")
+                        image_status.info(f"Document still processing... (attempt {attempt + 1}/{max_retries})")
+                        if "detail" in response.json():
+                            server_status.info(response.json()["detail"])
+                        else:
+                            if len(response.json()) > 100:
+                                server_status.info(response.text[50:])
                         await asyncio.sleep(delay)
                         continue
                     else:
@@ -54,7 +65,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
         
         # Check if we have images in the response
         if "images" in image_data and image_data["images"]:
-            st.success(f"Found {len(image_data['images'])} images in the document")
+            image_status.success(f"Found {len(image_data['images'])} images in the document")
             
             # if "cookies" not in st.session_state:
             #     st.session_state.cookies = image_data.get("cookies", {})
@@ -71,17 +82,17 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         try:
                             st.image(
                                 img_url,
-                                caption=f"Image {i+1} (from {img_key})",
-                                use_column_width=True
+                                caption=f"Image {i+1} (from {img_key['image_key']})",
+                                use_container_width =True
                             )
                         except Exception as e:
                             logger.error(f"Error loading image {i+1}: {e}")
                             st.error(f"Error loading image {i+1}: {e}")
                     
                     with col2:
-                        st.markdown(f"**Image Key:** {img_key}")
+                        st.markdown(f"**Image Key:** {img_key['image_key']}")
                         st.markdown(f"**Image ID:** IMG_{i+1:03d}")
-                        st.markdown(f"**Image URL:** {img_url}")
+                        st.markdown(f"**Image URL:** {img_url['url']}")
                     
                     st.markdown('</div>', unsafe_allow_html=True)
                     st.divider()  # Add separator between images
