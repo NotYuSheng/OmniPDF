@@ -31,7 +31,7 @@ async def get_images(doc_id, max_retries=60, delay=1):
                 elif response.status_code == 202:
                     # Still processing, continue polling
                     if attempt < max_retries - 1:
-                        image_status.info(f"Document still processing... (attempt {attempt + 1}/{max_retries})")
+                        image_status.info(f"Document still processing... ({(attempt + 1)*delay}s)")
                         if "detail" in response.json():
                             server_status.info(response.json()["detail"])
                         else:
@@ -73,9 +73,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
             # Display each image
             for i, image_data in enumerate(image_response["images"]):
                 with st.container():
-                    st.markdown('<div class="image-container">', unsafe_allow_html=True)
-                    
-                    col1, col2 = st.columns([1, 2])
+                    col1, col2 = st.columns([1, 2], border=True)
                     
                     with col1:
                         # Display actual image from URL
