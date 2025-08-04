@@ -10,7 +10,7 @@ PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-async def process_pdf(uploaded_file):
+async def process_pdf(uploaded_files):
     """
     Placeholder function for PDF processing
     In real implementation, this would call your backend API
@@ -36,14 +36,15 @@ async def process_pdf(uploaded_file):
     # Process pdf through PDF_processor endpoint
     try:
         # Upload the PDF document
-        logger.info(f"Uploading PDF: {uploaded_file}")
-        bytes_data = uploaded_file.getvalue() # bytes
-        files = {'file': (uploaded_file.name, 
+        logger.info(f"Uploading PDF: {uploaded_files}")
+        bytes_data = uploaded_files.getvalue() # bytes
+        files = {'file': (uploaded_files.name, 
                                   bytes_data, 
                                   'application/pdf')}
         async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
             upload_response = await client.post(f"{PDF_PROCESSOR_URL}/documents/", files=files)
-            st.session_state.httpx_cookies = upload_response.cookies
+            if upload_response.cookies:
+                st.session_state.httpx_cookies = upload_response.cookies
         # upload_response = requests.post(
         #     url=f"{PDF_PROCESSOR_URL}/documents/",
         #     files=files,
@@ -79,27 +80,32 @@ async def process_pdf(uploaded_file):
 
 st.markdown('<h1 class="main-header">🦸 OmniPDF</h1>', unsafe_allow_html=True)
 st.header("📁 Upload PDF")
-uploaded_file = st.file_uploader(
+uploaded_files = st.file_uploader(
     "Choose a PDF file",
     type=['pdf'],
-    help="Upload a PDF file to process"
+    help="Upload a PDF file to process",
+    accept_multiple_files=True
 )
 
-if uploaded_file is not None:
-    st.session_state.uploaded_file = uploaded_file
+# Check if all files are uploaded
+for uploaded_file in uploaded_files:
+    # st.multiselect(uploaded_file.name)
+    # if st.button("🚀 Process PDF", type="primary"):
+    with st.spinner("Processing PDF..."):
+        asyncio.run(process_pdf(uploaded_file))
+
+st.multiselect("Choose files to view:", [uploaded_file.name for uploaded_file in uploaded_files])
+
+if uploaded_files is not None:
+    st.session_state.uploaded_files = uploaded_files
     
     # Processing options
     st.subheader("Processing Options")
-    target_language = st.selectbox(
-        "Target Language",
-        ["English", "Spanish", "French", "German", "Chinese", "Japanese"]
-    )
     
     extract_images = st.checkbox("Extract Images", value=True)
     generate_metadata = st.checkbox("Generate Metadata", value=True)
     enable_rag = st.checkbox("Enable RAG Chat", value=True)
     
-    if st.button("🚀 Process PDF", type="primary"):
-        with st.spinner("Processing PDF..."):
-            asyncio.run(process_pdf(uploaded_file))
-            
+
+    
+    
