@@ -60,18 +60,18 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
     try:
         # Show loading message
         with st.spinner("Extracting images from document..."):
-            image_data = asyncio.run(get_images(doc_id=doc_id))
+            image_response = asyncio.run(get_images(doc_id=doc_id))
         
         
         # Check if we have images in the response
-        if "images" in image_data and image_data["images"]:
-            image_status.success(f"Found {len(image_data['images'])} images in the document")
+        if "images" in image_response and image_response["images"]:
+            image_status.success(f"Found {len(image_response['images'])} images in the document")
             
             # if "cookies" not in st.session_state:
-            #     st.session_state.cookies = image_data.get("cookies", {})
+            #     st.session_state.cookies = image_response.get("cookies", {})
 
             # Display each image
-            for i, (img_key, img_url) in enumerate(image_data["images"]):
+            for i, image_data in enumerate(image_response["images"]):
                 with st.container():
                     st.markdown('<div class="image-container">', unsafe_allow_html=True)
                     
@@ -81,8 +81,8 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         # Display actual image from URL
                         try:
                             st.image(
-                                img_url,
-                                caption=f"Image {i+1} (from {img_key['image_key']})",
+                                image_data["url"],
+                                caption=f"Image {i+1} (from {image_data["image_key"]})",
                                 use_container_width =True
                             )
                         except Exception as e:
@@ -90,9 +90,9 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                             st.error(f"Error loading image {i+1}: {e}")
                     
                     with col2:
-                        st.markdown(f"**Image Key:** {img_key['image_key']}")
+                        st.markdown(f"**Image Key:** {image_data["image_key"]}")
                         st.markdown(f"**Image ID:** IMG_{i+1:03d}")
-                        st.markdown(f"**Image URL:** {img_url['url']}")
+                        st.markdown(f"**Image URL:** {image_data["url"]}")
                     
                     st.markdown('</div>', unsafe_allow_html=True)
                     st.divider()  # Add separator between images
