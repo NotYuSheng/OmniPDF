@@ -41,7 +41,7 @@ help:
 
 ## Install a single Helm chart
 install:
-	helm install $(CHART_NAME) $(CHART_DIR) \
+	helm upgrade --install $(CHART_NAME) $(CHART_DIR) \
 		--namespace $(NAMESPACE) \
 		--create-namespace \
 		--values $(VALUES_FILE)

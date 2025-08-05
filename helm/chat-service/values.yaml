@@ -7,9 +7,10 @@ replicaCount: 2
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: ghcr.io/notyusheng/chat_service
+  repository: ghcr.io/notyusheng/chat-service
+  pullPolicy: Never
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "dev-v0.0.0-6653136"
+  tag: ""
 
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
