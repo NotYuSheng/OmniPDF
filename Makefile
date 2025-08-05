@@ -27,7 +27,7 @@ help:
 	@echo "  make status                 Show status of Helm release (CHART_NAME)"
 	@echo "                              e.g. make status CHART_NAME=chat-service"
 	@echo "  make port-forward           Port-forward a pod to local machine"
-	@echo "                              e.g. make port-forward CHART_NAME=chat-service LOCAL_PORT=8000 REMOTE_PORT=8080"
+	@echo "                              e.g. make port-forward CHART_NAME=chat-service LOCAL_PORT=8000 REMOTE_PORT=8000"
 	@echo ""
 	@echo "Multi-service commands:"
 	@echo "  make install-all            Install all charts under ./helm/"
@@ -102,11 +102,11 @@ uninstall-all:
 			--namespace $(NAMESPACE); \
 	done
 
-## Port-forward a running pod (default 8080:8080)
+## Port-forward a running pod (default 8000:8000)
 port-forward:
 ifndef CHART_NAME
 	@echo "ERROR: CHART_NAME is required. Example usage:"
-	@echo "  make port-forward CHART_NAME=chat-service LOCAL_PORT=3000 REMOTE_PORT=8080"
+	@echo "  make port-forward CHART_NAME=chat-service LOCAL_PORT=3000 REMOTE_PORT=8000"
 	@exit 1
 else
 	kubectl --namespace $(NAMESPACE) port-forward \
