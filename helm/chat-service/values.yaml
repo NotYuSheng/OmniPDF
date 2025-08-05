@@ -135,10 +135,15 @@ affinity: {}
 env:
   - name: OPENAI_BASE_URL
     value: http://webworkdgx/vllm_qwen2.5/v1
-  - name: OPENAI_API_KEY
-    value: lm-studio
   - name: OPENAI_MODEL
     value: qwen2.5-0.5b-instruct
+
+# Secret configuration for sensitive values
+secrets:
+  # Set to true to create secret from values, false to use existing secret
+  create: false
+  # Name of the secret to reference (must exist if create=false)
+  name: chat-service-secrets
 
 #istio:
 #  enabled: true
