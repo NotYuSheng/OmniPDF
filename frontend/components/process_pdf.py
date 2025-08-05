@@ -82,7 +82,7 @@ async def check_backend():
         results = await asyncio.gather(*(check_service(name, url) for name, url in services.items()))
         return {name: status for name, status in results}
     except Exception as e:
-        print(f"Error checking backend services: {e}")
+        logger.error(f"Error checking backend services: {e}")
         return {}
 
 
