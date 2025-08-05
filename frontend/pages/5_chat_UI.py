@@ -33,7 +33,7 @@ async def chat_with_rag(prompt, _document_content):
     """
     async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
         response = await client.post(url=f"{CHAT_URL}/chat/",
-                                     data=json.dumps({"prompt": prompt, }))
+                                     json={"prompt": prompt})
         if response.status_code == 200:
             return response.json()  # Job done, return result
         else:
