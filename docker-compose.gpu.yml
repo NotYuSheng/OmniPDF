@@ -1,0 +1,136 @@
+services:
+  pdf_processor_service:
+    build:
+      context: .
+      dockerfile: ./pdf_processor_service/Dockerfile
+    container_name: pdf_processor_service
+    env_file:
+      - ./pdf_processor_service/.env
+
+  chat_service:
+    build:
+      context: .
+      dockerfile: ./chat_service/Dockerfile
+    container_name: chat_service
+    env_file:
+      - ./chat_service/.env
+
+  pdf_extraction_service:
+    build:
+      context: .
+      dockerfile: ./pdf_extraction_service/Dockerfile
+    container_name: pdf_extraction_service
+    env_file:
+      - ./pdf_extraction_service/.env
+    depends_on:
+      - minio
+
+  docling_translation_service:
+    build:
+      context: .
+      dockerfile: ./docling_translation_service/Dockerfile
+    container_name: docling_translation_service
+    env_file:
+      - ./docling_translation_service/.env
+      
+  embedder_service:
+    build:
+      context: .
+      dockerfile: ./embedder_service/Dockerfile
+    container_name: embedder_service
+    env_file:
+      - ./embedder_service/.env
+    depends_on:
+      - chromadb
+
+  nginx:
+    container_name: nginx
+    build: 
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./nginx/.env
+    depends_on:
+      - pdf_extraction_service
+      - pdf_processor_service
+      - chat_service
+      - docling_translation_service
+      - embedder_service
+
+  redis:
+    container_name: redis
+    image: redis:7.4.4-alpine
+    expose:
+      - "6379"
+  
+  chromadb:
+    container_name: chromadb
+    image: chromadb/chroma:1.0.13
+    expose:
+      - "5100"
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Admin UI
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  createbucket:
+    image: minio/mc
+    container_name: createbucket
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+        echo 'Waiting for MinIO to be ready...';
+        until mc alias set local http://minio:9000 minioadmin minioadmin; do
+          sleep 2;
+        done;
+        echo 'MinIO is healthy, continuing...';
+        mc mb -p local/omnifiles;
+        mc policy set none local/omnifiles
+        exit 0;
+      "
+
+  vllm-qwen2.5:
+    container_name: vllm-qwen2.5
+    image: vllm/vllm-openai:latest
+    runtime: nvidia
+    ipc: host
+    volumes:
+      - ./llm_models/Qwen2.5-14B-Instruct:/mnt/model/
+      # - ./llm_models/Qwen2.5-0.5B-Instruct:/mnt/model/
+    ports:
+      - "1234:8000"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0,1,2,3
+      # - NVIDIA_VISIBLE_DEVICES=0
+      - HF_HUB_OFFLINE=1
+    command: [
+      "--model", "/mnt/model/",
+      "--served-model-name","qwen2.5",
+      "--max-model-len", "4096",
+      "--tensor-parallel-size", "4",
+      # "--tensor-parallel-size", "1",
+      "--gpu-memory-utilization", "0.8",
+      # "--gpu-memory-utilization", "0.5",
+      "--enable-auto-tool-choice",
+      "--tool-call-parser", "hermes"
+    ]
+
+volumes:
+  minio-data:

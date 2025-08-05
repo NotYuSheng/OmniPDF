@@ -1,0 +1,30 @@
+name: Helm Lint
+
+on:
+  pull_request:
+    paths:
+      - 'helm/**'
+  push:
+    paths:
+      - 'helm/**'
+
+jobs:
+  helm-lint:
+    name: Lint Helm Charts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.18.3
+
+      - name: Lint all Helm charts in ./helm/
+        run: |
+          for chart in helm/*/; do
+            echo "Linting chart: $chart"
+            helm lint "$chart" || exit 1
+          done

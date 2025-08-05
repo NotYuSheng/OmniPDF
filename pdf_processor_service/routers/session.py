@@ -1,6 +1,6 @@
 from fastapi import Depends, APIRouter, Response
 
-from shared_utils.redis import (
+from utils.session import (
     delete_session,
     get_session_id,
     get_session_storage,

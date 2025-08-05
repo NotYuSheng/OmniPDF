@@ -2,9 +2,8 @@ from pydantic import BaseModel
 
 
 class ImageData(BaseModel):
-    image_id: int
-    page: int
-    base64: bytes
+    image_key: str
+    url: str
 
 
 class ImageResponse(BaseModel):

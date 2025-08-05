@@ -36,3 +36,6 @@ build/
 # Uploaded files (if saved locally during dev)
 uploads/
 data/
+
+llm_models/
+.llm_models

@@ -18,4 +18,3 @@ class ExtractResponse(BaseModel):
     doc_id: str
     status: str
     result: Optional[PDFDataResponse] = None
-    message: Optional[str] = None

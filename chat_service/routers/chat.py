@@ -1,19 +1,19 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.concurrency import run_in_threadpool
 from openai import OpenAI, APIError
-from shared_utils.client import get_openai_client
+from shared_utils.openai_client import get_openai_client
 import logging
 import os
 from models.chat import ChatRequest
 
-router = APIRouter(prefix="/chat")
+router = APIRouter()
 logger = logging.getLogger(__name__)
 
 _OPENAI_MODEL_DEFAULT = "qwen2.5-0.5b-instruct"
 OPENAI_MODEL_NAME = os.getenv("OPENAI_MODEL", _OPENAI_MODEL_DEFAULT)
 
 
-@router.post("/", status_code=201)
+@router.post("/chat", status_code=201)
 async def handle_chat(
     chat_request: ChatRequest,
     client: OpenAI = Depends(get_openai_client),

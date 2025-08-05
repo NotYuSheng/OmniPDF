@@ -3,26 +3,63 @@
 
 from os import getenv
 from datetime import timedelta
-from typing import Any, Callable, Generator
-from uuid import uuid4
+from typing import Any, Generator
 import logging
 import json
 
-from pydantic_settings import BaseSettings
-from fastapi import Depends, Request, Response, HTTPException
 from redis import Redis
 
 
 logger = logging.getLogger(__name__)
 
 
-# Stores the data as string using json
-class SessionStorage:
-    def __init__(self):
-        self.client = Redis.from_url(config.redis_url)
+class Config:
+    redis_url: str = getenv("REDIS_URL")
+    expire_time: timedelta = timedelta(hours=24)
 
+
+config = Config()
+SEPERATOR = ":"
+
+
+class RedisBase:
+    def __init__(
+        self,
+        redis_client=None,
+        prefix="",
+        default_expiry: timedelta | None = config.expire_time,
+    ):
+        self.client = redis_client if redis_client else Redis.from_url(config.redis_url)
+        self.prefix = prefix
+        self.default_expiry = default_expiry
+
+    def __delitem__(self, key: str):
+        self.client.delete(self.prefixed(key))
+
+    def __contains__(self, key: str):
+        return self.client.exists(self.prefixed(key))
+    
+    def prefixed(self, key: str):
+        return f"{self.prefix}{SEPERATOR}{key}" if self.prefix else key
+
+
+# Stores the data as string
+class RedisStringStorage(RedisBase):
     def __getitem__(self, key: str):
-        raw = self.client.get(key)
+        return self.client.getex(self.prefixed(key), self.default_expiry)
+
+    def __setitem__(self, key: str, value: str):
+        self.client.set(
+            self.prefixed(key),
+            value,
+            ex=self.default_expiry,
+        )
+
+
+# Stores the data as string using json
+class RedisJSONStorage(RedisStringStorage):
+    def __getitem__(self, key: str):
+        raw = super().__getitem__(key)
         if not raw:
             logger.info(f"Trying to load empty key {key}.")
             return None
@@ -30,164 +67,111 @@ class SessionStorage:
             return json.loads(raw)
         except json.JSONDecodeError as e:
             logger.error(f"Error parsing JSON data for {key}: {e}")
-            raise HTTPException(
-                status_code=500,
-                detail="Unable to load session data from memory. Please start a new session.",
-            )
+            raise e
 
     def __setitem__(self, key: str, value: Any):
-        self.client.set(
-            key,
-            json.dumps(value),
-            ex=config.expire_time,
-        )
-
-    def __delitem__(self, key: str):
-        self.client.delete(key)
-
-    def __contains__(self, key: str):
-        return self.client.exists(key)
-
-    def generate_session_id(self) -> str:
-        session_id = config.generate_session_id()
-        while self.client.get(session_id):
-            session_id = config.generate_session_id()
-        return session_id
+        super().__setitem__(key, json.dumps(value))
 
 
-class ServiceCache:
-    def __init__(self):
-        self.client = Redis.from_url(config.redis_url)
+class RedisSetStorage(RedisBase):
+    def __init__(self, redis_client=None, prefix="", default_expiry=config.expire_time):
+        super().__init__(redis_client, prefix, default_expiry)
+        self.pipeline = self.client.pipeline()
 
-    def __getitem__(self, key: str):
-        return self.client.smembers(key)
+    def __getitem__(self, key: str) -> set[str]:
+        if self.default_expiry is not None:
+            self.pipeline.expire(self.prefixed(key), self.default_expiry)
+        self.pipeline.smembers(self.prefixed(key))
+        members = self.pipeline.execute()[-1]
+        return members
+
+    def __setitem__(self, key: str, values: set):
+        if not isinstance(values, set):
+            raise ValueError("Set Expected. Right Hand Value should be a set.")
+        self.pipeline.delete(self.prefixed(key))
+        for value in values:
+            self.pipeline.sadd(self.prefixed(key), value)
+        self.pipeline.execute()
 
     def add(self, key: str, value: str):
-        self.client.sadd(key, value)
+        self.pipeline.sadd(self.prefixed(key), value)
+        if self.default_expiry is not None:
+            self.pipeline.expire(self.prefixed(key), self.default_expiry)
+        self.pipeline.execute()
 
-    def contains(self, key: str, value: str):
-        return self.client.sismember(key, value)
+    def contains(self, key: str, value: str) -> bool:
+        return self.client.sismember(self.prefixed(key), value)
 
     def remove(self, key: str, value: str):
-        self.client.srem(key, value)
+        self.pipeline.srem(self.prefixed(key), value)
+        if self.default_expiry is not None:
+            self.pipeline.expire(self.prefixed(key), self.default_expiry)
+        self.pipeline.execute()
 
 
-def generate_session_id() -> str:
-    return uuid4().hex
+class RedisSimpleFileFlag(RedisStringStorage):
+    def __init__(self, redis_client=None, prefix="S3_File:", default_expiry = timedelta(hours=1)):
+        super().__init__(redis_client, prefix, default_expiry)
+
+    def set(self, key: str):
+        self[key] = 1
+
+    def clear(self, key: str):
+        del self[key]
 
 
-settings = dict(session_id_generator=generate_session_id)
+class RedisSetWithFlagExpiry(RedisSetStorage):
+    # Do not use unless a clean up is set
+    def __init__(
+        self,
+        redis_client=None,
+        prefix="",
+        flag_prefix="Set_Flag:",
+        default_expiry=config.expire_time,
+    ):
+        super().__init__(redis_client, prefix, None)
+        self.flag_expiry = default_expiry
+        self.flag_prefix = flag_prefix
 
+    def __delitem__(self, key: str):
+        self.client.delete(self.flag_prefixed(key))
 
-class Config(BaseSettings):
-    redis_url: str = getenv("REDIS_URL")
-    settings: dict = settings
-    session_id_name: str = "OmniPDFSession"
-    expire_time: timedelta = timedelta(hours=24)
+    def __contains__(self, key: str):
+        return self.client.exists(self.flag_prefixed(key))
 
-    def generate_session_id(self) -> str:
-        return self.settings["session_id_generator"]()
+    def __getitem__(self, key: str):
+        self.pipeline.getex(self.flag_prefixed(key), ex=self.flag_expiry)
+        return super().__getitem__(key)
+    
+    def __setitem__(self, key: str, values: set):
+        if key not in self:
+            self.init(key)
+        super().__setitem__(key, values)
+    
+    def init(self, key: str):
+        self.client.set(self.flag_prefixed(key), 1, ex=self.flag_expiry)
 
+    def add(self, key: str, value: str):
+        self.pipeline.expire(self.flag_prefixed(key), self.flag_expiry)
+        return super().add(key, value)
 
-config = Config()
+    def remove(self, key: str, value: str):
+        self.pipeline.expire(self.flag_prefixed(key), self.flag_expiry)
+        return super().remove(key, value)
 
+    def flag_prefixed(self, key: str):
+        return self.flag_prefix + SEPERATOR + self.prefixed(key)
 
-def get_session_storage() -> Generator:
-    storage = SessionStorage()
+def get_json_storage() -> Generator:
+    storage = RedisJSONStorage()
     yield storage
 
 
-def get_service_cache() -> Generator:
-    service_cache = ServiceCache()
+def get_set_storage() -> Generator:
+    service_cache = RedisSetStorage()
     yield service_cache
 
 
-def get_doc_list(
-    request: Request, session_storage: SessionStorage = Depends(get_session_storage)
-):
-    session_id = request.cookies.get(config.session_id_name, "")
-    session_data = session_storage[session_id]
-    return session_data if session_data is not None else []
-
-
-def get_session_id(request: Request):
-    session_id = request.cookies.get(config.session_id_name, "")
-    return session_id
-
-
-def set_doc_list(session_id: str, session: Any, session_storage: SessionStorage):
-    session_storage[session_id] = session
-
-
-def create_new_session(
-    response: Response, session_storage: SessionStorage = Depends(get_session_storage)
-) -> str:
-    session_id = session_storage.generate_session_id()
-    session_storage[session_id] = []
-    response.set_cookie(config.session_id_name, session_id, httponly=True)
-    return session_id
-
-
-def delete_session(
-    response: Response,
-    session_id: str = Depends(get_session_id),
-    session_storage: SessionStorage = Depends(get_session_storage),
-):
-    if session_id:
-        response.set_cookie(
-            config.session_id_name, session_id, httponly=True, max_age=0
-        )
-        del session_storage[session_id]
-
-
-def validate_session_id(
-    session_id: str = Depends(get_session_id),
-    session_storage: SessionStorage = Depends(get_session_storage),
-) -> bool:
-    return session_id in session_storage
-
-
-def validate_session_doc_pair(
-    doc_id: str,
-    session_id: str = Depends(get_session_id),
-    session_storage: SessionStorage = Depends(get_session_storage),
-    valid_session: bool = Depends(validate_session_id),
-) -> bool:
-    if valid_session:
-        return doc_id in session_storage[session_id]
-    return False
-
-
-def get_doc_list_append_function(
-    response: Response,
-    session_id: str = Depends(get_session_id),
-    session_storage: SessionStorage = Depends(get_session_storage),
-) -> Callable[[str], None]:
-    if not validate_session_id(session_id, session_storage):
-        session_id = create_new_session(response, session_storage=session_storage)
-
-    def append_doc(filename: str):
-        session_data = session_storage[session_id]
-        if isinstance(session_data, list):
-            session_data.append(filename)
-        else:
-            session_data = [filename]
-        session_storage[session_id] = session_data
-
-    return append_doc
-
-def get_doc_list_remove_function(
-    response: Response,
-    session_id: str = Depends(get_session_id),
-    session_storage: SessionStorage = Depends(get_session_storage),
-) -> Callable[[str], None]:
-    if not validate_session_id(session_id, session_storage):
-        session_id = create_new_session(response, session_storage=session_storage)
-
-    def remove_doc(filename: str):
-        session_data: list[str] = session_storage[session_id]
-        if filename in session_data:
-            session_data.remove(filename)
-            session_storage[session_id] = session_data
-
-    return remove_doc
+def get_string_storage() -> Generator:
+    service_cache = RedisStringStorage()
+    yield service_cache
