@@ -5,7 +5,7 @@ from datetime import timedelta
 from typing import Callable, Generator
 from uuid import uuid4
 
-from fastapi import Depends, Request, Response
+from fastapi import Depends, Request, Response, HTTPException
 
 import shared_utils.redis
 
@@ -66,9 +66,13 @@ def validate_session_doc_pair(
     valid_session: bool = Depends(validate_session_id),
 ) -> bool:
     if valid_session:
-        return session_storage.contains(session_id, doc_id)
-        # return doc_id in session_storage[session_id]
-    return False
+        if session_storage.contains(session_id, doc_id):
+            return True
+    
+    raise HTTPException(
+        status_code=403,
+        detail="User not authorized to access this document or invalid document ID",
+    )
 
 
 def get_doc_list_append_function(

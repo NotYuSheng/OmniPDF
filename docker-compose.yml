@@ -70,6 +70,7 @@ services:
       - chat_service
       - docling_translation_service
       - embedder_service
+      - minio
 
   redis:
     container_name: redis

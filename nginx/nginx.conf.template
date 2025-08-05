@@ -33,4 +33,11 @@ server {
     location /embedder/ {
         proxy_pass ${EMBEDDER_URL}/;
     }
+
+    location /file/ {
+        proxy_pass ${MINIO_ENDPOINT}/;
+        proxy_intercept_errors on;
+
+        error_page 403 /error_pages/403.html;
+    }
 }
