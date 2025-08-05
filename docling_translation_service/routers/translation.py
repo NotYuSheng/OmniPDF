@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
 from models.translate import TranslateResponse
-from shared_utils.s3_utils import save_job, load_job
+from shared_utils.s3_utils import save_job, load_job, upload_fileobj
 
 import os
 import logging
 import httpx
+import io
 
 import asyncio
 from asyncio import Semaphore
@@ -121,6 +122,11 @@ async def doc_translate(payload: TranslateResponse = Body(...)):
         # Reassign translated cells back to their correct table
         for (table_idx, cell_idx), translated_entry in zip(table_cell_refs, translated_cells):
             data.tables[table_idx]["data"]["table_cells"][cell_idx] = translated_entry
+
+        json_bytes = io.BytesIO(json.dumps(data.model_dump()).encode('utf-8'))
+        json_key = f"{doc_id}/translated.json"
+        if not upload_fileobj(json_bytes, json_key, "application/json"):
+            raise IOError(f"Failed to upload translated JSON to S3 for doc_id={doc_id}")
 
         save_job(doc_id=doc_id, job_data=data, status="completed", job_type="translation")
         logger.info(f"Translation completed: doc_id={doc_id}")
