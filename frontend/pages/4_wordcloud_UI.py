@@ -3,6 +3,8 @@ import logging
 from streamlit.components.v1 import html
 import base64
 from components.process_pdf import generate_wordcloud
+import io
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,7 +17,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
     all_keywords = metadata.get('keywords', []) + metadata.get('image_keywords', [])
     
     if all_keywords:
-        import io
         fig = generate_wordcloud(all_keywords)
         buf = io.BytesIO()
         fig.savefig(buf, format="png", bbox_inches='tight')
