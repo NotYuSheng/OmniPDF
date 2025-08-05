@@ -1,31 +1,14 @@
 import streamlit as st
 import logging
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
 from streamlit.components.v1 import html
 import base64
+from components.process_pdf import generate_wordcloud
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def generate_wordcloud(text_data):
-    """Generate word cloud from text data"""
-    wordcloud = WordCloud(
-        width=800, 
-        height=400, 
-        background_color='white',
-        colormap='viridis'
-    ).generate(' '.join(text_data))
-    
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.imshow(wordcloud, interpolation='bilinear')
-    ax.axis('off')
-    return fig
-
-
+# WIP - this file is not fully functional yet
 st.header("☁️ Word Cloud")
-if 'metadata' not in st.session_state:
-    st.info("No metadata found in the document.")
 if "processed_data" in st.session_state and st.session_state.processed_data:
     # Generate word cloud from keywords
     all_keywords = st.session_state.processed_data['metadata']['keywords'] + st.session_state.processed_data['metadata']['image_keywords']
