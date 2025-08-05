@@ -1,0 +1,7 @@
+matplotlib
+pillow
+streamlit
+wordcloud
+pandas
+plotly
+httpx
