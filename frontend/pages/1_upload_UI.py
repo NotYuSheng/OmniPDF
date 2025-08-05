@@ -44,10 +44,8 @@ async def process_pdf(uploaded_file):
         async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
             upload_response = await client.post(f"{PDF_PROCESSOR_URL}/documents/", files=files)
             st.session_state.httpx_cookies = upload_response.cookies
-        # upload_response = requests.post(
-        #     url=f"{PDF_PROCESSOR_URL}/documents/",
-        #     files=files,
-        #     )
+            logger.info(f"Upload response cookies: {upload_response.cookies['OmniPDFSession']}")
+            
         logger.info(f"Upload PDF response: {upload_response.text}")   
                 
         upload_data = upload_response.json()
@@ -104,7 +102,7 @@ if uploaded_file is not None:
             asyncio.run(process_pdf(uploaded_file))
             
     # Always show metadata if available
-    if "processed_data" in uploaded_file:
+    if "processed_data" in st.session_state and st.session_state.processed_data:
         st.subheader("File Metadata")
         st.markdown(f"**Filename:** {uploaded_file.name}")
         size_unit = st.selectbox("File Size Unit", ["MB", "KB", "B"], index=0)
@@ -118,5 +116,5 @@ if uploaded_file is not None:
             size_val = uploaded_file.size
             size_str = f"{size_val} B"
         st.markdown(f"**Size:** {size_str}")
-        st.markdown(f"**Document ID:** {uploaded_file["processed_data"]["doc_id"]}")
-        st.markdown(f"**Download URL:** {uploaded_file["processed_data"]["download_url"]}")
+        st.markdown(f"**Document ID:** {st.session_state.processed_data['doc_id']}")
+        st.markdown(f"**Download URL:** {st.session_state.processed_data['download_url']}")
