@@ -2,7 +2,7 @@
 
 # Default namespace and configurable chart
 NAMESPACE ?= omnipdf
-CHART_NAME ?= example-service           # Override via CLI, e.g., make install CHART_NAME=embedder-service
+CHART_NAME ?= example-service
 CHART_DIR ?= helm/$(CHART_NAME)
 VALUES_FILE ?= $(CHART_DIR)/values.yaml
 
@@ -104,8 +104,8 @@ uninstall-all:
 
 ## Port-forward a running pod (default 8000:8000)
 port-forward:
-ifndef CHART_NAME
-	@echo "ERROR: CHART_NAME is required. Example usage:"
+ifeq ($(CHART_NAME),example-service)
+	@echo "ERROR: CHART_NAME must be specified. Example usage:"
 	@echo "  make port-forward CHART_NAME=chat-service LOCAL_PORT=3000 REMOTE_PORT=8000"
 	@exit 1
 else
