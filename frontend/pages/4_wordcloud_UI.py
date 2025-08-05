@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 st.header("☁️ Word Cloud")
 if "processed_data" in st.session_state and st.session_state.processed_data:
     # Generate word cloud from keywords
-    all_keywords = st.session_state.processed_data['metadata']['keywords'] + st.session_state.processed_data['metadata']['image_keywords']
+    metadata = st.session_state.processed_data.get('metadata', {})
+    all_keywords = metadata.get('keywords', []) + metadata.get('image_keywords', [])
     
     if all_keywords:
         import io
