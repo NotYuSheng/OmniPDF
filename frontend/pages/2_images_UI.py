@@ -2,6 +2,7 @@ import streamlit as st
 import logging
 import asyncio
 import httpx
+import json
 import os
 
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000")
@@ -19,12 +20,17 @@ async def get_images(doc_id, max_retries=60, delay=1):
             try:
                 response = await client.get(f"{PDF_PROCESSOR_URL}/images/{doc_id}")
                 logger.info(f"Image extraction response status: {response.status_code}")
-                if "detail" in response.json():
-                    server_status.info(response.json()["detail"])
-                    logger.info(f"Info details: {response.json()['detail']}")
-                else:
-                    server_status.info(f"Response: {response.text}")
-                    logger.info(f"Image extraction response: {response}")
+                try:
+                    data = response.json()
+                    if "detail" in data:
+                        server_status.info(data["detail"])
+                        logger.info(f"Info details: {data['detail']}")
+                    else:
+                        server_status.info("Successfully retrieved images")
+                        logger.info(f"Image extraction response: {response}")
+                except json.JSONDecodeError:
+                    logger.error(f"Failed to decode JSON from response: {response.text}")
+                    server_status.error("Received an invalid response from the server.")
                 
                 if response.status_code == 200:
                     return response.json()  # Success - return the actual data
