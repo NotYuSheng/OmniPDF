@@ -75,7 +75,7 @@ install-all:
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
 		echo "Installing chart: $$CHART"; \
-		helm install $$CHART helm/$$CHART \
+		helm upgrade --install $$CHART helm/$$CHART \
 			--namespace $(NAMESPACE) \
 			--create-namespace \
 			--values helm/$$CHART/values.yaml; \
@@ -87,8 +87,9 @@ upgrade-all:
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
 		echo "Upgrading chart: $$CHART"; \
-		helm upgrade $$CHART helm/$$CHART \
+		helm upgrade --install $$CHART helm/$$CHART \
 			--namespace $(NAMESPACE) \
+			--create-namespace \
 			--values helm/$$CHART/values.yaml; \
 	done
 

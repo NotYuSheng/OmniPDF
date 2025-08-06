@@ -85,7 +85,7 @@ resources:
 startupProbe:
   httpGet:
     path: /health
-    port: 8000
+    port: http
   initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 3
@@ -93,14 +93,14 @@ startupProbe:
 livenessProbe:
   httpGet:
     path: /health
-    port: 8000
+    port: http
   periodSeconds: 30
   timeoutSeconds: 5
   failureThreshold: 3
 readinessProbe:
   httpGet:
     path: /health
-    port: 8000
+    port: http
   periodSeconds: 10
   timeoutSeconds: 3
   failureThreshold: 2
