@@ -5,7 +5,7 @@ from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chroma_client
 import logging
 from models.chat import ChatRequest, ChatResponse
-from models.rag_config import QwenRAGConfig, QwenPromptTemplates, QwenRAGOptimizer
+from models.rag_config import QwenRAGConfig, QwenPromptTemplates, QwenRAGOptimizer, QueryType, EnhancedQueryValidator
 
 router = APIRouter(prefix="/chat")
 
@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 qwen_config = QwenRAGConfig()
 prompt_templates = QwenPromptTemplates()
 qwen_optimizer = QwenRAGOptimizer()
+query_validator = EnhancedQueryValidator()
 
 OPENAI_MODEL_NAME = qwen_config.model_name
 
@@ -88,11 +89,13 @@ async def perform_rag_query(
     collection_name: str, 
     doc_id: Optional[str] = None,
     top_k: int = 5,
-    query_type: str = "general",
-    enable_reranking: bool = True
-) -> tuple[str, List[Dict[str, Any]], str]:
+    # query_type: str = None,
+    enable_reranking: bool = True,
+    openai_client: AsyncOpenAI = None
+) -> tuple[str, List[Dict[str, Any]], str, str]:
     """
     Perform complete RAG query: retrieve relevant chunks and generate response
+    Returns: (user_prompt, optimized_chunks, system_prompt, detected_query_type)
     """
     try:
         chroma_client = await get_chroma_client()
@@ -118,7 +121,8 @@ async def perform_rag_query(
         
         if not chunks:
             logger.warning(f"No relevant chunks found for query: {query}")
-            return "I couldn't find any relevant information in the document collection to answer your question.", [], ""
+            return ("I couldn't find any relevant information in the document collection to answer your question.", 
+                   [], "", QueryType.GENERAL.value)
         
         # Step 3: Rerank chunks for more diverse results across multiple documents
         if enable_reranking and len(chunks) > 1:
@@ -134,23 +138,81 @@ async def perform_rag_query(
         logger.info(f"Relevant chunks from {num_of_docs} documents")
         logger.info(f"Using {len(optimized_chunks)} chunks for context (total length: {len(context)} chars)")
 
-        # Step 5: Auto-detect query type if not provided
-        logger.info(f"Query type: {query_type}")
-        if qwen_config.enable_query_type_detection and query_type == "general":
-                query_type = qwen_optimizer.detect_query_type(query)
-                logger.info(f"Auto-detected query type: {query_type}")
+        # Step 5: Enhanced query type detection
+        # detected_query_type = query_type
+        # if query_type == "general" or query_type is None:
+        detected_query_type = await qwen_optimizer.detect_query_type(
+            question=query,
+            model_name=OPENAI_MODEL_NAME,
+            config=qwen_config,
+            openai_client=openai_client
+        )
+        logger.info(f"Auto-detected query type: {detected_query_type}")
+        # else:
+        #     logger.info(f"Using provided query type: {detected_query_type}")
         
         # Step 6: Prepare system and user prompts
-        system_prompt = prompt_templates.get_system_prompt(query_type)
-        user_prompt = prompt_templates.format_user_prompt(query, context, query_type)
-        logger.info(f"System prompt: {system_prompt}")
-        logger.info(f"User prompt: {user_prompt}")
+        system_prompt = prompt_templates.get_system_prompt(detected_query_type)
+        user_prompt = prompt_templates.format_user_prompt(query, context, detected_query_type)
+        
+        logger.info(f"Final query type: {detected_query_type}")
+        logger.debug(f"System prompt length: {len(system_prompt)} chars")
+        logger.debug(f"User prompt length: {len(user_prompt)} chars")
 
-        return user_prompt, optimized_chunks, system_prompt
+        return user_prompt, optimized_chunks, system_prompt, detected_query_type
         
     except Exception as e:
         logger.error(f"RAG query failed: {e}")
         raise HTTPException(status_code=500, detail="RAG query failed")
+
+
+async def validate_query_with_llm(
+    query: str,
+    collection_name: str,
+    openai_client: AsyncOpenAI = None,
+    model_name: str = OPENAI_MODEL_NAME,
+) -> tuple[bool, Optional[str]]:
+    """
+    Use LLM to validate if query is meaningful and can be answered with documents.
+    """
+    if collection_name:
+        collection_info = f"Documents about {collection_name}" 
+    else:
+        None
+    validation_prompt = query_validator._get_enhanced_validation_prompt(query, collection_info)
+
+    try:
+        # Prepare messages for Qwen-2.5
+        messages = [
+            {
+                "role": "system",
+                "content": "You are an expert query analysis system. Follow the instructions precisely and provide structured responses."
+            },
+            {
+                "role": "user",
+                "content": validation_prompt
+            }
+        ]
+
+        response = await openai_client.chat.completions.create(
+            model=model_name,
+            messages=messages,
+            max_tokens=qwen_config.query_params["max_tokens"],
+            temperature=0
+        )
+        
+        result = response.choices[0].message.content.strip()
+
+        logger.info(f"Result: {result}")
+        
+        if "PROCEED_WITH_RAG" in result:
+            return True, None
+        elif "HANDLE_WITHOUT_RAG" or "INVALID_QUERY" or "NEEDS_CLARIFICATION" in result:
+            return False, result
+            
+    except Exception as e:
+        logger.warning(f"LLM validation failed: {e}")
+        raise HTTPException(status_code=500, detail="LLM validation failed")
 
 
 @router.post("/", status_code=201, response_model=ChatResponse)
@@ -159,45 +221,90 @@ async def handle_chat(
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
     """
-    Handle incoming chat requests and return AI responses.
+    Handle incoming chat requests and return AI responses with enhanced query classification.
     """
     try:
-        logger.info(chat_request.collection_name)
+        logger.info(f"Processing chat request for collection: {chat_request.collection_name}")
+        logger.info(f"User query: {chat_request.message}")
 
-        # Perform RAG query to get context and relevant chunks
-        user_prompt, relevant_chunks, system_prompt = await perform_rag_query(
-            query=chat_request.message,
-            collection_name=chat_request.collection_name,
-            doc_id=chat_request.doc_id,
-            top_k=chat_request.top_k,
-            query_type=chat_request.query_type or "general",
-            enable_reranking=qwen_config.enable_reranking
+        # Simple logic to call RAG if needed
+        should_rag, validation_error = await validate_query_with_llm(
+            chat_request.message,
+            chat_request.collection_name, 
+            client, 
+            OPENAI_MODEL_NAME
         )
-        if not relevant_chunks:
-            logger.error("No relevant chunks found!")
+        
+        if not should_rag:
+            logger.info(f"LLM query validation failed: {validation_error}")
             return ChatResponse(
-                response=user_prompt,
+                response=f"""I'm sorry, but I couldn't process your query based on the documents in {chat_request.collection_name} that you want to query data from. Please provide a clear, specific question that I can help answer using the available documents in {chat_request.collection_name}.""",
                 relevant_chunks=[],
-                metadata={}
+                metadata={
+                    "query_type": "invalid",
+                    "chunks_used": 0,
+                    "documents_searched_count": 0,
+                    "document_ids": [],
+                    "total_context_length": 0,
+                    "model_used": OPENAI_MODEL_NAME,
+                    "collection_name": chat_request.collection_name,
+                    "validation_error": validation_error,
+                    "validation_method": "llm",
+                    "rag_performed": False,
+                    "generation_params": qwen_config.generation_params,
+                    "reranking_enabled": qwen_config.enable_reranking
+                }
+            )
+        else:
+            # Perform RAG query with enhanced classification
+            user_prompt, relevant_chunks, system_prompt, detected_query_type = await perform_rag_query(
+                query=chat_request.message,
+                collection_name=chat_request.collection_name,
+                doc_id=chat_request.doc_id,
+                top_k=chat_request.top_k,
+                # query_type=chat_request.query_type or "general",
+                enable_reranking=qwen_config.enable_reranking,
+                openai_client=client
+            )
+            
+            if not relevant_chunks:
+                logger.error("No relevant chunks found!")
+                return ChatResponse(
+                    response=user_prompt,
+                    relevant_chunks=[],
+                    metadata={
+                        "query_type": detected_query_type,
+                        "chunks_used": 0,
+                        "documents_searched_count": 0,
+                        "document_ids": [],
+                        "total_context_length": len(user_prompt),
+                        "model_used": OPENAI_MODEL_NAME,
+                        "collection_name": chat_request.collection_name,
+                        "classification_method": "no_chunks_found",
+                        "generation_params": qwen_config.generation_params,
+                        "reranking_enabled": qwen_config.enable_reranking
+                    }
+                )
+            
+            # Prepare messages for Qwen-2.5
+            messages = [
+                {
+                    "role": "system",
+                    "content": system_prompt
+                },
+                {
+                    "role": "user", 
+                    "content": user_prompt
+                }
+            ]
+
+            logger.info(f"Sending request to {OPENAI_MODEL_NAME} with {len(messages)} messages")
+            response = await client.chat.completions.create(
+                model=OPENAI_MODEL_NAME,
+                messages=messages,
+                **qwen_config.generation_params,
             )
         
-        # Prepare messages for Qwen-2.5
-        messages = [
-            {
-                "role": "system",
-                "content": system_prompt
-            },
-            {
-                "role": "user", 
-                "content": user_prompt
-            }
-        ]
-
-        response = await client.chat.completions.create(
-            model=OPENAI_MODEL_NAME,
-            messages=messages,
-            **qwen_config.generation_params,
-        )
     except APIError as e:
         logger.error(f"Unexpected error during chat completion: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Unexpected error during chat completion")
@@ -226,9 +333,20 @@ async def handle_chat(
     # Analyze document diversity in results
     doc_ids = set(chunk.get('doc_id') for chunk in relevant_chunks if chunk.get('doc_id'))
     
-    # Prepare metadata for response
+    # # Determine classification method used
+    # classification_method = "provided"
+    # if chat_request.query_type is None or chat_request.query_type == "general":
+    #     if qwen_config.enable_llm_query_classification:
+    #         classification_method = "llm_only"
+    #         classification_method = "llm_with_fallback" if qwen_config.fallback_to_keyword_classification else "llm_only"
+    #     else:
+    #         classification_method = "keyword_fallback"
+    
+    # Prepare enhanced metadata for response
     metadata = {
-        "query_type": chat_request.query_type,
+        "query_type": detected_query_type,
+        # "original_query_type": chat_request.query_type,
+        # "classification_method": classification_method,
         "chunks_used": len(relevant_chunks),
         "documents_searched_count": len(doc_ids) if doc_ids else 0,
         "document_ids": list(doc_ids) if doc_ids else [],
@@ -236,8 +354,13 @@ async def handle_chat(
         "model_used": OPENAI_MODEL_NAME,
         "collection_name": chat_request.collection_name,
         "generation_params": qwen_config.generation_params,
-        "reranking_enabled": qwen_config.enable_reranking
+        "reranking_enabled": qwen_config.enable_reranking,
+        "llm_classification_enabled": qwen_config.enable_llm_query_classification,
+        "response_post_processing_enabled": qwen_config.enable_response_post_processing
     }
+    
+    logger.info(f"Generated response with {len(processed_response)} characters")
+    logger.info(f"Final metadata: {metadata}")
     
     # Return structured response
     return ChatResponse(
