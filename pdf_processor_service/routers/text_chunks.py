@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 @router.get("/{doc_id}")
 async def get_pdf_text_chunks(
     doc_id: str,
-    valid_request: bool = Depends(validate_session_doc_pair),
+    _validated: bool = Depends(validate_session_doc_pair),
     job_or_reposnse = Depends(load_or_create_job)
 ):
     if isinstance(job_or_reposnse, Response):

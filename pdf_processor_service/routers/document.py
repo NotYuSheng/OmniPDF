@@ -3,7 +3,7 @@ import uuid
 import logging
 from shared_utils.s3_utils import (
     upload_fileobj,
-    generate_presigned_url,
+    generate_external_presigned_url,
     delete_file,
     s3_client,
     S3_BUCKET,
@@ -13,7 +13,6 @@ from utils.session import (
     get_doc_list_remove_function,
     validate_session_doc_pair,
 )
-from utils.proxy import get_external_minio_uri
 from models.document import DocumentUploadResponse
 from botocore.exceptions import ClientError
 
@@ -45,7 +44,7 @@ async def upload_document(
         if not success:
             raise HTTPException(status_code=500, detail="Failed to upload file to S3")
 
-        presigned_url = generate_presigned_url(key)
+        presigned_url = generate_external_presigned_url(key)
         if not presigned_url:
             raise HTTPException(
                 status_code=500, detail="Failed to generate presigned URL"
@@ -55,9 +54,7 @@ async def upload_document(
         logger.error(f"Unexpected error during upload: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
 
-    append_doc(doc_id)
-    presigned_url = get_external_minio_uri(presigned_url)
-
+    append_doc(key)
     return DocumentUploadResponse(
         doc_id=doc_id, filename=key, download_url=presigned_url
     )
@@ -65,7 +62,7 @@ async def upload_document(
 
 @router.get("/{doc_id}", response_model=DocumentUploadResponse)
 async def get_document(
-    doc_id: str, valid_request: bool = Depends(validate_session_doc_pair)
+    doc_id: str, _validated: bool = Depends(validate_session_doc_pair)
 ):
     key = f"{doc_id}/original.pdf"
 
@@ -77,8 +74,7 @@ async def get_document(
             raise HTTPException(status_code=404, detail="Document not found")
         raise HTTPException(status_code=500, detail="Failed to check document")
 
-    presigned_url = generate_presigned_url(key)
-    presigned_url = get_external_minio_uri(presigned_url)
+    presigned_url = generate_external_presigned_url(key)
     return DocumentUploadResponse(
         doc_id=doc_id, filename=key, download_url=presigned_url
     )
@@ -87,7 +83,7 @@ async def get_document(
 @router.delete("/{doc_id}", status_code=204)
 async def delete_document(
     doc_id: str,
-    valid_request: bool = Depends(validate_session_doc_pair),
+    _validated: bool = Depends(validate_session_doc_pair),
     remove_doc=Depends(get_doc_list_remove_function),
 ):
     key = f"{doc_id}/original.pdf"

@@ -1,7 +1,7 @@
-matplotlib
-pillow
-streamlit
-wordcloud
-pandas
-plotly
-httpx
+matplotlib==3.10.5
+pillow==11.3.0
+streamlit==1.47.1
+wordcloud==1.9.4
+pandas==2.3.1
+plotly==6.2.0
+httpx==0.28.1

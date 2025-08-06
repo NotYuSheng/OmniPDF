@@ -1,6 +1,5 @@
 import streamlit as st
 import logging
-import json
 import os
 
 from httpx import Cookies
@@ -25,55 +24,6 @@ if "httpx_cookies" not in st.session_state:
 # Backend
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000")
 CHAT_URL = os.getenv("CHAT_URL", "http://chat_service:8000")
-
-    
-
-def metadata_UI():
-    st.write("📊 PDF Metadata")
-    if 'metadata' not in st.session_state:
-        st.info("No metadata found in the document.")
-        return
-    if "processed_data" in st.session_state and st.session_state.processed_data:
-        data = st.session_state.processed_data
-        metadata = data['metadata']
-        
-        # Authors
-        st.subheader("👥 Authors")
-        for author in metadata['authors']:
-            st.markdown(f"• {author}")
-        
-        # Executive Summary
-        st.subheader("📋 Executive Summary")
-        st.markdown(f'<div class="metric-card">{metadata["exec_summary"]}</div>', unsafe_allow_html=True)
-        
-        # Short Description
-        st.subheader("📝 Short Description")
-        st.markdown(f'<div class="metric-card">{metadata["short_description"]}</div>', unsafe_allow_html=True)
-        
-        # Keywords
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("🔤 Keywords")
-            for keyword in metadata['keywords']:
-                st.markdown(f"• {keyword}")
-        
-        with col2:
-            st.subheader("🖼️ Image Keywords")
-            for keyword in metadata['image_keywords']:
-                st.markdown(f"• {keyword}")
-        
-        # Export metadata
-        st.subheader("📤 Export Metadata")
-        metadata_json = json.dumps(metadata, indent=2)
-        st.download_button(
-            label="📥 Download Metadata (JSON)",
-            data=metadata_json,
-            file_name="document_metadata.json",
-            mime="application/json"
-        )
-    else:
-        st.info("Please upload and process a PDF first")
 
     
 if __name__ == "__main__":

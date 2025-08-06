@@ -1,9 +1,7 @@
 import asyncio
 import logging
-import time
 import os
 import httpx
-
 import streamlit as st
 
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000")
@@ -29,7 +27,7 @@ async def process_pdf(uploaded_files):
             status_text.text('Generating metadata...')
         else:
             status_text.text('Finalizing processing...')
-        time.sleep(0.02)
+        asyncio.sleep(0.02)
     
     progress_bar.empty()
     status_text.empty()
