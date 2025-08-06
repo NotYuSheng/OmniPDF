@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "chat-service.fullname" . }}:{{ .Values.service.port }}']
+      args: ['--spider', '--timeout=10', '{{ include "chat-service.fullname" . }}:{{ .Values.service.port }}/health']
   restartPolicy: Never
