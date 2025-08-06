@@ -142,15 +142,5 @@ services:
       "--tool-call-parser", "hermes"
     ]
 
-  frontend:
-    build:
-      context: .
-      dockerfile: ./frontend/Dockerfile
-    container_name: frontend
-    env_file:
-      - ./frontend/.env
-    ports:
-      - "8504:8504"
-
 volumes:
   minio-data:
