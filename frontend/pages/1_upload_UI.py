@@ -2,20 +2,28 @@ import asyncio
 import logging
 import os
 import httpx
+
 import streamlit as st
 
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-async def process_pdf(uploaded_files):
+if 'processed_data' not in st.session_state or st.session_state.processed_data is None:
+    st.session_state.processed_data = {}
+
+# Ensure httpx_cookies is initialized
+if 'httpx_cookies' not in st.session_state:
+    st.session_state.httpx_cookies = None
+
+
+async def process_pdf(uploaded_files, status_text):
     """
     Placeholder function for PDF processing
     In real implementation, this would call your backend API
     """
     # Simulate processing time
     progress_bar = st.progress(0)
-    status_text = st.empty()
     
     for i in range(100):
         progress_bar.progress(i + 1)
@@ -43,22 +51,24 @@ async def process_pdf(uploaded_files):
             upload_response = await client.post(f"{PDF_PROCESSOR_URL}/documents/", files=files)
             if upload_response.cookies:
                 st.session_state.httpx_cookies = upload_response.cookies
-        # upload_response = requests.post(
-        #     url=f"{PDF_PROCESSOR_URL}/documents/",
-        #     files=files,
-        #     )
+                
         logger.info(f"Upload PDF response: {upload_response.text}")   
                 
         upload_data = upload_response.json()
         doc_id = upload_data["doc_id"]
         filename = upload_data["filename"]
         download_url = upload_data["download_url"]
-        st.session_state.processed_data = {
+        if 'processed_data' not in st.session_state or st.session_state.processed_data is None:
+            st.session_state.processed_data = {}
+        st.session_state.processed_data[doc_id] = {
             "doc_id": doc_id,
             "filename": filename,
-            "download_url": download_url
+            "download_url": download_url,
+            "uploaded_filename": uploaded_files.name
         }
-        status_text.success(f"PDF uploaded successfully! Document ID: {doc_id}")
+        status_text.success(f"Successfully processed! {uploaded_files.name}")
+        
+        # Display all processed files in this session
 
         # Check Set-Cookie header
         # set_cookie = upload_response.headers.get('Set-Cookie')
@@ -85,25 +95,32 @@ uploaded_files = st.file_uploader(
     accept_multiple_files=True
 )
 
-# Check if all files are uploaded
-for uploaded_file in uploaded_files:
-    # st.multiselect(uploaded_file.name)
-    # if st.button("🚀 Process PDF", type="primary"):
-    with st.spinner("Processing PDF..."):
-        asyncio.run(process_pdf(uploaded_file))
+if uploaded_files:
+    # Create a list of uploaded files for selection
+    file_options = [file.name for file in uploaded_files]
+    
+    selection = st.multiselect(
+        "Choose files to process:",
+        options=file_options,
+        default=file_options  # By default, select all uploaded files
+    )
 
-st.multiselect("Choose files to view:", [uploaded_file.name for uploaded_file in uploaded_files])
+    # Check if files are selected and process button is clicked
+    if st.button("Process PDF", type="primary"):
+        status_text = st.empty()
+        with st.spinner("Processing PDF..."):
+            # Process each selected file
+            for file_name in selection:
+                # Find the corresponding file object
+                file_to_process = next(file for file in uploaded_files if file.name == file_name)
+                asyncio.run(process_pdf(file_to_process, status_text))
 
 if uploaded_files is not None:
     st.session_state.uploaded_files = uploaded_files
     
-    # Processing options
-    st.subheader("Processing Options")
-    
-    extract_images = st.checkbox("Extract Images", value=True)
-    generate_metadata = st.checkbox("Generate Metadata", value=True)
-    enable_rag = st.checkbox("Enable RAG Chat", value=True)
-    
+# Initialize or update the status message
+info_container = st.container()
 
-    
+with info_container:
+    st.write(f"Total files processed in this session: {len(st.session_state.processed_data)}")
     
