@@ -126,8 +126,7 @@ async def pdf_render(
         logger.error("Rendering failed", exc_info=True)
         raise HTTPException(500, f"PDF processing error {e}")
 
-    buffer = io.BytesIO(output_bytes)
-    file_size = len(buffer.getvalue())
+    file_size = len(output_bytes)
 
     rendered_size = file_size / 1024
 

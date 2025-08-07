@@ -3,6 +3,7 @@ from typing import Literal
 from models.bypass import BypassResponse
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi.concurrency import run_in_threadpool
+from io import BytesIO
 
 from shared_utils.s3_utils import (
     upload_fileobj,
@@ -17,8 +18,6 @@ def s3_upload(file_bytes: bytes, key: str) -> str:
     Sync helper: upload bytes to S3 and return a presigned URL.
     Raises exceptions on failure.
     """
-    # upload_fileobj expects a file-like, so wrap in BytesIO
-    from io import BytesIO
     bio = BytesIO(file_bytes)
     success = upload_fileobj(bio, key, content_type="application/json")
     if not success:
