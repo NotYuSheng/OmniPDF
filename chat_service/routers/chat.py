@@ -171,10 +171,11 @@ async def validate_query_with_llm(
     """
     Use LLM to validate if query is meaningful and can be answered with documents.
     """
-    collection_info = None
+    collection_info = ""
     
     if collection_name:
         collection_info = f"Documents about {collection_name}" 
+        logger.info(collection_info)
     else:
         None
     validation_prompt = query_validator._get_enhanced_validation_prompt(query, collection_info)
@@ -205,7 +206,9 @@ async def validate_query_with_llm(
         
         if "PROCEED_WITH_RAG" in result:
             return True, None
-        elif ("HANDLE_WITHOUT_RAG" or "INVALID_QUERY" or "NEEDS_CLARIFICATION") in result:
+        elif (("HANDLE_WITHOUT_RAG" in result) or 
+        ("INVALID_QUERY" in result) or 
+        ("NEEDS_CLARIFICATION" in result)):
             return False, result
             
     except Exception as e:
