@@ -139,8 +139,6 @@ async def perform_rag_query(
         logger.info(f"Using {len(optimized_chunks)} chunks for context (total length: {len(context)} chars)")
 
         # Step 5: Enhanced query type detection
-        # detected_query_type = query_type
-        # if query_type == "general" or query_type is None:
         detected_query_type = await qwen_optimizer.detect_query_type(
             question=query,
             model_name=OPENAI_MODEL_NAME,
@@ -148,8 +146,6 @@ async def perform_rag_query(
             openai_client=openai_client
         )
         logger.info(f"Auto-detected query type: {detected_query_type}")
-        # else:
-        #     logger.info(f"Using provided query type: {detected_query_type}")
         
         # Step 6: Prepare system and user prompts
         system_prompt = prompt_templates.get_system_prompt(detected_query_type)
@@ -335,20 +331,9 @@ async def handle_chat(
     # Analyze document diversity in results
     doc_ids = set(chunk.get('doc_id') for chunk in relevant_chunks if chunk.get('doc_id'))
     
-    # # Determine classification method used
-    # classification_method = "provided"
-    # if chat_request.query_type is None or chat_request.query_type == "general":
-    #     if qwen_config.enable_llm_query_classification:
-    #         classification_method = "llm_only"
-    #         classification_method = "llm_with_fallback" if qwen_config.fallback_to_keyword_classification else "llm_only"
-    #     else:
-    #         classification_method = "keyword_fallback"
-    
     # Prepare enhanced metadata for response
     metadata = {
         "query_type": detected_query_type,
-        # "original_query_type": chat_request.query_type,
-        # "classification_method": classification_method,
         "chunks_used": len(relevant_chunks),
         "documents_searched_count": len(doc_ids) if doc_ids else 0,
         "document_ids": list(doc_ids) if doc_ids else [],
