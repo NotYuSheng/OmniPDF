@@ -389,7 +389,7 @@ class QwenRAGOptimizer:
         question: str, 
         model_name: str,
         classification_params: Dict[str, Any],
-        openai_client: AsyncOpenAI = None
+        openai_client: AsyncOpenAI
     ) -> str:
         """Use LLM to classify query type with few-shot examples"""
         try:
@@ -431,9 +431,9 @@ class QwenRAGOptimizer:
     @staticmethod
     async def detect_query_type(
         question: str, 
+        openai_client: AsyncOpenAI,
         model_name: str = None,
         config: QwenRAGConfig = None,
-        openai_client: AsyncOpenAI = None
     ) -> str:
         """
         Detect query type using LLM classification
