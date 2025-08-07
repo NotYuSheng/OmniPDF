@@ -8,6 +8,7 @@ from collections import defaultdict
 from fastapi import APIRouter, HTTPException, Body
 from models.render import DocumentRendererResponse, AnnotationResponse
 from botocore.exceptions import ClientError
+from fastapi.concurrency import run_in_threadpool
 
 from shared_utils.s3_utils import (
     upload_fileobj,
@@ -17,28 +18,10 @@ from shared_utils.s3_utils import (
 router = APIRouter(prefix="/render", tags=["render"])
 logger = logging.getLogger(__name__)
 
-@router.post("/{doc_id}")
-async def pdf_render(
-                doc_url: str,
-                json_data: AnnotationResponse = Body(...)
-                ):
-
-    start_time = time.time()
-    async with httpx.AsyncClient() as client:
-        pdf_response = await client.get(doc_url)
-        pdf_response.raise_for_status()
-
-    content_length = pdf_response.headers.get("Content-Length")
-    if content_length:
-        size_bytes = int(content_length)
-    else:
-        size_bytes = len(pdf_response.content)
-    original_size = size_bytes / 1024
-
-    json_data = json_data.model_dump()
-    doc = pymupdf.open(stream=pdf_response.content, filetype="pdf")
+def redact_and_render(pdf_bytes: bytes, annotations: dict) -> bytes:
+    doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
     trans_text_data = defaultdict(list)
-    texts = json_data.get("docling", {}).get("texts", [])
+    texts = annotations.get("docling", {}).get("texts", [])
 
     for text_item in texts:
         translated = text_item.get("translated_text", "")
@@ -55,10 +38,8 @@ async def pdf_render(
                     "bbox": bbox
                 })
 
-    logger.info(f"Text data: \n{trans_text_data}")
-
     for page in doc:
-        logger.info(f"{page.number}\n") 
+        logger.info(f"{page.number}") 
         for cell in trans_text_data.get(page.number + 1, []):
             bbox = cell.get('bbox')
             rect_bbox = pymupdf.Rect(bbox["l"],
@@ -100,7 +81,52 @@ async def pdf_render(
     doc.subset_fonts()
     doc.save(buffer, garbage=4, deflate=True, clean=True)
     buffer.seek(0)
+    return buffer.getvalue()
 
+def handle_file(buffer_bytes: bytes, key: str) -> str:
+    """
+    Sync helper to upload bytes to S3 and generate a presigned URL.
+    Returns the presigned URL string.
+    Raises ClientError or other on failure.
+    """
+    buf = io.BytesIO(buffer_bytes)
+    # 1) upload
+    success = upload_fileobj(buf, key, content_type="application/pdf")
+    if not success:
+        # mimic your existing HTTPException path
+        raise RuntimeError("Failed to upload file to S3")
+    # 2) generate presigned URL
+    url = generate_presigned_url(key)
+    return url
+    
+@router.post("/{doc_id}")
+async def pdf_render(
+                doc_url: str,
+                json_data: AnnotationResponse = Body(...)
+                ):
+
+    start_time = time.time()
+    async with httpx.AsyncClient() as client:
+        pdf_response = await client.get(doc_url)
+        pdf_response.raise_for_status()
+
+    content_length = pdf_response.headers.get("Content-Length")
+    if content_length:
+        size_bytes = int(content_length)
+    else:
+        size_bytes = len(pdf_response.content)
+    original_size = size_bytes / 1024
+    json_data = json_data.model_dump()
+    
+    try:
+        output_bytes = await run_in_threadpool(redact_and_render,
+                                               pdf_response.content,
+                                               json_data)
+    except Exception as e:
+        logger.error("Rendering failed", exc_info=True)
+        raise HTTPException(500, f"PDF processing error {e}")
+
+    buffer = io.BytesIO(output_bytes)
     file_size = len(buffer.getvalue())
 
     rendered_size = file_size / 1024
@@ -116,26 +142,23 @@ async def pdf_render(
     key = f"{new_doc_id}/rendered.pdf"
 
     try:
-        success = upload_fileobj(
-            buffer, key, content_type="application/pdf"
+        presigned_url = await run_in_threadpool(
+            handle_file,
+            output_bytes,
+            key
         )
-        if not success:
-            raise HTTPException(status_code=500, detail="Failed to upload file to S3")
-
-        presigned_url = generate_presigned_url(key)
-
+        
     except ClientError as e:
         code = e.response.get("Error", {}).get("Code", "Unknown")
         logger.error(f"S3 ClientError {code}", exc_info=True)
-        raise HTTPException(
-            status_code=502,
-            detail=f"S3 service error ({code})"
-        )
-
+        raise HTTPException(502, f"S3 service error ({code})")
+    except RuntimeError as e:
+        # this covers your "upload returned False" path
+        raise HTTPException(500, str(e))
     except Exception as e:
-        logger.error(f"Unexpected error during upload: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
-
+        logger.error("Unexpected upload error", exc_info=True)
+        raise HTTPException(500, f"Internal server error {e}")
+    
     return(DocumentRendererResponse(doc_id=new_doc_id,
                                     filename=key,
                                     download_url=presigned_url,
