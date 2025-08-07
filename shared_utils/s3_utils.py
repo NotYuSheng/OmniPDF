@@ -96,6 +96,36 @@ def delete_file(key: str) -> bool:
         return False
 
 
+def list_folder(folder: str) -> list[str]:
+    paginator = s3_client.get_paginator("list_objects_v2")
+    pages = paginator.paginate(Bucket=S3_BUCKET, Prefix=folder)
+    keys = [obj["Key"] for page in pages for obj in page.get("Contents", [])]
+    return keys
+
+
+def delete_folder(key: str) -> bool:
+    """
+    Deletes a folder from S3 using the given key.
+    Returns True if the folder existed and was deleted, False if it did not exist.
+    """
+    DELETE_OBJECT_LIMIT = 1000
+    try:
+        keys = list_folder(key)
+        chunked_keys = [
+            keys[i : i + DELETE_OBJECT_LIMIT]
+            for i in range(0, len(keys), DELETE_OBJECT_LIMIT)
+        ]
+        for chunk in chunked_keys:
+            s3_client.delete_objects(
+                Bucket=S3_BUCKET,
+                Delete={"Objects": [{"Key": key} for key in chunk], "Quiet": True},
+            )
+        return True
+    except (BotoCoreError, ClientError) as e:
+        logger.exception(f"Failed to delete file from S3: {e}")
+        return False
+
+
 def save_job(
     doc_id: str, job_data: Union[dict, BaseModel], status: str, job_type: str
 ) -> bool:
@@ -113,12 +143,12 @@ def save_job(
             "data": payload,
         }
         file_obj = BytesIO(json.dumps(wrapped).encode("utf-8"))
-        
+
         redis_flag_store.set(f"jobs/{job_type}/{doc_id}.json")
         return upload_fileobj(
-            file_obj, 
-            key=f"jobs/{job_type}/{doc_id}.json", 
-            content_type="application/json"
+            file_obj,
+            key=f"jobs/{job_type}/{doc_id}.json",
+            content_type="application/json",
         )
     except Exception as e:
         logger.exception(f"Failed to save job for doc_id: {doc_id} - {e}")

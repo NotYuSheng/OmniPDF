@@ -1,7 +1,8 @@
 import logging
 
+from shared_utils.chroma_client import get_chroma_client
 from shared_utils.redis import RedisBase, RedisSetStorage, SEPERATOR
-from shared_utils.s3_utils import delete_file
+from shared_utils.s3_utils import delete_file, delete_folder
 
 logger = logging.getLogger(__name__)
 
@@ -22,12 +23,23 @@ def clean_redis_key(key: str):
 
 
 def clean_s3_files(key: str):
-    logger.info(f"deleting s3 {key}")
+    logger.info(f"deleting s3 files by filenames: {key}")
     redis_set_store = RedisSetStorage(redis_client=redis_store.client)
     for doc_key in redis_set_store[key]:
         if doc_key:
             logger.info(f"deleting {doc_key}")
             delete_file(doc_key)
+    del redis_set_store[key]
+
+
+def clean_s3_folder(key: str):
+    logger.info(f"deleting s3 files by folder: {key}")
+    redis_set_store = RedisSetStorage(redis_client=redis_store.client)
+    for doc_key in redis_set_store[key]:
+        if doc_key:
+            logger.info(f"deleting {doc_key}")
+            delete_folder(doc_key)
+            delete_file(f"jobs/extraction/{doc_key}.json")
     del redis_set_store[key]
 
 
@@ -39,10 +51,9 @@ def clean_s3_file(key: str):
 def clean_chromadb(key):
     pass
 
-
 DELETION_PREFIX_CALLBACK_DICT = {
     "S3Key": clean_s3_files,
-    "SessionHeader": clean_s3_files,
+    "SessionHeader": clean_s3_folder,
     "S3_File": clean_s3_file,
     "RedisKey": clean_redis_key,
     "ChromaDBKey": clean_chromadb,
