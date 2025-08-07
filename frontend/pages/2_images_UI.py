@@ -152,7 +152,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         st.session_state.expander_states[data['uploaded_filename']] = False
                         if data['uploaded_filename'] in expanded_docs:
                             expanded_docs.remove(data['uploaded_filename'])
-                            st.experimental_rerun()
                     else:  # expander is open
                         st.session_state.expander_states[data['uploaded_filename']] = True
                     
