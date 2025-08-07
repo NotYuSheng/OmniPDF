@@ -175,6 +175,8 @@ async def validate_query_with_llm(
     """
     Use LLM to validate if query is meaningful and can be answered with documents.
     """
+    collection_info = None
+    
     if collection_name:
         collection_info = f"Documents about {collection_name}" 
     else:
