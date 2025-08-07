@@ -168,7 +168,7 @@ def load_job(doc_id: str, job_type: str) -> Optional[dict]:
         job_key = get_job_s3_key(doc_id, job_type)
         response = s3_client.get_object(Bucket=S3_BUCKET, Key=job_key)
         job = json.loads(response["Body"].read().decode("utf-8"))
-        redis_flag_store.set(f"jobs/{job_type}/{doc_id}.json")
+        redis_flag_store.set(job_key)
         return {
             "doc_id": doc_id,
             "status": job.get("status", "unknown"),
