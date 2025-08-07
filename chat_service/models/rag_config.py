@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Optional
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, APIError
 import os
 import logging
 from enum import Enum
@@ -423,7 +423,7 @@ class QwenRAGOptimizer:
                 logger.error("LLM classification returned empty response")
                 return QueryType.GENERAL.value
                 
-        except Exception as e:
+        except APIError as e:
             logger.error(f"LLM query classification failed: {e}")
             return QueryType.GENERAL.value
 

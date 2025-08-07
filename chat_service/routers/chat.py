@@ -212,7 +212,7 @@ async def validate_query_with_llm(
         ("NEEDS_CLARIFICATION" in result)):
             return False, result
             
-    except Exception as e:
+    except APIError as e:
         logger.warning(f"LLM validation failed: {e}")
         raise HTTPException(status_code=500, detail="LLM validation failed")
 
