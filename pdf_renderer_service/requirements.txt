@@ -5,3 +5,4 @@ PyMuPDF==1.26.1
 python-multipart==0.0.20
 spire-pdf==11.7.0
 httpx==0.28.1
+redis==6.3.0
