@@ -207,7 +207,7 @@ async def validate_query_with_llm(
         
         if "PROCEED_WITH_RAG" in result:
             return True, None
-        elif "HANDLE_WITHOUT_RAG" or "INVALID_QUERY" or "NEEDS_CLARIFICATION" in result:
+        elif ("HANDLE_WITHOUT_RAG" or "INVALID_QUERY" or "NEEDS_CLARIFICATION") in result:
             return False, result
             
     except Exception as e:
