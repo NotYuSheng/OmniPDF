@@ -126,6 +126,10 @@ def delete_folder(key: str) -> bool:
         return False
 
 
+def get_job_s3_key(doc_id: str, job_type: str):
+    return f"jobs/{job_type}/{doc_id}.json"
+
+
 def save_job(
     doc_id: str, job_data: Union[dict, BaseModel], status: str, job_type: str
 ) -> bool:
@@ -144,10 +148,11 @@ def save_job(
         }
         file_obj = BytesIO(json.dumps(wrapped).encode("utf-8"))
 
-        redis_flag_store.set(f"jobs/{job_type}/{doc_id}.json")
+        job_key = get_job_s3_key(doc_id, job_type)
+        redis_flag_store.set(job_key)
         return upload_fileobj(
             file_obj,
-            key=f"jobs/{job_type}/{doc_id}.json",
+            key=job_key,
             content_type="application/json",
         )
     except Exception as e:
@@ -160,8 +165,8 @@ def load_job(doc_id: str, job_type: str) -> Optional[dict]:
     Loads job metadata and data from S3 given a doc_id.
     """
     try:
-        key = f"jobs/{job_type}/{doc_id}.json"
-        response = s3_client.get_object(Bucket=S3_BUCKET, Key=key)
+        job_key = get_job_s3_key(doc_id, job_type)
+        response = s3_client.get_object(Bucket=S3_BUCKET, Key=job_key)
         job = json.loads(response["Body"].read().decode("utf-8"))
         redis_flag_store.set(f"jobs/{job_type}/{doc_id}.json")
         return {

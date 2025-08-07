@@ -1,7 +1,7 @@
 import logging
 
 from shared_utils.redis import RedisBase, RedisSetStorage, SEPERATOR
-from shared_utils.s3_utils import delete_file, delete_folder
+from shared_utils.s3_utils import delete_file, delete_folder, get_job_s3_key
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ def clean_s3_folder(key: str):
         if doc_key:
             logger.info(f"deleting {doc_key}")
             delete_folder(doc_key)
-            delete_file(f"jobs/extraction/{doc_key}.json")
+            delete_file(get_job_s3_key(doc_key, "extraction"))
     del redis_set_store[key]
 
 
