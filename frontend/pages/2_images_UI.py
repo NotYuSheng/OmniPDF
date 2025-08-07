@@ -14,7 +14,7 @@ st.header("🖼️ Image Extraction")
 image_status = st.empty()
 server_status = st.empty()
 
-async def get_images(doc_id, max_retries=60, delay=1):
+async def get_images(doc_id, max_retries=60, delay=1) -> dict:
     for attempt in range(max_retries):
         async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
             try:
@@ -60,48 +60,71 @@ async def get_images(doc_id, max_retries=60, delay=1):
     
     raise TimeoutError("Max retries exceeded")
 
+def display_images(image_response):
+    """
+    Display images extracted from the processed PDF document.
+    """
+     # Check if we have images in the response
+    if "images" in image_response and image_response["images"]:
+        image_status.success(f"Found {len(image_response['images'])} images in the document")
+        
+        # if "cookies" not in st.session_state:
+        #     st.session_state.cookies = image_response.get("cookies", {})
+
+        # Display each image
+        for i, image_data in enumerate(image_response["images"]):
+            with st.container():
+                col1, col2 = st.columns([1, 2], border=True)
+                
+                with col1:
+                    # Display actual image from URL
+                    try:
+                        st.image(
+                            image_data["url"],
+                            caption=f"Image {i+1} (from {image_data["image_key"]})",
+                            use_container_width =True
+                        )
+                    except Exception as e:
+                        logger.error(f"Error loading image {i+1}: {e}")
+                        st.error(f"Error loading image {i+1}: {e}")
+                
+                with col2:
+                    st.markdown(f"**Image Key:** {image_data["image_key"]}")
+                    st.markdown(f"**Image ID:** IMG_{i+1:03d}")
+                    st.markdown(f"**Image URL:** {image_data["url"]}")
+                
+                st.markdown('</div>', unsafe_allow_html=True)
+                st.divider()  # Add separator between images
+    else:
+        logger.info("No images found in the document")
+        st.info("No images found in the document")
+
 if "processed_data" in st.session_state and st.session_state.processed_data:
-    doc_id = st.session_state.processed_data["doc_id"]
+    response_lst = st.session_state.processed_data.items()
+    for doc_id, data in response_lst:
+        st.markdown(f"**Document ID:** {doc_id}")
+        st.markdown(f"**Filename:** {data['filename']}")
+        st.markdown(f"**Download URL:** [Download]({data['download_url']})")
+        st.markdown(f"**Uploaded Filename:** {data['uploaded_filename']}")
+    # doc_id = st.session_state.processed_data["doc_id"]
     
     try:
+        image_responses = []
         # Show loading message
         with st.spinner("Extracting images from document..."):
-            image_response = asyncio.run(get_images(doc_id=doc_id))
+            for doc_id, data in response_lst:
+                logger.info(f"Extracting images for document ID: {doc_id}")
+                image_responses.append(asyncio.run(get_images(doc_id=doc_id)))
         
-        
-        # Check if we have images in the response
-        if "images" in image_response and image_response["images"]:
-            image_status.success(f"Found {len(image_response['images'])} images in the document")
-            
-            # if "cookies" not in st.session_state:
-            #     st.session_state.cookies = image_response.get("cookies", {})
+        # Multiselect - Display images for selected document, defaulted to all documents
 
-            # Display each image
-            for i, image_data in enumerate(image_response["images"]):
-                with st.container():
-                    col1, col2 = st.columns([1, 2], border=True)
-                    
-                    with col1:
-                        # Display actual image from URL
-                        try:
-                            st.image(
-                                image_data["url"],
-                                caption=f"Image {i+1} (from {image_data["image_key"]})",
-                                use_container_width =True
-                            )
-                        except Exception as e:
-                            logger.error(f"Error loading image {i+1}: {e}")
-                            st.error(f"Error loading image {i+1}: {e}")
-                    
-                    with col2:
-                        st.markdown(f"**Image Key:** {image_data["image_key"]}")
-                        st.markdown(f"**Image ID:** IMG_{i+1:03d}")
-                        st.markdown(f"**Image URL:** {image_data["url"]}")
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-                    st.divider()  # Add separator between images
-        else:
-            st.info("No images found in the document")
+        for image_response in image_responses:
+            if image_response:
+                display_images(image_response)
+            else:
+                st.info("No images found in the document")
+        
+       
             
     except TimeoutError as e:
         st.error(f"Timeout error: {e}")
