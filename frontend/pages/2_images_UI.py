@@ -81,7 +81,7 @@ def display_images(image_response):
                     try:
                         st.image(
                             image_data["url"],
-                            caption=f"Image {i+1} (from {image_data["image_key"]})",
+                            caption=f"Image {i+1} {describe_image(image_data)}",
                             use_container_width =True
                         )
                     except Exception as e:
@@ -94,37 +94,76 @@ def display_images(image_response):
                     st.markdown(f"**Image URL:** {image_data["url"]}")
                 
                 st.markdown('</div>', unsafe_allow_html=True)
-                st.divider()  # Add separator between images
+                
     else:
         logger.info("No images found in the document")
         st.info("No images found in the document")
 
+def describe_image(image_data):
+    """
+    Placeholder function to describe the image.
+    In a real application, this could call an AI model or service to generate a description.
+    """
+    # Simulate a description
+    return "Description for image"
+
+
 if "processed_data" in st.session_state and st.session_state.processed_data:
-    response_lst = st.session_state.processed_data.items()
-    for doc_id, data in response_lst:
-        st.markdown(f"**Document ID:** {doc_id}")
-        st.markdown(f"**Filename:** {data['filename']}")
-        st.markdown(f"**Download URL:** [Download]({data['download_url']})")
-        st.markdown(f"**Uploaded Filename:** {data['uploaded_filename']}")
-    # doc_id = st.session_state.processed_data["doc_id"]
+    # Initialize session state for expander states if not exists
+    if 'expander_states' not in st.session_state:
+        st.session_state.expander_states = {}
     
+    response_lst = list(st.session_state.processed_data.items())
+    doc_names = [data['uploaded_filename'] for _, data in response_lst]
+    
+    # Initialize expander states for new documents
+    for doc_name in doc_names:
+        if doc_name not in st.session_state.expander_states:
+            st.session_state.expander_states[doc_name] = True
+    
+    # Update multiselect based on expander states
+    expanded_docs = st.multiselect(
+        label="Expand documents:",
+        options=doc_names,
+        default=[doc for doc in doc_names if st.session_state.expander_states.get(doc, True)],
+        help="Choose which documents should be expanded",
+        key="expander_multiselect"
+    )
+    
+    # Update session state based on multiselect
+    for doc_name in doc_names:
+        st.session_state.expander_states[doc_name] = doc_name in expanded_docs
+
     try:
         image_responses = []
         # Show loading message
         with st.spinner("Extracting images from document..."):
             for doc_id, data in response_lst:
-                logger.info(f"Extracting images for document ID: {doc_id}")
-                image_responses.append(asyncio.run(get_images(doc_id=doc_id)))
-        
-        # Multiselect - Display images for selected document, defaulted to all documents
+                if data['uploaded_filename'] in doc_names:
+                    # Create expander and update state when it's clicked
+                    expander_key = f"expander_{data['uploaded_filename']}"
+                    file_lst = st.expander(
+                        label=f"**{data['uploaded_filename']}**", 
+                        expanded=st.session_state.expander_states.get(data['uploaded_filename'], True)
+                    )
+                    
+                    # Update expander state and multiselect when expander is toggled
+                    if not file_lst:  # expander is closed
+                        st.session_state.expander_states[data['uploaded_filename']] = False
+                        if data['uploaded_filename'] in expanded_docs:
+                            expanded_docs.remove(data['uploaded_filename'])
+                            st.experimental_rerun()
+                    else:  # expander is open
+                        st.session_state.expander_states[data['uploaded_filename']] = True
+                    
+                    with file_lst:
+                        st.markdown(f"**Document ID:** {doc_id}")
+                        st.markdown(f"**Filename:** [{data['filename']}]({data['download_url']})") # Download link
+                        logger.info(f"Extracting images for document ID: {doc_id}")
+                        image_response = asyncio.run(get_images(doc_id=doc_id))
+                        image_responses.append(image_response)
+                        display_images(image_response)
 
-        for image_response in image_responses:
-            if image_response:
-                display_images(image_response)
-            else:
-                st.info("No images found in the document")
-        
-       
             
     except TimeoutError as e:
         st.error(f"Timeout error: {e}")
