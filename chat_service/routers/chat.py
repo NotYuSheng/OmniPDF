@@ -240,7 +240,7 @@ async def handle_chat(
         if not should_rag:
             logger.info(f"LLM query validation failed: {validation_error}")
             return ChatResponse(
-                response=f"""I'm sorry, but I couldn't process your query based on the documents in {chat_request.collection_name} that you want to query data from. Please provide a clear, specific question that I can help answer using the available documents in {chat_request.collection_name}.""",
+                response=f"""I'm sorry, but I couldn't process your query based on the documents in {chat_request.collection_name} that you want to query data from. {validation_error} Please provide a clear, specific question that I can help answer using the available documents in {chat_request.collection_name}.""",
                 relevant_chunks=[],
                 metadata={
                     "query_type": "invalid",
