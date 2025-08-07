@@ -96,21 +96,21 @@ def delete_file(key: str) -> bool:
         return False
 
 
-def list_folder(folder: str) -> list[str]:
+def list_folder(folder_prefix: str) -> list[str]:
     paginator = s3_client.get_paginator("list_objects_v2")
-    pages = paginator.paginate(Bucket=S3_BUCKET, Prefix=folder)
+    pages = paginator.paginate(Bucket=S3_BUCKET, Prefix=folder_prefix)
     keys = [obj["Key"] for page in pages for obj in page.get("Contents", [])]
     return keys
 
 
-def delete_folder(key: str) -> bool:
+def delete_folder(folder_prefix: str) -> bool:
     """
     Deletes a folder from S3 using the given key.
-    Returns True if the folder existed and was deleted, False if it did not exist.
+    Returns True if the folder was deleted, False if an error occured.
     """
     DELETE_OBJECT_LIMIT = 1000
     try:
-        keys = list_folder(key)
+        keys = list_folder(folder_prefix)
         chunked_keys = [
             keys[i : i + DELETE_OBJECT_LIMIT]
             for i in range(0, len(keys), DELETE_OBJECT_LIMIT)
