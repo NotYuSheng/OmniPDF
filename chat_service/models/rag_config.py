@@ -449,6 +449,9 @@ class QwenRAGOptimizer:
             # If LLM classification succeeded, return it
             if llm_classification != QueryType.GENERAL.value:
                 return llm_classification
+        
+        # If LLM classification failed, return General
+        return QueryType.GENERAL.value
     
     @staticmethod
     def optimize_chunks_for_qwen(chunks: List[Dict[str, Any]], max_context_length: int = 4000) -> tuple[List[Dict[str, Any]], str]:
