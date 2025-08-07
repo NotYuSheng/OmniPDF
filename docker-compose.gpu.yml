@@ -32,6 +32,14 @@ services:
     container_name: docling_translation_service
     env_file:
       - ./docling_translation_service/.env
+  
+  pdf_renderer_service:
+    build:
+      context: .
+      dockerfile: ./pdf_renderer_service/Dockerfile
+    container_name: pdf_renderer_service
+    env_file:
+      - ./pdf_renderer_service/.env
       
   embedder_service:
     build:
