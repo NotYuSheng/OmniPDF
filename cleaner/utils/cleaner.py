@@ -1,6 +1,5 @@
 import logging
 
-from shared_utils.chroma_client import get_chroma_client
 from shared_utils.redis import RedisBase, RedisSetStorage, SEPERATOR
 from shared_utils.s3_utils import delete_file, delete_folder
 
