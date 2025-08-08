@@ -201,17 +201,9 @@ async def validate_query_with_llm(
         )
         
         result = response.choices[0].message.content.strip()
-
         logger.info(f"Result: {result}")
-        
-        # if "PROCEED_WITH_RAG" in result:
-        #     return True, None
-        # elif (("HANDLE_WITHOUT_RAG" in result) or 
-        # ("INVALID_QUERY" in result) or 
-        # ("NEEDS_CLARIFICATION" in result)):
-        #     return False, result
-
         decision_line = next((line for line in result.split('\n') if line.startswith("DECISION:")), "")
+        
         if "PROCEED_WITH_RAG" in decision_line:
             return True, None
 
