@@ -231,6 +231,28 @@ async def handle_chat(
     Handle incoming chat requests and return AI responses with enhanced query classification.
     """
     try:
+        relevant_chunks = []
+        detected_query_type = ""
+        user_prompt = ""
+        doc_ids = set()
+        should_rag = bool()
+        
+        # Prepare enhanced metadata for ChatResponse
+        metadata = {
+            "query_type": detected_query_type if detected_query_type else "invalid",
+            "chunks_used": len(relevant_chunks) if relevant_chunks else 0,
+            "documents_searched_count": len(doc_ids) if doc_ids else 0,
+            "document_ids": list(doc_ids) if doc_ids else [],
+            "total_context_length": len(user_prompt) if user_prompt else 0,
+            "model_used": OPENAI_MODEL_NAME,
+            "collection_name": chat_request.collection_name,
+            "rag_performed": True if should_rag else False,
+            "generation_params": qwen_config.generation_params,
+            "reranking_enabled": qwen_config.enable_reranking,
+            "llm_classification_enabled": qwen_config.enable_llm_query_classification,
+            "response_post_processing_enabled": qwen_config.enable_response_post_processing
+        }
+        
         logger.info(f"Processing chat request for collection: {chat_request.collection_name}")
         logger.info(f"User query: {chat_request.message}")
 
@@ -247,20 +269,7 @@ async def handle_chat(
             return ChatResponse(
                 response=f"""I'm sorry, but I couldn't process your query based on the documents in {chat_request.collection_name} that you want to query data from. {validation_error} Please provide a clear, specific question that I can help answer using the available documents in {chat_request.collection_name}.""",
                 relevant_chunks=[],
-                metadata={
-                    "query_type": "invalid",
-                    "chunks_used": 0,
-                    "documents_searched_count": 0,
-                    "document_ids": [],
-                    "total_context_length": 0,
-                    "model_used": OPENAI_MODEL_NAME,
-                    "collection_name": chat_request.collection_name,
-                    "validation_error": validation_error,
-                    "validation_method": "llm",
-                    "rag_performed": False,
-                    "generation_params": qwen_config.generation_params,
-                    "reranking_enabled": qwen_config.enable_reranking
-                }
+                metadata=metadata
             )
         else:
             # Perform RAG query with enhanced classification
@@ -272,24 +281,17 @@ async def handle_chat(
                 enable_reranking=qwen_config.enable_reranking,
                 openai_client=client
             )
+
+            if relevant_chunks:
+                # Analyze document diversity in results
+                doc_ids = set(chunk.get('doc_id') for chunk in relevant_chunks if chunk.get('doc_id'))
             
-            if not relevant_chunks:
+            else:
                 logger.error("No relevant chunks found!")
                 return ChatResponse(
                     response=user_prompt,
                     relevant_chunks=[],
-                    metadata={
-                        "query_type": detected_query_type,
-                        "chunks_used": 0,
-                        "documents_searched_count": 0,
-                        "document_ids": [],
-                        "total_context_length": len(user_prompt),
-                        "model_used": OPENAI_MODEL_NAME,
-                        "collection_name": chat_request.collection_name,
-                        "classification_method": "no_chunks_found",
-                        "generation_params": qwen_config.generation_params,
-                        "reranking_enabled": qwen_config.enable_reranking
-                    }
+                    metadata=metadata
                 )
             
             # Prepare messages for Qwen-2.5
@@ -335,24 +337,6 @@ async def handle_chat(
         processed_response = qwen_optimizer.post_process_qwen_response(first_choice.message.content)
     else:
         processed_response = first_choice.message.content
-
-    # Analyze document diversity in results
-    doc_ids = set(chunk.get('doc_id') for chunk in relevant_chunks if chunk.get('doc_id'))
-    
-    # Prepare enhanced metadata for response
-    metadata = {
-        "query_type": detected_query_type,
-        "chunks_used": len(relevant_chunks),
-        "documents_searched_count": len(doc_ids) if doc_ids else 0,
-        "document_ids": list(doc_ids) if doc_ids else [],
-        "total_context_length": len(user_prompt),
-        "model_used": OPENAI_MODEL_NAME,
-        "collection_name": chat_request.collection_name,
-        "generation_params": qwen_config.generation_params,
-        "reranking_enabled": qwen_config.enable_reranking,
-        "llm_classification_enabled": qwen_config.enable_llm_query_classification,
-        "response_post_processing_enabled": qwen_config.enable_response_post_processing
-    }
     
     logger.info(f"Generated response with {len(processed_response)} characters")
     logger.info(f"Final metadata: {metadata}")
