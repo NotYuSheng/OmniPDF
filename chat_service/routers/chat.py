@@ -89,7 +89,6 @@ async def perform_rag_query(
     collection_name: str, 
     doc_id: Optional[str] = None,
     top_k: int = 5,
-    # query_type: str = None,
     enable_reranking: bool = True,
     openai_client: AsyncOpenAI = None
 ) -> tuple[str, List[Dict[str, Any]], str, str]:
@@ -205,12 +204,18 @@ async def validate_query_with_llm(
 
         logger.info(f"Result: {result}")
         
-        if "PROCEED_WITH_RAG" in result:
+        # if "PROCEED_WITH_RAG" in result:
+        #     return True, None
+        # elif (("HANDLE_WITHOUT_RAG" in result) or 
+        # ("INVALID_QUERY" in result) or 
+        # ("NEEDS_CLARIFICATION" in result)):
+        #     return False, result
+
+        decision_line = next((line for line in result.split('\n') if line.startswith("DECISION:")), "")
+        if "PROCEED_WITH_RAG" in decision_line:
             return True, None
-        elif (("HANDLE_WITHOUT_RAG" in result) or 
-        ("INVALID_QUERY" in result) or 
-        ("NEEDS_CLARIFICATION" in result)):
-            return False, result
+
+        return False, result
             
     except APIError as e:
         logger.warning(f"LLM validation failed: {e}")
@@ -264,7 +269,6 @@ async def handle_chat(
                 collection_name=chat_request.collection_name,
                 doc_id=chat_request.doc_id,
                 top_k=chat_request.top_k,
-                # query_type=chat_request.query_type or "general",
                 enable_reranking=qwen_config.enable_reranking,
                 openai_client=client
             )
