@@ -32,7 +32,26 @@ image:
 make install CHART_NAME=chat-service
 ```
 
-## Option 2: Using OpenShift CRC Registry
+## Option 2: Using OpenShift CRC Registry (Automated)
+
+### Automated Image Loader Script
+
+Use the provided `load-images.sh` script to automatically pull images from external registries and push them to CRC:
+
+```bash
+# Load single image
+./helm/load-images.sh ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136
+
+# Load multiple images
+./helm/load-images.sh ghcr.io/notyusheng/chat_service:v1.0.0 ghcr.io/notyusheng/embedder_service:v1.1.0
+
+# Load from file (recommended for multiple services)
+./helm/load-images.sh -f images.txt
+```
+
+The script automatically handles login, pulling, tagging, and pushing to the CRC registry.
+
+### Manual Process (Alternative)
 
 ### Prerequisites
 - OpenShift CRC installed and running

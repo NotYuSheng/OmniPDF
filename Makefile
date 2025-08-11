@@ -4,7 +4,8 @@
 NAMESPACE ?= omnipdf
 CHART_NAME ?= example-service
 CHART_DIR ?= helm/$(CHART_NAME)
-VALUES_FILE ?= $(CHART_DIR)/values.yaml
+ENV ?= dev
+VALUES_FILE ?= $(CHART_DIR)/values-$(ENV).yaml
 
 # Default port for port-forwarding (override as needed)
 LOCAL_PORT ?= 8000
@@ -16,10 +17,10 @@ help:
 	@echo "Makefile commands for Helm chart management:"
 	@echo ""
 	@echo "Single-service commands:"
-	@echo "  make install                Install chart (CHART_NAME)"
-	@echo "                              e.g. make install CHART_NAME=chat-service"
-	@echo "  make upgrade                Upgrade chart (CHART_NAME)"
-	@echo "                              e.g. make upgrade CHART_NAME=embedder-service"
+	@echo "  make install                Install chart (CHART_NAME, ENV)"
+	@echo "                              e.g. make install CHART_NAME=chat-service ENV=staging"
+	@echo "  make upgrade                Upgrade chart (CHART_NAME, ENV)"
+	@echo "                              e.g. make upgrade CHART_NAME=embedder-service ENV=prod"
 	@echo "  make uninstall              Uninstall chart (CHART_NAME)"
 	@echo "                              e.g. make uninstall CHART_NAME=pdf-processor"
 	@echo "  make lint                   Run helm lint on chart (CHART_NAME)"
@@ -30,9 +31,14 @@ help:
 	@echo "                              e.g. make port-forward CHART_NAME=chat-service LOCAL_PORT=8000 REMOTE_PORT=8000"
 	@echo ""
 	@echo "Multi-service commands:"
-	@echo "  make install-all            Install all charts under ./helm/"
-	@echo "  make upgrade-all            Upgrade all charts under ./helm/"
+	@echo "  make install-all            Install all charts under ./helm/ (ENV)"
+	@echo "                              e.g. make install-all ENV=prod"
+	@echo "  make upgrade-all            Upgrade all charts under ./helm/ (ENV)"
+	@echo "                              e.g. make upgrade-all ENV=staging"
 	@echo "  make uninstall-all          Uninstall all charts under ./helm/"
+	@echo ""
+	@echo "Environment Variables:"
+	@echo "  ENV                         Environment (dev, staging, prestaging, prod) - defaults to 'dev'"
 	@echo ""
 	@echo "⚠️ IMPORTANT:"
 	@echo "  Avoid underscores (_) in CHART_NAME or release names."
@@ -78,7 +84,7 @@ install-all:
 		helm upgrade --install $$CHART helm/$$CHART \
 			--namespace $(NAMESPACE) \
 			--create-namespace \
-			--values helm/$$CHART/values.yaml; \
+			--values helm/$$CHART/values-$(ENV).yaml; \
 	done
 
 ## Upgrade all Helm charts in ./helm/
@@ -90,7 +96,7 @@ upgrade-all:
 		helm upgrade --install $$CHART helm/$$CHART \
 			--namespace $(NAMESPACE) \
 			--create-namespace \
-			--values helm/$$CHART/values.yaml; \
+			--values helm/$$CHART/values-$(ENV).yaml; \
 	done
 
 ## Uninstall all Helm charts in ./helm/

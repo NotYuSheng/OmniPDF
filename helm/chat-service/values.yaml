@@ -43,7 +43,7 @@ podSecurityContext: {}
 securityContext:
   allowPrivilegeEscalation: false
   runAsNonRoot: true
-  runAsUser: 65534
+  # runAsUser: 65534  # Let OpenShift assign user ID automatically
   readOnlyRootFilesystem: true
   capabilities:
     drop:
@@ -132,11 +132,12 @@ tolerations: []
 
 affinity: {}
 
-env:
-  - name: OPENAI_BASE_URL
-    value: http://webworkdgx/vllm_qwen2.5/v1
-  - name: OPENAI_MODEL
-    value: qwen2.5-0.5b-instruct
+# LLM Configuration - override in environment-specific values files
+llm:
+  baseUrl: "http://webworkdgx/vllm_qwen2.5/v1"  # Default for local dev
+  model: "qwen2.5-0.5b-instruct"
+
+env: []  # Will be populated from LLM config in deployment template
 
 # Secret configuration for sensitive values
 secrets:
@@ -144,6 +145,99 @@ secrets:
   create: false
   # Name of the secret to reference (must exist if create=false)
   name: chat-service-secrets
+  # Data for secret creation (only used when create=true)
+  # Values will be base64 encoded automatically
+  data: {}
+    # OPENAI_API_KEY: "your-api-key-here"
+    # DATABASE_PASSWORD: "your-db-password"
+
+# Network policy configuration for network segmentation
+networkPolicy:
+  enabled: false  # Disabled by default for dev/testing
+  ingress:
+    enabled: true
+    # Allow ingress controller to reach this service
+    fromIngressController: true
+    ingressControllerNamespaceLabels:
+      name: ingress-nginx
+    # Allow services in same namespace to communicate
+    fromSameNamespace: true
+    # Custom ingress rules (empty by default)
+    customRules: []
+  egress:
+    enabled: true
+    # Allow DNS resolution (required for hostname lookups)
+    allowDNS: true
+    # Allow HTTPS for external APIs
+    allowHTTPS: true
+    # Allow HTTP for internal services  
+    allowHTTP: false
+    # Allow communication to LLM service
+    allowLLMService: true
+    llmServiceSelectors:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: llm-service
+    llmServicePorts:
+      - 8080
+      - 8000
+    # Allow traffic to same namespace
+    toSameNamespace: true
+    # Custom egress rules (empty by default)
+    customRules: []
+
+# Pod Disruption Budget for high availability during maintenance
+podDisruptionBudget:
+  enabled: false  # Disabled by default for dev
+  # Use either minAvailable OR maxUnavailable (not both)
+  minAvailable: null
+  maxUnavailable: null
+
+# Deployment strategy for updates (defaults to Kubernetes standard)
+deploymentStrategy: {}
+  # Example configurations:
+  # type: RollingUpdate
+  # rollingUpdate:
+  #   maxUnavailable: 25%
+  #   maxSurge: 25%
+  # 
+  # OR for faster dev updates:
+  # type: Recreate
+
+# Resource quota for namespace-level resource management  
+resourceQuota:
+  enabled: false  # Disabled by default
+  # Compute resource limits
+  requests:
+    cpu: null     # e.g. "10" (10 CPU cores)
+    memory: null  # e.g. "20Gi" (20GB memory)
+    storage: null # e.g. "100Gi" (100GB storage)
+  limits:
+    cpu: null     # e.g. "20" (20 CPU cores)  
+    memory: null  # e.g. "40Gi" (40GB memory)
+  # Object count limits
+  pods: null                    # e.g. "50" (max 50 pods)
+  services: null                # e.g. "10" (max 10 services)
+  persistentvolumeclaims: null  # e.g. "5" (max 5 PVCs)
+  secrets: null                 # e.g. "20" (max 20 secrets)
+  configmaps: null              # e.g. "20" (max 20 configmaps)
+
+# Service monitoring for Prometheus (optional)
+serviceMonitor:
+  enabled: false  # Disabled by default - enable in environments with Prometheus
+  # Metrics endpoint configuration
+  port: "http"              # Service port name to scrape (default: http)
+  path: "/metrics"          # Metrics endpoint path
+  interval: "30s"           # How often to scrape metrics
+  scrapeTimeout: "10s"      # Timeout for each scrape
+  honorLabels: false        # Whether to honor labels from target
+  # Additional labels for ServiceMonitor resource
+  labels: {}
+  # Additional annotations for ServiceMonitor resource  
+  annotations: {}
+  # Metric relabeling (advanced)
+  metricRelabelings: []
+  relabelings: []
 
 #istio:
 #  enabled: true

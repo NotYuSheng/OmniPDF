@@ -22,3 +22,6 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "dev-v0.0.0-6653136"
+
+# Chart icon for Helm repositories and UIs - Local static logo
+icon: file://assets/logo.svg

@@ -1,0 +1,95 @@
+# Staging environment overrides
+replicaCount: 3
+
+# Staging LLM configuration
+llm:
+  baseUrl: "http://llm-staging.internal.company.com/v1"
+  model: "qwen2.5-14b-instruct"  # Production-like model
+
+# Staging resources (closer to production)
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+# Production-like autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Staging secrets
+secrets:
+  create: false
+  name: chat-service-staging-secrets
+
+# Production-like image handling
+image:
+  pullPolicy: Always
+
+# Enable ingress for staging testing
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "staging-issuer"
+  hosts:
+    - host: chat-staging.company.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: chat-staging-tls
+      hosts:
+        - chat-staging.company.com
+
+# Environment variables
+env:
+  - name: LOG_LEVEL
+    value: "WARN"
+  - name: ENVIRONMENT
+    value: "staging"
+  - name: ENABLE_METRICS
+    value: "true"
+  - name: ENABLE_TRACING
+    value: "true"
+
+# Enable network policy for staging security testing
+networkPolicy:
+  enabled: true
+
+# Pod disruption budget for staging availability (3 replicas, allow 1 down)
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+# Conservative deployment strategy for staging (production-like)
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+
+# Production-like resource quota for staging stress testing
+resourceQuota:
+  enabled: true
+  requests:
+    cpu: "15"      # 15 CPU cores max
+    memory: "30Gi" # 30GB memory max
+    storage: "50Gi" # 50GB storage max
+  limits:
+    cpu: "25"      # 25 CPU cores max
+    memory: "50Gi" # 50GB memory max
+  pods: "40"       # Max 40 pods total
+  services: "15"   # Max 15 services
+  secrets: "30"    # Max 30 secrets
+
+# Enable monitoring for staging (if Prometheus is available)
+serviceMonitor:
+  enabled: true
+  interval: "15s"  # More frequent monitoring for staging testing
