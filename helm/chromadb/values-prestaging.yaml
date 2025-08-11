@@ -1,0 +1,67 @@
+# Prestaging environment configuration for ChromaDB
+# This file overrides default values.yaml for prestaging deployment in CRC
+
+# Single replica for prestaging
+replicaCount: 1
+autoscaling:
+  enabled: false
+
+# Prestaging resource allocation - conservative for CRC
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# Persistence configuration for prestaging
+persistence:
+  enabled: true
+  storageClass: ""  # Use default CRC storage class
+  size: 2Gi
+  accessModes:
+    - ReadWriteOnce
+
+# Health probes disabled for prestaging due to ChromaDB API compatibility
+startupProbe:
+  enabled: false
+
+livenessProbe:
+  enabled: false
+
+readinessProbe:
+  enabled: false
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 2
+  successThreshold: 1
+
+# ChromaDB configuration for prestaging
+chromadb:
+  persistent: "true"
+  anonymizedTelemetry: "false"
+
+# Environment-specific environment variables
+env:
+  - name: "LOG_LEVEL"
+    value: "DEBUG"
+  - name: "ENVIRONMENT" 
+    value: "prestaging"
+
+# OpenShift security context adjustments for CRC
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: false  # ChromaDB needs to run as root or specific user
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+podSecurityContext: {}
+
+# No node selection needed for CRC
+nodeSelector: {}
+tolerations: []
+affinity: {}

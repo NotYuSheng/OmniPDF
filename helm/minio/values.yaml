@@ -1,0 +1,232 @@
+# Default values for minio.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: minio/minio
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # Let OpenShift assign appropriate user/group IDs automatically
+  # fsGroup: 1001
+  # runAsGroup: 1001
+  # runAsNonRoot: true
+  # runAsUser: 1001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  # runAsUser: 1001  # Let OpenShift assign user ID automatically
+  # runAsGroup: 1001
+  readOnlyRootFilesystem: false  # MinIO needs to write to filesystem
+  seccompProfile:
+    type: RuntimeDefault  # Required for OpenShift restricted security
+  capabilities:
+    drop:
+    - ALL
+
+service:
+  type: ClusterIP
+  port: 9000
+  consolePort: 9001
+  annotations: {}
+  # Create separate service for console (optional)
+  separateConsoleService: false
+  consoleType: ClusterIP
+  consoleAnnotations: {}
+
+# MinIO ingress configuration (optional)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: minio.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: minio-tls
+  #    hosts:
+  #      - minio.local
+
+# Console ingress (separate from API)
+consoleIngress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: minio-console.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Resource configuration
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# Autoscaling (typically disabled for MinIO unless in distributed mode)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 85
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Environment variables
+env:
+  - name: MINIO_BROWSER_REDIRECT_URL
+    value: "http://localhost:9001"
+  - name: MINIO_SERVER_URL
+    value: "http://localhost:9000"
+
+# MinIO persistence configuration
+persistence:
+  enabled: true
+  # existingClaim: ""
+  storageClass: ""  # Use default storage class
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+  selector: {}
+
+# Health probes configuration
+livenessProbe:
+  enabled: true
+  path: /minio/health/live
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  path: /minio/health/ready
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 2
+  successThreshold: 1
+
+startupProbe:
+  enabled: true
+  path: /minio/health/live
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 6
+  successThreshold: 1
+
+# MinIO credentials - MUST be configured
+secrets:
+  # Set to true to create secret from values, false to use existing secret
+  create: true
+  # Name of the secret to reference
+  name: minio-secrets
+  # Data for secret creation (only used when create=true)
+  data:
+    MINIO_ROOT_USER: "minioadmin"
+    MINIO_ROOT_PASSWORD: "minioadmin123"  # Change in production!
+
+# Network policy configuration (optional)
+networkPolicy:
+  enabled: false
+  ingress:
+    enabled: true
+    fromSameNamespace: true
+    fromIngressController: true
+    ingressControllerNamespaceLabels:
+      name: ingress-nginx
+    customRules: []
+  egress:
+    enabled: true
+    allowDNS: true
+    customRules: []
+
+# Pod Disruption Budget (optional)
+podDisruptionBudget:
+  enabled: false
+  minAvailable: null
+  maxUnavailable: null
+
+# Deployment strategy
+deploymentStrategy:
+  type: Recreate  # MinIO typically uses Recreate for single-node
+
+# Resource quota (optional)
+resourceQuota:
+  enabled: false
+  requests:
+    cpu: null
+    memory: null
+    storage: null
+  limits:
+    cpu: null
+    memory: null
+  pods: null
+  services: null
+  persistentvolumeclaims: null
+
+# Service monitoring for Prometheus (optional)
+serviceMonitor:
+  enabled: false
+  port: "minio-api"
+  path: "/minio/v2/metrics/cluster"
+  interval: "30s"
+  scrapeTimeout: "10s"
+  honorLabels: false
+  labels: {}
+  annotations: {}
+  metricRelabelings: []
+  relabelings: []

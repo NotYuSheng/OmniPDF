@@ -1,0 +1,79 @@
+# Development environment configuration for embedder-service
+# This file overrides default values.yaml for local development
+
+# Development image configuration
+image:
+  repository: ghcr.io/notyusheng/embedder-service
+  tag: "dev-latest"
+  pullPolicy: Always
+
+# Development resource allocation - minimal for local testing
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 25m
+    memory: 32Mi
+
+# Single replica for development
+replicaCount: 1
+autoscaling:
+  enabled: false
+
+# ChromaDB configuration for development
+chromadb:
+  host: "localhost"  # Assuming local ChromaDB instance
+  port: "8000"
+  collection: "dev_document_embeddings"
+
+# Health probes with relaxed timing for development
+startupProbe:
+  enabled: true
+  path: /health
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+livenessProbe:
+  enabled: true
+  path: /health
+  initialDelaySeconds: 30
+  periodSeconds: 60
+  timeoutSeconds: 10
+  failureThreshold: 5
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  path: /health
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+# Environment-specific environment variables
+env:
+  - name: "LOG_LEVEL"
+    value: "DEBUG"
+  - name: "ENVIRONMENT"
+    value: "development"
+
+# Disable monitoring in development
+serviceMonitor:
+  enabled: false
+
+# Disable network policies in development
+networkPolicy:
+  enabled: false
+
+# No pod disruption budget needed for development
+podDisruptionBudget:
+  enabled: false
+
+# No resource quotas in development
+resourceQuota:
+  enabled: false

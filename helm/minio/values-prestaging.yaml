@@ -1,0 +1,59 @@
+# MinIO prestaging environment configuration
+
+# Single replica for prestaging
+replicaCount: 1
+
+# Use official MinIO image
+image:
+  repository: minio/minio
+  tag: "RELEASE.2024-01-16T16-07-38Z"
+  pullPolicy: IfNotPresent
+
+# Reduced resources for prestaging
+resources:
+  limits:
+    cpu: 300m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Storage configuration for prestaging
+persistence:
+  enabled: true
+  storageClass: ""  # Use default CRC storage
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi  # Smaller size for prestaging
+
+# MinIO credentials for prestaging
+secrets:
+  create: true
+  name: minio-prestaging-secrets
+  data:
+    MINIO_ROOT_USER: "prestaging"
+    MINIO_ROOT_PASSWORD: "prestaging123"
+
+# Environment-specific settings
+env:
+  - name: MINIO_BROWSER_REDIRECT_URL
+    value: "http://localhost:9001"
+  - name: MINIO_SERVER_URL
+    value: "http://localhost:9000"
+  - name: MINIO_CONSOLE_ADDRESS
+    value: ":9001"
+
+# Disable autoscaling for prestaging
+autoscaling:
+  enabled: false
+
+# Use Recreate strategy for single-node
+deploymentStrategy:
+  type: Recreate
+
+# Enable service monitoring if Prometheus is available
+serviceMonitor:
+  enabled: false  # Enable when monitoring stack is deployed
+  interval: "60s"
+  labels:
+    environment: prestaging

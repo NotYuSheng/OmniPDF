@@ -1,0 +1,127 @@
+# MinIO production environment configuration
+
+# Single replica (can be scaled to distributed mode)
+replicaCount: 1
+
+# Use official MinIO image with specific stable version
+image:
+  repository: minio/minio
+  tag: "RELEASE.2024-01-16T16-07-38Z"
+  pullPolicy: IfNotPresent
+
+# Production resources
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+
+# Production storage configuration
+persistence:
+  enabled: true
+  storageClass: "fast-ssd"
+  accessModes:
+    - ReadWriteOnce
+  size: 100Gi  # Large storage for production
+
+# MinIO credentials for production (use external secret manager)
+secrets:
+  create: false  # Use external secret in production
+  name: minio-prod-secrets
+
+# Production environment settings
+env:
+  - name: MINIO_BROWSER_REDIRECT_URL
+    value: "https://minio-console.omnipdf.com"
+  - name: MINIO_SERVER_URL
+    value: "https://minio.omnipdf.com"
+  - name: MINIO_CONSOLE_ADDRESS
+    value: ":9001"
+  - name: MINIO_PROMETHEUS_AUTH_TYPE
+    value: "public"
+
+# Enable production ingress
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+  hosts:
+    - host: minio.omnipdf.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: minio-prod-tls
+      hosts:
+        - minio.omnipdf.com
+
+consoleIngress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: minio-console.omnipdf.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: minio-console-prod-tls
+      hosts:
+        - minio-console.omnipdf.com
+
+# Autoscaling disabled for single-node (enable for distributed mode)
+autoscaling:
+  enabled: false
+
+# Enable high availability features
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Production monitoring
+serviceMonitor:
+  enabled: true
+  interval: "15s"
+  labels:
+    environment: production
+
+# Enable network policies for security
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+    fromSameNamespace: true
+    fromIngressController: true
+    customRules:
+      # Allow specific services to access MinIO
+      - from:
+        - namespaceSelector:
+            matchLabels:
+              name: omnipdf
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: application
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: true
+
+# Production resource quotas
+resourceQuota:
+  enabled: true
+  requests:
+    cpu: "2"
+    memory: "4Gi"
+    storage: "200Gi"
+  limits:
+    cpu: "4"
+    memory: "8Gi"
+  pods: "5"
+  services: "3"
+  persistentvolumeclaims: "2"

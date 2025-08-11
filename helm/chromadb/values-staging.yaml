@@ -1,0 +1,78 @@
+# Staging environment configuration for ChromaDB
+# This file overrides default values.yaml for staging deployment
+
+# Single replica for staging (ChromaDB doesn't support clustering)
+replicaCount: 1
+autoscaling:
+  enabled: false
+
+# Staging resource allocation
+resources:
+  limits:
+    cpu: 1500m
+    memory: 3Gi
+  requests:
+    cpu: 300m
+    memory: 1Gi
+
+# Staging persistence configuration
+persistence:
+  enabled: true
+  storageClass: ""  # Use default storage class
+  size: 20Gi
+  accessModes:
+    - ReadWriteOnce
+
+# Production-like health probes for staging
+startupProbe:
+  enabled: true
+  path: /api/v1/heartbeat
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 12
+  successThreshold: 1
+
+livenessProbe:
+  enabled: true
+  path: /api/v1/heartbeat
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  path: /api/v1/heartbeat
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+# ChromaDB configuration for staging
+chromadb:
+  persistent: "true"
+  anonymizedTelemetry: "false"
+
+# Environment-specific environment variables
+env:
+  - name: "LOG_LEVEL"
+    value: "INFO"
+  - name: "ENVIRONMENT"
+    value: "staging"
+
+# Deployment strategy for staging
+deploymentStrategy:
+  type: Recreate  # Use Recreate for single replica with persistent storage
+
+# Node selection for staging workloads (if using node pools)
+nodeSelector: {}
+  # environment: staging
+
+# Tolerations for staging nodes
+tolerations: []
+
+# Anti-affinity not applicable for single replica
+affinity: {}

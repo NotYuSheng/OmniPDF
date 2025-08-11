@@ -1,0 +1,98 @@
+# MinIO staging environment configuration
+
+# Single replica for staging (distributed mode can be added later)
+replicaCount: 1
+
+# Use official MinIO image
+image:
+  repository: minio/minio
+  tag: "RELEASE.2024-01-16T16-07-38Z"
+  pullPolicy: IfNotPresent
+
+# Staging resources
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Storage configuration for staging
+persistence:
+  enabled: true
+  storageClass: "fast-ssd"  # Use faster storage for staging
+  accessModes:
+    - ReadWriteOnce
+  size: 20Gi
+
+# MinIO credentials for staging
+secrets:
+  create: true
+  name: minio-staging-secrets
+  data:
+    MINIO_ROOT_USER: "staging"
+    MINIO_ROOT_PASSWORD: "staging-secure-password-123"
+
+# Environment-specific settings
+env:
+  - name: MINIO_BROWSER_REDIRECT_URL
+    value: "https://minio-console-staging.omnipdf.local"
+  - name: MINIO_SERVER_URL
+    value: "https://minio-staging.omnipdf.local"
+  - name: MINIO_CONSOLE_ADDRESS
+    value: ":9001"
+
+# Enable ingress for staging
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+  hosts:
+    - host: minio-staging.omnipdf.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: minio-staging-tls
+      hosts:
+        - minio-staging.omnipdf.local
+
+consoleIngress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+  hosts:
+    - host: minio-console-staging.omnipdf.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: minio-console-staging-tls
+      hosts:
+        - minio-console-staging.omnipdf.local
+
+# Autoscaling disabled for single-node
+autoscaling:
+  enabled: false
+
+# Enable service monitoring
+serviceMonitor:
+  enabled: true
+  interval: "30s"
+  labels:
+    environment: staging
+
+# Enable network policies for security
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+    fromSameNamespace: true
+    fromIngressController: true
+  egress:
+    enabled: true
+    allowDNS: true
