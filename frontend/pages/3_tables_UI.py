@@ -1,43 +1,190 @@
 import streamlit as st
-import logging
 import pandas as pd
-from io import StringIO
+import logging
+import asyncio
+import httpx
+import json
+import os
 
+PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://localhost:8080/pdf_processor")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-st.header("📋 Extract Tables")
 
-if 'tables' not in st.session_state:
-    st.info("No tables found in the document.")
-if "processed_data" in st.session_state and st.session_state.processed_data:
-    data = st.session_state.processed_data
-    tables = data.get('tables', [])
-    if tables:
-        for i, table_data in enumerate(tables):
-            with st.container():
-                st.markdown('<div class="image-container">', unsafe_allow_html=True)
-                
-                st.markdown(f"**Table {i+1} (Page {table_data['page']})**")
-                
-                # Display table as CSV
+st.header("📋 Table Extraction")
+table_status = st.empty()
+server_status = st.empty()
+
+async def get_tables(doc_id, max_retries=60, delay=1) -> dict:
+    for attempt in range(max_retries):
+        async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
+            try:
+                response = await client.get(f"{PDF_PROCESSOR_URL}/tables/{doc_id}")
+                logger.info(f"Table extraction response status: {response.status_code}")
                 try:
-                    df = pd.read_csv(StringIO(table_data['csv']))
-                    st.dataframe(df, use_container_width=True)
-                    
-                    # Download button for CSV
-                    st.download_button(
-                        label=f"📥 Download Table {i+1} (CSV)",
-                        data=table_data['csv'],
-                        file_name=f"table_{i+1}_page_{table_data['page']}.csv",
-                        mime="text/csv"
-                    )
-                except Exception as e:
-                    st.error(f"Error displaying table: {e}")
-                    st.text(table_data['csv'])
+                    data = response.json()
+                    if "detail" in data:
+                        server_status.info(data["detail"])
+                        logger.info(f"Info details: {data['detail']}")
+                    else:
+                        server_status.info("Successfully retrieved tables")
+                        logger.info(f"Table extraction response: {response}")
+                except json.JSONDecodeError:
+                    logger.error(f"Failed to decode JSON from response: {response.text}")
+                    server_status.error("Received an invalid response from the server.")
                 
-                st.markdown('</div>', unsafe_allow_html=True)
+                if response.status_code == 200:
+                    return response.json()  # Success - return the actual data
+                elif response.status_code == 202:
+                    # Still processing, continue polling
+                    if attempt < max_retries - 1:
+                        table_status.info(f"Document still processing... ({(attempt + 1)*delay}s)")
+                        if "detail" in response.json():
+                            server_status.info(response.json()["detail"])
+                        else:
+                            if len(response.json()) > 100:
+                                server_status.info(response.text[50:])
+                        await asyncio.sleep(delay)
+                        continue
+                    else:
+                        raise TimeoutError("Document processing timed out after maximum retries")
+                else:
+                    # Handle other HTTP errors
+                    logger.error(f"HTTP error {response.status_code}: {response.text}")
+                    response.raise_for_status()
+                    
+            except httpx.RequestError as e:
+                logger.error(f"Request error on attempt {attempt + 1}: {e}")
+                if attempt == max_retries - 1:
+                    raise
+                await asyncio.sleep(delay)
+    
+    raise TimeoutError("Max retries exceeded")
+
+def table_json_to_df(table_json):
+    """
+    Convert a table's 'grid' field (list of lists of cell dicts) to a pandas DataFrame.
+    """
+    grid = table_json.get("data", {}).get("grid", [])
+    if not grid or not isinstance(grid, list):
+        return None
+    # Extract headers (first row)
+    headers = [cell.get("text", "") for cell in grid[0]]
+    # Extract rows (remaining rows)
+    rows = []
+    for row in grid[1:]:
+        rows.append([cell.get("text", "") for cell in row])
+    return pd.DataFrame(rows, columns=headers)
+
+
+def display_tables(table_response):
+    """
+    Display tables extracted from the processed PDF document.
+    """
+     # Check if we have tables in the response
+    if table_response:
+        table_status.success(f"Found {len(table_response)} tables in the document")
+        for i, table_data in enumerate(table_response):
+            with st.container():
+                col1, col2 = st.columns([3, 1], border=True)
+                
+                with col1:
+                    # Display actual image from URL
+                    st.markdown(f"### Table {i+1}")
+                    df = table_json_to_df(table_data)
+                    if df is not None:
+                        st.dataframe(df, use_container_width=True)
+                    else:
+                        st.warning("Could not parse table data.")
+            
+                with col2:    
+                    # Optionally show metadata
+                    st.markdown(f"**Table Key:** {table_data.get('table_key', '')}")
+                    st.markdown(f"**Table ID:** IMG_{i+1:03d}")
+                    st.markdown(f"**Table URL:** {table_data.get('url', '')}")
+                
+   
+                
     else:
+        logger.info("No tables found in the document")
         st.info("No tables found in the document")
+
+def describe_table(table_data):
+    """
+    Placeholder function to describe the table.
+    In a real application, this could call an AI model or service to generate a description.
+    """
+    # Simulate a description
+    return "Description for table"
+
+
+if "processed_data" in st.session_state and st.session_state.processed_data:
+    # Initialize session state for expander states if not exists
+    if 'expander_states' not in st.session_state:
+        st.session_state.expander_states = {}
+    
+    response_lst = list(st.session_state.processed_data.items())
+    doc_names = [data['uploaded_filename'] for _, data in response_lst]
+    
+    # Initialize expander states for new documents
+    for doc_name in doc_names:
+        if doc_name not in st.session_state.expander_states:
+            st.session_state.expander_states[doc_name] = True
+    
+    # Update multiselect based on expander states
+    expanded_docs = st.multiselect(
+        label="Expand documents:",
+        options=doc_names,
+        default=[doc for doc in doc_names if st.session_state.expander_states.get(doc, True)],
+        help="Choose which documents should be expanded",
+        key="expander_multiselect"
+    )
+    
+    # Update session state based on multiselect
+    for doc_name in doc_names:
+        st.session_state.expander_states[doc_name] = doc_name in expanded_docs
+
+    try:
+        table_responses = []
+        # Show loading message
+        with st.spinner("Extracting tables from document..."):
+            for doc_id, data in response_lst:
+                if data['uploaded_filename'] in doc_names:
+                    # Create expander and update state when it's clicked
+                    expander_key = f"expander_{data['uploaded_filename']}"
+                    file_lst = st.expander(
+                        label=f"**{data['uploaded_filename']}**", 
+                        expanded=st.session_state.expander_states.get(data['uploaded_filename'], True)
+                    )
+                    
+                    # Update expander state and multiselect when expander is toggled
+                    if not file_lst:  # expander is closed
+                        st.session_state.expander_states[data['uploaded_filename']] = False
+                        if data['uploaded_filename'] in expanded_docs:
+                            expanded_docs.remove(data['uploaded_filename'])
+                    else:  # expander is open
+                        st.session_state.expander_states[data['uploaded_filename']] = True
+                    
+                    with file_lst:
+                        st.markdown(f"**Document ID:** {doc_id}")
+                        st.markdown(f"**Filename:** [{data['filename']}]({data['download_url']})") # Download link
+                        logger.info(f"Extracting tables for document ID: {doc_id}")
+                        table_response = asyncio.run(get_tables(doc_id=doc_id))
+                        table_responses.append(table_response)
+                        display_tables(table_response)
+
+            
+    except TimeoutError as e:
+        st.error(f"Timeout error: {e}")
+        st.info("The document is taking longer than expected to process. Please try again later.")
+        
+    except httpx.RequestError as e:
+        st.error(f"Network error: {e}")
+        st.info("There was a problem connecting to the server. Please check your connection and try again.")
+        
+    except Exception as e:
+        logger.error(f"Unexpected error in table extraction: {e}")
+        st.error(f"An unexpected error occurred: {e}")
+        
 else:
-    st.info("Please upload and process a PDF first")
+    st.info("Please upload and process a PDF first to extract tables")
