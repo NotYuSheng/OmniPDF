@@ -1,0 +1,56 @@
+# OmniPDF Shared Pre-staging Values
+# Pre-staging specific overrides for all services (between staging and production)
+
+# Pre-staging image configuration
+image:
+  pullPolicy: IfNotPresent
+
+# Production-like resource allocation (slightly less than prod)
+resources:
+  limits:
+    cpu: 1500m
+    memory: 1.5Gi
+  requests:
+    cpu: 300m
+    memory: 384Mi
+
+# Multiple replicas for high availability
+replicaCount: 3
+
+# Enable autoscaling for pre-staging
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 65
+  targetMemoryUtilizationPercentage: 75
+
+# Enable production features in pre-staging
+networkPolicy:
+  enabled: true
+
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+serviceMonitor:
+  enabled: true
+  interval: "20s"
+
+# Pre-staging specific environment variables
+env:
+  - name: LOG_LEVEL
+    value: "INFO"
+  - name: ENVIRONMENT
+    value: "prestaging"
+  - name: ENABLE_METRICS
+    value: "true"
+  - name: ENABLE_TRACING
+    value: "true"
+
+# Production-like deployment strategy
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1

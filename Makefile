@@ -4,8 +4,26 @@
 NAMESPACE ?= omnipdf
 CHART_NAME ?= example-service
 CHART_DIR ?= helm/$(CHART_NAME)
-ENV ?= dev
-VALUES_FILE ?= $(CHART_DIR)/values-$(ENV).yaml
+ENV ?= staging
+
+# Shared values configuration
+SHARED_VALUES_DIR ?= helm/shared-values
+SHARED_BASE_VALUES ?= $(SHARED_VALUES_DIR)/common-base.yaml
+SHARED_ENV_VALUES ?= $(SHARED_VALUES_DIR)/common-$(ENV).yaml
+
+# Service-specific values files
+SERVICE_VALUES_FILE ?= $(CHART_DIR)/values.yaml
+SERVICE_ENV_VALUES_FILE ?= $(CHART_DIR)/values-$(ENV).yaml
+
+# Build values file list (in order of precedence)
+VALUES_FILES = -f $(SHARED_BASE_VALUES)
+ifneq ($(wildcard $(SHARED_ENV_VALUES)),)
+    VALUES_FILES += -f $(SHARED_ENV_VALUES)
+endif
+ifneq ($(wildcard $(SERVICE_ENV_VALUES_FILE)),)
+    VALUES_FILES += -f $(SERVICE_ENV_VALUES_FILE)
+endif
+VALUES_FILES += -f $(SERVICE_VALUES_FILE)
 
 # Default port for port-forwarding (override as needed)
 LOCAL_PORT ?= 8000
@@ -14,12 +32,12 @@ REMOTE_PORT ?= 8000
 .PHONY: help install install-all upgrade upgrade-all uninstall uninstall-all lint status port-forward
 
 help:
-	@echo "Makefile commands for Helm chart management:"
+	@echo "Makefile commands for Helm chart management with shared values:"
 	@echo ""
 	@echo "Single-service commands:"
-	@echo "  make install                Install chart (CHART_NAME, ENV)"
+	@echo "  make install                Install chart with shared values (CHART_NAME, ENV)"
 	@echo "                              e.g. make install CHART_NAME=chat-service ENV=staging"
-	@echo "  make upgrade                Upgrade chart (CHART_NAME, ENV)"
+	@echo "  make upgrade                Upgrade chart with shared values (CHART_NAME, ENV)"
 	@echo "                              e.g. make upgrade CHART_NAME=embedder-service ENV=prod"
 	@echo "  make uninstall              Uninstall chart (CHART_NAME)"
 	@echo "                              e.g. make uninstall CHART_NAME=pdf-processor"
@@ -31,32 +49,48 @@ help:
 	@echo "                              e.g. make port-forward CHART_NAME=chat-service LOCAL_PORT=8000 REMOTE_PORT=8000"
 	@echo ""
 	@echo "Multi-service commands:"
-	@echo "  make install-all            Install all charts under ./helm/ (ENV)"
+	@echo "  make install-all            Install all charts with shared values (ENV)"
 	@echo "                              e.g. make install-all ENV=prod"
-	@echo "  make upgrade-all            Upgrade all charts under ./helm/ (ENV)"
+	@echo "  make upgrade-all            Upgrade all charts with shared values (ENV)"
 	@echo "                              e.g. make upgrade-all ENV=staging"
 	@echo "  make uninstall-all          Uninstall all charts under ./helm/"
 	@echo ""
+	@echo "Shared Values System:"
+	@echo "  Values are applied in order (later values override earlier ones):"
+	@echo "  1. helm/shared-values/common-base.yaml       - Base configuration for all services"
+	@echo "  2. helm/shared-values/common-{ENV}.yaml      - Environment-specific shared config"
+	@echo "  3. helm/{SERVICE}/values-{ENV}.yaml          - Service-specific environment config"
+	@echo "  4. helm/{SERVICE}/values.yaml                - Service-specific base config"
+	@echo ""
 	@echo "Environment Variables:"
-	@echo "  ENV                         Environment (dev, staging, prestaging, prod) - defaults to 'dev'"
+	@echo "  ENV                         Environment (staging, prestaging, prod) - defaults to 'staging'"
+	@echo ""
+	@echo "Development Environment:"
+	@echo "  Use docker-compose for local development:"
+	@echo "    docker-compose up -d                           # Start all services locally"
+	@echo "    docker-compose logs -f chat_service            # View service logs"
 	@echo ""
 	@echo "⚠️ IMPORTANT:"
 	@echo "  Avoid underscores (_) in CHART_NAME or release names."
 	@echo "  Use hyphens (-) instead to follow Kubernetes naming conventions (RFC 1123)."
 	@echo "  Example: use chat-service ✅, not chat_service ❌"
 
-## Install a single Helm chart
+## Install a single Helm chart with shared values
 install:
+	@echo "Installing $(CHART_NAME) with shared values for environment: $(ENV)"
+	@echo "Values files (in order): $(VALUES_FILES)"
 	helm upgrade --install $(CHART_NAME) $(CHART_DIR) \
 		--namespace $(NAMESPACE) \
 		--create-namespace \
-		--values $(VALUES_FILE)
+		$(VALUES_FILES)
 
-## Upgrade a single Helm chart
+## Upgrade a single Helm chart with shared values
 upgrade:
+	@echo "Upgrading $(CHART_NAME) with shared values for environment: $(ENV)"
+	@echo "Values files (in order): $(VALUES_FILES)"
 	helm upgrade $(CHART_NAME) $(CHART_DIR) \
 		--namespace $(NAMESPACE) \
-		--values $(VALUES_FILE)
+		$(VALUES_FILES)
 
 ## Uninstall a single Helm chart
 uninstall:
@@ -75,28 +109,48 @@ status:
 	@echo "=== Pod Status ==="
 	kubectl get pods -n $(NAMESPACE) -l "app.kubernetes.io/name=$(CHART_NAME),app.kubernetes.io/instance=$(CHART_NAME)"
 
-## Install all Helm charts in ./helm/
+## Install all Helm charts in ./helm/ with shared values
 install-all:
-	@echo "Installing all Helm charts under ./helm/..."
+	@echo "Installing all Helm charts under ./helm/ with shared values for environment: $(ENV)"
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
-		echo "Installing chart: $$CHART"; \
-		helm upgrade --install $$CHART helm/$$CHART \
-			--namespace $(NAMESPACE) \
-			--create-namespace \
-			--values helm/$$CHART/values-$(ENV).yaml; \
+		if [ "$$CHART" != "shared-values" ]; then \
+			echo "Installing chart: $$CHART"; \
+			CHART_VALUES="-f $(SHARED_BASE_VALUES)"; \
+			if [ -f "$(SHARED_VALUES_DIR)/common-$(ENV).yaml" ]; then \
+				CHART_VALUES="$$CHART_VALUES -f $(SHARED_VALUES_DIR)/common-$(ENV).yaml"; \
+			fi; \
+			if [ -f "helm/$$CHART/values-$(ENV).yaml" ]; then \
+				CHART_VALUES="$$CHART_VALUES -f helm/$$CHART/values-$(ENV).yaml"; \
+			fi; \
+			CHART_VALUES="$$CHART_VALUES -f helm/$$CHART/values.yaml"; \
+			helm upgrade --install $$CHART helm/$$CHART \
+				--namespace $(NAMESPACE) \
+				--create-namespace \
+				$$CHART_VALUES; \
+		fi; \
 	done
 
-## Upgrade all Helm charts in ./helm/
+## Upgrade all Helm charts in ./helm/ with shared values
 upgrade-all:
-	@echo "Upgrading all Helm charts under ./helm/..."
+	@echo "Upgrading all Helm charts under ./helm/ with shared values for environment: $(ENV)"
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
-		echo "Upgrading chart: $$CHART"; \
-		helm upgrade --install $$CHART helm/$$CHART \
-			--namespace $(NAMESPACE) \
-			--create-namespace \
-			--values helm/$$CHART/values-$(ENV).yaml; \
+		if [ "$$CHART" != "shared-values" ]; then \
+			echo "Upgrading chart: $$CHART"; \
+			CHART_VALUES="-f $(SHARED_BASE_VALUES)"; \
+			if [ -f "$(SHARED_VALUES_DIR)/common-$(ENV).yaml" ]; then \
+				CHART_VALUES="$$CHART_VALUES -f $(SHARED_VALUES_DIR)/common-$(ENV).yaml"; \
+			fi; \
+			if [ -f "helm/$$CHART/values-$(ENV).yaml" ]; then \
+				CHART_VALUES="$$CHART_VALUES -f helm/$$CHART/values-$(ENV).yaml"; \
+			fi; \
+			CHART_VALUES="$$CHART_VALUES -f helm/$$CHART/values.yaml"; \
+			helm upgrade --install $$CHART helm/$$CHART \
+				--namespace $(NAMESPACE) \
+				--create-namespace \
+				$$CHART_VALUES; \
+		fi; \
 	done
 
 ## Uninstall all Helm charts in ./helm/

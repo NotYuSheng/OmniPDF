@@ -101,6 +101,23 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
 
+# This section is for configuring the ingress more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
 # Persistence configuration for ChromaDB data storage
 persistence:
   enabled: true
@@ -154,3 +171,57 @@ deploymentStrategy: {}
   # 
   # OR for faster dev updates:
   # type: Recreate
+
+# Network policy configuration for network segmentation
+networkPolicy:
+  enabled: false  # Disabled by default for dev/testing
+  ingress:
+    enabled: true
+    # Allow ingress controller to reach this service
+    fromIngressController: true
+    ingressControllerNamespaceLabels:
+      name: ingress-nginx
+    # Allow services in same namespace to communicate
+    fromSameNamespace: true
+    # Custom ingress rules (empty by default)
+    customRules: []
+  egress:
+    enabled: true
+    # Allow DNS resolution (required for hostname lookups)
+    allowDNS: true
+    # Allow HTTPS for external APIs
+    allowHTTPS: true
+    # Allow HTTP for internal services  
+    allowHTTP: true
+    # Allow communication to LLM service (not applicable for ChromaDB)
+    allowLLMService: false
+    llmServiceSelectors: []
+    llmServicePorts: []
+    # Allow traffic to same namespace
+    toSameNamespace: true
+    # Custom egress rules (empty by default)
+    customRules: []
+
+# Pod Disruption Budget for high availability during maintenance
+podDisruptionBudget:
+  enabled: false  # Disabled by default for dev
+  # Use either minAvailable OR maxUnavailable (not both)
+  minAvailable: null
+  maxUnavailable: null
+
+# Service monitoring for Prometheus (optional)
+serviceMonitor:
+  enabled: false  # Disabled by default - enable in environments with Prometheus
+  # Metrics endpoint configuration
+  port: "http"              # Service port name to scrape (default: http)
+  path: "/api/v1/heartbeat" # ChromaDB heartbeat endpoint
+  interval: "30s"           # How often to scrape metrics
+  scrapeTimeout: "10s"      # Timeout for each scrape
+  honorLabels: false        # Whether to honor labels from target
+  # Additional labels for ServiceMonitor resource
+  labels: {}
+  # Additional annotations for ServiceMonitor resource  
+  annotations: {}
+  # Metric relabeling (advanced)
+  metricRelabelings: []
+  relabelings: []

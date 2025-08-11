@@ -1,0 +1,124 @@
+# OmniPDF Shared Base Values
+# This file contains common configurations shared across all Kubernetes environments
+# (staging, prestaging, production)
+# Individual services inherit from this and can override as needed
+# 
+# NOTE: Development uses docker-compose.yml, not Helm
+
+# Common image configuration  
+image:
+  pullPolicy: IfNotPresent  # Standard for Kubernetes environments
+
+# Common service account configuration
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+# Common pod configuration
+podAnnotations: {}
+podLabels: {}
+
+# Common security context (production-ready defaults)
+podSecurityContext: {}
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# Common service configuration
+service:
+  type: ClusterIP
+  port: 8000
+
+# Common ingress configuration (disabled by default)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+# Common resource configuration
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Common autoscaling configuration (disabled by default)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Common network policy configuration (production-ready)
+networkPolicy:
+  enabled: false  # Disabled by default for dev/testing
+  ingress:
+    enabled: true
+    fromIngressController: true
+    ingressControllerNamespaceLabels:
+      name: ingress-nginx
+    fromSameNamespace: true
+    customRules: []
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: true
+    allowHTTP: true
+    allowLLMService: false
+    llmServiceSelectors: []
+    llmServicePorts: []
+    toSameNamespace: true
+    customRules: []
+
+# Common pod disruption budget (production-ready)
+podDisruptionBudget:
+  enabled: false  # Disabled by default for dev
+  minAvailable: null
+  maxUnavailable: null
+
+# Common service monitor configuration (production-ready)
+serviceMonitor:
+  enabled: false  # Disabled by default - enable in environments with Prometheus
+  port: "http"
+  path: "/health"
+  interval: "30s"
+  scrapeTimeout: "10s"
+  honorLabels: false
+  labels: {}
+  annotations: {}
+  metricRelabelings: []
+  relabelings: []
+
+# Common node selector, tolerations, and affinity
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Common volume configuration
+volumes: []
+volumeMounts: []
+
+# Common environment variables
+env: []
+
+# Common deployment strategy
+deploymentStrategy: {}
+
+# Base replica count for Kubernetes (minimum for any environment)
+replicaCount: 2

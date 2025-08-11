@@ -17,7 +17,3 @@ keywords:
   - vector-store
   - omnipdf
 
-# Chart maintainers
-maintainers:
-  - name: OmniPDF Team
-    email: team@omnipdf.local

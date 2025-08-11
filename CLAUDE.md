@@ -103,13 +103,19 @@ make uninstall CHART_NAME=chat-service
 
 ### Data Flow
 1. Files uploaded via nginx (8080) → pdf_processor_service (8000)
-2. pdf_processor_service orchestrates other services as needed
+2. pdf_processor_service orchestrates other services as needed:
+   - pdf_extraction_service for tables/images
+   - docling_translation_service for content translation
+   - embedder_service for text processing
 3. embedder_service chunks text → ChromaDB for vector storage
 4. chat_service queries ChromaDB + LLM for RAG responses
+5. Session data managed via Redis, file storage via MinIO
 
 ### Shared Utilities
 - `openai_client.py`: Configurable OpenAI-compatible client (works with vLLM)
 - `chroma_client.py`: Async ChromaDB client with environment-based config
+- `redis.py`: Redis connection utilities for session management
+- `s3_utils.py`: MinIO/S3 operations for file storage
 - All shared utilities use environment variables for configuration
 
 ## Code Standards
@@ -136,6 +142,13 @@ make uninstall CHART_NAME=chat-service
 - Each service should be tested independently
 - Use the `/health` endpoints for basic connectivity testing
 - Helm charts include test connections via `test-connection.yaml`
+- E2E testing setup available in `cypress/` directory
+
+### Development Dependencies
+Each service uses minimal dependencies:
+- **FastAPI** + **uvicorn** for web framework
+- **OpenAI client** for LLM integration (compatible with vLLM)
+- Service-specific requirements in each `{service}/requirements.txt`
 
 ### Port Assignments (Development Only)
 Development ports are documented in README.md. Production deployments should use proper routing layers (Ingress, Service Mesh, etc.).

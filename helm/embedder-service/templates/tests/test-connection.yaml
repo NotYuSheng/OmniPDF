@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "embedder-service.fullname" . }}-test-connection"
+  labels:
+    {{- include "embedder-service.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['--spider', '--timeout=10', '{{ include "embedder-service.fullname" . }}:{{ .Values.service.port }}/health']
+  restartPolicy: Never

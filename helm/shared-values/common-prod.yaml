@@ -1,0 +1,89 @@
+# OmniPDF Shared Production Values
+# Production-specific overrides for all services
+
+# Production image configuration
+image:
+  pullPolicy: Always  # Always pull latest for production
+
+# Production resource allocation
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# High availability replica count
+replicaCount: 3
+
+# Enable autoscaling for production
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 70
+
+# Enable all production features
+networkPolicy:
+  enabled: true
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2  # Always keep at least 2 replicas available
+
+serviceMonitor:
+  enabled: true
+  interval: "15s"  # More frequent monitoring in production
+
+# Production security context
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop:
+      - ALL
+
+# Production-specific environment variables
+env:
+  - name: LOG_LEVEL
+    value: "WARN"
+  - name: ENVIRONMENT
+    value: "production"
+  - name: ENABLE_METRICS
+    value: "true"
+  - name: ENABLE_TRACING
+    value: "true"
+  - name: ENABLE_PROFILING
+    value: "false"
+
+# Production deployment strategy
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 2
+
+# Production node selection preferences
+nodeSelector: {}
+  # node-type: production
+  # zone: us-east-1a
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - "{{ .Chart.Name }}"
+        topologyKey: kubernetes.io/hostname

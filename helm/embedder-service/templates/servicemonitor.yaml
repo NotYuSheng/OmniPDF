@@ -2,9 +2,9 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "chat-service.fullname" . }}
+  name: {{ include "embedder-service.fullname" . }}
   labels:
-    {{- include "chat-service.labels" . | nindent 4 }}
+    {{- include "embedder-service.labels" . | nindent 4 }}
     {{- with .Values.serviceMonitor.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -15,7 +15,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "chat-service.selectorLabels" . | nindent 6 }}
+      {{- include "embedder-service.selectorLabels" . | nindent 6 }}
   endpoints:
     - port: {{ .Values.serviceMonitor.port | default "http" }}
       {{- if .Values.serviceMonitor.path }}

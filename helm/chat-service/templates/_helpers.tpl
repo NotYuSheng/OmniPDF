@@ -60,3 +60,14 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create the name of the secret to use
+*/}}
+{{- define "chat-service.secretName" -}}
+{{- if .Values.secrets.create }}
+{{- include "chat-service.fullname" . }}-secrets
+{{- else }}
+{{- .Values.secrets.name }}
+{{- end }}
+{{- end }}

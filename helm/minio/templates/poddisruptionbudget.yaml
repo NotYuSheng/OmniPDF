@@ -2,9 +2,9 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "chat-service.fullname" . }}
+  name: {{ include "minio.fullname" . }}
   labels:
-    {{- include "chat-service.labels" . | nindent 4 }}
+    {{- include "minio.labels" . | nindent 4 }}
 spec:
   {{- if .Values.podDisruptionBudget.minAvailable }}
   minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
@@ -19,5 +19,5 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "chat-service.selectorLabels" . | nindent 6 }}
+      {{- include "minio.selectorLabels" . | nindent 6 }}
 {{- end }}
