@@ -24,6 +24,16 @@ jobs:
           remove-haskell: true
           remove-codeql: true
 
+      - name: Free up disk space on GitHub runner
+        run: |
+          sudo rm -rf /opt/ghc \
+                      /usr/local/lib/android \
+                      /usr/share/dotnet \
+                      /usr/local/share/boost \
+                      $AGENT_TOOLSDIRECTORY
+          docker system prune -af
+          sudo apt-get clean
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
