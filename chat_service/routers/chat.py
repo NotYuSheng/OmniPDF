@@ -33,14 +33,15 @@ def prepare_retrieval_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:
     distances = results.get('distances', [[]])[0]
     ids = results.get('ids', [[]])[0]
     
-    for i, doc in enumerate(documents):
-        chunk = {
+    for doc, metadata, distance, chunk_id in zip(documents, metadatas, distances, ids):
+        chunk={
             'content': doc,
-            'chunk_id': ids[i] if i < len(ids) else f"chunk_{i}",
-            'similarity_score': 1 - distances[i] if i < len(distances) else 0.0,  # Convert distance to similarity
-            'metadata': metadatas[i] if i < len(metadatas) else {},
-            'doc_id': metadatas[i].get('doc_id') if i < len(metadatas) and metadatas[i] else None  # Extract doc_id from metadata
+            'chunk_id': chunk_id,
+            'similarity_score': 1 - distance, # Convert distance to similarity score
+            'metadata': metadata or {},
+            'doc_id': metadata.get('doc_id') if metadata else None,
         }
+
         chunks.append(chunk)
     
     # Filter chunks by minimum similarity if configured
