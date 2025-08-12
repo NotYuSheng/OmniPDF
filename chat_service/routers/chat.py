@@ -92,9 +92,9 @@ async def perform_rag_query(
     query: str, 
     collection_name: str, 
     top_k: int,
+    openai_client: AsyncOpenAI,
     doc_id: Optional[str] = None,
     enable_reranking: bool = True,
-    openai_client: AsyncOpenAI = None
 ) -> tuple[str, List[Dict[str, Any]], str, str]:
     """
     Perform complete RAG query: retrieve relevant chunks and generate response
@@ -168,7 +168,7 @@ async def perform_rag_query(
 async def validate_query_with_llm(
     query: str,
     collection_name: str,
-    openai_client: AsyncOpenAI = None,
+    openai_client: AsyncOpenAI,
     model_name: str = OPENAI_MODEL_NAME,
 ) -> tuple[bool, Optional[str]]:
     """

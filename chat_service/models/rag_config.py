@@ -428,8 +428,8 @@ class QwenRAGOptimizer:
     async def detect_query_type(
         question: str, 
         openai_client: AsyncOpenAI,
-        model_name: str = None,
-        config: QwenRAGConfig = None,
+        model_name: str,
+        config: QwenRAGConfig,
     ) -> str:
         """
         Detect query type using LLM classification
