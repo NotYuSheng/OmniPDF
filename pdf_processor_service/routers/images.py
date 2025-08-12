@@ -1,3 +1,4 @@
+from datetime import timedelta
 import logging
 
 from fastapi import APIRouter, Depends, Response
@@ -7,9 +8,11 @@ from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
 from utils.proxy import load_or_create_job, generate_external_image_url
 from shared_utils.s3_utils import s3_client, S3_BUCKET, download_fileobj
+from shared_utils.redis import RedisSetWithFlagExpiry
 
 router = APIRouter(tags=["images"])
 logger = logging.getLogger(__name__)
+redis_image_sets = RedisSetWithFlagExpiry(prefix="ImageFiles", flag_prefix="S3Key", default_expiry=timedelta(hours=1))
 
 
 @router.get("/images/{doc_id}")
@@ -43,6 +46,10 @@ async def get_pdf_image(
 ):
     file_key = f"{doc_id}/images/{img_name}"
     file = download_fileobj(file_key)
+
+    # To extend expiry time for the images
+    _ = redis_image_sets[doc_id]
+
     def stream_file():
         with file:
             yield from file
