@@ -6,7 +6,7 @@ from fastapi.responses import StreamingResponse
 
 from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_job, generate_external_image_url
+from utils.proxy import load_or_create_job, generate_external_image_url, stream_file
 from shared_utils.s3_utils import s3_client, S3_BUCKET, download_fileobj
 from shared_utils.redis import RedisSetWithFlagExpiry
 
@@ -50,7 +50,4 @@ async def get_pdf_image(
     # To extend expiry time for the images
     _ = redis_image_sets[doc_id]
 
-    def stream_file():
-        with file:
-            yield from file
-    return StreamingResponse(stream_file(), media_type="image/png")
+    return StreamingResponse(stream_file(file), media_type="image/png")
