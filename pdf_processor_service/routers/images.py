@@ -7,8 +7,8 @@ from botocore.exceptions import ClientError
 
 from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_job, generate_external_image_url, stream_file
-from shared_utils.s3_utils import s3_client, S3_BUCKET, download_fileobj
+from utils.proxy import load_or_create_job, generate_external_image_url
+from shared_utils.s3_utils import s3_client, S3_BUCKET, get_object_stream
 from shared_utils.redis import RedisSetWithFlagExpiry
 
 router = APIRouter(tags=["images"])
@@ -49,13 +49,13 @@ async def get_pdf_image(
 
     # Check if object exists
     try:
-        file = download_fileobj(file_key)
+        file_stream = get_object_stream(file_key)
     except ClientError as e:
-        if e.response["Error"]["Code"] == "404":
+        if e.response["Error"]["Code"] == "NoSuchKey":
             raise HTTPException(status_code=404, detail="Image not found")
         raise HTTPException(status_code=500, detail="Failed to check Image")
     
     # To extend expiry time for the images
     _ = redis_image_sets[doc_id]
 
-    return StreamingResponse(stream_file(file), media_type="image/png")
+    return StreamingResponse(file_stream, media_type="image/png")

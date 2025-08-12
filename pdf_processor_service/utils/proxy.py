@@ -1,4 +1,3 @@
-from io import BytesIO
 import os
 import logging
 
@@ -63,7 +62,3 @@ def generate_external_image_url(doc_id: str, image_name: str):
 def generate_external_doc_url(doc_id: str):
     return f"{EXTERNAL_ENDPOINT}/documents/{doc_id}"
 
-
-def stream_file(file: BytesIO):
-    with file:
-        yield from file

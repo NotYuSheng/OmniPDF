@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 import logging
-from shared_utils.s3_utils import download_fileobj
+from shared_utils.s3_utils import get_object_stream
 from utils.session import validate_session_doc_pair
-from utils.proxy import stream_file
 
 from botocore.exceptions import ClientError
 
@@ -19,10 +18,10 @@ async def get_json(
 
     # Check if object exists
     try:
-        file = download_fileobj(key)
+        file_stream = get_object_stream(key)
     except ClientError as e:
-        if e.response["Error"]["Code"] == "404":
-            raise HTTPException(status_code=404, detail="Document not found")
-        raise HTTPException(status_code=500, detail="Failed to check document")
+        if e.response["Error"]["Code"] == "NoSuchKey":
+            raise HTTPException(status_code=404, detail="JSON file not found")
+        raise HTTPException(status_code=500, detail="Failed to check JSON file")
 
-    return StreamingResponse(stream_file(file), media_type="application/json")
+    return StreamingResponse(file_stream, media_type="application/json")

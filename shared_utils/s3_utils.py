@@ -48,21 +48,15 @@ def upload_fileobj(file_obj, key: str, content_type: str = "application/pdf") ->
         return False
 
 
-def download_fileobj(key: str) -> BytesIO:
+def get_object_stream(key: str):
     """
-    Downloads a file-like object from S3.
+    Gets a streaming body for an object from S3.
     """
     try:
-        f = BytesIO()
-        s3_client.download_fileobj(
-            Bucket=S3_BUCKET,
-            Key=key,
-            Fileobj=f
-        )
-        f.seek(0)
-        return f
+        response = s3_client.get_object(Bucket=S3_BUCKET, Key=key)
+        return response["Body"]
     except (BotoCoreError, ClientError) as e:
-        logger.exception(f"Failed to download file from S3: {e}")
+        logger.exception(f"Failed to get object stream from S3: {e}")
         raise
 
 
@@ -123,12 +117,12 @@ def save_job(
             "data": payload,
         }
         file_obj = BytesIO(json.dumps(wrapped).encode("utf-8"))
-        
+
         redis_flag_store.set(f"jobs/{job_type}/{doc_id}.json")
         return upload_fileobj(
-            file_obj, 
-            key=f"jobs/{job_type}/{doc_id}.json", 
-            content_type="application/json"
+            file_obj,
+            key=f"jobs/{job_type}/{doc_id}.json",
+            content_type="application/json",
         )
     except Exception as e:
         logger.exception(f"Failed to save job for doc_id: {doc_id} - {e}")

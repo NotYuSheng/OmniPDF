@@ -5,14 +5,14 @@ import logging
 from shared_utils.s3_utils import (
     upload_fileobj,
     delete_file,
-    download_fileobj,
+    get_object_stream,
 )
 from utils.session import (
     get_doc_list_append_function,
     get_doc_list_remove_function,
     validate_session_doc_pair,
 )
-from utils.proxy import generate_external_doc_url, stream_file
+from utils.proxy import generate_external_doc_url
 from models.document import DocumentUploadResponse
 from botocore.exceptions import ClientError
 
@@ -62,13 +62,13 @@ async def get_document(
 
     # Check if object exists
     try:
-        file = download_fileobj(key)
+        file_stream = get_object_stream(key)
     except ClientError as e:
-        if e.response["Error"]["Code"] == "404":
+        if e.response["Error"]["Code"] == "NoSuchKey":
             raise HTTPException(status_code=404, detail="Document not found")
         raise HTTPException(status_code=500, detail="Failed to check document")
 
-    return StreamingResponse(stream_file(file), media_type="application/pdf")
+    return StreamingResponse(file_stream, media_type="application/pdf")
 
 
 @router.delete("/{doc_id}", status_code=204)
