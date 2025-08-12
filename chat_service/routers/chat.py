@@ -215,7 +215,7 @@ async def validate_query_with_llm(
             return False, json_result
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse LLM validation response as JSON: {e}. Raw response: {raw_response}")
-            return False, "Failed to parse LLM response. Please try again."
+            raise HTTPException(status_code=500, detail="Failed to parse LLM response. Please try again.")
             
     except APIError as e:
         logger.warning(f"LLM validation failed: {e}")
