@@ -256,15 +256,16 @@ async def handle_chat(
             OPENAI_MODEL_NAME
         )
         
+        # Do not perform RAG if user query is invalid
         if not should_rag:
-            logger.info(f"LLM query validation failed: {validation_error}")
+            logger.info("LLM query validation failed")
             return ChatResponse(
                 response=f"""I'm sorry, but I couldn't process your query based on the documents in {chat_request.collection_name} that you want to query data from. {validation_error} Please provide a clear, specific question that I can help answer using the available documents in {chat_request.collection_name}.""",
                 relevant_chunks=[],
                 metadata=metadata
             )
         else:
-            # Perform RAG query with enhanced classification
+            # Perform RAG query with enhanced classification if user query is valid
             user_prompt, relevant_chunks, system_prompt, detected_query_type = await perform_rag_query(
                 query=chat_request.message,
                 collection_name=chat_request.collection_name,
@@ -275,7 +276,7 @@ async def handle_chat(
             )
 
             if relevant_chunks:
-                # Analyze document diversity in results
+                # Analyze document diversity in results if relevant chunks are found
                 doc_ids = set(chunk.get('doc_id') for chunk in relevant_chunks if chunk.get('doc_id'))
             
             else:
@@ -333,7 +334,7 @@ async def handle_chat(
     logger.info(f"Generated response with {len(processed_response)} characters")
     logger.info(f"Final metadata: {metadata}")
     
-    # Return structured response
+    # Return structured ChatResponse if relevant chunks are found
     return ChatResponse(
         response=processed_response,
         relevant_chunks=relevant_chunks,
