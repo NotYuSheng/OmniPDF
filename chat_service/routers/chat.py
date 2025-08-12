@@ -210,7 +210,7 @@ async def validate_query_with_llm(
             logger.info(f"Result: {json_result}")
             
             if json_result.get("decision") == "PROCEED_WITH_RAG":
-                return True, None
+                return True, json_result
 
             return False, json_result
         except json.JSONDecodeError as e:
@@ -257,7 +257,7 @@ async def handle_chat(
             }
 
             return ChatResponse(
-                response=f"""I'm sorry, but I couldn't process your query based on the documents in {chat_request.collection_name} that you want to query data from. {validation_error} Please provide a clear, specific question that I can help answer using the available documents in {chat_request.collection_name}.""",
+                response=f"""I'm sorry, but I couldn't process your query based on the documents in {chat_request.collection_name} that you want to query data from. Here is a more detailed explanation: {validation_error} \nPlease provide a clear, specific question that I can help answer using the available documents in {chat_request.collection_name}.""",
                 relevant_chunks=[],
                 metadata=metadata_without_rag
             )
