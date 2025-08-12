@@ -40,7 +40,7 @@ def prepare_retrieval_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:
         chunk={
             'content': doc,
             'chunk_id': chunk_id,
-            'similarity_score': 1 - distance, # Convert distance to similarity score
+            'similarity_score': 1 / (1 + distance), # Convert L2 distance (default distance metric adopted by ChromaDB) to similarity score
             'metadata': metadata or {},
             'doc_id': metadata.get('doc_id') if metadata else None,
         }
