@@ -81,14 +81,6 @@ def generate_presigned_url(key: str, expiry_seconds: int = 300) -> Optional[str]
         return None
 
 
-def generate_external_presigned_url(
-    key: str, expiry_seconds: int = 300
-) -> Optional[str]:
-    return generate_presigned_url(key, expiry_seconds).replace(
-        S3_ENDPOINT, EXTERNAL_S3_ENDPOINT
-    )
-
-
 def delete_file(key: str) -> bool:
     """
     Deletes a file from S3 using the given key.

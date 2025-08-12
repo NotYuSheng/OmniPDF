@@ -1,18 +1,20 @@
 from fastapi import APIRouter, Depends, File, UploadFile, HTTPException
+from fastapi.responses import StreamingResponse
 import uuid
 import logging
 from shared_utils.s3_utils import (
     upload_fileobj,
-    generate_external_presigned_url,
     delete_file,
     s3_client,
     S3_BUCKET,
+    download_fileobj,
 )
 from utils.session import (
     get_doc_list_append_function,
     get_doc_list_remove_function,
     validate_session_doc_pair,
 )
+from utils.proxy import generate_external_doc_url, stream_file
 from models.document import DocumentUploadResponse
 from botocore.exceptions import ClientError
 
@@ -44,20 +46,14 @@ async def upload_document(
         if not success:
             raise HTTPException(status_code=500, detail="Failed to upload file to S3")
 
-        presigned_url = generate_external_presigned_url(key)
-        if not presigned_url:
-            raise HTTPException(
-                status_code=500, detail="Failed to generate presigned URL"
-            )
+        url = generate_external_doc_url(doc_id)
 
     except Exception as e:
         logger.error(f"Unexpected error during upload: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
 
     append_doc(key)
-    return DocumentUploadResponse(
-        doc_id=doc_id, filename=key, download_url=presigned_url
-    )
+    return DocumentUploadResponse(doc_id=doc_id, filename=key, download_url=url)
 
 
 @router.get("/{doc_id}", response_model=DocumentUploadResponse)
@@ -69,15 +65,13 @@ async def get_document(
     # Check if object exists
     try:
         s3_client.head_object(Bucket=S3_BUCKET, Key=key)
+        file = download_fileobj(key)
     except ClientError as e:
         if e.response["Error"]["Code"] == "404":
             raise HTTPException(status_code=404, detail="Document not found")
         raise HTTPException(status_code=500, detail="Failed to check document")
 
-    presigned_url = generate_external_presigned_url(key)
-    return DocumentUploadResponse(
-        doc_id=doc_id, filename=key, download_url=presigned_url
-    )
+    return StreamingResponse(stream_file(file), media_type="application/pdf")
 
 
 @router.delete("/{doc_id}", status_code=204)
