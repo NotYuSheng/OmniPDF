@@ -178,7 +178,7 @@ class QwenRAGConfig:
         self.generation_params = {
             "temperature": float(os.getenv("QWEN_TEMPERATURE", "0.1")),
             "max_tokens": int(os.getenv("QWEN_MAX_TOKENS", "2000")),
-            "top_k": float(os.getenv("QWEN_TOP_K", "5")),
+            "top_k": int(os.getenv("QWEN_TOP_K", "5")),
             "frequency_penalty": float(os.getenv("QWEN_FREQ_PENALTY", "0.1")),
             "presence_penalty": float(os.getenv("QWEN_PRESENCE_PENALTY", "0.1")),
         }
