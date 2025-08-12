@@ -6,13 +6,6 @@ from enum import Enum
 
 logger = logging.getLogger(__name__)
 
-class QueryValidationResult(Enum):
-    """Enumeration of query validation results"""
-    PROCEED_WITH_RAG = "proceed_with_rag"
-    HANDLE_WITHOUT_RAG = "handle_without_rag"
-    INVALID_QUERY = "invalid_query"
-    NEEDS_CLARIFICATION = "needs_clarification"
-
 
 class EnhancedQueryValidator:
     """Enhanced query validation system for Qwen2.5"""
