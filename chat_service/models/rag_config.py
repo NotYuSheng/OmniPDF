@@ -95,7 +95,7 @@ class EnhancedQueryValidator:
             }
         ]
     
-    def _get_enhanced_validation_prompt(self, query: str, collection_info: Optional[str] = None) -> str:
+    def get_enhanced_validation_prompt(self, query: str, collection_info: Optional[str] = None) -> str:
         """Generate enhanced validation prompt with context awareness"""
         
         examples_text = "\n".join([

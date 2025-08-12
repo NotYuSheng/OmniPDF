@@ -182,7 +182,7 @@ async def validate_query_with_llm(
         collection_info=f"{collection_name} collection in ChromaDB."
         logger.info(collection_info)
         
-    validation_prompt = query_validator._get_enhanced_validation_prompt(query, collection_info)
+    validation_prompt = query_validator.get_enhanced_validation_prompt(query, collection_info)
 
     try:
         # Prepare messages for Qwen-2.5
