@@ -178,16 +178,16 @@ class QwenRAGConfig:
         self.generation_params = {
             "temperature": float(os.getenv("QWEN_TEMPERATURE", "0.1")),
             "max_tokens": int(os.getenv("QWEN_MAX_TOKENS", "2000")),
-            "top_p": float(os.getenv("QWEN_TOP_P", "0.8")),
+            "top_k": float(os.getenv("QWEN_TOP_K", "5")),
             "frequency_penalty": float(os.getenv("QWEN_FREQ_PENALTY", "0.1")),
             "presence_penalty": float(os.getenv("QWEN_PRESENCE_PENALTY", "0.1")),
         }
         
         # Query parameters (lighter settings for query validation and classification)
-        self.query_params = {
+        self.validation_params = {
             "temperature": 0.0,
             "max_tokens": 500,
-            "top_p": 0.9,
+            "top_p": float(os.getenv("QWEN_TOP_P", "0.8")),
             "frequency_penalty": 0.0,
             "presence_penalty": 0.0,
         }
@@ -443,7 +443,7 @@ class QwenRAGOptimizer:
             openai_client and model_name):
             
             llm_classification = await QwenRAGOptimizer.classify_query_with_llm(
-                question, model_name, config.query_params, openai_client
+                question, model_name, config.validation_params, openai_client
             )
             
             # If LLM classification succeeded, return it

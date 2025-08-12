@@ -9,7 +9,6 @@ class ChatRequest(BaseModel):
 
     message: str
     doc_id: Optional[str] = None
-    top_k: int = Field(default=5, ge=1, le=20, description="Number of relevant chunks to retrieve")
     collection_name: str = Field(default="default_collection", description="ChromaDB collection name")
 
 
