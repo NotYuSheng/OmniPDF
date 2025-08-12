@@ -1,8 +1,9 @@
 from datetime import timedelta
 import logging
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Response, HTTPException
 from fastapi.responses import StreamingResponse
+from botocore.exceptions import ClientError
 
 from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
@@ -45,8 +46,16 @@ async def get_pdf_image(
         _validated: bool = Depends(validate_session_doc_pair),
 ):
     file_key = f"{doc_id}/images/{img_name}"
-    file = download_fileobj(file_key)
 
+    # Check if object exists
+    try:
+        s3_client.head_object(Bucket=S3_BUCKET, Key=file_key)
+        file = download_fileobj(file_key)
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "404":
+            raise HTTPException(status_code=404, detail="Image not found")
+        raise HTTPException(status_code=500, detail="Failed to check Image")
+    
     # To extend expiry time for the images
     _ = redis_image_sets[doc_id]
 
