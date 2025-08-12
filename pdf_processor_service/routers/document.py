@@ -54,7 +54,7 @@ async def upload_document(
     return DocumentUploadResponse(doc_id=doc_id, filename=key, download_url=url)
 
 
-@router.get("/{doc_id}", response_model=DocumentUploadResponse)
+@router.get("/{doc_id}")
 async def get_document(
     doc_id: str, _validated: bool = Depends(validate_session_doc_pair)
 ):
