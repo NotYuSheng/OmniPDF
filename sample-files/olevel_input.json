@@ -1,0 +1,2722 @@
+{
+    "doc_id": "ccd31308-edf4-4479-929e-48306dc3f0b2",
+    "source_lang": "en",
+    "target_lang": "malay",
+    "docling": {
+      "schema_name": "DoclingDocument",
+      "version": "1.5.0",
+      "name": "original",
+      "origin": {
+        "mimetype": "application/pdf",
+        "binary_hash": 18163467616516796000,
+        "filename": "original.pdf"
+      },
+      "furniture": {
+        "self_ref": "#/furniture",
+        "children": [],
+        "content_layer": "furniture",
+        "name": "_root_",
+        "label": "unspecified"
+      },
+      "texts": [
+        {
+          "self_ref": "#/texts/0",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 738.997,
+                "r": 220.747,
+                "b": 718.969,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                17
+              ]
+            }
+          ],
+          "orig": "Cambridge O Level",
+          "text": "Cambridge O Level",
+          "level": 1
+        },
+        {
+          "self_ref": "#/texts/1",
+          "parent": {
+            "$ref": "#/pictures/1"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 42.397,
+                "t": 617.862,
+                "r": 48.144,
+                "b": 514.806,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                12
+              ]
+            }
+          ],
+          "orig": "*0123456789*",
+          "text": "*0123456789*"
+        },
+        {
+          "self_ref": "#/texts/2",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 686.399,
+                "r": 171.59,
+                "b": 674.16,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                16
+              ]
+            }
+          ],
+          "orig": "ENGLISH LANGUAGE",
+          "text": "ENGLISH LANGUAGE",
+          "level": 1
+        },
+        {
+          "self_ref": "#/texts/3",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 499.495,
+                "t": 686.399,
+                "r": 538.634,
+                "b": 674.16,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                7
+              ]
+            }
+          ],
+          "orig": "1123/01",
+          "text": "1123/01"
+        },
+        {
+          "self_ref": "#/texts/4",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 665.496,
+                "r": 131.712,
+                "b": 654.37,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                15
+              ]
+            }
+          ],
+          "orig": "Paper 1 Reading",
+          "text": "Paper 1 Reading"
+        },
+        {
+          "self_ref": "#/texts/5",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 411.374,
+                "t": 665.496,
+                "r": 538.617,
+                "b": 654.37,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                25
+              ]
+            }
+          ],
+          "orig": "For examination from 2024",
+          "text": "For examination from 2024"
+        },
+        {
+          "self_ref": "#/texts/6",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 645.495,
+                "r": 148.196,
+                "b": 634.368,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                15
+              ]
+            }
+          ],
+          "orig": "SPECIMEN INSERT",
+          "text": "SPECIMEN INSERT"
+        },
+        {
+          "self_ref": "#/texts/7",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 502.528,
+                "t": 645.495,
+                "r": 538.63,
+                "b": 634.368,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                7
+              ]
+            }
+          ],
+          "orig": "2 hours",
+          "text": "2 hours"
+        },
+        {
+          "self_ref": "#/texts/8",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 616.901,
+                "r": 129.997,
+                "b": 605.775,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                11
+              ]
+            }
+          ],
+          "orig": "INFORMATION",
+          "text": "INFORMATION",
+          "level": 1
+        },
+        {
+          "self_ref": "#/texts/9",
+          "parent": {
+            "$ref": "#/groups/1"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "list_item",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 603.9,
+                "r": 265.29,
+                "b": 592.773,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                44
+              ]
+            }
+          ],
+          "orig": "● This insert contains the reading passages.",
+          "text": "● This insert contains the reading passages.",
+          "enumerated": false,
+          "marker": ""
+        },
+        {
+          "self_ref": "#/texts/10",
+          "parent": {
+            "$ref": "#/groups/2"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "list_item",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 590.898,
+                "r": 536.219,
+                "b": 566.77,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                110
+              ]
+            }
+          ],
+          "orig": "● You may annotate this insert and use the blank spaces for planning. Do not write your answers on the insert.",
+          "text": "● You may annotate this insert and use the blank spaces for planning. Do not write your answers on the insert.",
+          "enumerated": false,
+          "marker": ""
+        },
+        {
+          "self_ref": "#/texts/11",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 42.397,
+                "t": 617.862,
+                "r": 48.144,
+                "b": 514.806,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                12
+              ]
+            }
+          ],
+          "orig": "*0123456789*",
+          "text": "*0123456789*"
+        },
+        {
+          "self_ref": "#/texts/12",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 165.352,
+                "t": 109.30799999999999,
+                "r": 429.957,
+                "b": 98.18100000000004,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                57
+              ]
+            }
+          ],
+          "orig": "This document has 6 pages. Any blank pages are indicated.",
+          "text": "This document has 6 pages. Any blank pages are indicated."
+        },
+        {
+          "self_ref": "#/texts/13",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 63.754999999999995,
+                "r": 236.883,
+                "b": 54.85299999999995,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021"
+        },
+        {
+          "self_ref": "#/texts/14",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 489.939,
+                "t": 65.55899999999997,
+                "r": 538.622,
+                "b": 54.43299999999999,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                10
+              ]
+            }
+          ],
+          "orig": "[Turn over",
+          "text": "[Turn over"
+        },
+        {
+          "self_ref": "#/texts/15",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 294.616,
+                "t": 804.468,
+                "r": 300.716,
+                "b": 792.229,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "2",
+          "text": "2"
+        },
+        {
+          "self_ref": "#/texts/16",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 779.103,
+                "r": 424.448,
+                "b": 766.864,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                71
+              ]
+            }
+          ],
+          "orig": "Read Text A and answer Question 1 and Question 2 on the question paper.",
+          "text": "Read Text A and answer Question 1 and Question 2 on the question paper."
+        },
+        {
+          "self_ref": "#/texts/17",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 753.1,
+                "r": 140.06,
+                "b": 740.861,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                16
+              ]
+            }
+          ],
+          "orig": "Text A: Nameless",
+          "text": "Text A: Nameless",
+          "level": 1
+        },
+        {
+          "self_ref": "#/texts/18",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 728.089,
+                "r": 517.339,
+                "b": 689.847,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                231
+              ]
+            }
+          ],
+          "orig": "Mo and Marwood have finally found Nameless. They had been looking for this large redwood tree that no one had ever attempted to climb before. Redwood trees can live for more than 2000 years and are the world's tallest living trees.",
+          "text": "Mo and Marwood have finally found Nameless. They had been looking for this large redwood tree that no one had ever attempted to climb before. Redwood trees can live for more than 2000 years and are the world's tallest living trees."
+        },
+        {
+          "self_ref": "#/texts/19",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 676.083,
+                "r": 517.374,
+                "b": 624.839,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                300
+              ]
+            }
+          ],
+          "orig": "Mo and Marwood stood at the base of Nameless, peering upwards into its crown. The structure of any redwood tree is the opposite of most trees, whose branches get smaller towards the top. Nameless, this ancient giant of the forest, grew increasingly complicated and more massive higher off the ground.",
+          "text": "Mo and Marwood stood at the base of Nameless, peering upwards into its crown. The structure of any redwood tree is the opposite of most trees, whose branches get smaller towards the top. Nameless, this ancient giant of the forest, grew increasingly complicated and more massive higher off the ground."
+        },
+        {
+          "self_ref": "#/texts/20",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 611.075,
+                "r": 517.36,
+                "b": 546.83,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                399
+              ]
+            }
+          ],
+          "orig": "The tree was about 100 metres tall with a diameter of about 3 metres near its base. The trunk was an enormous cylinder of soft crumbly bark. Far above the ground, a few small wispy branches popped out of the trunk, but there were no branches on its lower reaches. Higher up still, a tangle of limbs emerged and wandered out of sight, buried in clouds of foliage. Mo and Marwood couldn't see its top.",
+          "text": "The tree was about 100 metres tall with a diameter of about 3 metres near its base. The trunk was an enormous cylinder of soft crumbly bark. Far above the ground, a few small wispy branches popped out of the trunk, but there were no branches on its lower reaches. Higher up still, a tangle of limbs emerged and wandered out of sight, buried in clouds of foliage. Mo and Marwood couldn't see its top."
+        },
+        {
+          "self_ref": "#/texts/21",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 533.066,
+                "r": 517.386,
+                "b": 403.813,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                919
+              ]
+            }
+          ],
+          "orig": "Marwood recalled that in ideal conditions, a redwood can grow from a seed into a tree that's an astonishing 16 metres tall in just its first 20 years of life, increasing in height by nearly a metre annually. After that, it grows faster still. Adding mass at an accelerating rate, it can exceed 75 cm in diameter at chest height in fewer than 60 years. The growth of redwoods generally slows down after the first 100 years, though by the age of eight hundred, they may have reached a height as tall as a 30-storey building. Redwoods are shade-tolerant. They can survive in dark places at the bottom of a forest, in the deep shade of their elders, where few other trees would survive. A small redwood living in deep shade hardly grows at all, but doesn't die; it goes into a kind of suspended animation. If it is hit by light, it once again grows with relentless speed. Nameless had clearly basked in light - it was huge.",
+          "text": "Marwood recalled that in ideal conditions, a redwood can grow from a seed into a tree that's an astonishing 16 metres tall in just its first 20 years of life, increasing in height by nearly a metre annually. After that, it grows faster still. Adding mass at an accelerating rate, it can exceed 75 cm in diameter at chest height in fewer than 60 years. The growth of redwoods generally slows down after the first 100 years, though by the age of eight hundred, they may have reached a height as tall as a 30-storey building. Redwoods are shade-tolerant. They can survive in dark places at the bottom of a forest, in the deep shade of their elders, where few other trees would survive. A small redwood living in deep shade hardly grows at all, but doesn't die; it goes into a kind of suspended animation. If it is hit by light, it once again grows with relentless speed. Nameless had clearly basked in light - it was huge."
+        },
+        {
+          "self_ref": "#/texts/22",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 390.049,
+                "r": 409.367,
+                "b": 377.81,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                76
+              ]
+            }
+          ],
+          "orig": "'You aren't going to try to climb it, are you?' asked Marwood incredulously.",
+          "text": "'You aren't going to try to climb it, are you?' asked Marwood incredulously."
+        },
+        {
+          "self_ref": "#/texts/23",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 364.046,
+                "r": 104.632,
+                "b": 351.807,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                10
+              ]
+            }
+          ],
+          "orig": "No answer.",
+          "text": "No answer."
+        },
+        {
+          "self_ref": "#/texts/24",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 338.043,
+                "r": 517.382,
+                "b": 299.80099999999993,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                203
+              ]
+            }
+          ],
+          "orig": "Mo looked again at the lowest branch of a smaller tree standing next to Nameless. Without warning, he leapt, grabbed and swung himself up onto the branch in one fluid movement and began climbing upwards.",
+          "text": "Mo looked again at the lowest branch of a smaller tree standing next to Nameless. Without warning, he leapt, grabbed and swung himself up onto the branch in one fluid movement and began climbing upwards."
+        },
+        {
+          "self_ref": "#/texts/25",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 286.03700000000003,
+                "r": 373.051,
+                "b": 273.798,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                68
+              ]
+            }
+          ],
+          "orig": "'I really don't think that's very smart,' Marwood warned from below.",
+          "text": "'I really don't think that's very smart,' Marwood warned from below."
+        },
+        {
+          "self_ref": "#/texts/26",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 260.034,
+                "r": 517.387,
+                "b": 195.789,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                461
+              ]
+            }
+          ],
+          "orig": "Ten minutes later, Mo arrived at the top of the smaller tree. The tree had narrowed to a pole thinner than his wrist, and began swaying under his weight. Having got as high as he could go, Mo looked across at Nameless and spotted a spray of slender branches on the curving wall of its monstrous trunk. A little branch stuck out, directly in front of him. Mo wanted to grab that branch. He edged closer to it, and the smaller tree began to bend under his weight.",
+          "text": "Ten minutes later, Mo arrived at the top of the smaller tree. The tree had narrowed to a pole thinner than his wrist, and began swaying under his weight. Having got as high as he could go, Mo looked across at Nameless and spotted a spray of slender branches on the curving wall of its monstrous trunk. A little branch stuck out, directly in front of him. Mo wanted to grab that branch. He edged closer to it, and the smaller tree began to bend under his weight."
+        },
+        {
+          "self_ref": "#/texts/27",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 182.02499999999998,
+                "r": 517.385,
+                "b": 130.78200000000004,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                345
+              ]
+            }
+          ],
+          "orig": "There was a gap between the branch of the smaller tree and Nameless. From the ground, Mo hadn't noticed that gap, expecting that the little tree's branches touched the big tree's branches, providing a bridge to walk across. Mo studied the situation. If he could just reach out far enough, he might be able to grab that little branch on Nameless.",
+          "text": "There was a gap between the branch of the smaller tree and Nameless. From the ground, Mo hadn't noticed that gap, expecting that the little tree's branches touched the big tree's branches, providing a bridge to walk across. Mo studied the situation. If he could just reach out far enough, he might be able to grab that little branch on Nameless."
+        },
+        {
+          "self_ref": "#/texts/28",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 117.01800000000003,
+                "r": 517.328,
+                "b": 52.773000000000025,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                428
+              ]
+            }
+          ],
+          "orig": "Trying not to think about how high up he was, Mo focused his mind on the problem. The gap was really not very large, he thought. He would have to let go of the small redwood and make a leap up into the big tree, and grasp a branch with his hands, like a circus performer catching the bar of a swinging trapeze. He had to jump high, or his body wouldn't clear the branches of the smaller tree and he'd get tangled and would fall.",
+          "text": "Trying not to think about how high up he was, Mo focused his mind on the problem. The gap was really not very large, he thought. He would have to let go of the small redwood and make a leap up into the big tree, and grasp a branch with his hands, like a circus performer catching the bar of a swinging trapeze. He had to jump high, or his body wouldn't clear the branches of the smaller tree and he'd get tangled and would fall."
+        },
+        {
+          "self_ref": "#/texts/29",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 539.62,
+                "t": 611.075,
+                "r": 545.719,
+                "b": 598.836,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "5",
+          "text": "5"
+        },
+        {
+          "self_ref": "#/texts/30",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 533.066,
+                "r": 545.7,
+                "b": 520.827,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "10",
+          "text": "10"
+        },
+        {
+          "self_ref": "#/texts/31",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 468.059,
+                "r": 545.7,
+                "b": 455.819,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "15",
+          "text": "15"
+        },
+        {
+          "self_ref": "#/texts/32",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 390.049,
+                "r": 545.7,
+                "b": 377.81,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "20",
+          "text": "20"
+        },
+        {
+          "self_ref": "#/texts/33",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 286.03700000000003,
+                "r": 545.7,
+                "b": 273.798,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "25",
+          "text": "25"
+        },
+        {
+          "self_ref": "#/texts/34",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 208.02800000000002,
+                "r": 545.7,
+                "b": 195.789,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "30",
+          "text": "30"
+        },
+        {
+          "self_ref": "#/texts/35",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 117.01800000000003,
+                "r": 545.7,
+                "b": 104.779,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "35",
+          "text": "35"
+        },
+        {
+          "self_ref": "#/texts/36",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 43.90999999999997,
+                "r": 229.796,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021"
+        },
+        {
+          "self_ref": "#/texts/37",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 273.059,
+                "t": 43.90999999999997,
+                "r": 322.275,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                13
+              ]
+            }
+          ],
+          "orig": "1123/01/SI/24",
+          "text": "1123/01/SI/24"
+        },
+        {
+          "self_ref": "#/texts/38",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 294.616,
+                "t": 804.468,
+                "r": 300.716,
+                "b": 792.229,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "3",
+          "text": "3"
+        },
+        {
+          "self_ref": "#/texts/39",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 779.103,
+                "r": 517.357,
+                "b": 753.863,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                175
+              ]
+            }
+          ],
+          "orig": "If I was standing on the ground and I had to make this jump, I could do it, he thought. So why not up here? He tried to force his hand to just let go of the tree. Just let go.",
+          "text": "If I was standing on the ground and I had to make this jump, I could do it, he thought. So why not up here? He tried to force his hand to just let go of the tree. Just let go."
+        },
+        {
+          "self_ref": "#/texts/40",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 740.099,
+                "r": 517.37,
+                "b": 714.858,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                128
+              ]
+            }
+          ],
+          "orig": "'I can't watch,' Marwood shouted furiously from below and closed his eyes. He dreaded hearing a scream followed by a meaty thud.",
+          "text": "'I can't watch,' Marwood shouted furiously from below and closed his eyes. He dreaded hearing a scream followed by a meaty thud."
+        },
+        {
+          "self_ref": "#/texts/41",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 701.094,
+                "r": 263.02,
+                "b": 688.855,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                45
+              ]
+            }
+          ],
+          "orig": "In the top of the tree Mo let go, and jumped.",
+          "text": "In the top of the tree Mo let go, and jumped."
+        },
+        {
+          "self_ref": "#/texts/42",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 675.091,
+                "r": 545.7,
+                "b": 610.846,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                399
+              ]
+            }
+          ],
+          "orig": "He felt gravity go to zero. The world stopped. Mo watched the branch of the large redwood approach in slow motion and saw his fingers extend towards it. There was a jerk and he found himself hanging from the branch by both hands, bouncing with his feet kicking the air. Swinging hand-over-hand, he got himself over to the trunk and climbed the next three precarious metres onto a stronger branch. 45",
+          "text": "He felt gravity go to zero. The world stopped. Mo watched the branch of the large redwood approach in slow motion and saw his fingers extend towards it. There was a jerk and he found himself hanging from the branch by both hands, bouncing with his feet kicking the air. Swinging hand-over-hand, he got himself over to the trunk and climbed the next three precarious metres onto a stronger branch. 45"
+        },
+        {
+          "self_ref": "#/texts/43",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 597.082,
+                "r": 517.373,
+                "b": 467.829,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                871
+              ]
+            }
+          ],
+          "orig": "He had arrived somewhere in the lower tiers of Nameless, just below the crown of the huge tree. The branches here were bigger and closer together. There was foliage everywhere - above, below, and on all sides - layer upon layer of leaves, like tents within tents. The tree hadn't looked so big from the ground. Climbing upwards slowly and steadily through the labyrinth, Mo lost sight of the ground. It felt as if he was passing through a membrane and entering another world. His senses were overwhelmed by an impression of life all around. Flaky, grey-green, and brownish plants, in all manner of shapes, hung from branches - drippy, frizzy, stringy, and hairy. He began picking pieces off, tucking them into his pocket. As he neared the upper surface of the redwood canopy, the lacework of branches glowed with varied shades of green and he broke out into the sunlight.",
+          "text": "He had arrived somewhere in the lower tiers of Nameless, just below the crown of the huge tree. The branches here were bigger and closer together. There was foliage everywhere - above, below, and on all sides - layer upon layer of leaves, like tents within tents. The tree hadn't looked so big from the ground. Climbing upwards slowly and steadily through the labyrinth, Mo lost sight of the ground. It felt as if he was passing through a membrane and entering another world. His senses were overwhelmed by an impression of life all around. Flaky, grey-green, and brownish plants, in all manner of shapes, hung from branches - drippy, frizzy, stringy, and hairy. He began picking pieces off, tucking them into his pocket. As he neared the upper surface of the redwood canopy, the lacework of branches glowed with varied shades of green and he broke out into the sunlight."
+        },
+        {
+          "self_ref": "#/texts/44",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 454.065,
+                "r": 517.396,
+                "b": 428.825,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                102
+              ]
+            }
+          ],
+          "orig": "An hour after he'd jumped into it, Mo arrived at the top of Nameless. 'It's do-able.' he shouted down.",
+          "text": "An hour after he'd jumped into it, Mo arrived at the top of Nameless. 'It's do-able.' he shouted down."
+        },
+        {
+          "self_ref": "#/texts/45",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 533.502,
+                "t": 597.082,
+                "r": 545.7,
+                "b": 584.843,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "50",
+          "text": "50"
+        },
+        {
+          "self_ref": "#/texts/46",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 533.502,
+                "t": 532.074,
+                "r": 545.7,
+                "b": 519.835,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "55",
+          "text": "55"
+        },
+        {
+          "self_ref": "#/texts/47",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 533.502,
+                "t": 454.065,
+                "r": 545.7,
+                "b": 441.826,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "60",
+          "text": "60"
+        },
+        {
+          "self_ref": "#/texts/48",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 533.502,
+                "t": 779.103,
+                "r": 545.7,
+                "b": 766.864,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "40",
+          "text": "40"
+        },
+        {
+          "self_ref": "#/texts/49",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 43.90999999999997,
+                "r": 229.796,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021"
+        },
+        {
+          "self_ref": "#/texts/50",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 273.059,
+                "t": 43.90999999999997,
+                "r": 322.275,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                13
+              ]
+            }
+          ],
+          "orig": "1123/01/SI/24",
+          "text": "1123/01/SI/24"
+        },
+        {
+          "self_ref": "#/texts/51",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 492.155,
+                "t": 46.615999999999985,
+                "r": 545.707,
+                "b": 34.37699999999995,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                10
+              ]
+            }
+          ],
+          "orig": "[Turn over",
+          "text": "[Turn over"
+        },
+        {
+          "self_ref": "#/texts/52",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 294.616,
+                "t": 804.468,
+                "r": 300.716,
+                "b": 792.229,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "4",
+          "text": "4"
+        },
+        {
+          "self_ref": "#/texts/53",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 779.103,
+                "r": 343.543,
+                "b": 766.864,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                56
+              ]
+            }
+          ],
+          "orig": "Read Text B and answer Question 3 on the question paper.",
+          "text": "Read Text B and answer Question 3 on the question paper."
+        },
+        {
+          "self_ref": "#/texts/54",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 753.1,
+                "r": 214.231,
+                "b": 740.861,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                31
+              ]
+            }
+          ],
+          "orig": "Text B: A night among the trees",
+          "text": "Text B: A night among the trees",
+          "level": 1
+        },
+        {
+          "self_ref": "#/texts/55",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 728.089,
+                "r": 490.857,
+                "b": 715.85,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                94
+              ]
+            }
+          ],
+          "orig": "The writer of this review has just returned from a visit to the Treehotel, in northern Sweden.",
+          "text": "The writer of this review has just returned from a visit to the Treehotel, in northern Sweden."
+        },
+        {
+          "self_ref": "#/texts/56",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 702.086,
+                "r": 517.382,
+                "b": 650.842,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                310
+              ]
+            }
+          ],
+          "orig": "Recently, I watched a documentary film called 'The Tree Lover' - all about the link between trees and people. In the film, director Jonas Augustsén says: 'Imagine relaxing here on summer evenings …'. He's sitting in a treehouse he's spent months building, looking out over a wide forest lit by the setting sun.",
+          "text": "Recently, I watched a documentary film called 'The Tree Lover' - all about the link between trees and people. In the film, director Jonas Augustsén says: 'Imagine relaxing here on summer evenings …'. He's sitting in a treehouse he's spent months building, looking out over a wide forest lit by the setting sun."
+        },
+        {
+          "self_ref": "#/texts/57",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 637.078,
+                "r": 517.343,
+                "b": 598.836,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                244
+              ]
+            }
+          ],
+          "orig": "And guess what? It turns out you don't have to just imagine it. Since the Treehotel in northern Sweden opened last month, you too can live out your childhood dream and holiday in a treehouse, surveying the landscape. I simply had to try it out!",
+          "text": "And guess what? It turns out you don't have to just imagine it. Since the Treehotel in northern Sweden opened last month, you too can live out your childhood dream and holiday in a treehouse, surveying the landscape. I simply had to try it out!"
+        },
+        {
+          "self_ref": "#/texts/58",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 585.072,
+                "r": 517.384,
+                "b": 546.83,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                218
+              ]
+            }
+          ],
+          "orig": "The well-hidden Treehotel is the creation of guesthouse owners, Britta and Kent Lindvall, who were inspired by Augustsén's film to create this back-to-nature retreat where guests can switch off and breathe more deeply.",
+          "text": "The well-hidden Treehotel is the creation of guesthouse owners, Britta and Kent Lindvall, who were inspired by Augustsén's film to create this back-to-nature retreat where guests can switch off and breathe more deeply."
+        },
+        {
+          "self_ref": "#/texts/59",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 533.066,
+                "r": 517.382,
+                "b": 468.821,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                426
+              ]
+            }
+          ],
+          "orig": "An area of forest behind their guesthouse had been sold for logging. Instead of waiting for the inevitable to happen in a country where forestry is such an important industry, they persuaded the forest's new owner to sell it to them. With help from various architect friends, they planned the innovative designs of the Treehotel, determined to demonstrate that the natural forest environment had value beyond supplying timber.",
+          "text": "An area of forest behind their guesthouse had been sold for logging. Instead of waiting for the inevitable to happen in a country where forestry is such an important industry, they persuaded the forest's new owner to sell it to them. With help from various architect friends, they planned the innovative designs of the Treehotel, determined to demonstrate that the natural forest environment had value beyond supplying timber."
+        },
+        {
+          "self_ref": "#/texts/60",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 455.057,
+                "r": 517.375,
+                "b": 416.815,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                240
+              ]
+            }
+          ],
+          "orig": "On arrival, I was greeted by Britta, who explained, 'Guests usually leave their luggage here and just take a small overnight bag to the treehouses. We want them to get the feeling that they're leaving one world behind and entering another.'",
+          "text": "On arrival, I was greeted by Britta, who explained, 'Guests usually leave their luggage here and just take a small overnight bag to the treehouses. We want them to get the feeling that they're leaving one world behind and entering another.'"
+        },
+        {
+          "self_ref": "#/texts/61",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 403.051,
+                "r": 517.367,
+                "b": 338.806,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                423
+              ]
+            }
+          ],
+          "orig": "Britta led me along a narrow path through a glade of birch trees, explaining as we walked why the couple want to share their passion for this beautiful forest environment with guests. We arrived at the Mirrorcube. The most striking of the treehouses, it's a glass box perched high in the forest. Like an architectural magic trick, it almost disappears into the foliage, so sharply are the surrounding trees reflected in it.",
+          "text": "Britta led me along a narrow path through a glade of birch trees, explaining as we walked why the couple want to share their passion for this beautiful forest environment with guests. We arrived at the Mirrorcube. The most striking of the treehouses, it's a glass box perched high in the forest. Like an architectural magic trick, it almost disappears into the foliage, so sharply are the surrounding trees reflected in it."
+        },
+        {
+          "self_ref": "#/texts/62",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 325.0419999999999,
+                "r": 517.377,
+                "b": 260.797,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                475
+              ]
+            }
+          ],
+          "orig": "Inside, the Mirrorcube, like the hotel's other treehouses, facilities are fairly basic, not stretching much beyond an environmentally-friendly toilet - meals and showers are taken at the guesthouse, over 10 minutes' walk away. Still, underfloor heating will keep it cosy through winter. Reflective cladding means no one can see in but you can see out - you have an almost 360-degree view of the surrounding trees. There's even a window in the ceiling to look up into the sky.",
+          "text": "Inside, the Mirrorcube, like the hotel's other treehouses, facilities are fairly basic, not stretching much beyond an environmentally-friendly toilet - meals and showers are taken at the guesthouse, over 10 minutes' walk away. Still, underfloor heating will keep it cosy through winter. Reflective cladding means no one can see in but you can see out - you have an almost 360-degree view of the surrounding trees. There's even a window in the ceiling to look up into the sky."
+        },
+        {
+          "self_ref": "#/texts/63",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 247.03300000000002,
+                "r": 517.363,
+                "b": 221.79200000000003,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                191
+              ]
+            }
+          ],
+          "orig": "When I woke the next morning, it was a shock to find a bird seeming to be peering back at me through the glass. It was tempting to spend the day in my own little nest but I wanted to explore.",
+          "text": "When I woke the next morning, it was a shock to find a bird seeming to be peering back at me through the glass. It was tempting to spend the day in my own little nest but I wanted to explore."
+        },
+        {
+          "self_ref": "#/texts/64",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 208.02800000000002,
+                "r": 517.385,
+                "b": 130.78200000000004,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                507
+              ]
+            }
+          ],
+          "orig": "I went to take a peek at the Cabin, a sleek, organically-shaped space pod touched down in the treetops about 50 metres from the Mirrorcube. Also sleeping two, this one has a huge viewing platform - in summer you can actually sleep out under the open sky (safe from mosquitoes as they don't fly 10 metres up in the air). Just behind it is the four-person Bird's Nest, and the Blue Cone, scheduled for completion next month. A fifth and final treehouse in the collection, the UFO, opens at the end of October.",
+          "text": "I went to take a peek at the Cabin, a sleek, organically-shaped space pod touched down in the treetops about 50 metres from the Mirrorcube. Also sleeping two, this one has a huge viewing platform - in summer you can actually sleep out under the open sky (safe from mosquitoes as they don't fly 10 metres up in the air). Just behind it is the four-person Bird's Nest, and the Blue Cone, scheduled for completion next month. A fifth and final treehouse in the collection, the UFO, opens at the end of October."
+        },
+        {
+          "self_ref": "#/texts/65",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 117.01800000000003,
+                "r": 517.346,
+                "b": 91.77700000000004,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                156
+              ]
+            }
+          ],
+          "orig": "Later, over breakfast, Kent talked enthusiastically about village walking tours where guests can stop for coffee, cake and conversation with a local family.",
+          "text": "Later, over breakfast, Kent talked enthusiastically about village walking tours where guests can stop for coffee, cake and conversation with a local family."
+        },
+        {
+          "self_ref": "#/texts/66",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 539.62,
+                "t": 637.078,
+                "r": 545.719,
+                "b": 624.839,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "5",
+          "text": "5"
+        },
+        {
+          "self_ref": "#/texts/67",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 559.069,
+                "r": 545.7,
+                "b": 546.83,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "10",
+          "text": "10"
+        },
+        {
+          "self_ref": "#/texts/68",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 481.06,
+                "r": 545.7,
+                "b": 468.821,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "15",
+          "text": "15"
+        },
+        {
+          "self_ref": "#/texts/69",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 390.049,
+                "r": 545.7,
+                "b": 377.81,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "20",
+          "text": "20"
+        },
+        {
+          "self_ref": "#/texts/70",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 312.03999999999996,
+                "r": 545.7,
+                "b": 299.80099999999993,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "25",
+          "text": "25"
+        },
+        {
+          "self_ref": "#/texts/71",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 234.03099999999995,
+                "r": 545.7,
+                "b": 221.79200000000003,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "30",
+          "text": "30"
+        },
+        {
+          "self_ref": "#/texts/72",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 156.02199999999993,
+                "r": 545.7,
+                "b": 143.78300000000002,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "35",
+          "text": "35"
+        },
+        {
+          "self_ref": "#/texts/73",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 43.90999999999997,
+                "r": 229.796,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021"
+        },
+        {
+          "self_ref": "#/texts/74",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 273.059,
+                "t": 43.90999999999997,
+                "r": 322.275,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                13
+              ]
+            }
+          ],
+          "orig": "1123/01/SI/24",
+          "text": "1123/01/SI/24"
+        },
+        {
+          "self_ref": "#/texts/75",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 5,
+              "bbox": {
+                "l": 294.616,
+                "t": 804.468,
+                "r": 300.716,
+                "b": 792.229,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "5",
+          "text": "5"
+        },
+        {
+          "self_ref": "#/texts/76",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 5,
+              "bbox": {
+                "l": 49.613,
+                "t": 779.103,
+                "r": 517.373,
+                "b": 727.86,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                334
+              ]
+            }
+          ],
+          "orig": "Unsurprisingly, given their deeply rooted commitment to the forest, the Lindvalls built the Treehotel sustainably - the Mirrorcube is even fitted with an infrared film, visible to birds only, that stops them flying into it - and activities such as noisy snowmobile safaris are definitely out! So, will I be visiting again? Absolutely.",
+          "text": "Unsurprisingly, given their deeply rooted commitment to the forest, the Lindvalls built the Treehotel sustainably - the Mirrorcube is even fitted with an infrared film, visible to birds only, that stops them flying into it - and activities such as noisy snowmobile safaris are definitely out! So, will I be visiting again? Absolutely."
+        },
+        {
+          "self_ref": "#/texts/77",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 5,
+              "bbox": {
+                "l": 533.502,
+                "t": 766.102,
+                "r": 545.7,
+                "b": 753.863,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "40",
+          "text": "40"
+        },
+        {
+          "self_ref": "#/texts/78",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 5,
+              "bbox": {
+                "l": 49.613,
+                "t": 43.90999999999997,
+                "r": 229.796,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021"
+        },
+        {
+          "self_ref": "#/texts/79",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 5,
+              "bbox": {
+                "l": 273.059,
+                "t": 43.90999999999997,
+                "r": 322.275,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                13
+              ]
+            }
+          ],
+          "orig": "1123/01/SI/24",
+          "text": "1123/01/SI/24"
+        },
+        {
+          "self_ref": "#/texts/80",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 186.88200000000006,
+                "r": 144.255,
+                "b": 179.09400000000005,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                27
+              ]
+            }
+          ],
+          "orig": "Copyright Acknowledgements:",
+          "text": "Copyright Acknowledgements:"
+        },
+        {
+          "self_ref": "#/texts/81",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 168.88,
+                "r": 68.734,
+                "b": 161.09199999999998,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                6
+              ]
+            }
+          ],
+          "orig": "Text A",
+          "text": "Text A"
+        },
+        {
+          "self_ref": "#/texts/82",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 134.658,
+                "t": 168.88,
+                "r": 545.687,
+                "b": 152.091,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                154
+              ]
+            }
+          ],
+          "orig": "Adapted; From The Wild Trees by Richard Preston published by Penguin. Copyright © Richard Preston, 2007. Reprinted by permission of Penguin Books Limited.",
+          "text": "Adapted; From The Wild Trees by Richard Preston published by Penguin. Copyright © Richard Preston, 2007. Reprinted by permission of Penguin Books Limited."
+        },
+        {
+          "self_ref": "#/texts/83",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 150.87799999999993,
+                "r": 68.734,
+                "b": 143.09000000000003,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                6
+              ]
+            }
+          ],
+          "orig": "Text A",
+          "text": "Text A"
+        },
+        {
+          "self_ref": "#/texts/84",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 134.658,
+                "t": 150.87799999999993,
+                "r": 545.728,
+                "b": 134.08899999999994,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                227
+              ]
+            }
+          ],
+          "orig": "Adapted; Excerpt(s) from THE WILD TREES: A STORY OF PASSION AND DARING by Richard Preston, © 2007 by Richard Preston. Used by permission of Random House, an imprint and division of Penguin Random House LLC. All rights reserved.",
+          "text": "Adapted; Excerpt(s) from THE WILD TREES: A STORY OF PASSION AND DARING by Richard Preston, © 2007 by Richard Preston. Used by permission of Random House, an imprint and division of Penguin Random House LLC. All rights reserved."
+        },
+        {
+          "self_ref": "#/texts/85",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 132.87599999999998,
+                "r": 69.125,
+                "b": 125.08799999999997,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                6
+              ]
+            }
+          ],
+          "orig": "Text B",
+          "text": "Text B"
+        },
+        {
+          "self_ref": "#/texts/86",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 134.658,
+                "t": 132.87599999999998,
+                "r": 545.715,
+                "b": 116.08699999999999,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                192
+              ]
+            }
+          ],
+          "orig": "© Adapted; Rhiannon Batten; Rooms at the top: Sweden's stylish new treehouse ; The Guardian News & Media Ltd; 28 Aug 2010; https://www.theguardian.com/travel/2010/aug/28/treehouse-sweden-hotel",
+          "text": "© Adapted; Rhiannon Batten; Rooms at the top: Sweden's stylish new treehouse ; The Guardian News & Media Ltd; 28 Aug 2010; https://www.theguardian.com/travel/2010/aug/28/treehouse-sweden-hotel"
+        },
+        {
+          "self_ref": "#/texts/87",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 105.87300000000005,
+                "r": 545.653,
+                "b": 80.082,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                418
+              ]
+            }
+          ],
+          "orig": "Permission to reproduce items where third-party owned material protected by copyright is included has been sought and cleared where possible. Every reasonable effort has been made by the publisher (Cambridge University Press & Assessment) to trace copyright holders, but if any items requiring clearance have unwittingly been included, the publisher will be pleased to make amends at the earliest possible opportunity.",
+          "text": "Permission to reproduce items where third-party owned material protected by copyright is included has been sought and cleared where possible. Every reasonable effort has been made by the publisher (Cambridge University Press & Assessment) to trace copyright holders, but if any items requiring clearance have unwittingly been included, the publisher will be pleased to make amends at the earliest possible opportunity."
+        },
+        {
+          "self_ref": "#/texts/88",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 69.86900000000003,
+                "r": 545.677,
+                "b": 53.07899999999995,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                184
+              ]
+            }
+          ],
+          "orig": "Cambridge Assessment International Education is part of Cambridge University Press & Assessment. Cambridge University Press & Assessment is a department of the University of Cambridge.",
+          "text": "Cambridge Assessment International Education is part of Cambridge University Press & Assessment. Cambridge University Press & Assessment is a department of the University of Cambridge."
+        },
+        {
+          "self_ref": "#/texts/89",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 294.616,
+                "t": 804.468,
+                "r": 300.716,
+                "b": 792.229,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "6",
+          "text": "6"
+        },
+        {
+          "self_ref": "#/texts/90",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 261.717,
+                "t": 779.103,
+                "r": 333.611,
+                "b": 766.864,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                10
+              ]
+            }
+          ],
+          "orig": "BLANK PAGE",
+          "text": "BLANK PAGE",
+          "level": 1
+        },
+        {
+          "self_ref": "#/texts/91",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 43.90999999999997,
+                "r": 229.796,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021"
+        },
+        {
+          "self_ref": "#/texts/92",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 273.059,
+                "t": 43.90999999999997,
+                "r": 322.275,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                13
+              ]
+            }
+          ],
+          "orig": "1123/01/SI/24",
+          "text": "1123/01/SI/24"
+        }
+      ],
+      "pictures": [
+        {
+          "self_ref": "#/pictures/0",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "picture",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 261.5536804199219,
+                "t": 815.1662006378174,
+                "r": 446.2525634765625,
+                "b": 784.8999900817871,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                0
+              ]
+            }
+          ],
+          "captions": [],
+          "references": [],
+          "footnotes": [],
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 370,
+              "height": 60
+            }
+          },
+          "annotations": [],
+          "key": "img_0.png"
+        },
+        {
+          "self_ref": "#/pictures/1",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [
+            {
+              "$ref": "#/texts/1"
+            }
+          ],
+          "content_layer": "body",
+          "label": "picture",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 21.814355850219727,
+                "t": 618.1591339111328,
+                "r": 48.54130172729492,
+                "b": 515.031005859375,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                0
+              ]
+            }
+          ],
+          "captions": [],
+          "references": [],
+          "footnotes": [],
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 53,
+              "height": 206
+            }
+          },
+          "annotations": [],
+          "key": "img_1.png"
+        }
+      ],
+      "tables": [],
+      "key_value_items": [],
+      "form_items": [],
+      "pages": {
+        "1": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 1
+        },
+        "2": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 2
+        },
+        "3": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 3
+        },
+        "4": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 4
+        },
+        "5": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 5
+        },
+        "6": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 6
+        }
+      }
+    }
+}
