@@ -9,7 +9,7 @@ from shared_utils.s3_utils import load_job, generate_presigned_url
 
 logger = logging.getLogger(__name__)
 
-S3_ENDPOINT = os.getenv("MINIO_ENDPOINT", "http://minio:9000")  # MinIO-compatible
+EXTERNAL_IMAGE_ENDPOINT = os.getenv("EXTERNAL_IMAGE_ENDPOINT")
 EXTRACTION_URL = os.getenv("EXTRACTION_URL")
 if not EXTRACTION_URL:
     raise ValueError("EXTRACTION_URL is not set")
@@ -53,3 +53,7 @@ async def load_or_create_job(doc_id: str) -> dict | Response:
         )
 
     return job
+
+
+def generate_external_image_url(doc_id: str, image_name: str):
+    return f"{EXTERNAL_IMAGE_ENDPOINT}/{doc_id}/{image_name}"

@@ -48,6 +48,24 @@ def upload_fileobj(file_obj, key: str, content_type: str = "application/pdf") ->
         return False
 
 
+def download_fileobj(key: str) -> bool:
+    """
+    Downloads a file-like object from S3.
+    """
+    try:
+        f = BytesIO()
+        s3_client.download_fileobj(
+            Bucket=S3_BUCKET,
+            Key=key,
+            Fileobj=f
+        )
+        f.seek(0)
+        return f
+    except (BotoCoreError, ClientError) as e:
+        logger.exception(f"Failed to upload file to S3: {e}")
+        return False
+
+
 def generate_presigned_url(key: str, expiry_seconds: int = 300) -> Optional[str]:
     """
     Generates a presigned URL to download a file from S3.
