@@ -5,8 +5,6 @@ import logging
 from shared_utils.s3_utils import (
     upload_fileobj,
     delete_file,
-    s3_client,
-    S3_BUCKET,
     download_fileobj,
 )
 from utils.session import (
@@ -64,7 +62,6 @@ async def get_document(
 
     # Check if object exists
     try:
-        s3_client.head_object(Bucket=S3_BUCKET, Key=key)
         file = download_fileobj(key)
     except ClientError as e:
         if e.response["Error"]["Code"] == "404":

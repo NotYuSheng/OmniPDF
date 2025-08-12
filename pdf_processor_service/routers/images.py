@@ -49,7 +49,6 @@ async def get_pdf_image(
 
     # Check if object exists
     try:
-        s3_client.head_object(Bucket=S3_BUCKET, Key=file_key)
         file = download_fileobj(file_key)
     except ClientError as e:
         if e.response["Error"]["Code"] == "404":
