@@ -19,4 +19,6 @@ COPY frontend ./frontend
 
 EXPOSE 8504
 
+ENV STREAMLIT_CLIENT_TOOLBAR_MODE=minimal
+
 CMD ["streamlit", "run", "frontend/main.py", "--server.port=8504", "--server.address=0.0.0.0"]
