@@ -1,0 +1,95 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "pdf-renderer-service.fullname" . }}
+  labels:
+    {{- include "pdf-renderer-service.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "pdf-renderer-service.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    {{- if .Values.networkPolicy.ingress.enabled }}
+    - Ingress
+    {{- end }}
+    {{- if .Values.networkPolicy.egress.enabled }}
+    - Egress
+    {{- end }}
+  {{- if .Values.networkPolicy.ingress.enabled }}
+  ingress:
+    # Allow traffic from ingress controller
+    {{- if .Values.networkPolicy.ingress.fromIngressController }}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              {{- toYaml .Values.networkPolicy.ingress.ingressControllerNamespaceLabels | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.service.port }}
+    {{- end }}
+    # Allow traffic from same namespace
+    {{- if .Values.networkPolicy.ingress.fromSameNamespace }}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Release.Namespace }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.service.port }}
+    {{- end }}
+    # Custom ingress rules
+    {{- with .Values.networkPolicy.ingress.customRules }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+  {{- if .Values.networkPolicy.egress.enabled }}
+  egress:
+    # Allow DNS resolution
+    {{- if .Values.networkPolicy.egress.allowDNS }}
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    {{- end }}
+    # Allow HTTPS for external APIs
+    {{- if .Values.networkPolicy.egress.allowHTTPS }}
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+    {{- end }}
+    # Allow HTTP for internal services
+    {{- if .Values.networkPolicy.egress.allowHTTP }}
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 80
+    {{- end }}
+    # Allow communication to LLM service
+    {{- if .Values.networkPolicy.egress.allowLLMService }}
+    {{- range .Values.networkPolicy.egress.llmServiceSelectors }}
+    - to:
+        - {{ . | toYaml | nindent 10 }}
+      ports:
+        {{- range $.Values.networkPolicy.egress.llmServicePorts }}
+        - protocol: TCP
+          port: {{ . }}
+        {{- end }}
+    {{- end }}
+    {{- end }}
+    # Allow traffic to same namespace
+    {{- if .Values.networkPolicy.egress.toSameNamespace }}
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Release.Namespace }}
+    {{- end }}
+    # Custom egress rules
+    {{- with .Values.networkPolicy.egress.customRules }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

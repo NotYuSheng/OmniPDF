@@ -1,0 +1,34 @@
+# Pre-staging environment overrides
+
+# Production-like image handling
+image:
+  pullPolicy: Always
+
+# Pre-staging resources (production-like)
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Environment variables
+env:
+  - name: LOG_LEVEL
+    value: "INFO"
+  - name: ENVIRONMENT
+    value: "prestaging"
+
+# Pre-staging secrets
+secrets:
+  create: false
+  name: cleaner-prestaging-secrets
+
+# Enable network policy for pre-staging security validation
+networkPolicy:
+  enabled: true
+
+# Simple recreate strategy for background service
+deploymentStrategy:
+  type: Recreate

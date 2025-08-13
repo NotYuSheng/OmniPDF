@@ -1,7 +1,7 @@
 # OmniPDF Shared Staging Values
 # Staging-specific overrides for all services (production-like)
 
-# Staging image configuration
+# Staging image configuration - using local CRC registry
 image:
   pullPolicy: IfNotPresent
 

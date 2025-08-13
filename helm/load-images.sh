@@ -91,9 +91,28 @@ extract_image_info() {
     local external_image="$1"
     
     # Parse the external image URL
-    # Format: registry.com/org/image:tag or registry.com/org/image@sha256:...
+    # Handle multiple formats:
+    # - registry.com/org/image:tag (3 components)
+    # - docker.io/org/repo:tag (Docker Hub 3 components)  
+    # - docker.io/minio/minio:latest (Docker Hub 4 components)
     
-    if [[ "$external_image" =~ ^([^/]+)/([^/]+)/([^:@]+)(:(.+)|@(.+))$ ]]; then
+    # Try 4-component format first (docker.io/org/repo:tag)
+    if [[ "$external_image" =~ ^([^/]+)/([^/]+)/([^/]+)/([^:@]+)(:(.+)|@(.+))?$ ]]; then
+        local registry="${BASH_REMATCH[1]}"
+        local org="${BASH_REMATCH[2]}"
+        local repo="${BASH_REMATCH[3]}"
+        local image="${BASH_REMATCH[4]}"
+        local tag_or_sha="${BASH_REMATCH[6]:-${BASH_REMATCH[7]:-latest}}"
+        
+        # For SHA references, create a simpler tag
+        if [[ "$tag_or_sha" =~ ^sha256: ]]; then
+            tag_or_sha="$(echo "$tag_or_sha" | cut -c1-12)"
+        fi
+        
+        # Use the last component as the image name for local registry
+        echo "$registry|$org/$repo|$image|$tag_or_sha"
+    # Try 3-component format (registry.com/org/image:tag)
+    elif [[ "$external_image" =~ ^([^/]+)/([^/]+)/([^:@]+)(:(.+)|@(.+))?$ ]]; then
         local registry="${BASH_REMATCH[1]}"
         local org="${BASH_REMATCH[2]}"
         local image="${BASH_REMATCH[3]}"
@@ -106,7 +125,7 @@ extract_image_info() {
         
         echo "$registry|$org|$image|$tag_or_sha"
     else
-        error "Invalid image format: $external_image. Expected format: registry.com/org/image:tag"
+        error "Invalid image format: $external_image. Expected format: registry.com/org/image:tag or registry.com/org/repo/image:tag"
     fi
 }
 
@@ -202,7 +221,7 @@ read_images_from_file() {
         error "File not found: $file"
     fi
     
-    log "Reading images from file: $file"
+    log "Reading images from file: $file" >&2
     
     while IFS= read -r line || [[ -n "$line" ]]; do
         # Skip empty lines and comments
@@ -222,7 +241,7 @@ read_images_from_file() {
         error "No valid image URLs found in file: $file"
     fi
     
-    log "Found ${#images[@]} images in file"
+    log "Found ${#images[@]} images in file" >&2
     printf '%s\n' "${images[@]}"
 }
 

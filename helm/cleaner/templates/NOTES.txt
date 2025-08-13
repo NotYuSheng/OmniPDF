@@ -1,0 +1,20 @@
+OmniPDF Cleaner Service has been deployed!
+
+1. Check the status of the cleaner:
+  kubectl --namespace {{ .Release.Namespace }} get pods -l "app.kubernetes.io/name={{ include "cleaner.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"
+
+2. View Logs:
+  kubectl --namespace {{ .Release.Namespace }} logs -f deployment/{{ include "cleaner.fullname" . }}
+
+3. Monitor the background cleanup process:
+  kubectl --namespace {{ .Release.Namespace }} describe deployment/{{ include "cleaner.fullname" . }}
+
+{{- if .Values.networkPolicy.enabled }}
+
+4. Network Security:
+  - NetworkPolicy is enabled - only authorized traffic is allowed
+  - Egress allowed to: {{- if .Values.networkPolicy.egress.allowDNS }}DNS, {{- end }}{{- if .Values.networkPolicy.egress.allowHTTP }}Redis{{- end }}
+{{- end }}
+
+Note: The cleaner service runs as a background process and does not expose any network ports.
+It connects to Redis to monitor and clean up expired sessions and temporary data.

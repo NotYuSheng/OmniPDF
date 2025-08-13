@@ -26,13 +26,11 @@ autoscaling:
 # Staging secrets
 secrets:
   create: false
-  name: chat-service-staging-secrets
+  name: pdf-extraction-service-staging-secrets
 
-# Production-like image handling - using local CRC registry
+# Production-like image handling
 image:
-  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/chat_service
-  tag: "dev-v0.0.1-860e67e"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # Enable ingress for staging testing
 ingress:
@@ -41,14 +39,14 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: "staging-issuer"
   hosts:
-    - host: chat-staging.company.com
+    - host: pdf-extraction-service-staging.company.com
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: chat-staging-tls
+    - secretName: pdf-extraction-service-staging-tls
       hosts:
-        - chat-staging.company.com
+        - pdf-extraction-service-staging.company.com
 
 # Environment variables
 env:

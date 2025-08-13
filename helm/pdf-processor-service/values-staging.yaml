@@ -1,18 +1,13 @@
 # Staging environment overrides
 replicaCount: 3
 
-# Staging LLM configuration
-llm:
-  baseUrl: "http://llm-staging.internal.company.com/v1"
-  model: "qwen2.5-14b-instruct"  # Production-like model
-
 # Staging resources (closer to production)
 resources:
   limits:
-    cpu: 500m
+    cpu: 1000m
     memory: 1Gi
   requests:
-    cpu: 200m
+    cpu: 300m
     memory: 256Mi
 
 # Production-like autoscaling
@@ -26,11 +21,11 @@ autoscaling:
 # Staging secrets
 secrets:
   create: false
-  name: chat-service-staging-secrets
+  name: pdf-processor-service-staging-secrets
 
 # Production-like image handling - using local CRC registry
 image:
-  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/chat_service
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/pdf_processor_service
   tag: "dev-v0.0.1-860e67e"
   pullPolicy: IfNotPresent
 
@@ -41,14 +36,14 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: "staging-issuer"
   hosts:
-    - host: chat-staging.company.com
+    - host: pdf-processor-staging.company.com
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: chat-staging-tls
+    - secretName: pdf-processor-staging-tls
       hosts:
-        - chat-staging.company.com
+        - pdf-processor-staging.company.com
 
 # Environment variables
 env:

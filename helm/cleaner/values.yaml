@@ -1,0 +1,124 @@
+# Default values for cleaner.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/notyusheng/cleaner
+  pullPolicy: Never
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # Let OpenShift assign appropriate user/group IDs automatically
+  # fsGroup: 1001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  # runAsUser: 65534  # Let OpenShift assign user ID automatically
+  readOnlyRootFilesystem: true
+  seccompProfile:
+    type: RuntimeDefault  # Required for OpenShift restricted security
+  capabilities:
+    drop:
+      - ALL
+
+# Cleaner is a background service, no service needed
+service:
+  enabled: false
+
+# Cleaner doesn't need ingress - it's a background service
+ingress:
+  enabled: false
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Background service doesn't need health checks via HTTP
+# It will rely on process health monitoring
+startupProbe:
+  enabled: false
+livenessProbe:
+  enabled: false
+readinessProbe:
+  enabled: false
+
+# Cleaner doesn't need autoscaling - single instance is sufficient
+autoscaling:
+  enabled: false
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env: []
+
+# Secret configuration for sensitive values
+secrets:
+  # Set to true to create secret from values, false to use existing secret
+  create: false
+  # Name of the secret to reference (must exist if create=false)
+  name: cleaner-secrets
+  # Data for secret creation (only used when create=true)
+  data: {}
+
+# Network policy configuration
+networkPolicy:
+  enabled: false  # Disabled by default for dev/testing
+  ingress:
+    enabled: false  # Cleaner doesn't accept inbound connections
+    customRules: []
+  egress:
+    enabled: true
+    # Allow DNS resolution
+    allowDNS: true
+    # Allow HTTP for Redis connection
+    allowHTTP: true
+    # Allow traffic to same namespace (Redis)
+    toSameNamespace: true
+    customRules: []
+
+# Pod Disruption Budget not needed for single replica background service
+podDisruptionBudget:
+  enabled: false
+
+# Simple recreate strategy for background service
+deploymentStrategy:
+  type: Recreate
+
+# Service monitoring for Prometheus (if the cleaner exposes metrics)
+serviceMonitor:
+  enabled: false

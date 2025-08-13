@@ -1,0 +1,123 @@
+# Production environment overrides
+replicaCount: 5
+
+# Production LLM configuration
+llm:
+  baseUrl: "https://llm-prod.company.com/v1"  # HTTPS for production
+  model: "qwen2.5-32b-instruct"  # Full production model
+
+# Production resources
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Production autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 5
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 60  # Conservative for prod
+  targetMemoryUtilizationPercentage: 70
+
+# Production secrets (externally managed)
+secrets:
+  create: false
+  name: pdf-renderer-service-prod-secrets
+
+# Production image handling
+image:
+  pullPolicy: IfNotPresent  # Stable tags in production
+
+# Production ingress with proper SSL
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "production-issuer"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: chat.company.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: pdf-renderer-service-prod-tls
+      hosts:
+        - chat.company.com
+
+# Production pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  fsGroup: 65534
+
+# Production node affinity (spread across zones)
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - chat-service
+        topologyKey: kubernetes.io/hostname
+
+# Environment variables
+env:
+  - name: LOG_LEVEL
+    value: "ERROR"
+  - name: ENVIRONMENT
+    value: "production"
+  - name: ENABLE_METRICS
+    value: "true"
+  - name: ENABLE_TRACING
+    value: "true"
+  - name: PERFORMANCE_MODE
+    value: "high"
+
+# Enable network policy for production security
+networkPolicy:
+  enabled: true
+
+# Pod disruption budget for production high availability
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: "25%"  # Allow 25% disruption, keep 75% running
+
+# Ultra-conservative deployment strategy for production
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: "10%"  # Very conservative - only 10% down at a time
+    maxSurge: "25%"        # Allow 25% extra pods for smooth rollout
+
+# Generous resource quota for production (prevent outages, allow scaling)
+resourceQuota:
+  enabled: true
+  requests:
+    cpu: "30"       # 30 CPU cores max (supports 60 pods @ 0.5 CPU each)
+    memory: "60Gi"  # 60GB memory max (supports 120 pods @ 512MB each)
+    storage: "200Gi" # 200GB storage max
+  limits:
+    cpu: "50"       # 50 CPU cores max (supports 50 pods @ 1 CPU each)
+    memory: "100Gi" # 100GB memory max (supports 50 pods @ 2GB each)
+  pods: "60"        # Max 60 pods total (above HPA max of 20)
+  services: "20"    # Max 20 services
+  secrets: "50"     # Max 50 secrets
+  configmaps: "30"  # Max 30 configmaps
+
+# Enable monitoring for production
+serviceMonitor:
+  enabled: true
+  interval: "30s"           # Standard production monitoring interval
+  scrapeTimeout: "10s"      # Conservative timeout
+  labels:
+    environment: production # Help Prometheus organize metrics

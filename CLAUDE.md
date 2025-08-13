@@ -50,7 +50,7 @@ All services use FastAPI with consistent structure: main.py imports routers, rou
 # Start all services
 docker-compose up -d
 
-# Start with GPU support
+# Start with GPU support (for vLLM backend)
 docker-compose -f docker-compose.gpu.yml up -d
 
 # View logs for specific service
@@ -58,6 +58,12 @@ docker-compose logs -f chat_service
 
 # Rebuild and restart service
 docker-compose up -d --build chat_service
+
+# Stop all services
+docker-compose down
+
+# Stop and remove volumes (full cleanup)
+docker-compose down -v
 ```
 
 ### Helm/Kubernetes Operations
@@ -92,6 +98,8 @@ make uninstall CHART_NAME=chat-service
 - Helm uses environment-specific values: `values-{dev,staging,prestaging,prod}.yaml`
 - Default namespace: `omnipdf`
 - Use hyphens (not underscores) in chart names for Kubernetes compliance
+- Shared values system provides consistent configuration across environments:
+  - Values applied in order: `common-base.yaml` → `common-{env}.yaml` → `{service}/values-{env}.yaml` → `{service}/values.yaml`
 
 ## Key Implementation Details
 
@@ -152,3 +160,15 @@ Each service uses minimal dependencies:
 
 ### Port Assignments (Development Only)
 Development ports are documented in README.md. Production deployments should use proper routing layers (Ingress, Service Mesh, etc.).
+
+### Shared Values Management
+- Use `scripts/update-shared-values.sh` to update configuration across environments
+- Example: `./scripts/update-shared-values.sh "networkPolicy.enabled=true" staging`
+- Helm shared values directory: `helm/shared-values/`
+- Each service can override shared configuration in its own values files
+
+### Branch and Environment Strategy
+- Main development branch: `dev`
+- Current feature branch: `feat/helm-setup`
+- Environments: staging (default), prestaging, prod
+- Use `make install ENV=prod` to specify non-default environment

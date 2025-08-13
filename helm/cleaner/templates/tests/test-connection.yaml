@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "cleaner.fullname" . }}-test-connection"
+  labels:
+    {{- include "cleaner.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['--spider', '--timeout=10', '{{ include "cleaner.fullname" . }}:{{ .Values.service.port }}/cleaner/health/live']
+  restartPolicy: Never
