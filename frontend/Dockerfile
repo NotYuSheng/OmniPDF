@@ -4,7 +4,7 @@ WORKDIR /app
 
 ENV PYTHONPATH=/app/frontend:/app/shared_utils
 
-RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
+RUN apt-get update 
 
 # Copy requirements.txt from frontend folder in root context
 COPY frontend/requirements.txt .
