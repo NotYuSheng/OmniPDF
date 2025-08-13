@@ -1,12 +1,9 @@
-import logging
-import json
 from fastapi import APIRouter, HTTPException, Depends
 from openai import AsyncOpenAI, APIError
 from typing import List, Dict, Any, Optional
-
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chroma_client
-
+import logging
 from models.chat import ChatRequest, ChatResponse
 from models.rag_config import QwenRAGConfig, QwenPromptTemplates, QwenRAGOptimizer, QueryType, EnhancedQueryValidator
 
@@ -200,22 +197,17 @@ async def validate_query_with_llm(
         response = await openai_client.chat.completions.create(
             model=model_name,
             messages=messages,
-            response_format={"type": "json_object"},
             **qwen_config.validation_params
         )
+        
+        result = response.choices[0].message.content.strip()
+        logger.info(f"Result: {result}")
+        decision_line = next((line for line in result.split('\n') if line.startswith("DECISION:")), "")
+        
+        if "PROCEED_WITH_RAG" in decision_line:
+            return True, None
 
-        try: 
-            raw_response = response.choices[0].message.content.strip()       
-            json_result = json.loads(raw_response)
-            logger.info(f"Result: {json_result}")
-            
-            if json_result.get("decision") == "PROCEED_WITH_RAG":
-                return True, None
-
-            return False, json_result
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse LLM validation response as JSON: {e}. Raw response: {raw_response}")
-            raise HTTPException(status_code=500, detail="Failed to parse LLM response. Please try again.")
+        return False, result
             
     except APIError as e:
         logger.warning(f"LLM validation failed: {e}")

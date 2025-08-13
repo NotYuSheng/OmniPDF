@@ -143,14 +143,11 @@ Analyze the query considering:
 3. Intent clarity - Is the user's intent clear?
 4. Scope - Is it asking for general knowledge vs. specific document information?
 
-Respond with a JSON object that strictly adheres to the following schema:
-```json
-{
-    "decision": "PROCEED_WITH_RAG" | "HANDLE_WITHOUT_RAG" | "INVALID_QUERY" | "NEEDS_CLARIFICATION",
-    "confidence": "HIGH" | "MEDIUM" | "LOW",
-    "reason": "Brief explanation of your decision",
-    "suggestion": "If your decision is not PROCEED_WITH_RAG, suggest how to handle or what clarification is needed"
-}
+Respond in this exact format:
+DECISION: [PROCEED_WITH_RAG|HANDLE_WITHOUT_RAG|INVALID_QUERY|NEEDS_CLARIFICATION]
+CONFIDENCE: [HIGH|MEDIUM|LOW]
+REASON: [Brief explanation of your decision]
+SUGGESTION: [If not PROCEED_WITH_RAG, suggest how to handle or what clarification is needed]
 
 Query: "{query}"
 """
