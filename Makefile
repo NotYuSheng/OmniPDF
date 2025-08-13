@@ -43,6 +43,7 @@ help:
 	@echo "                              e.g. make uninstall CHART_NAME=pdf-processor"
 	@echo "  make lint                   Run helm lint on chart (CHART_NAME)"
 	@echo "                              e.g. make lint CHART_NAME=embedder-service"
+	@echo "  make lint-all               Lint all charts under ./helm/"
 	@echo "  make status                 Show status of Helm release (CHART_NAME)"
 	@echo "                              e.g. make status CHART_NAME=chat-service"
 	@echo "  make port-forward           Port-forward a pod to local machine"
@@ -96,6 +97,19 @@ upgrade:
 uninstall:
 	helm uninstall $(CHART_NAME) \
 		--namespace $(NAMESPACE)
+
+## Lint all Helm charts under ./helm/
+lint-all:
+	@echo "Linting all Helm charts under ./helm/..."
+	@for dir in helm/*/; do \
+		CHART=$$(basename $$dir); \
+		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
+			echo "Linting chart: $$CHART"; \
+			helm lint $$dir || exit 1; \
+		else \
+			echo "Skipping non-chart directory: $$dir"; \
+		fi; \
+	done
 
 ## Run lint check on a chart
 lint:
