@@ -44,14 +44,40 @@ update_yaml_file() {
     
     echo "📝 Updating $file..."
     
-    # Use yq if available, otherwise use sed (basic replacement)
+    # Use yq if available, otherwise use improved sed fallback
     if command -v yq >/dev/null 2>&1; then
         yq eval ".$key = \"$value\"" -i "$file"
     else
-        echo "⚠️  Warning: yq not found, using basic sed fallback. Install yq for better YAML parsing."
+        echo "⚠️  Warning: yq not found, using sed fallback. Install yq for better YAML parsing."
         echo "   Install with: sudo snap install yq (or brew install yq on macOS)"
-        # Basic sed replacement for simple keys (may not work with nested paths)
-        sed -i "s/^\\s*$(echo "$key" | sed 's/\./\\./g'):.*/  $key: $value/" "$file"
+        
+        # Check if this is a nested key (contains dots)
+        if [[ "$key" == *.* ]]; then
+            echo "⚠️  Warning: Nested key '$key' detected. Sed fallback may not work correctly."
+            echo "   Please install yq for proper nested key support."
+            return 1
+        fi
+        
+        # Escape the key for regex
+        escaped_key=$(echo "$key" | sed 's/[[\.*^$()+?{|]/\\&/g')
+        
+        # Check if key exists in file
+        if ! grep -q "^[[:space:]]*$escaped_key[[:space:]]*:" "$file"; then
+            echo "⚠️  Warning: Key '$key' not found in $file"
+            return 1
+        fi
+        
+        # Determine value type and format appropriately
+        if [[ "$value" =~ ^(true|false)$ ]]; then
+            # Boolean value - no quotes
+            sed -i "s/^[[:space:]]*$escaped_key[[:space:]]*:.*/  $key: $value/" "$file"
+        elif [[ "$value" =~ ^[0-9]+$ ]]; then
+            # Numeric value - no quotes  
+            sed -i "s/^[[:space:]]*$escaped_key[[:space:]]*:.*/  $key: $value/" "$file"
+        else
+            # String value - add quotes
+            sed -i "s/^[[:space:]]*$escaped_key[[:space:]]*:.*/  $key: \"$value\"/" "$file"
+        fi
     fi
 }
 

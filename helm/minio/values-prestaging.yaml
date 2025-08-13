@@ -26,13 +26,10 @@ persistence:
     - ReadWriteOnce
   size: 5Gi  # Smaller size for prestaging
 
-# MinIO credentials for prestaging
+# MinIO credentials for prestaging (externally managed)
 secrets:
-  create: true
+  create: false
   name: minio-prestaging-secrets
-  data:
-    MINIO_ROOT_USER: "prestaging"
-    MINIO_ROOT_PASSWORD: "prestaging123"
 
 # Environment-specific settings
 env:

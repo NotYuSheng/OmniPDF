@@ -26,13 +26,10 @@ persistence:
     - ReadWriteOnce
   size: 20Gi
 
-# MinIO credentials for staging
+# MinIO credentials for staging (externally managed)
 secrets:
-  create: true
+  create: false
   name: minio-staging-secrets
-  data:
-    MINIO_ROOT_USER: "staging"
-    MINIO_ROOT_PASSWORD: "staging-secure-password-123"
 
 # Environment-specific settings
 env:

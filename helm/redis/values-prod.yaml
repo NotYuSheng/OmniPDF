@@ -31,16 +31,10 @@ secrets:
   create: false  # Use external secret in production
   name: redis-prod-secrets
 
-# Production environment settings
+# Redis environment settings for production
 env:
-  - name: MINIO_BROWSER_REDIRECT_URL
-    value: "https://minio-console.omnipdf.com"
-  - name: MINIO_SERVER_URL
-    value: "https://minio.omnipdf.com"
-  - name: MINIO_CONSOLE_ADDRESS
-    value: ":9001"
-  - name: MINIO_PROMETHEUS_AUTH_TYPE
-    value: "public"
+  - name: REDIS_LOG_LEVEL
+    value: "warning"  # Less verbose for production
 
 # Enable production ingress
 ingress:

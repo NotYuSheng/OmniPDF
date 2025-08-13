@@ -26,22 +26,15 @@ persistence:
     - ReadWriteOnce
   size: 5Gi  # Smaller size for prestaging
 
-# MinIO credentials for prestaging
+# Redis doesn't require secrets in prestaging
 secrets:
-  create: true
+  create: false
   name: redis-prestaging-secrets
-  data:
-    MINIO_ROOT_USER: "prestaging"
-    MINIO_ROOT_PASSWORD: "prestaging123"
 
-# Environment-specific settings
+# Redis environment settings for prestaging
 env:
-  - name: MINIO_BROWSER_REDIRECT_URL
-    value: "http://localhost:9001"
-  - name: MINIO_SERVER_URL
-    value: "http://localhost:9000"
-  - name: MINIO_CONSOLE_ADDRESS
-    value: ":9001"
+  - name: REDIS_LOG_LEVEL
+    value: "notice"
 
 # Disable autoscaling for prestaging
 autoscaling:

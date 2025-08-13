@@ -26,22 +26,15 @@ persistence:
     - ReadWriteOnce
   size: 20Gi
 
-# MinIO credentials for staging
+# Redis doesn't require secrets in staging
 secrets:
-  create: true
+  create: false
   name: redis-staging-secrets
-  data:
-    MINIO_ROOT_USER: "staging"
-    MINIO_ROOT_PASSWORD: "staging-secure-password-123"
 
-# Environment-specific settings
+# Redis environment settings for staging
 env:
-  - name: MINIO_BROWSER_REDIRECT_URL
-    value: "https://minio-console-staging.omnipdf.local"
-  - name: MINIO_SERVER_URL
-    value: "https://minio-staging.omnipdf.local"
-  - name: MINIO_CONSOLE_ADDRESS
-    value: ":9001"
+  - name: REDIS_LOG_LEVEL
+    value: "notice"
 
 # Enable ingress for staging
 ingress:

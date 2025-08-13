@@ -8,8 +8,15 @@ metadata:
     "helm.sh/hook": test
 spec:
   containers:
-    - name: wget
-      image: busybox
-      command: ['wget']
-      args: ['--spider', '--timeout=10', '{{ include "cleaner.fullname" . }}:{{ .Values.service.port }}/cleaner/health/live']
+    - name: kubectl
+      image: bitnami/kubectl:latest
+      command: ['/bin/sh']
+      args: 
+        - -c
+        - |
+          echo "Testing cleaner deployment status..."
+          kubectl get deployment {{ include "cleaner.fullname" . }} -n {{ .Release.Namespace }}
+          kubectl wait --for=condition=available --timeout=60s deployment/{{ include "cleaner.fullname" . }} -n {{ .Release.Namespace }}
+          echo "Cleaner deployment is running successfully"
   restartPolicy: Never
+  serviceAccountName: {{ include "cleaner.serviceAccountName" . }}

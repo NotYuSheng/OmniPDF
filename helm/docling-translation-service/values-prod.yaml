@@ -67,7 +67,7 @@ affinity:
           - key: app.kubernetes.io/name
             operator: In
             values:
-            - chat-service
+            - docling-translation-service
         topologyKey: kubernetes.io/hostname
 
 # Environment variables
