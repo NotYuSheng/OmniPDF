@@ -86,25 +86,44 @@ def display_tables(table_response):
         table_status.success(f"Found {len(table_response)} tables in the document")
         for i, table_data in enumerate(table_response):
             with st.container():
-                col1, col2 = st.columns([3, 1], border=True)
+                col1, col2 = st.columns([2, 1], border=True)
                 
                 with col1:
-                    # Display actual image from URL
-                    st.markdown(f"### Table {i+1}")
+                    # Get page number and table position
+                    page_num = table_data.get('prov', [{}])[0].get('page_no', 'N/A')
+
+                    # Convert and display table data
                     df = table_json_to_df(table_data)
+
+                    # Display table title with page info and copy button
+                    if st.button(f"📋Table {i+1}", key=f"copy_icon_{i+1}", help=f"Copy table {i+1} to clipboard"):
+                        if df is not None:
+                            df.to_clipboard(index=False)
+                            st.toast("Table copied to clipboard!")
+
+
                     if df is not None:
                         st.dataframe(df, use_container_width=True)
                     else:
                         st.warning("Could not parse table data.")
-            
-                with col2:    
-                    # Optionally show metadata
-                    st.markdown(f"**Table Key:** {table_data.get('table_key', '')}")
-                    st.markdown(f"**Table ID:** IMG_{i+1:03d}")
-                    st.markdown(f"**Table URL:** {table_data.get('url', '')}")
-                
-   
-                
+                    
+                with col2:
+                    # Metadata display
+                    st.markdown(f"**Location:** Page {page_num}")
+                    
+                    # Display table structure info
+                    grid_data = table_data.get('data', {}).get('grid', [])
+                    num_rows = len(grid_data)
+                    num_cols = len(grid_data[0]) if grid_data else 0
+                    st.markdown(f"**Dimensions:** {num_rows}×{num_cols}")
+                    
+
+                    # Display header information if available
+                    headers = [cell.get('text', '') for cell in grid_data[0] if cell.get('column_header', False)]
+                    if headers:
+                        for header in headers:
+                            st.markdown(f"- {header}")
+                    
     else:
         logger.info("No tables found in the document")
         st.info("No tables found in the document")
