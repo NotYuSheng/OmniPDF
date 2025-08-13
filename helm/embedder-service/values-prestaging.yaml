@@ -75,5 +75,3 @@ podDisruptionBudget:
   enabled: false
 
 # Resource quota for prestaging namespace
-resourceQuota:
-  enabled: false  # Enable to limit resource usage per namespace

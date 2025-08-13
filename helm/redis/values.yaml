@@ -1,14 +1,14 @@
-# Default values for minio.
+# Default values for redis.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 image:
-  repository: redis
+  repository: docker.io/library/redis
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "7.4.4-alpine"
+  tag: "7-alpine"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -29,79 +29,105 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
-  # Let OpenShift assign appropriate user/group IDs automatically
-  # fsGroup: 1001
-  # runAsGroup: 1001
-  # runAsNonRoot: true
-  # runAsUser: 1001
+  # fsGroup: 2000
 
 securityContext:
   allowPrivilegeEscalation: false
   runAsNonRoot: true
-  # runAsUser: 1001  # Let OpenShift assign user ID automatically
-  # runAsGroup: 1001
-  readOnlyRootFilesystem: false  # MinIO needs to write to filesystem
-  seccompProfile:
-    type: RuntimeDefault  # Required for OpenShift restricted security
+  # runAsUser: 65534  # Let OpenShift assign user ID automatically
+  readOnlyRootFilesystem: false  # Redis needs to write to disk
   capabilities:
     drop:
-    - ALL
+      - ALL
 
 service:
   type: ClusterIP
   port: 6379
-  consolePort: 9001
-  annotations: {}
-  # Create separate service for console (optional)
-  separateConsoleService: false
-  consoleType: ClusterIP
-  consoleAnnotations: {}
 
-# MinIO ingress configuration (optional)
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: minio.local
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
-  #  - secretName: minio-tls
-  #    hosts:
-  #      - minio.local
+# Redis-specific configuration
+redis:
+  # Redis configuration options
+  config: |
+    # Redis configuration file
+    # Basic configuration for Docker/Kubernetes deployment
+    
+    # Network
+    bind 0.0.0.0
+    port 6379
+    
+    # General
+    timeout 0
+    tcp-keepalive 300
+    
+    # Memory management
+    maxmemory-policy allkeys-lru
+    
+    # Persistence (disabled for session cache use case)
+    save ""
+    
+    # Logging
+    loglevel notice
+    
+  # Redis password (optional, will be generated if not provided)
+  # Leave empty to disable authentication
+  password: ""
 
-# Console ingress (separate from API)
-consoleIngress:
-  enabled: false
-  className: ""
+# Persistence for Redis data
+persistence:
+  enabled: true
+  # storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 1Gi
   annotations: {}
-  hosts:
-    - host: minio-console.local
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
 
-# Resource configuration
 resources:
   limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 250m
+    cpu: 200m
     memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
 
-# Autoscaling (typically disabled for MinIO unless in distributed mode)
+# Health checks
+livenessProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - "redis-cli ping"
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - "redis-cli ping"
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+startupProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - "redis-cli ping"
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 30
+
 autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
-  targetMemoryUtilizationPercentage: 85
+  targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
 volumes: []
@@ -122,107 +148,33 @@ tolerations: []
 
 affinity: {}
 
-# Environment variables
-env:
-  - name: MINIO_BROWSER_REDIRECT_URL
-    value: "http://localhost:9001"
-  - name: MINIO_SERVER_URL
-    value: "http://localhost:9000"
-
-# MinIO persistence configuration
-persistence:
-  enabled: true
-  # existingClaim: ""
-  storageClass: ""  # Use default storage class
-  accessModes:
-    - ReadWriteOnce
-  size: 10Gi
-  annotations: {}
-  selector: {}
-
-# Health probes configuration
-livenessProbe:
-  enabled: true
-  path: /minio/health/live
-  initialDelaySeconds: 30
-  periodSeconds: 30
-  timeoutSeconds: 5
-  failureThreshold: 3
-  successThreshold: 1
-
-readinessProbe:
-  enabled: true
-  path: /minio/health/ready
-  initialDelaySeconds: 10
-  periodSeconds: 10
-  timeoutSeconds: 3
-  failureThreshold: 2
-  successThreshold: 1
-
-startupProbe:
-  enabled: true
-  path: /minio/health/live
-  initialDelaySeconds: 10
-  periodSeconds: 5
-  timeoutSeconds: 3
-  failureThreshold: 6
-  successThreshold: 1
-
-# MinIO credentials - MUST be configured
-secrets:
-  # Set to true to create secret from values, false to use existing secret
-  create: true
-  # Name of the secret to reference
-  name: redis-secrets
-  # Data for secret creation (only used when create=true)
-  data:
-    MINIO_ROOT_USER: "minioadmin"
-    MINIO_ROOT_PASSWORD: "minioadmin123"  # Change in production!
-
-# Network policy configuration (optional)
+# Network policy configuration
 networkPolicy:
   enabled: false
   ingress:
     enabled: true
     fromSameNamespace: true
-    fromIngressController: true
-    ingressControllerNamespaceLabels:
-      name: ingress-nginx
+    fromIngressController: false
     customRules: []
   egress:
-    enabled: true
+    enabled: false
     allowDNS: true
     customRules: []
 
-# Pod Disruption Budget (optional)
+# Pod Disruption Budget
 podDisruptionBudget:
   enabled: false
   minAvailable: null
   maxUnavailable: null
 
 # Deployment strategy
-deploymentStrategy:
-  type: Recreate  # MinIO typically uses Recreate for single-node
-
-# Resource quota (optional)
-resourceQuota:
-  enabled: false
-  requests:
-    cpu: null
-    memory: null
-    storage: null
-  limits:
-    cpu: null
-    memory: null
-  pods: null
-  services: null
-  persistentvolumeclaims: null
+deploymentStrategy: {}
 
 # Service monitoring for Prometheus (optional)
 serviceMonitor:
   enabled: false
-  port: "minio-api"
-  path: "/minio/v2/metrics/cluster"
+  port: "redis"
+  path: "/metrics"
   interval: "30s"
   scrapeTimeout: "10s"
   honorLabels: false

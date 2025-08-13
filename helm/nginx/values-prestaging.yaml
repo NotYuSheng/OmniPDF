@@ -2,9 +2,6 @@
 replicaCount: 1
 
 # Pre-staging LLM configuration - External vLLM service on VPN
-llm:
-  baseUrl: "http://100.108.2.57/vllm_qwen2.5/v1"
-  model: "Qwen2.5-14B-Coder-Instruct"  # Model name as served by external vLLM
 
 # Pre-staging resources - minimal for disk pressure
 resources:
@@ -26,7 +23,7 @@ secrets:
 
 # Pre-staging specific configurations - using local CRC registry
 image:
-  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/chat_service
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/nginx
   tag: "dev-v0.0.0-6653136"
   pullPolicy: IfNotPresent  # Use local registry image
 
@@ -56,18 +53,6 @@ deploymentStrategy:
     maxSurge: 1
 
 # Moderate resource quota for pre-staging testing
-resourceQuota:
-  enabled: true
-  requests:
-    cpu: "5"       # 5 CPU cores max
-    memory: "10Gi" # 10GB memory max
-  limits:
-    cpu: "10"      # 10 CPU cores max
-    memory: "20Gi" # 20GB memory max
-  pods: "20"       # Max 20 pods total
-  services: "8"    # Max 8 services
-
-# Enable monitoring for pre-staging (test monitoring setup)
 serviceMonitor:
   enabled: true
   interval: "20s"           # Between staging and prod intervals

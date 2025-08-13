@@ -123,13 +123,13 @@ status:
 	@echo "=== Pod Status ==="
 	kubectl get pods -n $(NAMESPACE) -l "app.kubernetes.io/name=$(CHART_NAME),app.kubernetes.io/instance=$(CHART_NAME)"
 
-## Install all Helm charts in ./helm/ with shared values
-install-all:
-	@echo "Installing all Helm charts under ./helm/ with shared values for environment: $(ENV)"
+# Helper function to deploy all charts (used by both install-all and upgrade-all)
+define deploy-all-charts
+	@echo "$(1) all Helm charts under ./helm/ with shared values for environment: $(ENV)"
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
 		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
-			echo "Installing chart: $$CHART"; \
+			echo "$(1) chart: $$CHART"; \
 			CHART_VALUES="-f $(SHARED_BASE_VALUES)"; \
 			if [ -f "$(SHARED_VALUES_DIR)/common-$(ENV).yaml" ]; then \
 				CHART_VALUES="$$CHART_VALUES -f $(SHARED_VALUES_DIR)/common-$(ENV).yaml"; \
@@ -144,28 +144,15 @@ install-all:
 				$$CHART_VALUES; \
 		fi; \
 	done
+endef
+
+## Install all Helm charts in ./helm/ with shared values
+install-all:
+	$(call deploy-all-charts,Installing)
 
 ## Upgrade all Helm charts in ./helm/ with shared values
 upgrade-all:
-	@echo "Upgrading all Helm charts under ./helm/ with shared values for environment: $(ENV)"
-	@for dir in helm/*/; do \
-		CHART=$$(basename $$dir); \
-		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
-			echo "Upgrading chart: $$CHART"; \
-			CHART_VALUES="-f $(SHARED_BASE_VALUES)"; \
-			if [ -f "$(SHARED_VALUES_DIR)/common-$(ENV).yaml" ]; then \
-				CHART_VALUES="$$CHART_VALUES -f $(SHARED_VALUES_DIR)/common-$(ENV).yaml"; \
-			fi; \
-			if [ -f "helm/$$CHART/values-$(ENV).yaml" ]; then \
-				CHART_VALUES="$$CHART_VALUES -f helm/$$CHART/values-$(ENV).yaml"; \
-			fi; \
-			CHART_VALUES="$$CHART_VALUES -f helm/$$CHART/values.yaml"; \
-			helm upgrade --install $$CHART helm/$$CHART \
-				--namespace $(NAMESPACE) \
-				--create-namespace \
-				$$CHART_VALUES; \
-		fi; \
-	done
+	$(call deploy-all-charts,Upgrading)
 
 ## Uninstall all Helm charts in ./helm/
 uninstall-all:

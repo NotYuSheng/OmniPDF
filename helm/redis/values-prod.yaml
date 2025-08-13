@@ -113,15 +113,3 @@ networkPolicy:
     allowHTTPS: true
 
 # Production resource quotas
-resourceQuota:
-  enabled: true
-  requests:
-    cpu: "2"
-    memory: "4Gi"
-    storage: "200Gi"
-  limits:
-    cpu: "4"
-    memory: "8Gi"
-  pods: "5"
-  services: "3"
-  persistentvolumeclaims: "2"

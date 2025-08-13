@@ -56,18 +56,6 @@ deploymentStrategy:
     maxSurge: 1
 
 # Moderate resource quota for pre-staging testing
-resourceQuota:
-  enabled: true
-  requests:
-    cpu: "5"       # 5 CPU cores max
-    memory: "10Gi" # 10GB memory max
-  limits:
-    cpu: "10"      # 10 CPU cores max
-    memory: "20Gi" # 20GB memory max
-  pods: "20"       # Max 20 pods total
-  services: "8"    # Max 8 services
-
-# Enable monitoring for pre-staging (test monitoring setup)
 serviceMonitor:
   enabled: true
   interval: "20s"           # Between staging and prod intervals

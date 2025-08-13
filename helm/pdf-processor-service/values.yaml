@@ -180,11 +180,6 @@ podDisruptionBudget:
 # Deployment strategy for updates (defaults to Kubernetes standard)
 deploymentStrategy: {}
 
-# Resource quota for namespace-level resource management  
-resourceQuota:
-  enabled: false  # Disabled by default
-
-# Service monitoring for Prometheus (optional)
 serviceMonitor:
   enabled: false  # Disabled by default - enable in environments with Prometheus
   # Metrics endpoint configuration

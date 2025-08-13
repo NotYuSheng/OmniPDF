@@ -107,22 +107,6 @@ deploymentStrategy:
     maxSurge: 1
 
 # Resource quota for production namespace
-resourceQuota:
-  enabled: true
-  requests:
-    cpu: "10"
-    memory: "20Gi"
-    storage: "200Gi"
-  limits:
-    cpu: "20"
-    memory: "40Gi"
-  pods: "50"
-  services: "20"
-  persistentvolumeclaims: "10"
-  secrets: "50"
-  configmaps: "50"
-
-# Production security context (more restrictive)
 securityContext:
   allowPrivilegeEscalation: false
   runAsNonRoot: true

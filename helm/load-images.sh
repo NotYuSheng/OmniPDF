@@ -76,7 +76,7 @@ setup_registry_access() {
     oc project "$NAMESPACE"
     
     # Login to CRC registry
-    local token=$(oc whoami -t)
+    local token=$(oc whoami --show-token)
     local username=$(oc whoami)
     
     log "Logging into CRC registry: $CRC_REGISTRY"

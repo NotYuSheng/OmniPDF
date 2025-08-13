@@ -24,7 +24,7 @@ version: 0.1.0
 appVersion: "RELEASE.2024-01-16T16-07-38Z"
 
 # Chart icon for Helm repositories and UIs - Local static logo
-icon: file://assets/logo.svg
+icon: file://../assets/logo.svg
 
 # Keywords for chart search
 keywords:

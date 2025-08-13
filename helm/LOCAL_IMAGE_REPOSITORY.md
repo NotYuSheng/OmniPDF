@@ -69,7 +69,7 @@ crc console --credentials  # Get login credentials
 oc login -u <username> -p <password> https://api.crc.testing:6443
 
 # Login to image registry
-docker login -u $(oc whoami) -p $(oc whoami -t) default-route-openshift-image-registry.apps-crc.testing
+docker login -u $(oc whoami) -p $(oc whoami --show-token) default-route-openshift-image-registry.apps-crc.testing
 ```
 
 ### Step 3: Create Project/Namespace

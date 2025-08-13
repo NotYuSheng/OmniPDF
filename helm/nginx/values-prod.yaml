@@ -2,9 +2,6 @@
 replicaCount: 5
 
 # Production LLM configuration
-llm:
-  baseUrl: "https://llm-prod.company.com/v1"  # HTTPS for production
-  model: "qwen2.5-32b-instruct"  # Full production model
 
 # Production resources
 resources:
@@ -100,21 +97,6 @@ deploymentStrategy:
     maxSurge: "25%"        # Allow 25% extra pods for smooth rollout
 
 # Generous resource quota for production (prevent outages, allow scaling)
-resourceQuota:
-  enabled: true
-  requests:
-    cpu: "30"       # 30 CPU cores max (supports 60 pods @ 0.5 CPU each)
-    memory: "60Gi"  # 60GB memory max (supports 120 pods @ 512MB each)
-    storage: "200Gi" # 200GB storage max
-  limits:
-    cpu: "50"       # 50 CPU cores max (supports 50 pods @ 1 CPU each)
-    memory: "100Gi" # 100GB memory max (supports 50 pods @ 2GB each)
-  pods: "60"        # Max 60 pods total (above HPA max of 20)
-  services: "20"    # Max 20 services
-  secrets: "50"     # Max 50 secrets
-  configmaps: "30"  # Max 30 configmaps
-
-# Enable monitoring for production
 serviceMonitor:
   enabled: true
   interval: "30s"           # Standard production monitoring interval

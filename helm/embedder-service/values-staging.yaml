@@ -100,17 +100,3 @@ deploymentStrategy:
     maxSurge: 25%
 
 # Resource quota for staging namespace
-resourceQuota:
-  enabled: true
-  requests:
-    cpu: "4"
-    memory: "8Gi"
-    storage: "50Gi"
-  limits:
-    cpu: "8"
-    memory: "16Gi"
-  pods: "20"
-  services: "10"
-  persistentvolumeclaims: "5"
-  secrets: "20"
-  configmaps: "20"

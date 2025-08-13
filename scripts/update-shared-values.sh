@@ -48,7 +48,9 @@ update_yaml_file() {
     if command -v yq >/dev/null 2>&1; then
         yq eval ".$key = \"$value\"" -i "$file"
     else
-        # Basic sed replacement for simple keys
+        echo "⚠️  Warning: yq not found, using basic sed fallback. Install yq for better YAML parsing."
+        echo "   Install with: sudo snap install yq (or brew install yq on macOS)"
+        # Basic sed replacement for simple keys (may not work with nested paths)
         sed -i "s/^\\s*$(echo "$key" | sed 's/\./\\./g'):.*/  $key: $value/" "$file"
     fi
 }

@@ -229,25 +229,6 @@ deploymentStrategy: {}
   # OR for faster dev updates:
   # type: Recreate
 
-# Resource quota for namespace-level resource management  
-resourceQuota:
-  enabled: false  # Disabled by default
-  # Compute resource limits
-  requests:
-    cpu: null     # e.g. "2" (2 CPU cores)
-    memory: null  # e.g. "4Gi" (4GB memory)
-    storage: null # e.g. "20Gi" (20GB storage)
-  limits:
-    cpu: null     # e.g. "4" (4 CPU cores)  
-    memory: null  # e.g. "8Gi" (8GB memory)
-  # Object count limits
-  pods: null                    # e.g. "10" (max 10 pods)
-  services: null                # e.g. "5" (max 5 services)
-  persistentvolumeclaims: null  # e.g. "2" (max 2 PVCs)
-  secrets: null                 # e.g. "10" (max 10 secrets)
-  configmaps: null              # e.g. "10" (max 10 configmaps)
-
-# Service monitoring for Prometheus (optional)
 serviceMonitor:
   enabled: false  # Disabled by default - enable in environments with Prometheus
   # Metrics endpoint configuration

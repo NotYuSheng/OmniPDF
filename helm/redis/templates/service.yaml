@@ -4,7 +4,7 @@ metadata:
   name: {{ include "redis.fullname" . }}
   labels:
     {{- include "redis.labels" . | nindent 4 }}
-    service.omnipdf.local/type: storage
+    service.omnipdf.local/type: cache
   {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -13,36 +13,8 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: redis-api
+      targetPort: redis
       protocol: TCP
-      name: redis-api
-    - port: {{ .Values.service.consolePort }}
-      targetPort: redis-console
-      protocol: TCP
-      name: redis-console
+      name: redis
   selector:
     {{- include "redis.selectorLabels" . | nindent 4 }}
-
----
-{{- if .Values.service.separateConsoleService }}
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ include "redis.fullname" . }}-console
-  labels:
-    {{- include "redis.labels" . | nindent 4 }}
-    service.omnipdf.local/type: storage-console
-  {{- with .Values.service.consoleAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-spec:
-  type: {{ .Values.service.consoleType }}
-  ports:
-    - port: {{ .Values.service.consolePort }}
-      targetPort: redis-console
-      protocol: TCP
-      name: redis-console
-  selector:
-    {{- include "redis.selectorLabels" . | nindent 4 }}
-{{- end }}

@@ -205,20 +205,6 @@ deploymentStrategy:
   type: Recreate  # MinIO typically uses Recreate for single-node
 
 # Resource quota (optional)
-resourceQuota:
-  enabled: false
-  requests:
-    cpu: null
-    memory: null
-    storage: null
-  limits:
-    cpu: null
-    memory: null
-  pods: null
-  services: null
-  persistentvolumeclaims: null
-
-# Service monitoring for Prometheus (optional)
 serviceMonitor:
   enabled: false
   port: "minio-api"
