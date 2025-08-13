@@ -114,7 +114,7 @@ install-all:
 	@echo "Installing all Helm charts under ./helm/ with shared values for environment: $(ENV)"
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
-		if [ "$$CHART" != "shared-values" ]; then \
+		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
 			echo "Installing chart: $$CHART"; \
 			CHART_VALUES="-f $(SHARED_BASE_VALUES)"; \
 			if [ -f "$(SHARED_VALUES_DIR)/common-$(ENV).yaml" ]; then \
@@ -136,7 +136,7 @@ upgrade-all:
 	@echo "Upgrading all Helm charts under ./helm/ with shared values for environment: $(ENV)"
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
-		if [ "$$CHART" != "shared-values" ]; then \
+		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
 			echo "Upgrading chart: $$CHART"; \
 			CHART_VALUES="-f $(SHARED_BASE_VALUES)"; \
 			if [ -f "$(SHARED_VALUES_DIR)/common-$(ENV).yaml" ]; then \
@@ -158,9 +158,11 @@ uninstall-all:
 	@echo "Uninstalling all Helm charts under ./helm/..."
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
-		echo "Uninstalling chart: $$CHART"; \
-		helm uninstall $$CHART \
-			--namespace $(NAMESPACE); \
+		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
+			echo "Uninstalling chart: $$CHART"; \
+			helm uninstall $$CHART \
+				--namespace $(NAMESPACE); \
+		fi; \
 	done
 
 ## Port-forward a running pod (default 8000:8000)
