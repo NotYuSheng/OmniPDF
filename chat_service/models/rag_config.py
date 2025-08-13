@@ -141,7 +141,7 @@ Analyze the query considering:
 1. Specificity - Is the query specific enough to be actionable?
 2. Context dependency - Does it require specific document content?
 3. Intent clarity - Is the user's intent clear?
-4. Scope - Is it asking for genderal knowledge vs. specific document information?
+4. Scope - Is it asking for general knowledge vs. specific document information?
 
 Respond in this exact format:
 DECISION: [PROCEED_WITH_RAG|HANDLE_WITHOUT_RAG|INVALID_QUERY|NEEDS_CLARIFICATION]
