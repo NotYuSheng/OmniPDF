@@ -170,7 +170,7 @@ async def validate_query_with_llm(
     collection_name: str,
     openai_client: AsyncOpenAI,
     model_name: str = OPENAI_MODEL_NAME,
-) -> tuple[bool, Dict[str, Any]]:
+) -> tuple[bool, Optional[str]]:
     """
     Use LLM to validate if query is meaningful and can be answered with documents.
     """
