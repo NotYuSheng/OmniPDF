@@ -42,18 +42,23 @@ jobs:
         run: |
           docker builder prune --all --force
 
-      - name: Wait for all *_service containers (via Nginx)
+      - name: Wait for all service containers (via Nginx)
         run: |
-          echo "Detecting *_service containers..."
-          SERVICE_NAMES=$(docker compose ps --services | grep '_service')
+          echo "Reading services from services-to-build.txt..."
+          SERVICE_NAMES=$(grep -v '^#' .github/services-to-build.txt | grep -v '^$')
       
           if [ -z "$SERVICE_NAMES" ]; then
-            echo "No *_service services found. Exiting."
+            echo "No services found in services-to-build.txt. Exiting."
             exit 1
           fi
       
           for NAME in $SERVICE_NAMES; do
-            PREFIX=${NAME%_service}
+            # Handle cleaner service (no _service suffix) and regular services
+            if [[ "$NAME" == "cleaner" ]]; then
+              PREFIX="cleaner"
+            else
+              PREFIX=${NAME%_service}
+            fi
             echo "Waiting for $NAME via http://localhost:8080/$PREFIX/health..."
       
             for i in {1..30}; do
