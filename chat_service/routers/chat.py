@@ -4,6 +4,7 @@ from typing import List, Dict, Any, Optional
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chroma_client
 import logging
+import os
 from models.chat import ChatRequest, ChatResponse
 from models.rag_config import QwenRAGConfig, QwenPromptTemplates, QwenRAGOptimizer, QueryType, EnhancedQueryValidator
 
@@ -18,6 +19,7 @@ qwen_optimizer = QwenRAGOptimizer()
 query_validator = EnhancedQueryValidator()
 
 OPENAI_MODEL_NAME = qwen_config.model_name
+QWEN_TOP_K = int(os.getenv("QWEN_TOP_K"))
 
 
 def prepare_retrieval_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -260,7 +262,7 @@ async def handle_chat(
                 query=chat_request.message,
                 collection_name=chat_request.collection_name,
                 doc_id=chat_request.doc_id,
-                top_k=qwen_config.generation_params["top_k"],
+                top_k=QWEN_TOP_K,
                 enable_reranking=qwen_config.enable_reranking,
             )
 
