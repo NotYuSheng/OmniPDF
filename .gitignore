@@ -39,3 +39,6 @@ data/
 
 llm_models/
 .llm_models
+
+# Claude Code project instructions
+CLAUDE.md
