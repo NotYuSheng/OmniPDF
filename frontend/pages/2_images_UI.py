@@ -4,11 +4,13 @@ import asyncio
 import httpx
 import json
 import os
+from components.process_image import get_image_dimensions
 
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://localhost:8080/pdf_processor")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+FIXED_IMAGE_HEIGHT = 200  # Set your desired fixed height in pixels
 
 st.header("🖼️ Image Extraction")
 image_status = st.empty()
@@ -68,22 +70,22 @@ def display_images(image_response):
     if "images" in image_response and image_response["images"]:
         image_status.success(f"Found {len(image_response['images'])} images in the document")
         
-        # if "cookies" not in st.session_state:
-        #     st.session_state.cookies = image_response.get("cookies", {})
-
         # Display each image
         for i, image_data in enumerate(image_response["images"]):
             with st.container():
-                col1, col2 = st.columns([1, 2], border=True)
+                col1, col2 = st.columns([1, 2], 
+                                        border=True,
+                                        vertical_alignment="top")
                 
                 with col1:
                     # Display actual image from URL
                     try:
-                        st.image(
-                            image_data["url"],
-                            caption=f"Image {i+1} {describe_image(image_data)}",
-                            use_container_width =True
-                        )
+                        orig_width, orig_height = get_image_dimensions(image_data["url"])
+                        aspect_ratio = orig_width / orig_height
+                        display_width = int(FIXED_IMAGE_HEIGHT * aspect_ratio)
+                        _right, center, _right = st.columns([1, 2, 1])
+                        with center:
+                            st.image(image_data["url"], width=display_width)
                     except Exception as e:
                         logger.error(f"Error loading image {i+1}: {e}")
                         st.error(f"Error loading image {i+1}: {e}")
