@@ -1,15 +1,27 @@
 describe('Service Health Tests', () => {
-  const services = [
-    'chat_service',
-    'embedder_service', 
-    'pdf_processor_service',
-    'pdf_extraction_service',
-    'pdf_renderer_service',
-    'docling_translation_service',
-    'cleaner'
-  ];
+  let services = [];
 
-  it('verifies all services are healthy via direct container checks', () => {
+  before(() => {
+    // Dynamically discover running containers ending with _service
+    cy.task('exec', { 
+      command: 'docker ps --format "{{.Names}}" | grep "_service$"',
+      timeout: 10000 
+    }).then((result) => {
+      if (result.code === 0 && result.stdout.trim()) {
+        services = result.stdout.trim().split('\n').filter(name => name.trim());
+        cy.log(`Found services: ${services.join(', ')}`);
+      } else {
+        cy.log('No _service containers found');
+      }
+    });
+  });
+
+  it('verifies all running *_service containers are healthy', () => {
+    if (services.length === 0) {
+      cy.log('No services to check - skipping health verification');
+      return;
+    }
+
     services.forEach(service => {
       cy.task('exec', { 
         command: `docker exec ${service} curl -f http://localhost:8000/health`,

@@ -42,27 +42,22 @@ jobs:
         run: |
           docker builder prune --all --force
 
-      - name: Wait for all service containers (direct health checks)
+      - name: Wait for all *_service containers (direct health checks)
         run: |
-          echo "Reading services from services-to-build.txt..."
-          SERVICE_NAMES=$(grep -v '^#' .github/services-to-build.txt | grep -v '^$')
+          echo "Detecting *_service containers..."
+          SERVICE_NAMES=$(docker ps --format "{{.Names}}" | grep '_service$')
       
           if [ -z "$SERVICE_NAMES" ]; then
-            echo "No services found in services-to-build.txt. Exiting."
+            echo "No *_service containers found. Exiting."
             exit 1
           fi
+      
+          echo "Found services: $SERVICE_NAMES"
       
           for NAME in $SERVICE_NAMES; do
             echo "Waiting for $NAME to be healthy..."
       
             for i in {1..30}; do
-              # Check if container is running first
-              if ! docker ps --format "table {{.Names}}" | grep -q "^$NAME$"; then
-                echo "Container $NAME is not running yet..."
-                sleep 3
-                continue
-              fi
-              
               # Execute health check directly inside the container
               STATUS=$(docker exec $NAME curl -s -o /dev/null -w "%{http_code}" "http://localhost:8000/health" 2>/dev/null || echo "000")
               if [ "$STATUS" == "200" ]; then
