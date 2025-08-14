@@ -36,11 +36,20 @@ describe('Service Health Tests', () => {
     services.forEach(service => {
       cy.task('dockerExec', { 
         containerName: service,
-        args: ['curl', '-f', 'http://localhost:8000/health'],
+        args: ['python3', '-c', `
+import urllib.request
+try:
+    response = urllib.request.urlopen('http://localhost:8000/health', timeout=5)
+    print(f'HTTP {response.getcode()}')
+    exit(0 if response.getcode() == 200 else 1)
+except Exception as e:
+    print(f'Health check failed: {e}')
+    exit(1)
+`],
         timeout: 10000 
       }).then((result) => {
-        expect(result.code, `Health check for '${service}' failed. Command: docker exec ${service} curl -f http://localhost:8000/health. Stdout: ${result.stdout}. Stderr: ${result.stderr}`).to.eq(0);
-        cy.log(`✓ ${service} is healthy`);
+        expect(result.code, `Health check for '${service}' failed. Command: docker exec ${service} python3 health check. Stdout: ${result.stdout}. Stderr: ${result.stderr}`).to.eq(0);
+        cy.log(`✓ ${service} is healthy (${result.stdout.trim()})`);
       });
     });
   });
