@@ -3,9 +3,9 @@
 
 # Production image configuration
 image:
-  repository: ghcr.io/notyusheng/embedder-service
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/embedder_service
   tag: "v1.0.0"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # Production resource allocation
 resources:

@@ -7,7 +7,7 @@
 
 # Common image configuration  
 image:
-  pullPolicy: IfNotPresent  # Standard for Kubernetes environments
+  pullPolicy: Always  # Always pull latest images
 
 # Common service account configuration
 serviceAccount:

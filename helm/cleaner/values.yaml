@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/notyusheng/cleaner
-  pullPolicy: Never
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/cleaner
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 

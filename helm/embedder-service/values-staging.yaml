@@ -5,7 +5,7 @@
 image:
   repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/embedder_service
   tag: "dev-v0.0.1-860e67e"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # Staging resource allocation
 resources:

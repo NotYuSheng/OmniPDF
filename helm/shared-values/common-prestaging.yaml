@@ -3,7 +3,7 @@
 
 # Pre-staging image configuration
 image:
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # Production-like resource allocation (slightly less than prod)
 resources:

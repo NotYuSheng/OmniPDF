@@ -3,7 +3,7 @@
 
 # Staging image configuration - using local CRC registry
 image:
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # Production-like resource allocation
 resources:

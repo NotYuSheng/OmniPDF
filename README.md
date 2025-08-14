@@ -24,6 +24,64 @@ The following port mappings are used across the OmniPDF microservices **for deve
 | S3-Compatible Store       | Object storage (e.g., MinIO S3 API)                       | 9000   |
 | MinIO Console             | MinIO web-based Admin UI                                  | 9001   |
 
+## CRC (OpenShift Local) Setup
+
+OmniPDF uses Red Hat CodeReady Containers (CRC) for local OpenShift development. Due to the resource-intensive nature of running 8+ microservices, CRC requires significant CPU and memory allocation.
+
+### Recommended CRC Configuration
+
+#### Quick Setup (Recommended)
+```bash
+# Run the automated setup script
+./config/crc/setup-crc.sh
+
+# Start CRC with configured settings
+crc start
+
+# Set up oc environment
+eval $(crc oc-env)
+
+# Get login credentials and login
+crc console --credentials
+oc login -u kubeadmin -p <password> https://api.crc.testing:6443 --insecure-skip-tls-verify
+```
+
+#### Manual Configuration
+Alternatively, configure CRC manually:
+
+```bash
+# Stop CRC if running
+crc stop
+
+# Configure CRC resources (adjust based on your system)
+crc config set memory 262144    # 256GB RAM
+crc config set cpus 32          # 32 CPU cores
+crc config set disk-size 80     # 80GB disk
+
+# Start CRC with new configuration
+crc start
+```
+
+### Configuration Notes
+
+- **Memory**: 256GB recommended for running all microservices without constraints
+- **CPU**: 32 cores provides abundant processing power for OpenShift + services
+- **Disk**: 80GB sufficient for container images and persistent data
+- **Configuration saved**: Current settings stored in `config/crc/crc-config.txt`
+
+### Verify Setup
+
+```bash
+# Check CRC status
+crc status
+
+# Check node resources
+oc describe node crc | grep -A 10 "Allocated resources"
+
+# View current configuration
+crc config view
+```
+
 ## Development Workflow
 
 This project uses a `Makefile` to simplify common Helm and Kubernetes operations.

@@ -28,7 +28,7 @@ secrets:
 image:
   repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/pdf_processor_service
   tag: "dev-v0.0.0-6653136"
-  pullPolicy: IfNotPresent  # Use local registry image
+  pullPolicy: Always  # Use local registry image
 
 # Environment variables
 env:

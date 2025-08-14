@@ -27,7 +27,7 @@ secrets:
 
 # Production image handling
 image:
-  pullPolicy: IfNotPresent  # Stable tags in production
+  pullPolicy: Always  # Stable tags in production
 
 # Production ingress with proper SSL
 ingress:
