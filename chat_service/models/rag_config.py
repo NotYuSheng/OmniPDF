@@ -18,6 +18,11 @@ class EnhancedQueryValidator:
         return [
             # PROCEED_WITH_RAG examples
             {
+                "query": "Describe the CEO's role in the company",
+                "decision": "PROCEED_WITH_RAG",
+                "reason": "Factual extraction from specific documents"
+            },
+            {
                 "query": "What are the main findings in the quarterly report?",
                 "decision": "PROCEED_WITH_RAG",
                 "reason": "Specific document content request"
@@ -171,7 +176,7 @@ class QwenRAGConfig:
         self.generation_params = {
             "temperature": float(os.getenv("QWEN_TEMPERATURE", "0.1")),
             "max_tokens": int(os.getenv("QWEN_MAX_TOKENS", "2000")),
-            "top_k": int(os.getenv("QWEN_TOP_K", "5")),
+            "top_p": float(os.getenv("QWEN_TOP_P", "0.8")),
             "frequency_penalty": float(os.getenv("QWEN_FREQ_PENALTY", "0.1")),
             "presence_penalty": float(os.getenv("QWEN_PRESENCE_PENALTY", "0.1")),
         }
