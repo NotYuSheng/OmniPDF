@@ -485,18 +485,17 @@ class QwenRAGOptimizer:
     def post_process_qwen_response(response: str) -> str:
         """Post-process Qwen-2.5 response for better formatting"""
         
-        # Remove any potential repetition
+        # Remove only consecutive duplicate lines to avoid breaking formatted content.
         lines = response.split('\n')
-        seen_lines = set()
-        filtered_lines = []
-        
-        for line in lines:
-            line_clean = line.strip()
-            if line_clean and line_clean not in seen_lines:
-                seen_lines.add(line_clean)
-                filtered_lines.append(line)
-            elif not line_clean:  # Keep empty lines for formatting
-                filtered_lines.append(line)
+        if not lines:
+            return ""
+
+        filtered_lines = [lines[0]]
+        for i in range(1, len(lines)):
+            current_line_stripped = lines[i].strip()
+            prev_line_stripped = lines[i-1].strip()
+            if not current_line_stripped or current_line_stripped != prev_line_stripped:
+                filtered_lines.append(lines[i])
         
         cleaned_response = '\n'.join(filtered_lines)
         
