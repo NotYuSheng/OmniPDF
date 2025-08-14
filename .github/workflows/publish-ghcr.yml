@@ -24,6 +24,16 @@ jobs:
           remove-haskell: true
           remove-codeql: true
 
+      - name: Free up disk space on GitHub runner
+        run: |
+          sudo rm -rf /opt/ghc \
+                      /usr/local/lib/android \
+                      /usr/share/dotnet \
+                      /usr/local/share/boost \
+                      $AGENT_TOOLSDIRECTORY
+          docker system prune -af
+          sudo apt-get clean
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -70,12 +80,12 @@ jobs:
             echo "Created $(dirname "$f")/.env"
           done
 
-      - name: Build, tag, and push all *_service Docker Compose services
+      - name: Build, tag, and push services from services-to-build.txt
         run: |
           set -e
 
-          SERVICES=$(docker compose config --services | grep '_service$')
-          echo "Filtered services: $SERVICES"
+          SERVICES=$(grep -v '^#' .github/services-to-build.txt | grep -v '^$')
+          echo "Services to build: $SERVICES"
 
           for SERVICE in $SERVICES; do
             IMAGE_NAME="ghcr.io/${{ env.REPO_OWNER_LC }}/$SERVICE:${{ env.GIT_TAG }}"

@@ -42,22 +42,38 @@ jobs:
         run: |
           docker builder prune --all --force
 
-      - name: Wait for all *_service containers (via Nginx)
+      - name: Wait for all *_service containers (direct health checks)
         run: |
-          echo "Detecting *_service containers..."
-          SERVICE_NAMES=$(docker compose ps --services | grep '_service')
+          echo "Detecting *_service containers using docker filter..."
+          SERVICE_NAMES=$(docker ps --filter "name=.*_service$" --format "{{.Names}}")
       
           if [ -z "$SERVICE_NAMES" ]; then
-            echo "No *_service services found. Exiting."
+            echo "No *_service containers found. Listing all containers for debugging:"
+            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
             exit 1
           fi
       
+          echo "Found services: $SERVICE_NAMES"
+      
           for NAME in $SERVICE_NAMES; do
-            PREFIX=${NAME%_service}
-            echo "Waiting for $NAME via http://localhost:8080/$PREFIX/health..."
+            # Validate container name format for security
+            if ! echo "$NAME" | grep -E '^[a-zA-Z0-9][a-zA-Z0-9_.-]*$' > /dev/null; then
+              echo "Invalid container name format: $NAME"
+              exit 1
+            fi
+            
+            echo "Waiting for $NAME to be healthy..."
       
             for i in {1..30}; do
-              STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/$PREFIX/health")
+              # Execute health check using Python (available in all containers)
+              STATUS=$(docker exec "$NAME" python3 -c "
+import urllib.request
+try:
+    response = urllib.request.urlopen('http://localhost:8000/health', timeout=5)
+    print(response.getcode())
+except Exception as e:
+    print('000')
+" 2>/dev/null || echo "000")
               if [ "$STATUS" == "200" ]; then
                 echo "$NAME is healthy"
                 break
