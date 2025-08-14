@@ -80,12 +80,12 @@ jobs:
             echo "Created $(dirname "$f")/.env"
           done
 
-      - name: Build, tag, and push all *_service Docker Compose services
+      - name: Build, tag, and push services from services-to-build.txt
         run: |
           set -e
 
-          SERVICES=$(docker compose config --services | grep '_service$')
-          echo "Filtered services: $SERVICES"
+          SERVICES=$(grep -v '^#' .github/services-to-build.txt | grep -v '^$')
+          echo "Services to build: $SERVICES"
 
           for SERVICE in $SERVICES; do
             IMAGE_NAME="ghcr.io/${{ env.REPO_OWNER_LC }}/$SERVICE:${{ env.GIT_TAG }}"
