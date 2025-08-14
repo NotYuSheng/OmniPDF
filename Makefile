@@ -174,6 +174,6 @@ ifeq ($(CHART_NAME),example-service)
 	@exit 1
 else
 	kubectl --namespace $(NAMESPACE) port-forward \
-	  $$(kubectl get pod -n $(NAMESPACE) -l "app.kubernetes.io/name=$(CHART_NAME),app.kubernetes.io/instance=$(CHART_NAME)" -o jsonpath="{.items[0].metadata.name}") \
+	  deployment/$(CHART_NAME) \
 	  $(LOCAL_PORT):$(REMOTE_PORT)
 endif

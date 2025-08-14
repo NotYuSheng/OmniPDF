@@ -46,7 +46,8 @@ update_yaml_file() {
     
     # Use yq if available, otherwise use improved sed fallback
     if command -v yq >/dev/null 2>&1; then
-        yq eval ".$key = \"$value\"" -i "$file"
+        # Use strenv to preserve value types (boolean, number, string)
+        yq eval ".$key = strenv(VALUE)" -i "$file"
     else
         echo "⚠️  Warning: yq not found, using sed fallback. Install yq for better YAML parsing."
         echo "   Install with: sudo snap install yq (or brew install yq on macOS)"
