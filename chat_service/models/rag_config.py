@@ -444,9 +444,7 @@ class QwenRAGOptimizer:
                 question, model_name, config.validation_params, openai_client
             )
             
-            # If LLM classification succeeded, return it
-            if llm_classification != QueryType.GENERAL.value:
-                return llm_classification
+            return llm_classification
         
         # If LLM classification failed, return General
         return QueryType.GENERAL.value
