@@ -42,7 +42,7 @@ jobs:
         run: |
           docker builder prune --all --force
 
-      - name: Wait for all service containers (via Nginx)
+      - name: Wait for all service containers (direct health checks)
         run: |
           echo "Reading services from services-to-build.txt..."
           SERVICE_NAMES=$(grep -v '^#' .github/services-to-build.txt | grep -v '^$')
@@ -53,16 +53,18 @@ jobs:
           fi
       
           for NAME in $SERVICE_NAMES; do
-            # Handle cleaner service (no _service suffix) and regular services
-            if [[ "$NAME" == "cleaner" ]]; then
-              PREFIX="cleaner"
-            else
-              PREFIX=${NAME%_service}
-            fi
-            echo "Waiting for $NAME via http://localhost:8080/$PREFIX/health..."
+            echo "Waiting for $NAME to be healthy..."
       
             for i in {1..30}; do
-              STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/$PREFIX/health")
+              # Check if container is running first
+              if ! docker ps --format "table {{.Names}}" | grep -q "^$NAME$"; then
+                echo "Container $NAME is not running yet..."
+                sleep 3
+                continue
+              fi
+              
+              # Execute health check directly inside the container
+              STATUS=$(docker exec $NAME curl -s -o /dev/null -w "%{http_code}" "http://localhost:8000/health" 2>/dev/null || echo "000")
               if [ "$STATUS" == "200" ]; then
                 echo "$NAME is healthy"
                 break
