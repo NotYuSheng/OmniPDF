@@ -8,9 +8,7 @@ describe('Service Health Tests', () => {
       timeout: 10000 
     }).then((result) => {
       if (result.code === 0 && result.stdout.trim()) {
-        const foundServices = result.stdout.trim().split('\n').filter(name => name.trim());
-        // Filter to only include containers that actually end with _service
-        services = foundServices.filter(name => name.endsWith('_service'));
+        services = result.stdout.trim().split('\n').filter(name => name.trim());
         if (services.length > 0) {
           cy.log(`Found services: ${services.join(', ')}`);
         } else {
