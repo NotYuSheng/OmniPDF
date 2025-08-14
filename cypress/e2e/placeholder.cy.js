@@ -27,7 +27,7 @@ describe('Service Health Tests', () => {
         command: `docker exec ${service} curl -f http://localhost:8000/health`,
         timeout: 10000 
       }).then((result) => {
-        expect(result.code).to.eq(0);
+        expect(result.code, `Health check for '${service}' failed. Command: docker exec ${service} curl -f http://localhost:8000/health. Stdout: ${result.stdout}. Stderr: ${result.stderr}`).to.eq(0);
         cy.log(`✓ ${service} is healthy`);
       });
     });

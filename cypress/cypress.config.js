@@ -9,21 +9,20 @@ module.exports = defineConfig({
       // Enable cy.exec() command for running shell commands
       on('task', {
         exec: ({ command, timeout = 10000 }) => {
-          const { execSync } = require('child_process');
-          try {
-            const result = execSync(command, { 
-              encoding: 'utf8', 
-              timeout,
-              stdio: 'pipe'
+          const { exec } = require('child_process');
+          return new Promise((resolve) => {
+            exec(command, { timeout, encoding: 'utf8' }, (error, stdout, stderr) => {
+              if (error) {
+                resolve({
+                  code: error.code || 1,
+                  stdout: stdout || '',
+                  stderr: stderr || error.message,
+                });
+                return;
+              }
+              resolve({ code: 0, stdout, stderr });
             });
-            return { code: 0, stdout: result, stderr: '' };
-          } catch (error) {
-            return { 
-              code: error.status || 1, 
-              stdout: error.stdout || '', 
-              stderr: error.stderr || error.message 
-            };
-          }
+          });
         }
       });
     },
