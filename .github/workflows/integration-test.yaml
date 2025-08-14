@@ -66,14 +66,7 @@ jobs:
       
             for i in {1..30}; do
               # Execute health check using Python (available in all containers)
-              STATUS=$(docker exec "$NAME" python3 -c "
-import urllib.request
-try:
-    response = urllib.request.urlopen('http://localhost:8000/health', timeout=5)
-    print(response.getcode())
-except Exception as e:
-    print('000')
-" 2>/dev/null || echo "000")
+              STATUS=$(docker exec "$NAME" python3 -c 'import urllib.request; response = urllib.request.urlopen("http://localhost:8000/health", timeout=5); print(response.getcode())' 2>/dev/null || echo "000")
               if [ "$STATUS" == "200" ]; then
                 echo "$NAME is healthy"
                 break
