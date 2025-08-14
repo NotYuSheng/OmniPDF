@@ -25,6 +25,17 @@ jobs:
       - name: Lint all Helm charts in ./helm/
         run: |
           for chart in helm/*/; do
-            echo "Linting chart: $chart"
-            helm lint "$chart" || exit 1
+            # Skip directories that aren't Helm charts
+            if [[ "$chart" == "helm/assets/" || "$chart" == "helm/shared-values/" ]]; then
+              echo "Skipping non-chart directory: $chart"
+              continue
+            fi
+            
+            # Only lint if Chart.yaml exists
+            if [[ -f "$chart/Chart.yaml" ]]; then
+              echo "Linting chart: $chart"
+              helm lint "$chart" || exit 1
+            else
+              echo "Skipping directory without Chart.yaml: $chart"
+            fi
           done
