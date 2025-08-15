@@ -58,18 +58,6 @@ async def process_pdf(uploaded_file):
         }
         status_text.success(f"PDF uploaded successfully! Document ID: {doc_id}")
 
-        # Check Set-Cookie header
-        # set_cookie = upload_response.headers.get('Set-Cookie')
-        # if set_cookie:
-        #     logger.info(f"Set-Cookie: {set_cookie}")
-        #     logger.info(f"Set-Cookie: {set_cookie}")
-        #     st.session_state.set_cookie = set_cookie
-
-
-    # except requests.exceptions.ConnectionError as e:
-    #     st.error("Could not connect to PDF processor service. Please check if the service is running.")
-    #     logger.error(f"Error processing PDF: {e}")
-
     except Exception as e:
         st.error(f"Error processing PDF: {e}")
         logger.error(f"Error processing PDF: {e}")
