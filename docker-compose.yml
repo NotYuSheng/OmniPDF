@@ -139,7 +139,6 @@ services:
     ports:
       - "8504:8504"
 
-
 volumes:
   minio-data:
   chromadb-data:
