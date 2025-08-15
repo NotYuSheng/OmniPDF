@@ -35,7 +35,7 @@ async def process_pdf(uploaded_files, status_text):
             status_text.text('Generating metadata...')
         else:
             status_text.text('Finalizing processing...')
-        asyncio.sleep(0.02)
+        await asyncio.sleep(0.02)
     
     progress_bar.empty()
     status_text.empty()
