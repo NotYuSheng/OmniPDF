@@ -53,3 +53,16 @@ async def load_or_create_job(doc_id: str) -> dict | Response:
         )
 
     return job
+
+
+async def concat_text(doc_id: str) -> str:
+    job = load_job(doc_id=doc_id, job_type="extraction")
+    if job.get("status") == "processing":
+        raise HTTPException(
+            status_code=202,
+            detail="The document is still being processed. Please try again later.",
+        )
+    
+    texts = job.get("data", {}).get("result", {}).get("texts")
+    text_list = [entry.get("text") or entry.get("orig") for entry in texts]
+    return text_list.join("\n")
