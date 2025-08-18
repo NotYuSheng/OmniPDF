@@ -12,12 +12,12 @@ from shared_utils.s3_utils import get_object_stream, list_folder
 from shared_utils.redis import RedisSetWithFlagExpiry
 
 
-router = APIRouter(tags=["images"])
+router = APIRouter(prefix="/images", tags=["images"])
 logger = logging.getLogger(__name__)
 redis_image_sets = RedisSetWithFlagExpiry(prefix="ImageFiles", flag_prefix="S3Key", default_expiry=timedelta(hours=1))
 
 
-@router.get("/images/{doc_id}")
+@router.get("/{doc_id}", response_model=ImageResponse)
 async def get_pdf_images(
         doc_id: str,
         _validated: bool = Depends(validate_session_doc_pair),
@@ -38,7 +38,7 @@ async def get_pdf_images(
 
     return ImageResponse(doc_id=doc_id, filename=f"{doc_id}.pdf", images=url_list)
 
-@router.get("/image/{doc_id}/{img_name}")
+@router.get("/{doc_id}/{img_name}", response_class=StreamingResponse)
 async def get_pdf_image(
         doc_id: str,
         img_name: str,

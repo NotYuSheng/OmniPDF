@@ -56,7 +56,7 @@ async def upload_document(
     )
 
 
-@router.get("/{doc_id}")
+@router.get("/{doc_id}", response_class=StreamingResponse)
 async def get_document(
     doc_id: str, _validated: bool = Depends(validate_session_doc_pair)
 ):

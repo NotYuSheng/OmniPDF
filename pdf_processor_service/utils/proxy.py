@@ -56,7 +56,7 @@ async def load_or_create_job(doc_id: str) -> dict | Response:
 
 
 def generate_external_image_url(doc_id: str, image_name: str):
-    return f"{EXTERNAL_ENDPOINT}/image/{doc_id}/{image_name}"
+    return f"{EXTERNAL_ENDPOINT}/images/{doc_id}/{image_name}"
 
 
 def generate_external_doc_url(doc_id: str):
