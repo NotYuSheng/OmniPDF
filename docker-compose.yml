@@ -61,7 +61,7 @@ services:
       context: .
       dockerfile: ./nginx/Dockerfile
     ports:
-      - "8181:8181"
+      - "8080:8080"
     env_file:
       - ./nginx/.env
     depends_on:
@@ -133,7 +133,7 @@ services:
     build:
       context: .
       dockerfile: ./frontend/Dockerfile
-    container_name: omni-frontend
+    container_name: frontend
     env_file:
       - ./frontend/.env
     ports:
