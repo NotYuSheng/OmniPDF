@@ -1,8 +1,9 @@
 import logging
 import os
 from typing import Literal
+from json import JSONDecodeError
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 
 from utils.session import validate_session_doc_pair, get_session_id
 from utils.proxy import concat_text, proxy_post
@@ -19,12 +20,19 @@ if not EMBED_URL:
 async def text_embed_proxy(
     embed_type: Literal["embed"],
     doc_id: str,
-    config: dict = {},
-    pages_info: list = [],
+    request: Request,
     session_id: str = Depends(get_session_id),
     _validated: bool = Depends(validate_session_doc_pair),
     full_text: str = Depends(concat_text),
 ):
+    # placeholder for pages_info, when implemented in the future
+    pages_info = []
+    # Get the config from the request body
+    try:
+        config = await request.json()
+    except (ValueError, JSONDecodeError) as e:
+        logger.error(f"Invalid JSON in request body: {e}")
+        config = {}
     param = {
         "doc_id": doc_id,
         "text": full_text,
