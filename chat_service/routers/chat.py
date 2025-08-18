@@ -8,7 +8,7 @@ import os
 from models.chat import ChatRequest, ChatResponse
 from models.rag_config import QwenRAGConfig, QwenPromptTemplates, QwenRAGOptimizer, QueryType, EnhancedQueryValidator
 
-router = APIRouter(prefix="/chat")
+router = APIRouter(prefix="/chat", tags=["chat"])
 
 logger = logging.getLogger(__name__)
 
