@@ -66,7 +66,6 @@ async def concat_text(doc_id: str) -> str:
             status_code=202,
             detail="The document is still being processed. Please try again later.",
         )
-    
-    texts = job.get("data", {}).get("result", {}).get("texts")
-    text_list = [entry.get("text") or entry.get("orig") for entry in texts]
+    texts = job.get("data", {}).get("result", {}).get("texts", [])
+    text_list = [entry.get("text", "") or entry.get("orig", "") for entry in texts]
     return "\n".join(text_list)
