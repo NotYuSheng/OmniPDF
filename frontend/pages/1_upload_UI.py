@@ -20,11 +20,11 @@ async def process_pdf(uploaded_file):
     
     for i in range(100):
         progress_bar.progress(i + 1)
-        if i < 30:
+        if i < 25:
             status_text.text('Extracting text and images...')
-        elif i < 60:
+        elif i < 50:
             status_text.text('Translating content...')
-        elif i < 80:
+        elif i < 75:
             status_text.text('Generating metadata...')
         else:
             status_text.text('Finalizing processing...')
