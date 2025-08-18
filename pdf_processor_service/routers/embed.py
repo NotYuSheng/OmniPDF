@@ -24,12 +24,11 @@ async def text_embed_proxy(
     session_id: str = Depends(get_session_id),
     _validated: bool = Depends(validate_session_doc_pair),
     full_text: str = Depends(concat_text),
-):
     param = {
         "doc_id": doc_id,
-        "session_id": session_id,
         "text": full_text,
         "config": config,
         "pages_info": pages_info,
     }
+    return await proxy_post(f"{EMBED_URL}/embed/", body=param)
     return await proxy_post(f"{EMBED_URL}/{embed_type}/", body=param)
