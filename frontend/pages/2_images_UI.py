@@ -80,12 +80,8 @@ def display_images(image_response):
                 with col1:
                     # Display actual image from URL
                     try:
-                        orig_width, orig_height = get_image_dimensions(image_data["url"])
-                        aspect_ratio = orig_width / orig_height
-                        display_width = int(FIXED_IMAGE_HEIGHT * aspect_ratio)
-                        _right, center, _right = st.columns([1, 2, 1])
-                        with center:
-                            st.image(image_data["url"], width=display_width)
+                        st.image(image_data["url"])
+
                     except Exception as e:
                         logger.error(f"Error loading image {i+1}: {e}")
                         st.error(f"Error loading image {i+1}: {e}")
