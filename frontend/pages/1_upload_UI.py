@@ -77,7 +77,7 @@ if uploaded_file is not None:
     st.subheader("Processing Options")
     target_language = st.selectbox(
         "Target Language",
-        ["English", "Spanish", "French", "German", "Chinese", "Japanese"]
+        ["English", "Chinese", "Malay", "Indonesian",]
     )
     
     extract_images = st.checkbox("Extract Images", value=True)
