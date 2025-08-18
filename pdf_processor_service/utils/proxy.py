@@ -18,7 +18,7 @@ if not EXTRACTION_URL:
 async def proxy_post(url: str, body: dict):
     async with httpx.AsyncClient() as client:
         try:
-            req = await client.post(url, data=body)
+            req = await client.post(url, json=body)
             req.raise_for_status()  # Raise an exception for bad status codes
         except httpx.HTTPStatusError as e:
             logger.error(f"HTTP error retrieving from {url}: {e}")
@@ -57,6 +57,10 @@ async def load_or_create_job(doc_id: str) -> dict | Response:
 
 async def concat_text(doc_id: str) -> str:
     job = load_job(doc_id=doc_id, job_type="extraction")
+    if not job:
+        raise HTTPException(
+            status_code=404, detail="Document not found or not processed yet"
+        )
     if job.get("status") == "processing":
         raise HTTPException(
             status_code=202,
@@ -65,4 +69,4 @@ async def concat_text(doc_id: str) -> str:
     
     texts = job.get("data", {}).get("result", {}).get("texts")
     text_list = [entry.get("text") or entry.get("orig") for entry in texts]
-    return text_list.join("\n")
+    return "\n".join(text_list)
