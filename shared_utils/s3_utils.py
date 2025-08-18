@@ -18,7 +18,7 @@ S3_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
 S3_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
 S3_BUCKET = os.getenv("MINIO_BUCKET", "omnifiles")
 REGION_NAME = os.getenv("AWS_REGION", "ap-southeast-1")  # Optional; ignored by MinIO
-EXTERNAL_S3_ENDPOINT = os.getenv("EXTERNAL_S3_ENDPOINT", "http://localhost:8080/file")
+EXTERNAL_S3_ENDPOINT = os.getenv("EXTERNAL_S3_ENDPOINT", "http://localhost:8181/file")
 
 # Instantiate boto3 S3 client
 s3_client = boto3.client(

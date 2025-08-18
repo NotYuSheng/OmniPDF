@@ -66,7 +66,7 @@ def validate_session_doc_pair(
     valid_session: bool = Depends(validate_session_id),
 ) -> bool:
     if valid_session:
-        if session_storage.contains(session_id, doc_id):
+        if session_storage.contains(session_id, f"{doc_id}/original.pdf"):
             return True
     
     raise HTTPException(

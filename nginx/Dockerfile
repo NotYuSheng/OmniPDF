@@ -1,6 +1,6 @@
 FROM nginx:1.29.0-alpine
 
-EXPOSE 8080
+EXPOSE 8181
 
 COPY ./nginx/error_pages/ /etc/nginx/html/error_pages/
 

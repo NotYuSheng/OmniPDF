@@ -5,7 +5,7 @@ import httpx
 
 import streamlit as st
 
-PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000")
+PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://localhost:8181/pdf_processor")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ if uploaded_file is not None:
     st.subheader("Processing Options")
     target_language = st.selectbox(
         "Target Language",
-        ["English", "Spanish", "French", "German", "Chinese", "Japanese"]
+        ["English", "Chinese", "Malay", "Indonesian"]
     )
     
     extract_images = st.checkbox("Extract Images", value=True)
@@ -88,20 +88,3 @@ if uploaded_file is not None:
         with st.spinner("Processing PDF..."):
             asyncio.run(process_pdf(uploaded_file))
             
-    # Always show metadata if available
-    if "processed_data" in st.session_state and st.session_state.processed_data:
-        st.subheader("File Metadata")
-        st.markdown(f"**Filename:** {uploaded_file.name}")
-        size_unit = st.selectbox("File Size Unit", ["MB", "KB", "B"], index=0)
-        if size_unit == "MB":
-            size_val = uploaded_file.size / (1024 * 1024)
-            size_str = f"{size_val:.2f} MB"
-        elif size_unit == "KB":
-            size_val = uploaded_file.size / 1024
-            size_str = f"{size_val:.2f} KB"
-        else:
-            size_val = uploaded_file.size
-            size_str = f"{size_val} B"
-        st.markdown(f"**Size:** {size_str}")
-        st.markdown(f"**Document ID:** {st.session_state.processed_data['doc_id']}")
-        st.markdown(f"**Download URL:** {st.session_state.processed_data['download_url']}")

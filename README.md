@@ -11,7 +11,7 @@ The following port mappings are used across the OmniPDF microservices **for deve
 | Service                   | Description                                               | Port   |
 |---------------------------|-----------------------------------------------------------|--------|
 | Streamlit Frontend        | Web UI for user interaction                               | 8501   |
-| Nginx API Gateway         | Proxies file uploads to PDF Processor                     | 8080   |
+| Nginx API Gateway         | Proxies file uploads to PDF Processor                     | 8181   |
 | PDF Processor Service     | Main coordinator for processing and routing               | 8000   |
 | Chat Service              | Retrieves context chunks and queries LLM                  | 8001   |
 | PDF Extraction Service    | Extracts tables and images from PDFs                      | 8002   |
