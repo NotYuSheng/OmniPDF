@@ -12,3 +12,4 @@ docling_translation_service
 
 # Additional services
 cleaner
+nginx
