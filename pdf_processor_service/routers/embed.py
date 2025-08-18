@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Literal
 
 from fastapi import APIRouter, Depends
 
@@ -16,7 +17,7 @@ if not EMBED_URL:
 
 @router.post("/{embed_type}/{doc_id}")
 async def text_embed_proxy(
-    embed_type: str,
+    embed_type: Literal["embed"],
     doc_id: str,
     config: dict = {},
     pages_info: list = [],
