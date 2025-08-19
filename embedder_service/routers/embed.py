@@ -5,10 +5,11 @@ from typing import List, Dict, Any
 import logging
 import uuid
 
-from models.embed import ProcessingConfig, DataRequest
-from models.helper import get_chunking_model, get_embedding_model
+from models.embed import DataRequest
+from models.helper import get_chunking_model
 from shared_utils.chroma_client import get_chroma_client
 from langchain_core.documents import Document
+from utils.embed import vectorize_chromadb
 
 router = APIRouter(prefix="/embed", tags=["embed"])
 
@@ -98,47 +99,6 @@ async def data_chunking(request:DataRequest) -> List[Dict[str, Any]]:
         raise HTTPException(status_code=500, detail="Chunking failed.")
 
 
-async def vectorize_chromadb(chunk_data: List[Dict[str, Any]], config: ProcessingConfig):
-    """Embed data chunks of PDF document into ChromaDB AsyncHTTPClient instance"""
-
-    logger.info("Starting embedding process...")
-    embedding_model = get_embedding_model(config.embedding_model)
-
-    try:
-        # Connect to ChromaDB AsyncHTTPClient instance and retrieve/create specified database collection
-        logger.info("Getting collection...")
-        chroma_client = await get_chroma_client()
-        collection = await chroma_client.get_or_create_collection(name=SEMANTIC_EMBEDDING_COLLECTION, embedding_function=embedding_model)
-        logger.info(f"Using existing collection: {SEMANTIC_EMBEDDING_COLLECTION}")
-
-        # Split each chunk based on 'chunk_id', 'content' and 'metadata' keys 
-        # and append the values into 3 distinct lists to be embedded into ChromaDB
-        ids = [chunk['chunk_id'] for chunk in chunk_data]
-        documents = [chunk['content'] for chunk in chunk_data]
-        metadatas = [chunk['metadata'] for chunk in chunk_data]
-
-        if not ids:
-            logger.warning("No chunks to add to the collection.")
-            return
-        
-        # Embed into ChromaDB using specified embedding model
-        await collection.add(
-            ids=ids,
-            documents=documents,
-            metadatas=metadatas
-        )
-        logger.info(f"Added {len(ids)} chunks to collection '{SEMANTIC_EMBEDDING_COLLECTION}'")
-
-        return {
-            "collection_name": SEMANTIC_EMBEDDING_COLLECTION,
-            "total_chunks_added": len(chunk_data)
-        }
-
-    except Exception as e:
-        logger.error(f"Embedding failed: {e}")
-        raise HTTPException(status_code=500, detail="Embedding failed")
-
-
 @router.post("/")
 async def pdf_embedder_service(request: DataRequest):
     "Chunk up and embed data from PDF document into ChromaDB AsyncHTTPClient instance"
@@ -151,7 +111,7 @@ async def pdf_embedder_service(request: DataRequest):
             raise HTTPException(status_code=400, detail="No chunks were created from the input text") 
         
         # Once chunking is done, embed into ChromaDB with the specified embedding model
-        embed_results = await vectorize_chromadb(chunk_data, request.config)
+        embed_results = await vectorize_chromadb(chunk_data, request.config, SEMANTIC_EMBEDDING_COLLECTION)
         
         return {
                 "status": "success",
