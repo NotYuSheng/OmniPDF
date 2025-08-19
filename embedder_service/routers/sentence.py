@@ -22,6 +22,8 @@ def split_in_segments_by_sentences(text:str, max_length:int):
     word_count = 0
     current_segment_sentences = []
     segments = []
+    segment_start_idx = [0]
+    segment_end_idx = []
     for sentence in sent_tokenize(text):
         new_word_count = len(sentence.split())
         word_count += new_word_count
@@ -30,9 +32,14 @@ def split_in_segments_by_sentences(text:str, max_length:int):
             segments.append(" ".join(current_segment_sentences))
             current_segment_sentences = []
             word_count = 0
+            segment_start_idx.append(text.find(sentence) + len(sentence))
+            segment_end_idx.append(segment_start_idx[-1] - 1)
     if current_segment_sentences:
         segments.append(" ".join(current_segment_sentences))
-    return segments
+        segment_end_idx.append(len(text) - 1)
+    if len(segment_start_idx) > len(segment_end_idx):
+        segment_start_idx.pop()
+    return segments, segment_start_idx, segment_end_idx
 
 
 async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
@@ -47,23 +54,16 @@ async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
                 status_code=400, detail="No textual content found in PDF"
             )
 
-        chunks = split_in_segments_by_sentences(request.text, MAX_STRING_LENGTH)
+        chunks, chunk_start_idx, chunk_end_idx = split_in_segments_by_sentences(request.text, MAX_STRING_LENGTH)
         logger.info(f"Number of chunks: {len(chunks)}")
 
         chunk_data = []
-        current_pos = 0
 
-        for i, chunk in enumerate(chunks):
+        for chunk, chunk_start, chunk_end in zip(chunks, chunk_start_idx, chunk_end_idx):
             # First iteration: Extract first chunk of doc.page_content
             chunk_content = chunk
-            logger.info(f"Length of chunk {i + 1}: {len(chunk_content.strip())}")
+            logger.info(f"Length of chunk: {len(chunk_content.strip())}")
 
-            chunk_start = request.text.find(chunk_content, current_pos)
-
-            if chunk_start == -1:
-                chunk_start = current_pos
-
-            chunk_end = chunk_start + len(chunk_content)
 
             # Include doc_id and session_id in metadata of each chunk
             chunk_metadata = {}
@@ -82,7 +82,6 @@ async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
                 }
             )
 
-            current_pos = chunk_end
 
         logger.info(chunk_data)
         return chunk_data
