@@ -170,7 +170,7 @@ class RAGConfig:
     """Configuration class for the model's RAG optimization"""
     
     def __init__(self):
-        self.model_name = os.getenv("OPENAI_MODEL", "Qwen2.5-14B-Coder-Instruct")
+        self.model_name = os.getenv("OPENAI_MODEL")
         
         # LLM's Generation parameters optimized for RAG
         self.generation_params = {
