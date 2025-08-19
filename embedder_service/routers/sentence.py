@@ -20,18 +20,18 @@ TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
 
 def split_in_segments_by_sentences(text:str, max_length:int):
     word_count = 0
-    mystring = list()
+    current_segment_sentences = []
     segments = []
     for sentence in sent_tokenize(text):
         new_word_count = len(sentence.split())
         word_count += new_word_count
-        mystring.append(str(sentence).strip())
+        current_segment_sentences.append(sentence.strip())
         if word_count > max_length:
-            segments.append(" ".join(mystring))
-            mystring = []
+            segments.append(" ".join(current_segment_sentences))
+            current_segment_sentences = []
             word_count = 0
-    if mystring:
-        segments.append(" ".join(mystring))
+    if current_segment_sentences:
+        segments.append(" ".join(current_segment_sentences))
     return segments
 
 
