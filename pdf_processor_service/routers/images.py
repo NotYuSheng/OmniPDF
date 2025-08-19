@@ -14,23 +14,25 @@ from shared_utils.redis import RedisSetWithFlagExpiry
 
 router = APIRouter(prefix="/images", tags=["images"])
 logger = logging.getLogger(__name__)
-redis_image_sets = RedisSetWithFlagExpiry(prefix="ImageFiles", flag_prefix="S3Key", default_expiry=timedelta(hours=1))
+redis_image_sets = RedisSetWithFlagExpiry(
+    prefix="ImageFiles", flag_prefix="S3Key", default_expiry=timedelta(hours=1)
+)
 
 
 @router.get("/{doc_id}", response_model=ImageResponse)
 async def get_pdf_images(
-        doc_id: str,
-        _validated: bool = Depends(validate_session_doc_pair),
-    job_or_reposnse = Depends(load_or_create_job)
+    doc_id: str,
+    _validated: bool = Depends(validate_session_doc_pair),
+    job_or_response=Depends(load_or_create_job),
 ):
-    if isinstance(job_or_reposnse, Response):
-        return job_or_reposnse
-    
+    if isinstance(job_or_response, Response):
+        return job_or_response
+
     url_list = []
 
     prefix = f"{doc_id}/images/"
     keys = list_folder(prefix)
-    
+
     for key in keys:
         image_name = key.rsplit("/", 1)[-1]
         url = generate_external_image_url(doc_id, image_name)
@@ -38,11 +40,12 @@ async def get_pdf_images(
 
     return ImageResponse(doc_id=doc_id, filename=f"{doc_id}.pdf", images=url_list)
 
+
 @router.get("/{doc_id}/{img_name}", response_class=StreamingResponse)
 async def get_pdf_image(
-        doc_id: str,
-        img_name: str,
-        _validated: bool = Depends(validate_session_doc_pair),
+    doc_id: str,
+    img_name: str,
+    _validated: bool = Depends(validate_session_doc_pair),
 ):
     file_key = f"{doc_id}/images/{img_name}"
 
@@ -53,7 +56,7 @@ async def get_pdf_image(
         if e.response["Error"]["Code"] == "NoSuchKey":
             raise HTTPException(status_code=404, detail="Image not found")
         raise HTTPException(status_code=500, detail="Failed to check Image")
-    
+
     # To extend expiry time for the images
     _ = redis_image_sets[doc_id]
 
