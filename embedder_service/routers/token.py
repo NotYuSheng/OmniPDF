@@ -5,35 +5,38 @@ from typing import List, Dict, Any
 import logging
 import uuid
 
-from models.embed import ProcessingConfig, DataRequest
+from models.embed import DataRequest
 from shared_utils.chroma_client import get_chroma_client
+from utils.embed import vectorize_chromadb
 from nltk.tokenize import sent_tokenize
 
-router = APIRouter(prefix="/embed")
+router = APIRouter(prefix="/sentence", tags=["sentence"])
 
 logger = logging.getLogger(__name__)
 
+# For English, 1 word is ~1.33 tokens, so for max of 4092 tokens, we use 4096 * (3/4) = 3072 words
+MAX_STRING_LENGTH = 3072
 TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
 
-def split_in_segments(text:str, max_words:int):
-    tokens = 0
+def split_in_segments_by_sentences(text:str, max_length:int):
+    word_count = 0
     mystring = list()
     segments = []
-    for sent in sent_tokenize(text):
-        newtokens = len(sent.split())
-        tokens += newtokens
-        mystring.append(str(sent).strip())
-        if tokens > max_words:
+    for sentence in sent_tokenize(text):
+        new_word_count = len(sentence.split())
+        word_count += new_word_count
+        mystring.append(str(sentence).strip())
+        if word_count > max_length:
             segments.append(" ".join(mystring))
             mystring = []
-            tokens = 0
+            word_count = 0
     if mystring:
         segments.append(" ".join(mystring))
     return segments
 
 
 async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
-    """Perform chunking / splitting of data via ,
+    """Perform chunking / splitting of data via sentences,
     and reject by returning empty list if PDF document has no textual content"""
 
     logger.info("Starting chunking process...")
@@ -44,8 +47,7 @@ async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
                 status_code=400, detail="No textual content found in PDF"
             )
 
-        # For English, 1 word is ~1.33 tokens, so for max of 4092 tokens, we use 4096 * (3/4) = 3072 words
-        chunks = split_in_segments(request.text, 3072)
+        chunks = split_in_segments_by_sentences(request.text, MAX_STRING_LENGTH)
         logger.info(f"Number of chunks: {len(chunks)}")
 
         chunk_data = []
@@ -89,46 +91,7 @@ async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
         raise HTTPException(status_code=500, detail="Chunking failed.")
 
 
-async def vectorize_chromadb(
-    chunk_data: List[Dict[str, Any]], config: ProcessingConfig
-):
-    """Embed data chunks of PDF document into ChromaDB AsyncHTTPClient instance"""
-
-
-    try:
-        # Connect to ChromaDB AsyncHTTPClient instance and retrieve/create specified database collection
-        logger.info("Getting collection...")
-        chroma_client = await get_chroma_client()
-        collection = await chroma_client.get_or_create_collection(
-            name=TEXTUAL_EMBEDDING_COLLECTION
-        )
-        logger.info(f"Using existing collection: {TEXTUAL_EMBEDDING_COLLECTION}")
-
-        # Split each chunk based on 'chunk_id', 'content' and 'metadata' keys
-        # and append the values into 3 distinct lists to be embedded into ChromaDB
-        ids = [chunk["chunk_id"] for chunk in chunk_data]
-        documents = [chunk["content"] for chunk in chunk_data]
-        metadatas = [chunk["metadata"] for chunk in chunk_data]
-
-        if not ids:
-            logger.warning("No chunks to add to the collection.")
-            return
-
-        # Embed into ChromaDB using specified embedding model
-        await collection.add(ids=ids, documents=documents, metadatas=metadatas)
-        logger.info(f"Added {len(ids)} chunks to collection '{TEXTUAL_EMBEDDING_COLLECTION}'")
-
-        return {
-            "collection_name": TEXTUAL_EMBEDDING_COLLECTION,
-            "total_chunks_added": len(chunk_data),
-        }
-
-    except Exception as e:
-        logger.error(f"Embedding failed: {e}")
-        raise HTTPException(status_code=500, detail="Embedding failed")
-
-
-@router.post("/token")
+@router.post("/")
 async def pdf_embedder_service(request: DataRequest):
     "Chunk up and embed data from PDF document into ChromaDB AsyncHTTPClient instance"
 
@@ -142,7 +105,7 @@ async def pdf_embedder_service(request: DataRequest):
             )
 
         # Once chunking is done, embed into ChromaDB with the specified embedding model
-        embed_results = await vectorize_chromadb(chunk_data, request.config)
+        embed_results = await vectorize_chromadb(chunk_data, request.config, TEXTUAL_EMBEDDING_COLLECTION)
 
         return {
             "status": "success",
@@ -167,13 +130,13 @@ async def pdf_embedder_service(request: DataRequest):
 
 
 @router.get("/status/{doc_id}")
-async def verify_document_embedding(doc_id: str, collection_name: str):
+async def verify_document_embedding(doc_id: str):
     """Verify if a document's data chunks have been successfully embedded into ChromaDB AsyncHTTPClient instance"""
 
     try:
         # Retrieve database collection from ChromaDB
         chroma_client = await get_chroma_client()
-        collection = await chroma_client.get_collection(collection_name)
+        collection = await chroma_client.get_collection(TEXTUAL_EMBEDDING_COLLECTION)
 
         # Query by doc_id of each chunk
         results = await collection.get(
