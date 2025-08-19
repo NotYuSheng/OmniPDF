@@ -15,6 +15,8 @@ router = APIRouter(prefix="/embed", tags=["embed"])
 logger = logging.getLogger(__name__)
 
 
+SEMANTIC_EMBEDDING_COLLECTION = "SematicEmbeds"
+
 async def data_chunking(request:DataRequest) -> List[Dict[str, Any]]:
     """Perform chunking / splitting of data via Semantic Chunking using LangChain's SemanticChunker,
     and reject by returning empty list if PDF document has no textual content"""
@@ -106,8 +108,8 @@ async def vectorize_chromadb(chunk_data: List[Dict[str, Any]], config: Processin
         # Connect to ChromaDB AsyncHTTPClient instance and retrieve/create specified database collection
         logger.info("Getting collection...")
         chroma_client = await get_chroma_client()
-        collection = await chroma_client.get_or_create_collection(name=config.collection_name, embedding_function=embedding_model)
-        logger.info(f"Using existing collection: {config.collection_name}")
+        collection = await chroma_client.get_or_create_collection(name=SEMANTIC_EMBEDDING_COLLECTION, embedding_function=embedding_model)
+        logger.info(f"Using existing collection: {SEMANTIC_EMBEDDING_COLLECTION}")
 
         # Split each chunk based on 'chunk_id', 'content' and 'metadata' keys 
         # and append the values into 3 distinct lists to be embedded into ChromaDB
@@ -125,10 +127,10 @@ async def vectorize_chromadb(chunk_data: List[Dict[str, Any]], config: Processin
             documents=documents,
             metadatas=metadatas
         )
-        logger.info(f"Added {len(ids)} chunks to collection '{config.collection_name}'")
+        logger.info(f"Added {len(ids)} chunks to collection '{SEMANTIC_EMBEDDING_COLLECTION}'")
 
         return {
-            "collection_name": config.collection_name,
+            "collection_name": SEMANTIC_EMBEDDING_COLLECTION,
             "total_chunks_added": len(chunk_data)
         }
 
@@ -174,13 +176,13 @@ async def pdf_embedder_service(request: DataRequest):
     
 
 @router.get("/status/{doc_id}")
-async def verify_document_embedding(doc_id: str, collection_name: str):
+async def verify_document_embedding(doc_id: str):
     """Verify if a document's data chunks have been successfully embedded into ChromaDB AsyncHTTPClient instance"""
     
     try:
         # Retrieve database collection from ChromaDB
         chroma_client = await get_chroma_client()
-        collection = await chroma_client.get_collection(collection_name)
+        collection = await chroma_client.get_collection(SEMANTIC_EMBEDDING_COLLECTION)
         
         # Query by doc_id of each chunk
         results = await collection.get(
