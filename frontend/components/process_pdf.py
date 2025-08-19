@@ -55,11 +55,11 @@ async def check_backend():
     Returns a dictionary with service names and their health status.m
     """
     services = {
-        "PDF Processor": os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000"),
-        "PDF Extractor": os.getenv("PDF_EXTRACTOR_URL", "http://pdf_extraction_service:8000"),
-        "Chat Service": os.getenv("CHAT_URL", "http://chat_service:8000"),
-        "Translation Service": os.getenv("DOCLING_TRANSLATION_URL", "http://docling_translation_service:8000"),
-        "Embedder Service": os.getenv("EMBEDDER_URL", "http://embedder_service:8000")
+        "PDF Processor": os.getenv("PDF_PROCESSOR_URL"),
+        "PDF Extractor": os.getenv("PDF_EXTRACTOR_URL"),
+        "Chat Service": os.getenv("CHAT_URL"),
+        "Translation Service": os.getenv("DOCLING_TRANSLATION_URL"),
+        "Embedder Service": os.getenv("EMBEDDER_URL")
     }
 
     async def check_service(service_name, url):
