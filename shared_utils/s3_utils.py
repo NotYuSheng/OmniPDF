@@ -48,6 +48,18 @@ def upload_fileobj(file_obj, key: str, content_type: str = "application/pdf") ->
         return False
 
 
+def get_object_stream(key: str):
+    """
+    Gets a streaming body for an object from S3.
+    """
+    try:
+        response = s3_client.get_object(Bucket=S3_BUCKET, Key=key)
+        return response["Body"]
+    except (BotoCoreError, ClientError) as e:
+        logger.exception(f"Failed to get object stream from S3: {e}")
+        raise
+
+
 def generate_presigned_url(key: str, expiry_seconds: int = 300) -> Optional[str]:
     """
     Generates a presigned URL to download a file from S3.
@@ -61,14 +73,6 @@ def generate_presigned_url(key: str, expiry_seconds: int = 300) -> Optional[str]
     except (BotoCoreError, ClientError) as e:
         logger.exception(f"Failed to generate presigned URL: {e}")
         return None
-
-
-def generate_external_presigned_url(
-    key: str, expiry_seconds: int = 300
-) -> Optional[str]:
-    return generate_presigned_url(key, expiry_seconds).replace(
-        S3_ENDPOINT, EXTERNAL_S3_ENDPOINT
-    )
 
 
 def delete_file(key: str) -> bool:
