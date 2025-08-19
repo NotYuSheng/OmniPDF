@@ -11,7 +11,7 @@ from shared_utils.chroma_client import get_chroma_client
 from langchain_core.documents import Document
 from utils.embed import vectorize_chromadb
 
-router = APIRouter(prefix="/embed", tags=["embed"])
+router = APIRouter(prefix="/semantic", tags=["semantic"])
 
 logger = logging.getLogger(__name__)
 

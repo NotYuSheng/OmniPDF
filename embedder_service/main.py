@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import health, embed, token
+from routers import health, semantic, token
 import nltk
 import logging
 
@@ -19,5 +19,5 @@ async def lifespan(app: FastAPI):
 app = FastAPI(root_path="/embedder", lifespan=lifespan)
 
 app.include_router(health.router)
-app.include_router(embed.router)
+app.include_router(semantic.router)
 app.include_router(token.router)
