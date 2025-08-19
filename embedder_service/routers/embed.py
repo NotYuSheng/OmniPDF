@@ -69,6 +69,7 @@ async def data_chunking(request:DataRequest) -> List[Dict[str, Any]]:
             # Include doc_id in metadata of each chunk
             chunk_metadata = chunk.metadata.copy()
             chunk_metadata["doc_id"] = request.doc_id
+            chunk_metadata["session_id"] = request.session_id
             
             # Skip chunks that are too small or too large
             # if (len(chunk_content.strip()) < request.config.min_chunk_size) or (len(chunk_content.strip()) > request.config.max_chunk_size):
