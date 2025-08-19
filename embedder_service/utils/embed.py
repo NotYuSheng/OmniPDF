@@ -49,3 +49,4 @@ async def vectorize_chromadb(chunk_data: List[Dict[str, Any]], config: Processin
     except Exception as e:
         logger.error(f"Embedding failed: {e}")
         raise HTTPException(status_code=500, detail="Embedding failed")
+    
