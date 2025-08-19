@@ -26,8 +26,6 @@ class ProcessingConfig(BaseModel):
     max_chunk_size: int = Field(default=1000, description="Maximum chunk size")
     store_in_chroma: bool = Field(
         default=True, description="Store embeddings in ChromaDB")
-    collection_name: str = Field(
-        default="my_documents", description="ChromaDB collection name")
 
 
 class DataRequest(BaseModel):
