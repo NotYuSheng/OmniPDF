@@ -16,7 +16,7 @@ router = APIRouter(prefix="/semantic", tags=["semantic"])
 logger = logging.getLogger(__name__)
 
 
-SEMANTIC_EMBEDDING_COLLECTION = "SematicEmbeds"
+SEMANTIC_EMBEDDING_COLLECTION = "SemanticEmbeds"
 
 async def data_chunking(request:DataRequest) -> List[Dict[str, Any]]:
     """Perform chunking / splitting of data via Semantic Chunking using LangChain's SemanticChunker,
