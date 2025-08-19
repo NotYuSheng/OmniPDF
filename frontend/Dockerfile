@@ -17,8 +17,8 @@ COPY shared_utils ./shared_utils
 # Copy frontend folder from root context into /app/frontend
 COPY frontend ./frontend
 
-EXPOSE 8504
+EXPOSE 8501
 
 ENV STREAMLIT_CLIENT_TOOLBAR_MODE=minimal
 
-CMD ["streamlit", "run", "frontend/main.py", "--server.port=8504", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "frontend/main.py", "--server.port=8501", "--server.address=0.0.0.0"]

@@ -140,7 +140,7 @@ services:
     env_file:
       - ./frontend/.env
     ports:
-      - "8504:8504"
+      - "8501:8501"
 
 volumes:
   minio-data:
