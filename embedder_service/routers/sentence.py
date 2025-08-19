@@ -22,23 +22,44 @@ def split_in_segments_by_sentences(text:str, max_length:int):
     word_count = 0
     current_segment_sentences = []
     segments = []
-    segment_start_idx = [0]
+    segment_start_idx = []
     segment_end_idx = []
-    for sentence in sent_tokenize(text):
+
+    sentences = sent_tokenize(text)
+    if not sentences:
+        return [], [], []
+
+    last_match_end = 0
+    current_segment_start = 0
+
+    for sentence in sentences:
         new_word_count = len(sentence.split())
-        word_count += new_word_count
-        current_segment_sentences.append(sentence.strip())
-        if word_count > max_length:
+
+        try:
+            sentence_start = text.index(sentence, last_match_end)
+        except ValueError:
+            # if sentences can't be located raise an error, as the tokenizer should not modify the text.
+            raise HTTPException(status_code=500, detail="Embedder failure.")
+
+        if word_count > 0 and word_count + new_word_count > max_length:
             segments.append(" ".join(current_segment_sentences))
+            segment_start_idx.append(current_segment_start)
+            segment_end_idx.append(last_match_end)
+
             current_segment_sentences = []
             word_count = 0
-            segment_start_idx.append(text.find(sentence) + len(sentence))
-            segment_end_idx.append(segment_start_idx[-1] - 1)
+            current_segment_start = sentence_start
+
+        current_segment_sentences.append(sentence.strip())
+        word_count += new_word_count
+        last_match_end = sentence_start + len(sentence)
+
+    # Add the final segment
     if current_segment_sentences:
         segments.append(" ".join(current_segment_sentences))
-        segment_end_idx.append(len(text) - 1)
-    if len(segment_start_idx) > len(segment_end_idx):
-        segment_start_idx.pop()
+        segment_start_idx.append(current_segment_start)
+        segment_end_idx.append(last_match_end)
+
     return segments, segment_start_idx, segment_end_idx
 
 
