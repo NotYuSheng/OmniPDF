@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class EnhancedQueryValidator:
-    """Enhanced query validation system for Qwen2.5"""
+    """Enhanced query validation system for LLM"""
     
     def __init__(self):
         self.validation_examples = self._get_validation_examples()
@@ -166,36 +166,36 @@ class QueryType(Enum):
     SUMMARIZATION = "summarization"
 
 
-class QwenRAGConfig:
-    """Configuration class for Qwen-2.5 RAG optimization"""
+class RAGConfig:
+    """Configuration class for the model's RAG optimization"""
     
     def __init__(self):
-        self.model_name = os.getenv("OPENAI_MODEL", "qwen2.5-0.5b-instruct")
+        self.model_name = os.getenv("OPENAI_MODEL", "Qwen2.5-14B-Coder-Instruct")
         
-        # Qwen-2.5 generation parameters optimized for RAG
+        # LLM's Generation parameters optimized for RAG
         self.generation_params = {
-            "temperature": float(os.getenv("QWEN_TEMPERATURE", "0.1")),
-            "max_tokens": int(os.getenv("QWEN_MAX_TOKENS", "2000")),
-            "top_p": float(os.getenv("QWEN_TOP_P", "0.8")),
-            "frequency_penalty": float(os.getenv("QWEN_FREQ_PENALTY", "0.1")),
-            "presence_penalty": float(os.getenv("QWEN_PRESENCE_PENALTY", "0.1")),
+            "temperature": float(os.getenv("MODEL_TEMPERATURE", "0.1")),
+            "max_tokens": int(os.getenv("MODEL_MAX_TOKENS", "2000")),
+            "top_p": float(os.getenv("MODEL_TOP_P", "0.8")),
+            "frequency_penalty": float(os.getenv("MODEL_FREQ_PENALTY", "0.1")),
+            "presence_penalty": float(os.getenv("MODEL_PRESENCE_PENALTY", "0.1")),
         }
         
         # Query parameters (lighter settings for query validation and classification)
         self.validation_params = {
             "temperature": 0.0,
             "max_tokens": 500,
-            "top_p": float(os.getenv("QWEN_TOP_P", "0.8")),
+            "top_p": float(os.getenv("MODEL_TOP_P", "0.8")),
             "frequency_penalty": 0.0,
             "presence_penalty": 0.0,
         }
         
         # Context management
-        self.max_context_length = int(os.getenv("QWEN_MAX_CONTEXT", "4000"))
+        self.max_context_length = int(os.getenv("MODEL_MAX_CONTEXT", "4000"))
         
         # RAG-specific settings
-        self.min_similarity_score = float(os.getenv("QWEN_MIN_SIMILARITY", "0.1"))
-        self.enable_reranking = os.getenv("QWEN_ENABLE_RERANKING", "true").lower() == "true"
+        self.min_similarity_score = float(os.getenv("MODEL_MIN_SIMILARITY", "0.1"))
+        self.enable_reranking = os.getenv("MODEL_ENABLE_RERANKING", "true").lower() == "true"
 
         # RAG Optimization flags
         self.enable_llm_query_classification = os.getenv("ENABLE_LLM_QUERY_CLASSIFICATION", "true").lower() == "true"
@@ -254,8 +254,8 @@ class QueryClassificationExamples:
             {"query": "What would you recommend for this situation?", "type": "general"},
         ]
 
-class QwenPromptTemplates:
-    """Specialized prompt templates for different types of RAG queries with Qwen-2.5"""
+class PromptTemplates:
+    """Specialized prompt templates for different types of RAG queries with LLM"""
     
     @staticmethod
     def get_classification_prompt(query: str) -> str:
@@ -293,7 +293,7 @@ Type:"""
         """Get system prompt based on query type"""
         
         prompts = {
-            QueryType.GENERAL.value: """You are Qwen, an advanced AI assistant specialized in document analysis and question answering.
+            QueryType.GENERAL.value: """You are an advanced AI assistant specialized in document analysis and question answering.
 
 Your primary responsibilities:
 - Analyze the provided document context carefully
@@ -308,7 +308,7 @@ Key principles:
 - Organize your response logically with clear reasoning
 - Maintain professional tone while being accessible""",
 
-            QueryType.FACTUAL.value: """You are Qwen, a precision-focused AI assistant for factual document analysis.
+            QueryType.FACTUAL.value: """You are a precision-focused AI assistant for factual document analysis.
 
 Your task is to extract and present factual information from documents with maximum accuracy:
 - Only state facts that are explicitly mentioned in the context
@@ -318,7 +318,7 @@ Your task is to extract and present factual information from documents with maxi
 - Distinguish between facts, opinions, and interpretations in the source
 - For lists or itemized information, present them in a clear, organized format""",
 
-            QueryType.ANALYTICAL.value: """You are Qwen, an analytical AI assistant specialized in document interpretation and analysis.
+            QueryType.ANALYTICAL.value: """You are an analytical AI assistant specialized in document interpretation and analysis.
 
 Your approach:
 - Analyze the document context for patterns, themes, and key insights
@@ -329,7 +329,7 @@ Your approach:
 - Structure analytical responses with clear reasoning chains
 - Consider multiple perspectives when the document presents them""",
 
-            QueryType.SUMMARIZATION.value: """You are Qwen, an expert at document summarization and synthesis.
+            QueryType.SUMMARIZATION.value: """You are an expert at document summarization and synthesis.
 
 Your summarization strategy:
 - Identify the main themes and key points from the context
@@ -379,8 +379,8 @@ Your summarization strategy:
         
         return prompt_formats.get(query_type, prompt_formats[QueryType.GENERAL.value])
 
-class QwenRAGOptimizer:
-    """Advanced optimization techniques for Qwen-2.5 RAG"""
+class RAGOptimizer:
+    """Advanced optimization techniques for RAG"""
     
     @staticmethod
     async def classify_query_with_llm(
@@ -391,7 +391,7 @@ class QwenRAGOptimizer:
     ) -> str:
         """Use LLM to classify query type with few-shot examples"""
         try:
-            classification_prompt = QwenPromptTemplates.get_classification_prompt(question)
+            classification_prompt = PromptTemplates.get_classification_prompt(question)
             
             messages = [
                 {
@@ -430,7 +430,7 @@ class QwenRAGOptimizer:
     async def detect_query_type(
         question: str, 
         model_name: str = None,
-        config: QwenRAGConfig = None,
+        config: RAGConfig = None,
         openai_client: AsyncOpenAI = None
     ) -> str:
         """
@@ -440,7 +440,7 @@ class QwenRAGOptimizer:
         if (config and config.enable_llm_query_classification and 
             openai_client and model_name):
             
-            llm_classification = await QwenRAGOptimizer.classify_query_with_llm(
+            llm_classification = await RAGOptimizer.classify_query_with_llm(
                 question, model_name, config.validation_params, openai_client
             )
             
@@ -450,8 +450,8 @@ class QwenRAGOptimizer:
         return QueryType.GENERAL.value
     
     @staticmethod
-    def optimize_chunks_for_qwen(chunks: List[Dict[str, Any]], max_context_length: int = 4000) -> tuple[List[Dict[str, Any]], str]:
-        """Optimize chunk selection and formatting specifically for Qwen-2.5"""
+    def chunk_optimization(chunks: List[Dict[str, Any]], max_context_length: int = 4000) -> tuple[List[Dict[str, Any]], str]:
+        """Optimize chunk selection and formatting"""
         
         if not chunks:
             return [], ""
@@ -464,7 +464,7 @@ class QwenRAGOptimizer:
         for i, chunk in enumerate(chunks):
             content = chunk.get('content', '')
             
-            # Format chunk for Qwen-2.5
+            # Format each chunk
             chunk_header = f"--- Document Section {i+1} (Relevance: {chunk.get('similarity_score', 0):.2f}) ---"
             formatted_chunk = f"{chunk_header}\n{content}\n"
             
@@ -480,8 +480,8 @@ class QwenRAGOptimizer:
         return selected_chunks, "\n".join(context_parts)
     
     @staticmethod
-    def post_process_qwen_response(response: str) -> str:
-        """Post-process Qwen-2.5 response for better formatting"""
+    def post_process_llm_response(response: str) -> str:
+        """Post-process LLM response for better formatting"""
         
         # Remove only consecutive duplicate lines to avoid breaking formatted content.
         lines = response.split('\n')

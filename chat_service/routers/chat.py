@@ -6,20 +6,20 @@ from shared_utils.chroma_client import get_chroma_client
 import logging
 import os
 from models.chat import ChatRequest, ChatResponse
-from models.rag_config import QwenRAGConfig, QwenPromptTemplates, QwenRAGOptimizer, QueryType, EnhancedQueryValidator
+from models.rag_config import RAGConfig, PromptTemplates, RAGOptimizer, QueryType, EnhancedQueryValidator
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 logger = logging.getLogger(__name__)
 
-# Initialize Qwen-2.5 RAG configuration
-qwen_config = QwenRAGConfig()
-prompt_templates = QwenPromptTemplates()
-qwen_optimizer = QwenRAGOptimizer()
+# Initialize RAG configuration for LLM
+rag_config = RAGConfig()
+prompt_templates = PromptTemplates()
+rag_optimizer = RAGOptimizer()
 query_validator = EnhancedQueryValidator()
 
-OPENAI_MODEL_NAME = qwen_config.model_name
-QWEN_TOP_K = int(os.getenv("QWEN_TOP_K"))
+OPENAI_MODEL_NAME = rag_config.model_name
+TOP_K = int(os.getenv("MODEL_TOP_K"))
 
 
 def prepare_retrieval_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -47,8 +47,8 @@ def prepare_retrieval_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:
         chunks.append(chunk)
     
     # Filter chunks by minimum similarity if configured
-    if qwen_config.min_similarity_score > 0:
-        chunks = [chunk for chunk in chunks if chunk['similarity_score'] >= qwen_config.min_similarity_score]
+    if rag_config.min_similarity_score > 0:
+        chunks = [chunk for chunk in chunks if chunk['similarity_score'] >= rag_config.min_similarity_score]
     
     return chunks
 
@@ -130,10 +130,10 @@ async def perform_rag_query(
         if enable_reranking and len(chunks) > 1:
             chunks = await rerank_chunks(chunks)
         
-        # Step 4: Optimize chunks for Qwen-2.5
-        optimized_chunks, context = qwen_optimizer.optimize_chunks_for_qwen(
+        # Step 4: Optimize chunks for LLM
+        optimized_chunks, context = rag_optimizer.chunk_optimization(
             chunks, 
-            max_context_length=qwen_config.max_context_length
+            max_context_length=rag_config.max_context_length
         )
 
         num_of_docs = len(set(chunk.get('doc_id') for chunk in optimized_chunks if chunk.get('doc_id')))
@@ -141,10 +141,10 @@ async def perform_rag_query(
         logger.info(f"Using {len(optimized_chunks)} chunks for context (total length: {len(context)} chars)")
 
         # Step 5: Enhanced query type detection
-        detected_query_type = await qwen_optimizer.detect_query_type(
+        detected_query_type = await rag_optimizer.detect_query_type(
             question=query,
             model_name=OPENAI_MODEL_NAME,
-            config=qwen_config,
+            config=rag_config,
             openai_client=openai_client
         )
         logger.info(f"Auto-detected query type: {detected_query_type}")
@@ -184,7 +184,7 @@ async def validate_query_with_llm(
     validation_prompt = query_validator.get_enhanced_validation_prompt(query, collection_info)
 
     try:
-        # Prepare messages for Qwen-2.5
+        # Prepare messages for LLM
         messages = [
             {
                 "role": "system",
@@ -199,7 +199,7 @@ async def validate_query_with_llm(
         response = await openai_client.chat.completions.create(
             model=model_name,
             messages=messages,
-            **qwen_config.validation_params
+            **rag_config.validation_params
         )
         
         result = response.choices[0].message.content.strip()
@@ -262,8 +262,8 @@ async def handle_chat(
                 query=chat_request.message,
                 collection_name=chat_request.collection_name,
                 doc_id=chat_request.doc_id,
-                top_k=QWEN_TOP_K,
-                enable_reranking=qwen_config.enable_reranking,
+                top_k=TOP_K,
+                enable_reranking=rag_config.enable_reranking,
             )
 
             metadata_with_rag = {
@@ -291,7 +291,7 @@ async def handle_chat(
                     metadata=metadata_with_rag
                 )
             
-            # Prepare messages for Qwen-2.5
+            # Prepare messages for LLM
             messages = [
                 {
                     "role": "system",
@@ -307,7 +307,7 @@ async def handle_chat(
             response = await client.chat.completions.create(
                 model=OPENAI_MODEL_NAME,
                 messages=messages,
-                **qwen_config.generation_params,
+                **rag_config.generation_params,
             )
         
     except APIError as e:
@@ -330,8 +330,8 @@ async def handle_chat(
         )
     
     # Post-process the response
-    if qwen_config.enable_response_post_processing:
-        processed_response = qwen_optimizer.post_process_qwen_response(first_choice.message.content)
+    if rag_config.enable_response_post_processing:
+        processed_response = rag_optimizer.post_process_llm_response(first_choice.message.content)
     else:
         processed_response = first_choice.message.content
     
