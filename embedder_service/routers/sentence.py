@@ -92,8 +92,8 @@ async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
 
 
 @router.post("/")
-async def pdf_embedder_service(request: DataRequest):
-    "Chunk up and embed data from PDF document into ChromaDB AsyncHTTPClient instance"
+async def sentence_embedder_service(request: DataRequest):
+    "Chunk up and embed data based on sentences into ChromaDB"
 
     try:
         # Extracted data has to be chunked up first
