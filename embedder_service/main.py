@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import health, semantic, token
+from routers import health, semantic, sentence
 import nltk
 import logging
 
@@ -20,4 +20,4 @@ app = FastAPI(root_path="/embedder", lifespan=lifespan)
 
 app.include_router(health.router)
 app.include_router(semantic.router)
-app.include_router(token.router)
+app.include_router(sentence.router)
