@@ -180,16 +180,16 @@ async def cascade_query(
     return await cascade_query(new_chunks, user_prompt, system_prompt, client)
 
 
-@router.get("/auth/{doc_id}")
+@router.get("/author/{doc_id}")
 async def get_authors(
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
-    system_prompt = "If the question cannot be answered, return a stop token."
+    system_prompt = "If the question cannot be answered, return only the stop token."
     user_prompt = """
     **DOCUMENT CONTEXT:**
     {context}
-    **SUMMARIZATION REQUEST:** Identify the Authors in the given document
+    **QUERY REQUEST:** Identify the Authors in the given document
 
     **INSTRUCTIONS:**
     Return the list of authors in the following format:
@@ -203,4 +203,31 @@ async def get_authors(
             )
         )
 
+    return await cascade_query(chunks, user_prompt, system_prompt, client)
+
+
+@router.get("/title/{doc_id}")
+async def get_title(
+    doc_id: str,
+    client: AsyncOpenAI = Depends(get_openai_client),
+):
+    system_prompt = "If the question cannot be answered, return only the stop token."
+    user_prompt = """
+    **DOCUMENT CONTEXT:**
+    {context}
+    **QUERY REQUEST:** Identify the title in the given document. If the title cannot be found, generate one based on the contents of the document.
+
+    **INSTRUCTIONS:**
+    Return the title in the following format:
+    Title: Title
+    """
+    chunks = []
+    async for chunk in get_chunk(doc_id):
+        chunks.append(
+            await get_model_response(
+                system_prompt, user_prompt.format(context=chunk), client
+            )
+        )
+    for hunk in chunks:
+        logger.info(hunk)
     return await cascade_query(chunks, user_prompt, system_prompt, client)
