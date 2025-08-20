@@ -160,3 +160,47 @@ async def get_summary(
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
     return await prepare_summaries(doc_id, client)
+
+
+async def cascade_query(
+    chunks: list[str],
+    user_prompt: str,
+    system_prompt: str,
+    client: AsyncOpenAI = Depends(get_openai_client),
+):
+    # Not ideal, will consume a lot of memory as prev chunks will not be gc till final set is gotten
+    if len(chunks) == 1:
+        return chunks[0]
+    new_chunks = []
+    for i in range(0, len(chunks), 8):
+        new_chunk_context = "\n".join(chunks[i : i + 8])
+        user_prompt = user_prompt.format(context=new_chunk_context)
+        new_chunks.append(await get_model_response(user_prompt, system_prompt, client))
+
+    return await cascade_query(new_chunks, user_prompt, system_prompt, client)
+
+
+@router.get("/auth/{doc_id}")
+async def get_authors(
+    doc_id: str,
+    client: AsyncOpenAI = Depends(get_openai_client),
+):
+    system_prompt = "If the question cannot be answered, return a stop token."
+    user_prompt = """
+    **DOCUMENT CONTEXT:**
+    {context}
+    **SUMMARIZATION REQUEST:** Identify the Authors in the given document
+
+    **INSTRUCTIONS:**
+    Return the list of authors in the following format:
+    Author: Author1, Author2, Author3, etc
+    """
+    chunks = []
+    async for chunk in get_chunk(doc_id):
+        chunks.append(
+            await get_model_response(
+                system_prompt, user_prompt.format(context=chunk), client
+            )
+        )
+
+    return await cascade_query(chunks, user_prompt, system_prompt, client)
