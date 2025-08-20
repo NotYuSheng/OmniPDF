@@ -5,7 +5,12 @@ from shared_utils.chroma_client import get_chroma_client
 import logging
 import os
 from metadata_service.models.metadata import MetadataRequest
-from models.rag_config import QwenRAGConfig, QwenPromptTemplates, QwenRAGOptimizer, QueryType
+from models.rag_config import (
+    QwenRAGConfig,
+    QwenPromptTemplates,
+    QwenRAGOptimizer,
+    QueryType,
+)
 
 router = APIRouter(prefix="/metadata")
 
@@ -24,33 +29,33 @@ MAX_CHUNK_IN_MEMORY = 10
 SUMMARY_LENGTH = 500
 EXECUTIVE_SUMMARY_LENGTH = 50
 
+
 async def get_chunk(doc_id: str):
     chroma_client = await get_chroma_client()
     collection = await chroma_client.get_collection(TEXTUAL_EMBEDDING_COLLECTION)
-    page = 0
-    results = await collection.get(where={"doc_id": doc_id}, limit=MAX_CHUNK_IN_MEMORY, page= page)
-    while results:
-        page += 1
-        for result in results:
+    offset = 0
+    results = await collection.get(
+        where={"doc_id": doc_id}, limit=MAX_CHUNK_IN_MEMORY, offset=offset
+    )
+    logger.info(results)
+    while results["documents"]:
+        offset += MAX_CHUNK_IN_MEMORY
+        for result in results["documents"]:
             yield result
-        results = await collection.get(where={"doc_id": doc_id}, limit=MAX_CHUNK_IN_MEMORY, page= page)
+        results = await collection.get(
+            where={"doc_id": doc_id}, limit=MAX_CHUNK_IN_MEMORY, offset=offset
+        )
 
 
 async def get_model_response(
-        system_prompt: str,
-        user_prompt: str,
-        client: AsyncOpenAI = Depends(get_openai_client),
+    system_prompt: str,
+    user_prompt: str,
+    client: AsyncOpenAI = Depends(get_openai_client),
 ):
     # Prepare messages for Qwen-2.5
     messages = [
-        {
-            "role": "system",
-            "content": system_prompt
-        },
-        {
-            "role": "user", 
-            "content": user_prompt
-        }
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
     ]
 
     try:
@@ -59,10 +64,12 @@ async def get_model_response(
             messages=messages,
             **qwen_config.generation_params,
         )
-        
+
     except APIError as e:
         logger.error(f"Unexpected error during chat completion: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Unexpected error during chat completion")
+        raise HTTPException(
+            status_code=500, detail="Unexpected error during chat completion"
+        )
 
     if not response.choices:
         logger.error("No choices found in OpenAI response: %s", response)
@@ -78,7 +85,7 @@ async def get_model_response(
             status_code=500,
             detail="Malformed choice in OpenAI response",
         )
-    
+
     processed_response = first_choice.message.content
     return processed_response
 
@@ -89,29 +96,67 @@ async def summarise_chunk(
 ):
     summary_len = SUMMARY_LENGTH if SUMMARY_LENGTH < len(context) else len(context)
     system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
-    user_prompt = prompt_templates.format_user_prompt(f"Prepare a summary of {summary_len} words. Return only the summary.", context, QueryType.SUMMARIZATION)
+    user_prompt = prompt_templates.format_user_prompt(
+        f"Prepare a single paragraph summary of {summary_len} words. Return only the summary.",
+        context,
+        QueryType.SUMMARIZATION,
+    )
     return await get_model_response(user_prompt, system_prompt, client)
 
 
-async def prepare_summary(
+async def cascade_summaries(
+    summaries: list[str],
+    client: AsyncOpenAI = Depends(get_openai_client),
+):
+    # Not ideal, will consume a lot of memory as prev summaries will not be gc till final set is gotten
+    if len(summaries) < 8:
+        return summaries
+    new_summaries = []
+    for i in range(len(summaries), 8):
+        new_summary_context = "\n".join(summaries[i : i + 8])
+        system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
+        user_prompt = prompt_templates.format_user_prompt(
+            f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
+            new_summary_context,
+            QueryType.SUMMARIZATION,
+        )
+        new_summaries.append(
+            await get_model_response(user_prompt, system_prompt, client)
+        )
+
+    return await cascade_summaries(new_summaries)
+
+
+async def prepare_summaries(
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
     summaries = []
-    for chunk in get_chunk(doc_id):
-        summaries.append(summarise_chunk(chunk, client))
+    async for chunk in get_chunk(doc_id):
+        summaries.append(await summarise_chunk(chunk, client))
 
     # naive assume that all chunks will fix in context
-    summary_context = "\n".join(summaries)
+    summary_context = "\n".join(await cascade_summaries(summaries))
 
     system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
-    user_prompt = prompt_templates.format_user_prompt(f"Prepare a summary of {SUMMARY_LENGTH} words. Return only the summary.", summary_context, QueryType.SUMMARIZATION)
-    return await get_model_response(user_prompt, system_prompt, client)
+    user_prompt = prompt_templates.format_user_prompt(
+        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
+        summary_context,
+        QueryType.SUMMARIZATION,
+    )
+    summary = await get_model_response(user_prompt, system_prompt, client)
+    user_prompt = prompt_templates.format_user_prompt(
+        f"Prepare a single paragraph summary of {EXECUTIVE_SUMMARY_LENGTH} words. Return only the summary.",
+        summary_context,
+        QueryType.SUMMARIZATION,
+    )
+    exacutive_summary = await get_model_response(user_prompt, system_prompt, client)
+    return {"summary": summary, "exacutive_summary": exacutive_summary}
+
 
 @router.get("/{doc_id}")
 async def get_summary(
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
-    return await prepare_summary(doc_id, client)
-    
+    return await prepare_summaries(doc_id, client)
