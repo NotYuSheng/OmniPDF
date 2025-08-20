@@ -231,3 +231,36 @@ async def get_title(
     for hunk in chunks:
         logger.info(hunk)
     return await cascade_query(chunks, user_prompt, system_prompt, client)
+
+
+@router.get("/keywords/{doc_id}")
+async def get_keywords(
+    doc_id: str,
+    client: AsyncOpenAI = Depends(get_openai_client),
+):
+    system_prompt = "If the question cannot be answered, return only the stop token."
+    user_prompt = """
+    **DOCUMENT CONTEXT:**
+    {context}
+    **QUERY REQUEST:** Identify the keywords in the given document.
+
+    **INSTRUCTIONS:**
+    Return the list of keywords in the following format:
+    keywords: keyword1, keyword2, keyword3, etc
+    """
+    chunks = []
+    async for chunk in get_chunk(doc_id):
+        chunks.append(
+            await get_model_response(
+                system_prompt, user_prompt.format(context=chunk), client
+            )
+        )
+
+    keywords = []
+    for chunk in chunks:
+        logger.info(chunk)
+        keywords_split = chunk.split("keywords:")
+        if len(keywords_split) <= 1:
+            continue
+        keywords.extend(keywords_split[-1].split(", "))
+    return list(set(keywords))
