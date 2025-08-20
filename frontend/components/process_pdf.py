@@ -75,11 +75,11 @@ async def check_backend():
                     logger.error(f'{service_name}, "status": {response.text}, "url": {url}')
                     logger.error(f"Health check: {response.text}")
                     return service_name, {"status": f"HTTP {response.status_code}", "url": url}
-        except httpx.ConnectError:
-            logger.error(f"Connection error for {service_name} at {url}")
+        except httpx.ConnectError as e:
+            logger.error(f"Connection error for {service_name} at {url}: {e}")
             return service_name, {"status": "Connection Error", "url": url}
-        except httpx.TimeoutException:
-            logger.error(f"Timeout error for {service_name} at {url}")
+        except httpx.TimeoutException as e:
+            logger.error(f"Timeout error for {service_name} at {url}: {e}")
             return service_name, {"status": "Timeout", "url": url}
         except Exception as e:
             logger.error(f"Unexpected error for {service_name} at {url}: {e}")

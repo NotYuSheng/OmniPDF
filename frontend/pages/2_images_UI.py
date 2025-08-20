@@ -28,8 +28,8 @@ async def get_images(doc_id, max_retries=60, delay=1):
                     else:
                         server_status.info("Successfully retrieved images")
                         logger.info(f"Image extraction response: {response}")
-                except json.JSONDecodeError:
-                    logger.error(f"Failed to decode JSON from response: {response.text}")
+                except json.JSONDecodeError as e:
+                    logger.error(f"Failed to decode JSON from response: {response.text}: {e}")
                     server_status.error("Received an invalid response from the server.")
                 
                 if response.status_code == 200:
