@@ -1,0 +1,2815 @@
+{
+    "doc_id": "ccd31308-edf4-4479-929e-48306dc3f0b2",
+    "docling": {
+      "schema_name": "DoclingDocument",
+      "version": "1.5.0",
+      "name": "original",
+      "origin": {
+        "mimetype": "application/pdf",
+        "binary_hash": 18163467616516796000,
+        "filename": "original.pdf"
+      },
+      "furniture": {
+        "self_ref": "#/furniture",
+        "children": [],
+        "content_layer": "furniture",
+        "name": "_root_",
+        "label": "unspecified"
+      },
+      "texts": [
+        {
+          "self_ref": "#/texts/0",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 738.997,
+                "r": 220.747,
+                "b": 718.969,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                17
+              ]
+            }
+          ],
+          "orig": "Cambridge O Level",
+          "text": "Cambridge O Level",
+          "level": 1,
+          "translated_text": "剑桥O水准"
+        },
+        {
+          "self_ref": "#/texts/1",
+          "parent": {
+            "$ref": "#/pictures/1"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 42.397,
+                "t": 617.862,
+                "r": 48.144,
+                "b": 514.806,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                12
+              ]
+            }
+          ],
+          "orig": "*0123456789*",
+          "text": "*0123456789*",
+          "translated_text": "*0123456789*"
+        },
+        {
+          "self_ref": "#/texts/2",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 686.399,
+                "r": 171.59,
+                "b": 674.16,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                16
+              ]
+            }
+          ],
+          "orig": "ENGLISH LANGUAGE",
+          "text": "ENGLISH LANGUAGE",
+          "level": 1,
+          "translated_text": "英语语言"
+        },
+        {
+          "self_ref": "#/texts/3",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 499.495,
+                "t": 686.399,
+                "r": 538.634,
+                "b": 674.16,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                7
+              ]
+            }
+          ],
+          "orig": "1123/01",
+          "text": "1123/01",
+          "translated_text": "1123/01"
+        },
+        {
+          "self_ref": "#/texts/4",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 665.496,
+                "r": 131.712,
+                "b": 654.37,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                15
+              ]
+            }
+          ],
+          "orig": "Paper 1 Reading",
+          "text": "Paper 1 Reading",
+          "translated_text": "阅读理解一"
+        },
+        {
+          "self_ref": "#/texts/5",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 411.374,
+                "t": 665.496,
+                "r": 538.617,
+                "b": 654.37,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                25
+              ]
+            }
+          ],
+          "orig": "For examination from 2024",
+          "text": "For examination from 2024",
+          "translated_text": "2024年考试用"
+        },
+        {
+          "self_ref": "#/texts/6",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 645.495,
+                "r": 148.196,
+                "b": 634.368,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                15
+              ]
+            }
+          ],
+          "orig": "SPECIMEN INSERT",
+          "text": "SPECIMEN INSERT",
+          "translated_text": "样品插入物"
+        },
+        {
+          "self_ref": "#/texts/7",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 502.528,
+                "t": 645.495,
+                "r": 538.63,
+                "b": 634.368,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                7
+              ]
+            }
+          ],
+          "orig": "2 hours",
+          "text": "2 hours",
+          "translated_text": "2小时"
+        },
+        {
+          "self_ref": "#/texts/8",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 616.901,
+                "r": 129.997,
+                "b": 605.775,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                11
+              ]
+            }
+          ],
+          "orig": "INFORMATION",
+          "text": "INFORMATION",
+          "level": 1,
+          "translated_text": "信息"
+        },
+        {
+          "self_ref": "#/texts/9",
+          "parent": {
+            "$ref": "#/groups/1"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "list_item",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 603.9,
+                "r": 265.29,
+                "b": 592.773,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                44
+              ]
+            }
+          ],
+          "orig": "● This insert contains the reading passages.",
+          "text": "● This insert contains the reading passages.",
+          "enumerated": false,
+          "marker": "",
+          "translated_text": "这个插页包含阅读文章。"
+        },
+        {
+          "self_ref": "#/texts/10",
+          "parent": {
+            "$ref": "#/groups/2"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "list_item",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 590.898,
+                "r": 536.219,
+                "b": 566.77,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                110
+              ]
+            }
+          ],
+          "orig": "● You may annotate this insert and use the blank spaces for planning. Do not write your answers on the insert.",
+          "text": "● You may annotate this insert and use the blank spaces for planning. Do not write your answers on the insert.",
+          "enumerated": false,
+          "marker": "",
+          "translated_text": "您可以对这张插页进行标注，并利用空白处进行规划，但不要在插页上写下您的答案。"
+        },
+        {
+          "self_ref": "#/texts/11",
+          "parent": {
+            "$ref": "#/groups/0"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 42.397,
+                "t": 617.862,
+                "r": 48.144,
+                "b": 514.806,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                12
+              ]
+            }
+          ],
+          "orig": "*0123456789*",
+          "text": "*0123456789*",
+          "translated_text": "*0123456789*"
+        },
+        {
+          "self_ref": "#/texts/12",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 165.352,
+                "t": 109.30799999999999,
+                "r": 429.957,
+                "b": 98.18100000000004,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                57
+              ]
+            }
+          ],
+          "orig": "This document has 6 pages. Any blank pages are indicated.",
+          "text": "This document has 6 pages. Any blank pages are indicated.",
+          "translated_text": "该文档共有6页。空白页已注明。"
+        },
+        {
+          "self_ref": "#/texts/13",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 56.7,
+                "t": 63.754999999999995,
+                "r": 236.883,
+                "b": 54.85299999999995,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021",
+          "translated_text": "© 牛津大学出版社及评估 2021"
+        },
+        {
+          "self_ref": "#/texts/14",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 489.939,
+                "t": 65.55899999999997,
+                "r": 538.622,
+                "b": 54.43299999999999,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                10
+              ]
+            }
+          ],
+          "orig": "[Turn over",
+          "text": "[Turn over",
+          "translated_text": "[翻页]"
+        },
+        {
+          "self_ref": "#/texts/15",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 294.616,
+                "t": 804.468,
+                "r": 300.716,
+                "b": 792.229,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "2",
+          "text": "2",
+          "translated_text": "二"
+        },
+        {
+          "self_ref": "#/texts/16",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 779.103,
+                "r": 424.448,
+                "b": 766.864,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                71
+              ]
+            }
+          ],
+          "orig": "Read Text A and answer Question 1 and Question 2 on the question paper.",
+          "text": "Read Text A and answer Question 1 and Question 2 on the question paper.",
+          "translated_text": "阅读文本A，并在答题纸上回答问题1和问题2。"
+        },
+        {
+          "self_ref": "#/texts/17",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 753.1,
+                "r": 140.06,
+                "b": 740.861,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                16
+              ]
+            }
+          ],
+          "orig": "Text A: Nameless",
+          "text": "Text A: Nameless",
+          "level": 1,
+          "translated_text": "无名"
+        },
+        {
+          "self_ref": "#/texts/18",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 728.089,
+                "r": 517.339,
+                "b": 689.847,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                231
+              ]
+            }
+          ],
+          "orig": "Mo and Marwood have finally found Nameless. They had been looking for this large redwood tree that no one had ever attempted to climb before. Redwood trees can live for more than 2000 years and are the world's tallest living trees.",
+          "text": "Mo and Marwood have finally found Nameless. They had been looking for this large redwood tree that no one had ever attempted to climb before. Redwood trees can live for more than 2000 years and are the world's tallest living trees.",
+          "translated_text": "莫和马鲁伍德终于找到了那棵无名巨红杉树。他们一直在寻找这棵从来没有人尝试攀爬过的巨大的红杉树。红杉树可以活超过两千年，是世界上最高的树木。"
+        },
+        {
+          "self_ref": "#/texts/19",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 676.083,
+                "r": 517.374,
+                "b": 624.839,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                300
+              ]
+            }
+          ],
+          "orig": "Mo and Marwood stood at the base of Nameless, peering upwards into its crown. The structure of any redwood tree is the opposite of most trees, whose branches get smaller towards the top. Nameless, this ancient giant of the forest, grew increasingly complicated and more massive higher off the ground.",
+          "text": "Mo and Marwood stood at the base of Nameless, peering upwards into its crown. The structure of any redwood tree is the opposite of most trees, whose branches get smaller towards the top. Nameless, this ancient giant of the forest, grew increasingly complicated and more massive higher off the ground.",
+          "translated_text": "莫和马伍德站在无名红杉的底部，抬头仰望着它的树冠。任何一棵红杉的结构都与其他树木相反，其他树木的树枝在顶部会变得越来越细小，而这棵古老的森林巨人在离地面更高的地方却变得越来越复杂、越来越庞大。"
+        },
+        {
+          "self_ref": "#/texts/20",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 611.075,
+                "r": 517.36,
+                "b": 546.83,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                399
+              ]
+            }
+          ],
+          "orig": "The tree was about 100 metres tall with a diameter of about 3 metres near its base. The trunk was an enormous cylinder of soft crumbly bark. Far above the ground, a few small wispy branches popped out of the trunk, but there were no branches on its lower reaches. Higher up still, a tangle of limbs emerged and wandered out of sight, buried in clouds of foliage. Mo and Marwood couldn't see its top.",
+          "text": "The tree was about 100 metres tall with a diameter of about 3 metres near its base. The trunk was an enormous cylinder of soft crumbly bark. Far above the ground, a few small wispy branches popped out of the trunk, but there were no branches on its lower reaches. Higher up still, a tangle of limbs emerged and wandered out of sight, buried in clouds of foliage. Mo and Marwood couldn't see its top.",
+          "translated_text": "这棵树大约有100米高，树干底部直径约为3米。树干是一个巨大的由松软易碎树皮构成的圆柱体。离地面很高处，从树干中伸出几根细小的枝条，但树的下部没有树枝。再往上，一些错综复杂的枝丫冒出来，隐没在茂密的树叶之中。墨和马伍德看不到树顶。"
+        },
+        {
+          "self_ref": "#/texts/21",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 533.066,
+                "r": 517.386,
+                "b": 403.813,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                919
+              ]
+            }
+          ],
+          "orig": "Marwood recalled that in ideal conditions, a redwood can grow from a seed into a tree that's an astonishing 16 metres tall in just its first 20 years of life, increasing in height by nearly a metre annually. After that, it grows faster still. Adding mass at an accelerating rate, it can exceed 75 cm in diameter at chest height in fewer than 60 years. The growth of redwoods generally slows down after the first 100 years, though by the age of eight hundred, they may have reached a height as tall as a 30-storey building. Redwoods are shade-tolerant. They can survive in dark places at the bottom of a forest, in the deep shade of their elders, where few other trees would survive. A small redwood living in deep shade hardly grows at all, but doesn't die; it goes into a kind of suspended animation. If it is hit by light, it once again grows with relentless speed. Nameless had clearly basked in light - it was huge.",
+          "text": "Marwood recalled that in ideal conditions, a redwood can grow from a seed into a tree that's an astonishing 16 metres tall in just its first 20 years of life, increasing in height by nearly a metre annually. After that, it grows faster still. Adding mass at an accelerating rate, it can exceed 75 cm in diameter at chest height in fewer than 60 years. The growth of redwoods generally slows down after the first 100 years, though by the age of eight hundred, they may have reached a height as tall as a 30-storey building. Redwoods are shade-tolerant. They can survive in dark places at the bottom of a forest, in the deep shade of their elders, where few other trees would survive. A small redwood living in deep shade hardly grows at all, but doesn't die; it goes into a kind of suspended animation. If it is hit by light, it once again grows with relentless speed. Nameless had clearly basked in light - it was huge.",
+          "translated_text": "马伍德回忆起，在理想条件下，红杉树从种子成长为一棵高达惊人的16米的树木只需20年时间，每年平均增长近一米。之后，它的生长速度还会更快。以加速的速度增加质量，它在不到60年内胸高处直径就能超过75厘米。红杉树的生长速度通常在最初的100年后会放缓，但到了800岁的时候，它们的高度可能与一座30层楼高的建筑相当。红杉树耐阴，可以在森林底部、在其他树木的浓荫下生存，而大多数其他树木在这种环境下是无法存活的。生活在深阴中的小红杉几乎不生长，但也不会死亡；它进入了一种类似休眠的状态。一旦受到光照，它又会以惊人的速度生长。显然，“无名”红杉树沐浴在了阳光下——它是巨大的。"
+        },
+        {
+          "self_ref": "#/texts/22",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 390.049,
+                "r": 409.367,
+                "b": 377.81,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                76
+              ]
+            }
+          ],
+          "orig": "'You aren't going to try to climb it, are you?' asked Marwood incredulously.",
+          "text": "'You aren't going to try to climb it, are you?' asked Marwood incredulously.",
+          "translated_text": "马伍德难以置信地问道：“你不会是要爬上去吧？”"
+        },
+        {
+          "self_ref": "#/texts/23",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 364.046,
+                "r": 104.632,
+                "b": 351.807,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                10
+              ]
+            }
+          ],
+          "orig": "No answer.",
+          "text": "No answer.",
+          "translated_text": "没有回答。"
+        },
+        {
+          "self_ref": "#/texts/24",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 338.043,
+                "r": 517.382,
+                "b": 299.80099999999993,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                203
+              ]
+            }
+          ],
+          "orig": "Mo looked again at the lowest branch of a smaller tree standing next to Nameless. Without warning, he leapt, grabbed and swung himself up onto the branch in one fluid movement and began climbing upwards.",
+          "text": "Mo looked again at the lowest branch of a smaller tree standing next to Nameless. Without warning, he leapt, grabbed and swung himself up onto the branch in one fluid movement and began climbing upwards.",
+          "translated_text": "墨寻又看了一眼身旁无名旁边一棵较小树木上最低的树枝，不作任何预警，他猛地一跃，抓住树枝荡了上去，开始向上攀爬。"
+        },
+        {
+          "self_ref": "#/texts/25",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 286.03700000000003,
+                "r": 373.051,
+                "b": 273.798,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                68
+              ]
+            }
+          ],
+          "orig": "'I really don't think that's very smart,' Marwood warned from below.",
+          "text": "'I really don't think that's very smart,' Marwood warned from below.",
+          "translated_text": "“我觉得那样并不聪明。”马伍德从下面警告说。"
+        },
+        {
+          "self_ref": "#/texts/26",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 260.034,
+                "r": 517.387,
+                "b": 195.789,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                461
+              ]
+            }
+          ],
+          "orig": "Ten minutes later, Mo arrived at the top of the smaller tree. The tree had narrowed to a pole thinner than his wrist, and began swaying under his weight. Having got as high as he could go, Mo looked across at Nameless and spotted a spray of slender branches on the curving wall of its monstrous trunk. A little branch stuck out, directly in front of him. Mo wanted to grab that branch. He edged closer to it, and the smaller tree began to bend under his weight.",
+          "text": "Ten minutes later, Mo arrived at the top of the smaller tree. The tree had narrowed to a pole thinner than his wrist, and began swaying under his weight. Having got as high as he could go, Mo looked across at Nameless and spotted a spray of slender branches on the curving wall of its monstrous trunk. A little branch stuck out, directly in front of him. Mo wanted to grab that branch. He edged closer to it, and the smaller tree began to bend under his weight.",
+          "translated_text": "十分钟后，莫爬到了那棵较小的树顶。这棵树已经细得像一根比他手腕还细的杆子，在他的重量下开始摇晃起来。爬到不能再往上之后，莫看向无名，发现它那巨大的树干曲面上有一簇纤细的枝条。其中一根小枝正好对着他。莫想要抓住那根枝条，于是他慢慢靠近，较小的树在他的重量下开始弯曲。"
+        },
+        {
+          "self_ref": "#/texts/27",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 182.02499999999998,
+                "r": 517.385,
+                "b": 130.78200000000004,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                345
+              ]
+            }
+          ],
+          "orig": "There was a gap between the branch of the smaller tree and Nameless. From the ground, Mo hadn't noticed that gap, expecting that the little tree's branches touched the big tree's branches, providing a bridge to walk across. Mo studied the situation. If he could just reach out far enough, he might be able to grab that little branch on Nameless.",
+          "text": "There was a gap between the branch of the smaller tree and Nameless. From the ground, Mo hadn't noticed that gap, expecting that the little tree's branches touched the big tree's branches, providing a bridge to walk across. Mo studied the situation. If he could just reach out far enough, he might be able to grab that little branch on Nameless.",
+          "translated_text": "那棵小树的枝条与无名之间有一段距离，莫从地面没有注意到这个空隙，还以为小树的枝条碰到了大树的枝条，可以当作桥来走过去。莫仔细观察了一下，如果他能够再伸长一点的话，或许就能够到无名的那根小枝了。"
+        },
+        {
+          "self_ref": "#/texts/28",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 117.01800000000003,
+                "r": 517.328,
+                "b": 52.773000000000025,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                428
+              ]
+            }
+          ],
+          "orig": "Trying not to think about how high up he was, Mo focused his mind on the problem. The gap was really not very large, he thought. He would have to let go of the small redwood and make a leap up into the big tree, and grasp a branch with his hands, like a circus performer catching the bar of a swinging trapeze. He had to jump high, or his body wouldn't clear the branches of the smaller tree and he'd get tangled and would fall.",
+          "text": "Trying not to think about how high up he was, Mo focused his mind on the problem. The gap was really not very large, he thought. He would have to let go of the small redwood and make a leap up into the big tree, and grasp a branch with his hands, like a circus performer catching the bar of a swinging trapeze. He had to jump high, or his body wouldn't clear the branches of the smaller tree and he'd get tangled and would fall.",
+          "translated_text": "莫离尽量不去想自己有多高，而是把心思放在眼前的难题上。他觉得这个缝隙其实并不大，只要松开那棵小红树，纵身一跃跳到大树上，用手抓住一根树枝就好，就像马戏团的演员接住秋千上的横杆一样。但是必须跳得足够高，否则身体过不了小树的枝丫，就会被缠住摔下来。"
+        },
+        {
+          "self_ref": "#/texts/29",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 539.62,
+                "t": 611.075,
+                "r": 545.719,
+                "b": 598.836,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "5",
+          "text": "5",
+          "translated_text": "五"
+        },
+        {
+          "self_ref": "#/texts/30",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 533.066,
+                "r": 545.7,
+                "b": 520.827,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "10",
+          "text": "10",
+          "translated_text": "10"
+        },
+        {
+          "self_ref": "#/texts/31",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 468.059,
+                "r": 545.7,
+                "b": 455.819,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "15",
+          "text": "15",
+          "translated_text": "十五"
+        },
+        {
+          "self_ref": "#/texts/32",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 390.049,
+                "r": 545.7,
+                "b": 377.81,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "20",
+          "text": "20",
+          "translated_text": "二十"
+        },
+        {
+          "self_ref": "#/texts/33",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 286.03700000000003,
+                "r": 545.7,
+                "b": 273.798,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "25",
+          "text": "25",
+          "translated_text": "二十五"
+        },
+        {
+          "self_ref": "#/texts/34",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 208.02800000000002,
+                "r": 545.7,
+                "b": 195.789,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "30",
+          "text": "30",
+          "translated_text": "三十"
+        },
+        {
+          "self_ref": "#/texts/35",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 533.502,
+                "t": 117.01800000000003,
+                "r": 545.7,
+                "b": 104.779,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "35",
+          "text": "35",
+          "translated_text": "三十五"
+        },
+        {
+          "self_ref": "#/texts/36",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 49.613,
+                "t": 43.90999999999997,
+                "r": 229.796,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021",
+          "translated_text": "© 牛津大学出版社及评估 2021"
+        },
+        {
+          "self_ref": "#/texts/37",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 2,
+              "bbox": {
+                "l": 273.059,
+                "t": 43.90999999999997,
+                "r": 322.275,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                13
+              ]
+            }
+          ],
+          "orig": "1123/01/SI/24",
+          "text": "1123/01/SI/24",
+          "translated_text": "1123/01/SI/24"
+        },
+        {
+          "self_ref": "#/texts/38",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 294.616,
+                "t": 804.468,
+                "r": 300.716,
+                "b": 792.229,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "3",
+          "text": "3",
+          "translated_text": "三"
+        },
+        {
+          "self_ref": "#/texts/39",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 779.103,
+                "r": 517.357,
+                "b": 753.863,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                175
+              ]
+            }
+          ],
+          "orig": "If I was standing on the ground and I had to make this jump, I could do it, he thought. So why not up here? He tried to force his hand to just let go of the tree. Just let go.",
+          "text": "If I was standing on the ground and I had to make this jump, I could do it, he thought. So why not up here? He tried to force his hand to just let go of the tree. Just let go.",
+          "translated_text": "如果我站在地上，要做这个跳跃的话，我可以做到的，他心想。那么在这里为什么不行呢？他努力让自己的手放开那棵树。放手就好了。"
+        },
+        {
+          "self_ref": "#/texts/40",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 740.099,
+                "r": 517.37,
+                "b": 714.858,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                128
+              ]
+            }
+          ],
+          "orig": "'I can't watch,' Marwood shouted furiously from below and closed his eyes. He dreaded hearing a scream followed by a meaty thud.",
+          "text": "'I can't watch,' Marwood shouted furiously from below and closed his eyes. He dreaded hearing a scream followed by a meaty thud.",
+          "translated_text": "“我受不了了。”马伍德从下面愤怒地喊道，然后闭上了眼睛。他害怕听到一声尖叫后紧接着传来一声沉闷的撞击声。"
+        },
+        {
+          "self_ref": "#/texts/41",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 701.094,
+                "r": 263.02,
+                "b": 688.855,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                45
+              ]
+            }
+          ],
+          "orig": "In the top of the tree Mo let go, and jumped.",
+          "text": "In the top of the tree Mo let go, and jumped.",
+          "translated_text": "在树顶，莫松手跳了下去。"
+        },
+        {
+          "self_ref": "#/texts/42",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 675.091,
+                "r": 545.7,
+                "b": 610.846,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                399
+              ]
+            }
+          ],
+          "orig": "He felt gravity go to zero. The world stopped. Mo watched the branch of the large redwood approach in slow motion and saw his fingers extend towards it. There was a jerk and he found himself hanging from the branch by both hands, bouncing with his feet kicking the air. Swinging hand-over-hand, he got himself over to the trunk and climbed the next three precarious metres onto a stronger branch. 45",
+          "text": "He felt gravity go to zero. The world stopped. Mo watched the branch of the large redwood approach in slow motion and saw his fingers extend towards it. There was a jerk and he found himself hanging from the branch by both hands, bouncing with his feet kicking the air. Swinging hand-over-hand, he got himself over to the trunk and climbed the next three precarious metres onto a stronger branch. 45",
+          "translated_text": "他感到重力归零，世界停止了。莫看到巨大的红杉树枝以慢动作向自己靠近，同时看到自己的手指伸向它。突然一震，他发现自己双手抓着树枝，双脚在空中晃动。他用手倒立着移动到树干上，然后爬上了接下来的三米，到达了一个更稳固的树枝上。"
+        },
+        {
+          "self_ref": "#/texts/43",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 597.082,
+                "r": 517.373,
+                "b": 467.829,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                871
+              ]
+            }
+          ],
+          "orig": "He had arrived somewhere in the lower tiers of Nameless, just below the crown of the huge tree. The branches here were bigger and closer together. There was foliage everywhere - above, below, and on all sides - layer upon layer of leaves, like tents within tents. The tree hadn't looked so big from the ground. Climbing upwards slowly and steadily through the labyrinth, Mo lost sight of the ground. It felt as if he was passing through a membrane and entering another world. His senses were overwhelmed by an impression of life all around. Flaky, grey-green, and brownish plants, in all manner of shapes, hung from branches - drippy, frizzy, stringy, and hairy. He began picking pieces off, tucking them into his pocket. As he neared the upper surface of the redwood canopy, the lacework of branches glowed with varied shades of green and he broke out into the sunlight.",
+          "text": "He had arrived somewhere in the lower tiers of Nameless, just below the crown of the huge tree. The branches here were bigger and closer together. There was foliage everywhere - above, below, and on all sides - layer upon layer of leaves, like tents within tents. The tree hadn't looked so big from the ground. Climbing upwards slowly and steadily through the labyrinth, Mo lost sight of the ground. It felt as if he was passing through a membrane and entering another world. His senses were overwhelmed by an impression of life all around. Flaky, grey-green, and brownish plants, in all manner of shapes, hung from branches - drippy, frizzy, stringy, and hairy. He began picking pieces off, tucking them into his pocket. As he neared the upper surface of the redwood canopy, the lacework of branches glowed with varied shades of green and he broke out into the sunlight.",
+          "translated_text": "他来到了无名之树较低的层级，就在那棵巨大树木树冠的下方。这里的树枝更加粗大且密集，周围到处都是树叶，上下左右层层叠叠，如同帐篷中的帐篷一般。从地面看，这棵树并没有这么庞大。在迷宫般的树干中缓慢而稳定地向上攀爬时，墨失去了对地面的视线。仿佛穿过了一层膜，进入了一个全新的世界，四周的生命气息扑面而来。各种形状的灰绿色、褐色和鳞片状植物悬挂在枝头，有的滴着水珠，有的蓬松纠结，有的细长如丝，有的毛茸茸的。他开始摘取一些放入口袋中。当他接近红木树冠的上表面时，交织的树枝呈现出各种绿色的光芒，他终于突破树冠，沐浴在阳光下。"
+        },
+        {
+          "self_ref": "#/texts/44",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 454.065,
+                "r": 517.396,
+                "b": 428.825,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                102
+              ]
+            }
+          ],
+          "orig": "An hour after he'd jumped into it, Mo arrived at the top of Nameless. 'It's do-able.' he shouted down.",
+          "text": "An hour after he'd jumped into it, Mo arrived at the top of Nameless. 'It's do-able.' he shouted down.",
+          "translated_text": "莫在跳入一小时后到达了无名的顶端。“做得到！”他朝下喊道。"
+        },
+        {
+          "self_ref": "#/texts/45",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 533.502,
+                "t": 597.082,
+                "r": 545.7,
+                "b": 584.843,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "50",
+          "text": "50",
+          "translated_text": "五十"
+        },
+        {
+          "self_ref": "#/texts/46",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 533.502,
+                "t": 532.074,
+                "r": 545.7,
+                "b": 519.835,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "55",
+          "text": "55",
+          "translated_text": "五十五"
+        },
+        {
+          "self_ref": "#/texts/47",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 533.502,
+                "t": 454.065,
+                "r": 545.7,
+                "b": 441.826,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "60",
+          "text": "60",
+          "translated_text": "六十"
+        },
+        {
+          "self_ref": "#/texts/48",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 533.502,
+                "t": 779.103,
+                "r": 545.7,
+                "b": 766.864,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "40",
+          "text": "40",
+          "translated_text": "四十"
+        },
+        {
+          "self_ref": "#/texts/49",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 49.613,
+                "t": 43.90999999999997,
+                "r": 229.796,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021",
+          "translated_text": "© 牛津大学出版社及评估 2021"
+        },
+        {
+          "self_ref": "#/texts/50",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 273.059,
+                "t": 43.90999999999997,
+                "r": 322.275,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                13
+              ]
+            }
+          ],
+          "orig": "1123/01/SI/24",
+          "text": "1123/01/SI/24",
+          "translated_text": "1123/01/SI/24"
+        },
+        {
+          "self_ref": "#/texts/51",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 3,
+              "bbox": {
+                "l": 492.155,
+                "t": 46.615999999999985,
+                "r": 545.707,
+                "b": 34.37699999999995,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                10
+              ]
+            }
+          ],
+          "orig": "[Turn over",
+          "text": "[Turn over",
+          "translated_text": "[翻页]"
+        },
+        {
+          "self_ref": "#/texts/52",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 294.616,
+                "t": 804.468,
+                "r": 300.716,
+                "b": 792.229,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "4",
+          "text": "4",
+          "translated_text": "四"
+        },
+        {
+          "self_ref": "#/texts/53",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 779.103,
+                "r": 343.543,
+                "b": 766.864,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                56
+              ]
+            }
+          ],
+          "orig": "Read Text B and answer Question 3 on the question paper.",
+          "text": "Read Text B and answer Question 3 on the question paper.",
+          "translated_text": "阅读文本B，并在答题纸上回答问题3。"
+        },
+        {
+          "self_ref": "#/texts/54",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 753.1,
+                "r": 214.231,
+                "b": 740.861,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                31
+              ]
+            }
+          ],
+          "orig": "Text B: A night among the trees",
+          "text": "Text B: A night among the trees",
+          "level": 1,
+          "translated_text": "夜宿林中"
+        },
+        {
+          "self_ref": "#/texts/55",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 728.089,
+                "r": 490.857,
+                "b": 715.85,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                94
+              ]
+            }
+          ],
+          "orig": "The writer of this review has just returned from a visit to the Treehotel, in northern Sweden.",
+          "text": "The writer of this review has just returned from a visit to the Treehotel, in northern Sweden.",
+          "translated_text": "这位评论的作者刚刚从瑞典北部的Treehotel参观回来。"
+        },
+        {
+          "self_ref": "#/texts/56",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 702.086,
+                "r": 517.382,
+                "b": 650.842,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                310
+              ]
+            }
+          ],
+          "orig": "Recently, I watched a documentary film called 'The Tree Lover' - all about the link between trees and people. In the film, director Jonas Augustsén says: 'Imagine relaxing here on summer evenings …'. He's sitting in a treehouse he's spent months building, looking out over a wide forest lit by the setting sun.",
+          "text": "Recently, I watched a documentary film called 'The Tree Lover' - all about the link between trees and people. In the film, director Jonas Augustsén says: 'Imagine relaxing here on summer evenings …'. He's sitting in a treehouse he's spent months building, looking out over a wide forest lit by the setting sun.",
+          "translated_text": "最近我看了一部名为《树之恋》的纪录片，讲述了树木与人之间的联系。在影片中，导演乔纳斯·奥古斯滕说：“想象一下，在夏天的傍晚放松在这里……”他坐在自己花了数月时间建造的树屋里，俯瞰着落日余晖照耀下的广阔森林。"
+        },
+        {
+          "self_ref": "#/texts/57",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 637.078,
+                "r": 517.343,
+                "b": 598.836,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                244
+              ]
+            }
+          ],
+          "orig": "And guess what? It turns out you don't have to just imagine it. Since the Treehotel in northern Sweden opened last month, you too can live out your childhood dream and holiday in a treehouse, surveying the landscape. I simply had to try it out!",
+          "text": "And guess what? It turns out you don't have to just imagine it. Since the Treehotel in northern Sweden opened last month, you too can live out your childhood dream and holiday in a treehouse, surveying the landscape. I simply had to try it out!",
+          "translated_text": "而且猜猜怎么着？事实证明，你不必只是想象一下。自从瑞典北部的Treehotel上个月开业以来，你也可以实现童年梦想，在树屋里度假，俯瞰风景。我简直非试不可！"
+        },
+        {
+          "self_ref": "#/texts/58",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 585.072,
+                "r": 517.384,
+                "b": 546.83,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                218
+              ]
+            }
+          ],
+          "orig": "The well-hidden Treehotel is the creation of guesthouse owners, Britta and Kent Lindvall, who were inspired by Augustsén's film to create this back-to-nature retreat where guests can switch off and breathe more deeply.",
+          "text": "The well-hidden Treehotel is the creation of guesthouse owners, Britta and Kent Lindvall, who were inspired by Augustsén's film to create this back-to-nature retreat where guests can switch off and breathe more deeply.",
+          "translated_text": "隐藏得很好的Treehotel是由民宿主人布里塔和肯特·林德瓦尔夫妇创作的，他们受到奥古斯森电影的启发，打造了这个回归自然的度假胜地，让客人可以关闭电子设备，更深入地呼吸。"
+        },
+        {
+          "self_ref": "#/texts/59",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 533.066,
+                "r": 517.382,
+                "b": 468.821,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                426
+              ]
+            }
+          ],
+          "orig": "An area of forest behind their guesthouse had been sold for logging. Instead of waiting for the inevitable to happen in a country where forestry is such an important industry, they persuaded the forest's new owner to sell it to them. With help from various architect friends, they planned the innovative designs of the Treehotel, determined to demonstrate that the natural forest environment had value beyond supplying timber.",
+          "text": "An area of forest behind their guesthouse had been sold for logging. Instead of waiting for the inevitable to happen in a country where forestry is such an important industry, they persuaded the forest's new owner to sell it to them. With help from various architect friends, they planned the innovative designs of the Treehotel, determined to demonstrate that the natural forest environment had value beyond supplying timber.",
+          "translated_text": "他们背后的森林区已经被卖给了伐木公司。而不是等待在这个林业如此重要的国家里无可避免的事情发生，他们说服了这片森林的新主人将它卖给他们。在几位建筑师朋友的帮助下，他们规划了树屋酒店的创新设计，决心证明自然森林环境的价值不仅仅在于提供木材。"
+        },
+        {
+          "self_ref": "#/texts/60",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 455.057,
+                "r": 517.375,
+                "b": 416.815,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                240
+              ]
+            }
+          ],
+          "orig": "On arrival, I was greeted by Britta, who explained, 'Guests usually leave their luggage here and just take a small overnight bag to the treehouses. We want them to get the feeling that they're leaving one world behind and entering another.'",
+          "text": "On arrival, I was greeted by Britta, who explained, 'Guests usually leave their luggage here and just take a small overnight bag to the treehouses. We want them to get the feeling that they're leaving one world behind and entering another.'",
+          "translated_text": "到达时，Britta迎接了我，并解释说：“客人通常会把行李放在这里，只拿一个小包去树屋。我们希望他们能感受到自己仿佛离开了一个世界，进入了另一个世界。”"
+        },
+        {
+          "self_ref": "#/texts/61",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 403.051,
+                "r": 517.367,
+                "b": 338.806,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                423
+              ]
+            }
+          ],
+          "orig": "Britta led me along a narrow path through a glade of birch trees, explaining as we walked why the couple want to share their passion for this beautiful forest environment with guests. We arrived at the Mirrorcube. The most striking of the treehouses, it's a glass box perched high in the forest. Like an architectural magic trick, it almost disappears into the foliage, so sharply are the surrounding trees reflected in it.",
+          "text": "Britta led me along a narrow path through a glade of birch trees, explaining as we walked why the couple want to share their passion for this beautiful forest environment with guests. We arrived at the Mirrorcube. The most striking of the treehouses, it's a glass box perched high in the forest. Like an architectural magic trick, it almost disappears into the foliage, so sharply are the surrounding trees reflected in it.",
+          "translated_text": "布里塔领着我沿着一条狭窄的小径穿过一片白桦林，边走边解释这对夫妇为什么希望与客人分享他们对这片美丽森林环境的热情。我们来到了镜立方。这是树屋中最引人注目的一个，它是一个高高架在森林中的玻璃盒子。就像一种建筑魔术，它几乎消失在树叶中，因为周围的树木在其中的反射是如此清晰。"
+        },
+        {
+          "self_ref": "#/texts/62",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 325.0419999999999,
+                "r": 517.377,
+                "b": 260.797,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                475
+              ]
+            }
+          ],
+          "orig": "Inside, the Mirrorcube, like the hotel's other treehouses, facilities are fairly basic, not stretching much beyond an environmentally-friendly toilet - meals and showers are taken at the guesthouse, over 10 minutes' walk away. Still, underfloor heating will keep it cosy through winter. Reflective cladding means no one can see in but you can see out - you have an almost 360-degree view of the surrounding trees. There's even a window in the ceiling to look up into the sky.",
+          "text": "Inside, the Mirrorcube, like the hotel's other treehouses, facilities are fairly basic, not stretching much beyond an environmentally-friendly toilet - meals and showers are taken at the guesthouse, over 10 minutes' walk away. Still, underfloor heating will keep it cosy through winter. Reflective cladding means no one can see in but you can see out - you have an almost 360-degree view of the surrounding trees. There's even a window in the ceiling to look up into the sky.",
+          "translated_text": "内部的镜立方，像酒店其他树屋一样，设施相对简单，主要是一个环保厕所，餐食和淋浴需要到大约十分钟步行路程外的住宿接待处进行。不过，地暖会确保冬季的舒适度。反射性外墙材料使得别人无法看到里面，而你可以向外看，几乎可以全方位（360度）欣赏周围的树木景色。天花板上甚至还有一个天窗，让你可以仰望天空。"
+        },
+        {
+          "self_ref": "#/texts/63",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 247.03300000000002,
+                "r": 517.363,
+                "b": 221.79200000000003,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                191
+              ]
+            }
+          ],
+          "orig": "When I woke the next morning, it was a shock to find a bird seeming to be peering back at me through the glass. It was tempting to spend the day in my own little nest but I wanted to explore.",
+          "text": "When I woke the next morning, it was a shock to find a bird seeming to be peering back at me through the glass. It was tempting to spend the day in my own little nest but I wanted to explore.",
+          "translated_text": "当我第二天早晨醒来时，发现一只鸟似乎正透过玻璃向我窥视，这让我吃了一惊。虽然诱惑着我想整天待在我的小巢里，但我还是想出去探索一番。"
+        },
+        {
+          "self_ref": "#/texts/64",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 208.02800000000002,
+                "r": 517.385,
+                "b": 130.78200000000004,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                507
+              ]
+            }
+          ],
+          "orig": "I went to take a peek at the Cabin, a sleek, organically-shaped space pod touched down in the treetops about 50 metres from the Mirrorcube. Also sleeping two, this one has a huge viewing platform - in summer you can actually sleep out under the open sky (safe from mosquitoes as they don't fly 10 metres up in the air). Just behind it is the four-person Bird's Nest, and the Blue Cone, scheduled for completion next month. A fifth and final treehouse in the collection, the UFO, opens at the end of October.",
+          "text": "I went to take a peek at the Cabin, a sleek, organically-shaped space pod touched down in the treetops about 50 metres from the Mirrorcube. Also sleeping two, this one has a huge viewing platform - in summer you can actually sleep out under the open sky (safe from mosquitoes as they don't fly 10 metres up in the air). Just behind it is the four-person Bird's Nest, and the Blue Cone, scheduled for completion next month. A fifth and final treehouse in the collection, the UFO, opens at the end of October.",
+          "translated_text": "我去看了看树屋小木屋（Cabins），它是一个流线型、有机形状的空间舱，降落在距离镜立方大约50米的树冠上。这个小木屋也可以住两个人，它有一个巨大的观景平台——在夏天，你甚至可以睡在露天的天空下（不用担心蚊子，因为它们不会飞到离地面10米高的地方）。它的后面是可容纳四人的鸟巢（Bird's Nest）和预计下个月完工的蓝锥体（Blue Cone）。第五个也是最后一个树屋——UFO，将于十月末开放。"
+        },
+        {
+          "self_ref": "#/texts/65",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 117.01800000000003,
+                "r": 517.346,
+                "b": 91.77700000000004,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                156
+              ]
+            }
+          ],
+          "orig": "Later, over breakfast, Kent talked enthusiastically about village walking tours where guests can stop for coffee, cake and conversation with a local family.",
+          "text": "Later, over breakfast, Kent talked enthusiastically about village walking tours where guests can stop for coffee, cake and conversation with a local family.",
+          "translated_text": "后来，在早餐时，肯特热情地介绍了村庄步行游，在这些游览中，游客可以停下来与当地家庭一起喝咖啡、吃蛋糕和聊天。"
+        },
+        {
+          "self_ref": "#/texts/66",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 539.62,
+                "t": 637.078,
+                "r": 545.719,
+                "b": 624.839,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "5",
+          "text": "5",
+          "translated_text": "五"
+        },
+        {
+          "self_ref": "#/texts/67",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 559.069,
+                "r": 545.7,
+                "b": 546.83,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "10",
+          "text": "10",
+          "translated_text": "10"
+        },
+        {
+          "self_ref": "#/texts/68",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 481.06,
+                "r": 545.7,
+                "b": 468.821,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "15",
+          "text": "15",
+          "translated_text": "十五"
+        },
+        {
+          "self_ref": "#/texts/69",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 390.049,
+                "r": 545.7,
+                "b": 377.81,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "20",
+          "text": "20",
+          "translated_text": "二十"
+        },
+        {
+          "self_ref": "#/texts/70",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 312.03999999999996,
+                "r": 545.7,
+                "b": 299.80099999999993,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "25",
+          "text": "25",
+          "translated_text": "二十五"
+        },
+        {
+          "self_ref": "#/texts/71",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 234.03099999999995,
+                "r": 545.7,
+                "b": 221.79200000000003,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "30",
+          "text": "30",
+          "translated_text": "三十"
+        },
+        {
+          "self_ref": "#/texts/72",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 533.502,
+                "t": 156.02199999999993,
+                "r": 545.7,
+                "b": 143.78300000000002,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "35",
+          "text": "35",
+          "translated_text": "三十五"
+        },
+        {
+          "self_ref": "#/texts/73",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 49.613,
+                "t": 43.90999999999997,
+                "r": 229.796,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021",
+          "translated_text": "© 牛津大学出版社及评估 2021"
+        },
+        {
+          "self_ref": "#/texts/74",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 4,
+              "bbox": {
+                "l": 273.059,
+                "t": 43.90999999999997,
+                "r": 322.275,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                13
+              ]
+            }
+          ],
+          "orig": "1123/01/SI/24",
+          "text": "1123/01/SI/24",
+          "translated_text": "1123/01/SI/24"
+        },
+        {
+          "self_ref": "#/texts/75",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 5,
+              "bbox": {
+                "l": 294.616,
+                "t": 804.468,
+                "r": 300.716,
+                "b": 792.229,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "5",
+          "text": "5",
+          "translated_text": "五"
+        },
+        {
+          "self_ref": "#/texts/76",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 5,
+              "bbox": {
+                "l": 49.613,
+                "t": 779.103,
+                "r": 517.373,
+                "b": 727.86,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                334
+              ]
+            }
+          ],
+          "orig": "Unsurprisingly, given their deeply rooted commitment to the forest, the Lindvalls built the Treehotel sustainably - the Mirrorcube is even fitted with an infrared film, visible to birds only, that stops them flying into it - and activities such as noisy snowmobile safaris are definitely out! So, will I be visiting again? Absolutely.",
+          "text": "Unsurprisingly, given their deeply rooted commitment to the forest, the Lindvalls built the Treehotel sustainably - the Mirrorcube is even fitted with an infrared film, visible to birds only, that stops them flying into it - and activities such as noisy snowmobile safaris are definitely out! So, will I be visiting again? Absolutely.",
+          "translated_text": "不出所料，由于林德瓦尔家族对森林的深深承诺，他们以可持续的方式建造了树酒店——镜立方甚至安装了一种只能被鸟类看到的红外膜，防止鸟类撞上它——而且像雪地摩托之类的吵闹活动在这里肯定是不允许的！那么，我还会再来吗？绝对会。"
+        },
+        {
+          "self_ref": "#/texts/77",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 5,
+              "bbox": {
+                "l": 533.502,
+                "t": 766.102,
+                "r": 545.7,
+                "b": 753.863,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                2
+              ]
+            }
+          ],
+          "orig": "40",
+          "text": "40",
+          "translated_text": "四十"
+        },
+        {
+          "self_ref": "#/texts/78",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 5,
+              "bbox": {
+                "l": 49.613,
+                "t": 43.90999999999997,
+                "r": 229.796,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021",
+          "translated_text": "© 牛津大学出版社及评估 2021"
+        },
+        {
+          "self_ref": "#/texts/79",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 5,
+              "bbox": {
+                "l": 273.059,
+                "t": 43.90999999999997,
+                "r": 322.275,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                13
+              ]
+            }
+          ],
+          "orig": "1123/01/SI/24",
+          "text": "1123/01/SI/24",
+          "translated_text": "1123/01/SI/24"
+        },
+        {
+          "self_ref": "#/texts/80",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 186.88200000000006,
+                "r": 144.255,
+                "b": 179.09400000000005,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                27
+              ]
+            }
+          ],
+          "orig": "Copyright Acknowledgements:",
+          "text": "Copyright Acknowledgements:",
+          "translated_text": "版权致谢："
+        },
+        {
+          "self_ref": "#/texts/81",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 168.88,
+                "r": 68.734,
+                "b": 161.09199999999998,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                6
+              ]
+            }
+          ],
+          "orig": "Text A",
+          "text": "Text A",
+          "translated_text": "文本A"
+        },
+        {
+          "self_ref": "#/texts/82",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 134.658,
+                "t": 168.88,
+                "r": 545.687,
+                "b": 152.091,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                154
+              ]
+            }
+          ],
+          "orig": "Adapted; From The Wild Trees by Richard Preston published by Penguin. Copyright © Richard Preston, 2007. Reprinted by permission of Penguin Books Limited.",
+          "text": "Adapted; From The Wild Trees by Richard Preston published by Penguin. Copyright © Richard Preston, 2007. Reprinted by permission of Penguin Books Limited.",
+          "translated_text": "改编自理查德·普雷斯顿所著《野树》（Penguin出版），©理查德·普雷斯顿，2007年。经Penguin Books Limited许可转载。"
+        },
+        {
+          "self_ref": "#/texts/83",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 150.87799999999993,
+                "r": 68.734,
+                "b": 143.09000000000003,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                6
+              ]
+            }
+          ],
+          "orig": "Text A",
+          "text": "Text A",
+          "translated_text": "文本A"
+        },
+        {
+          "self_ref": "#/texts/84",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 134.658,
+                "t": 150.87799999999993,
+                "r": 545.728,
+                "b": 134.08899999999994,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                227
+              ]
+            }
+          ],
+          "orig": "Adapted; Excerpt(s) from THE WILD TREES: A STORY OF PASSION AND DARING by Richard Preston, © 2007 by Richard Preston. Used by permission of Random House, an imprint and division of Penguin Random House LLC. All rights reserved.",
+          "text": "Adapted; Excerpt(s) from THE WILD TREES: A STORY OF PASSION AND DARING by Richard Preston, © 2007 by Richard Preston. Used by permission of Random House, an imprint and division of Penguin Random House LLC. All rights reserved.",
+          "translated_text": "改编自理查德·普雷斯顿的《野树：激情与胆识的故事》中的片段，© 2007 理查德·普雷斯顿。由兰登书屋授权使用，兰登书屋是企鹅兰登书屋有限公司的一个印迹和部门。所有权利保留。"
+        },
+        {
+          "self_ref": "#/texts/85",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 132.87599999999998,
+                "r": 69.125,
+                "b": 125.08799999999997,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                6
+              ]
+            }
+          ],
+          "orig": "Text B",
+          "text": "Text B",
+          "translated_text": "文本B"
+        },
+        {
+          "self_ref": "#/texts/86",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 134.658,
+                "t": 132.87599999999998,
+                "r": 545.715,
+                "b": 116.08699999999999,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                192
+              ]
+            }
+          ],
+          "orig": "© Adapted; Rhiannon Batten; Rooms at the top: Sweden's stylish new treehouse ; The Guardian News & Media Ltd; 28 Aug 2010; https://www.theguardian.com/travel/2010/aug/28/treehouse-sweden-hotel",
+          "text": "© Adapted; Rhiannon Batten; Rooms at the top: Sweden's stylish new treehouse ; The Guardian News & Media Ltd; 28 Aug 2010; https://www.theguardian.com/travel/2010/aug/28/treehouse-sweden-hotel",
+          "translated_text": "©改编自；莱昂诺尔·贝顿；树顶客房：瑞典新潮的树屋；卫报新闻及媒体有限公司；2010年8月28日；https://www.theguardian.com/travel/2010/aug/28/treehouse-sweden-hotel"
+        },
+        {
+          "self_ref": "#/texts/87",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 105.87300000000005,
+                "r": 545.653,
+                "b": 80.082,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                418
+              ]
+            }
+          ],
+          "orig": "Permission to reproduce items where third-party owned material protected by copyright is included has been sought and cleared where possible. Every reasonable effort has been made by the publisher (Cambridge University Press & Assessment) to trace copyright holders, but if any items requiring clearance have unwittingly been included, the publisher will be pleased to make amends at the earliest possible opportunity.",
+          "text": "Permission to reproduce items where third-party owned material protected by copyright is included has been sought and cleared where possible. Every reasonable effort has been made by the publisher (Cambridge University Press & Assessment) to trace copyright holders, but if any items requiring clearance have unwittingly been included, the publisher will be pleased to make amends at the earliest possible opportunity.",
+          "translated_text": "出版商（剑桥大学出版社及评估部门）已尽一切合理努力追踪版权所有者，但对于任何可能无意中包含的需要授权的材料，出版商将尽快予以纠正。"
+        },
+        {
+          "self_ref": "#/texts/88",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 69.86900000000003,
+                "r": 545.677,
+                "b": 53.07899999999995,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                184
+              ]
+            }
+          ],
+          "orig": "Cambridge Assessment International Education is part of Cambridge University Press & Assessment. Cambridge University Press & Assessment is a department of the University of Cambridge.",
+          "text": "Cambridge Assessment International Education is part of Cambridge University Press & Assessment. Cambridge University Press & Assessment is a department of the University of Cambridge.",
+          "translated_text": "剑桥国际教育评估是剑桥大学出版社与评估部门的一部分。剑桥大学出版社与评估部门是剑桥大学的一个部门。"
+        },
+        {
+          "self_ref": "#/texts/89",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "text",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 294.616,
+                "t": 804.468,
+                "r": 300.716,
+                "b": 792.229,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                1
+              ]
+            }
+          ],
+          "orig": "6",
+          "text": "6",
+          "translated_text": "六"
+        },
+        {
+          "self_ref": "#/texts/90",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "section_header",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 261.717,
+                "t": 779.103,
+                "r": 333.611,
+                "b": 766.864,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                10
+              ]
+            }
+          ],
+          "orig": "BLANK PAGE",
+          "text": "BLANK PAGE",
+          "level": 1,
+          "translated_text": "空白页面"
+        },
+        {
+          "self_ref": "#/texts/91",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 49.613,
+                "t": 43.90999999999997,
+                "r": 229.796,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                46
+              ]
+            }
+          ],
+          "orig": "© Cambridge University Press & Assessment 2021",
+          "text": "© Cambridge University Press & Assessment 2021",
+          "translated_text": "© 牛津大学出版社及评估 2021"
+        },
+        {
+          "self_ref": "#/texts/92",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "furniture",
+          "label": "page_footer",
+          "prov": [
+            {
+              "page_no": 6,
+              "bbox": {
+                "l": 273.059,
+                "t": 43.90999999999997,
+                "r": 322.275,
+                "b": 35.009000000000015,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                13
+              ]
+            }
+          ],
+          "orig": "1123/01/SI/24",
+          "text": "1123/01/SI/24",
+          "translated_text": "1123/01/SI/24"
+        }
+      ],
+      "pictures": [
+        {
+          "self_ref": "#/pictures/0",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [],
+          "content_layer": "body",
+          "label": "picture",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 261.5536804199219,
+                "t": 815.1662006378174,
+                "r": 446.2525634765625,
+                "b": 784.8999900817871,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                0
+              ]
+            }
+          ],
+          "captions": [],
+          "references": [],
+          "footnotes": [],
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 370,
+              "height": 60
+            }
+          },
+          "annotations": [],
+          "key": "img_0.png"
+        },
+        {
+          "self_ref": "#/pictures/1",
+          "parent": {
+            "$ref": "#/body"
+          },
+          "children": [
+            {
+              "$ref": "#/texts/1"
+            }
+          ],
+          "content_layer": "body",
+          "label": "picture",
+          "prov": [
+            {
+              "page_no": 1,
+              "bbox": {
+                "l": 21.814355850219727,
+                "t": 618.1591339111328,
+                "r": 48.54130172729492,
+                "b": 515.031005859375,
+                "coord_origin": "BOTTOMLEFT"
+              },
+              "charspan": [
+                0,
+                0
+              ]
+            }
+          ],
+          "captions": [],
+          "references": [],
+          "footnotes": [],
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 53,
+              "height": 206
+            }
+          },
+          "annotations": [],
+          "key": "img_1.png"
+        }
+      ],
+      "tables": [],
+      "key_value_items": [],
+      "form_items": [],
+      "pages": {
+        "1": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 1
+        },
+        "2": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 2
+        },
+        "3": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 3
+        },
+        "4": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 4
+        },
+        "5": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 5
+        },
+        "6": {
+          "size": {
+            "width": 596,
+            "height": 842
+          },
+          "image": {
+            "mimetype": "image/png",
+            "dpi": 144,
+            "size": {
+              "width": 1192,
+              "height": 1684
+            }
+          },
+          "page_no": 6
+        }
+      }
+    },
+    "source_lang": "en",
+    "target_lang": "chinese"
+  }

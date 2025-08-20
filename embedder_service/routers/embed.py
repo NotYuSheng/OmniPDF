@@ -10,7 +10,7 @@ from models.helper import get_chunking_model, get_embedding_model
 from shared_utils.chroma_client import get_chroma_client
 from langchain_core.documents import Document
 
-router = APIRouter(prefix="/embed")
+router = APIRouter(prefix="/embed", tags=["embed"])
 
 logger = logging.getLogger(__name__)
 

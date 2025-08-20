@@ -1,3 +1,5 @@
 fastapi==0.115.12
 uvicorn==0.34.3
 openai==1.86.0
+chromadb==1.0.13
+sentence-transformers==4.1.0

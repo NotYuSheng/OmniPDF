@@ -1,0 +1,2815 @@
+{
+  "doc_id": "ccd31308-edf4-4479-929e-48306dc3f0b2",
+  "docling": {
+    "schema_name": "DoclingDocument",
+    "version": "1.5.0",
+    "name": "original",
+    "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 18163467616516796000,
+      "filename": "original.pdf"
+    },
+    "furniture": {
+      "self_ref": "#/furniture",
+      "children": [],
+      "content_layer": "furniture",
+      "name": "_root_",
+      "label": "unspecified"
+    },
+    "texts": [
+      {
+        "self_ref": "#/texts/0",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 56.7,
+              "t": 738.997,
+              "r": 220.747,
+              "b": 718.969,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              17
+            ]
+          }
+        ],
+        "orig": "Cambridge O Level",
+        "text": "Cambridge O Level",
+        "level": 1,
+        "translated_text": "O Level Cambridge"
+      },
+      {
+        "self_ref": "#/texts/1",
+        "parent": {
+          "$ref": "#/pictures/1"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 42.397,
+              "t": 617.862,
+              "r": 48.144,
+              "b": 514.806,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              12
+            ]
+          }
+        ],
+        "orig": "*0123456789*",
+        "text": "*0123456789*",
+        "translated_text": "*0123456789*"
+      },
+      {
+        "self_ref": "#/texts/2",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 56.7,
+              "t": 686.399,
+              "r": 171.59,
+              "b": 674.16,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              16
+            ]
+          }
+        ],
+        "orig": "ENGLISH LANGUAGE",
+        "text": "ENGLISH LANGUAGE",
+        "level": 1,
+        "translated_text": "BAHASA INGGERIS"
+      },
+      {
+        "self_ref": "#/texts/3",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 499.495,
+              "t": 686.399,
+              "r": 538.634,
+              "b": 674.16,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              7
+            ]
+          }
+        ],
+        "orig": "1123/01",
+        "text": "1123/01",
+        "translated_text": "1123/01"
+      },
+      {
+        "self_ref": "#/texts/4",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 56.7,
+              "t": 665.496,
+              "r": 131.712,
+              "b": 654.37,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              15
+            ]
+          }
+        ],
+        "orig": "Paper 1 Reading",
+        "text": "Paper 1 Reading",
+        "translated_text": "Bacaan Kertas 1"
+      },
+      {
+        "self_ref": "#/texts/5",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 411.374,
+              "t": 665.496,
+              "r": 538.617,
+              "b": 654.37,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              25
+            ]
+          }
+        ],
+        "orig": "For examination from 2024",
+        "text": "For examination from 2024",
+        "translated_text": "Untuk peperiksaan bermula tahun 2024"
+      },
+      {
+        "self_ref": "#/texts/6",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 56.7,
+              "t": 645.495,
+              "r": 148.196,
+              "b": 634.368,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              15
+            ]
+          }
+        ],
+        "orig": "SPECIMEN INSERT",
+        "text": "SPECIMEN INSERT",
+        "translated_text": "INSERT SPESIMEN"
+      },
+      {
+        "self_ref": "#/texts/7",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 502.528,
+              "t": 645.495,
+              "r": 538.63,
+              "b": 634.368,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              7
+            ]
+          }
+        ],
+        "orig": "2 hours",
+        "text": "2 hours",
+        "translated_text": "2 jam"
+      },
+      {
+        "self_ref": "#/texts/8",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 56.7,
+              "t": 616.901,
+              "r": 129.997,
+              "b": 605.775,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              11
+            ]
+          }
+        ],
+        "orig": "INFORMATION",
+        "text": "INFORMATION",
+        "level": 1,
+        "translated_text": "MAKLUMAT"
+      },
+      {
+        "self_ref": "#/texts/9",
+        "parent": {
+          "$ref": "#/groups/1"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "list_item",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 56.7,
+              "t": 603.9,
+              "r": 265.29,
+              "b": 592.773,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              44
+            ]
+          }
+        ],
+        "orig": "● This insert contains the reading passages.",
+        "text": "● This insert contains the reading passages.",
+        "enumerated": false,
+        "marker": "",
+        "translated_text": "● Sertakan ini mengandungi ayat bacaan."
+      },
+      {
+        "self_ref": "#/texts/10",
+        "parent": {
+          "$ref": "#/groups/2"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "list_item",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 56.7,
+              "t": 590.898,
+              "r": 536.219,
+              "b": 566.77,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              110
+            ]
+          }
+        ],
+        "orig": "● You may annotate this insert and use the blank spaces for planning. Do not write your answers on the insert.",
+        "text": "● You may annotate this insert and use the blank spaces for planning. Do not write your answers on the insert.",
+        "enumerated": false,
+        "marker": "",
+        "translated_text": "● Anda boleh membuat nota pada inser ini dan menggunakan ruang kosong untuk merancang. Jangan tulis jawapan anda pada inser."
+      },
+      {
+        "self_ref": "#/texts/11",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 42.397,
+              "t": 617.862,
+              "r": 48.144,
+              "b": 514.806,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              12
+            ]
+          }
+        ],
+        "orig": "*0123456789*",
+        "text": "*0123456789*",
+        "translated_text": "*0123456789*"
+      },
+      {
+        "self_ref": "#/texts/12",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 165.352,
+              "t": 109.30799999999999,
+              "r": 429.957,
+              "b": 98.18100000000004,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              57
+            ]
+          }
+        ],
+        "orig": "This document has 6 pages. Any blank pages are indicated.",
+        "text": "This document has 6 pages. Any blank pages are indicated.",
+        "translated_text": "Dokumen ini mempunyai 6 muka surat. Setiap muka surat kosong telah ditunjukkan."
+      },
+      {
+        "self_ref": "#/texts/13",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 56.7,
+              "t": 63.754999999999995,
+              "r": 236.883,
+              "b": 54.85299999999995,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              46
+            ]
+          }
+        ],
+        "orig": "© Cambridge University Press & Assessment 2021",
+        "text": "© Cambridge University Press & Assessment 2021",
+        "translated_text": "© Universiti Cambridge Press & Penilaian 2021"
+      },
+      {
+        "self_ref": "#/texts/14",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 489.939,
+              "t": 65.55899999999997,
+              "r": 538.622,
+              "b": 54.43299999999999,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              10
+            ]
+          }
+        ],
+        "orig": "[Turn over",
+        "text": "[Turn over",
+        "translated_text": "[Balik halaman]"
+      },
+      {
+        "self_ref": "#/texts/15",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 294.616,
+              "t": 804.468,
+              "r": 300.716,
+              "b": 792.229,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              1
+            ]
+          }
+        ],
+        "orig": "2",
+        "text": "2",
+        "translated_text": "2"
+      },
+      {
+        "self_ref": "#/texts/16",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 779.103,
+              "r": 424.448,
+              "b": 766.864,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              71
+            ]
+          }
+        ],
+        "orig": "Read Text A and answer Question 1 and Question 2 on the question paper.",
+        "text": "Read Text A and answer Question 1 and Question 2 on the question paper.",
+        "translated_text": "Baca Teks A dan jawab Soalan 1 dan Soalan 2 dalam kertas soalan."
+      },
+      {
+        "self_ref": "#/texts/17",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 753.1,
+              "r": 140.06,
+              "b": 740.861,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              16
+            ]
+          }
+        ],
+        "orig": "Text A: Nameless",
+        "text": "Text A: Nameless",
+        "level": 1,
+        "translated_text": "Tanpa nama"
+      },
+      {
+        "self_ref": "#/texts/18",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 728.089,
+              "r": 517.339,
+              "b": 689.847,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              231
+            ]
+          }
+        ],
+        "orig": "Mo and Marwood have finally found Nameless. They had been looking for this large redwood tree that no one had ever attempted to climb before. Redwood trees can live for more than 2000 years and are the world's tallest living trees.",
+        "text": "Mo and Marwood have finally found Nameless. They had been looking for this large redwood tree that no one had ever attempted to climb before. Redwood trees can live for more than 2000 years and are the world's tallest living trees.",
+        "translated_text": "Mo dan Marwood telah berjaya menemui Pohon Tanpa Nama. Mereka telah mencari pohon redwood besar yang tidak pernah ada yang cuba naik sebelum ini. Pohon redwood boleh hidup lebih daripada 2000 tahun dan merupakan pohon hidup tertinggi di dunia."
+      },
+      {
+        "self_ref": "#/texts/19",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 676.083,
+              "r": 517.374,
+              "b": 624.839,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              300
+            ]
+          }
+        ],
+        "orig": "Mo and Marwood stood at the base of Nameless, peering upwards into its crown. The structure of any redwood tree is the opposite of most trees, whose branches get smaller towards the top. Nameless, this ancient giant of the forest, grew increasingly complicated and more massive higher off the ground.",
+        "text": "Mo and Marwood stood at the base of Nameless, peering upwards into its crown. The structure of any redwood tree is the opposite of most trees, whose branches get smaller towards the top. Nameless, this ancient giant of the forest, grew increasingly complicated and more massive higher off the ground.",
+        "translated_text": "Mo dan Marwood berdiri di pangkuan Nameless, memandang ke atas ke arah kepalanya. Struktur sebarang pokok rwood merah adalah lawan daripada kebanyakan pokok, di mana cabang-cabangnya menjadi lebih kecil semakin ke atas. Nameless, raja tua ini hutan, menjadi semakin rumit dan lebih besar semakin tinggi dari permukaan tanah."
+      },
+      {
+        "self_ref": "#/texts/20",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 611.075,
+              "r": 517.36,
+              "b": 546.83,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              399
+            ]
+          }
+        ],
+        "orig": "The tree was about 100 metres tall with a diameter of about 3 metres near its base. The trunk was an enormous cylinder of soft crumbly bark. Far above the ground, a few small wispy branches popped out of the trunk, but there were no branches on its lower reaches. Higher up still, a tangle of limbs emerged and wandered out of sight, buried in clouds of foliage. Mo and Marwood couldn't see its top.",
+        "text": "The tree was about 100 metres tall with a diameter of about 3 metres near its base. The trunk was an enormous cylinder of soft crumbly bark. Far above the ground, a few small wispy branches popped out of the trunk, but there were no branches on its lower reaches. Higher up still, a tangle of limbs emerged and wandered out of sight, buried in clouds of foliage. Mo and Marwood couldn't see its top.",
+        "translated_text": "Pekelitian itu mempunyai ketinggian kira-kira 100 meter dengan diameter sekitar 3 meter di hujung bawahnya. Batangnya adalah sebuah silinder raksasa yang terdiri daripada kulit kayu yang lembut dan mudah berkeping-keping. Jauh di atas tanah, beberapa batang kecil dan nipis keluar dari batang tersebut, tetapi tiada batang pada bahagian bawahnya. Lebih tinggi lagi, sebongkah ranting-ranting bertangkuran muncul dan hilang dari pandangan, tersembunyi dalam awan daun. Mo dan Marwood tidak dapat melihat bahagian puncaknya."
+      },
+      {
+        "self_ref": "#/texts/21",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 533.066,
+              "r": 517.386,
+              "b": 403.813,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              919
+            ]
+          }
+        ],
+        "orig": "Marwood recalled that in ideal conditions, a redwood can grow from a seed into a tree that's an astonishing 16 metres tall in just its first 20 years of life, increasing in height by nearly a metre annually. After that, it grows faster still. Adding mass at an accelerating rate, it can exceed 75 cm in diameter at chest height in fewer than 60 years. The growth of redwoods generally slows down after the first 100 years, though by the age of eight hundred, they may have reached a height as tall as a 30-storey building. Redwoods are shade-tolerant. They can survive in dark places at the bottom of a forest, in the deep shade of their elders, where few other trees would survive. A small redwood living in deep shade hardly grows at all, but doesn't die; it goes into a kind of suspended animation. If it is hit by light, it once again grows with relentless speed. Nameless had clearly basked in light - it was huge.",
+        "text": "Marwood recalled that in ideal conditions, a redwood can grow from a seed into a tree that's an astonishing 16 metres tall in just its first 20 years of life, increasing in height by nearly a metre annually. After that, it grows faster still. Adding mass at an accelerating rate, it can exceed 75 cm in diameter at chest height in fewer than 60 years. The growth of redwoods generally slows down after the first 100 years, though by the age of eight hundred, they may have reached a height as tall as a 30-storey building. Redwoods are shade-tolerant. They can survive in dark places at the bottom of a forest, in the deep shade of their elders, where few other trees would survive. A small redwood living in deep shade hardly grows at all, but doesn't die; it goes into a kind of suspended animation. If it is hit by light, it once again grows with relentless speed. Nameless had clearly basked in light - it was huge.",
+        "translated_text": "Marwood mengingat bahawa dalam keadaan yang ideal, sebatang redwood boleh tumbuh dari biji menjadi pokok setinggi 16 meter hanya dalam tempoh 20 tahun pertama kehidupannya, bertambah tinggi sehingga kira-kira satu meter setahun. Selepas itu, ia tumbuh dengan laju lagi. Menambah jisim dengan kadar yang mempercepat, ia boleh melebihi 75 cm dalam diameter pada tinggi dada dalam kurang daripada 60 tahun. Pertumbuhan redwood biasanya melambat selepas 100 tahun pertama, walaupun pada umur 800 tahun, mereka mungkin telah mencapai ketinggian sebanyak sebuah bangunan 30 tingkat. Redwood boleh bertahan di tempat yang gelap seperti di bahagian bawah hutan, di bawah bayangan pokok-pokok tua, di mana sedikit pokok lain dapat bertahan. Sebatang redwood kecil yang hidup di tempat yang sangat gelap tidak tumbuh sama sekali, tetapi tidak mati; ia masuk ke dalam jenis susupan animasi. Jika ia disentuh oleh cahaya, ia sekali lagi tumbuh dengan kelajuan yang tidak kenal lelah. Namaless pasti telah berjemur di bawah cahaya - ia sangat besar."
+      },
+      {
+        "self_ref": "#/texts/22",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 390.049,
+              "r": 409.367,
+              "b": 377.81,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              76
+            ]
+          }
+        ],
+        "orig": "'You aren't going to try to climb it, are you?' asked Marwood incredulously.",
+        "text": "'You aren't going to try to climb it, are you?' asked Marwood incredulously.",
+        "translated_text": "'Anda tidak berniat untuk mencuba mengaliminya, kan?' tanya Marwood dengan tidak percaya."
+      },
+      {
+        "self_ref": "#/texts/23",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 364.046,
+              "r": 104.632,
+              "b": 351.807,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              10
+            ]
+          }
+        ],
+        "orig": "No answer.",
+        "text": "No answer.",
+        "translated_text": "Tiada jawapan."
+      },
+      {
+        "self_ref": "#/texts/24",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 338.043,
+              "r": 517.382,
+              "b": 299.80099999999993,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              203
+            ]
+          }
+        ],
+        "orig": "Mo looked again at the lowest branch of a smaller tree standing next to Nameless. Without warning, he leapt, grabbed and swung himself up onto the branch in one fluid movement and began climbing upwards.",
+        "text": "Mo looked again at the lowest branch of a smaller tree standing next to Nameless. Without warning, he leapt, grabbed and swung himself up onto the branch in one fluid movement and began climbing upwards.",
+        "translated_text": "Mo memeriksa semula cabang terendah sebuah pohon yang lebih kecil yang berdiri di sebelah Nama Tidak Diketahui. Tanpa peringatan, dia melompat, menggenggam dan memanjat ke atas cabang itu dalam satu gerakan lancar dan bermula untuk memanjat ke atas."
+      },
+      {
+        "self_ref": "#/texts/25",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 286.03700000000003,
+              "r": 373.051,
+              "b": 273.798,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              68
+            ]
+          }
+        ],
+        "orig": "'I really don't think that's very smart,' Marwood warned from below.",
+        "text": "'I really don't think that's very smart,' Marwood warned from below.",
+        "translated_text": "'Tidak ramai yang faham kalau perangkap ni cerdik,' Marwood peringat dari bawah. \n\nNote: The translation provided is an interpretation aiming to convey the meaning in a natural Malay expression, as a direct word-for-word translation might not always sound natural or convey the intended tone."
+      },
+      {
+        "self_ref": "#/texts/26",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 260.034,
+              "r": 517.387,
+              "b": 195.789,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              461
+            ]
+          }
+        ],
+        "orig": "Ten minutes later, Mo arrived at the top of the smaller tree. The tree had narrowed to a pole thinner than his wrist, and began swaying under his weight. Having got as high as he could go, Mo looked across at Nameless and spotted a spray of slender branches on the curving wall of its monstrous trunk. A little branch stuck out, directly in front of him. Mo wanted to grab that branch. He edged closer to it, and the smaller tree began to bend under his weight.",
+        "text": "Ten minutes later, Mo arrived at the top of the smaller tree. The tree had narrowed to a pole thinner than his wrist, and began swaying under his weight. Having got as high as he could go, Mo looked across at Nameless and spotted a spray of slender branches on the curving wall of its monstrous trunk. A little branch stuck out, directly in front of him. Mo wanted to grab that branch. He edged closer to it, and the smaller tree began to bend under his weight.",
+        "translated_text": "Sepuluh minit kemudian, Mo telah tiba di puncak pokok yang lebih kecil. Pokok itu telah menyempit menjadi tiang yang lebih tipis daripada pergelangan tangannya, dan bermula bergetar di bawah beratnya. Setelah mencapai sejauh yang boleh dia capai, Mo memandang ke arah Nameless dan menjejaki semburan batang-batang halus pada dinding melengkung trunksnya yang raksasa. Satu batang kecil keluar, tepat di hadapan beliau. Mo ingin mengambil batang tersebut. Dia mengerusi ke arahnya, dan pokok yang lebih kecil bermula membengkok di bawah beratnya."
+      },
+      {
+        "self_ref": "#/texts/27",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 182.02499999999998,
+              "r": 517.385,
+              "b": 130.78200000000004,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              345
+            ]
+          }
+        ],
+        "orig": "There was a gap between the branch of the smaller tree and Nameless. From the ground, Mo hadn't noticed that gap, expecting that the little tree's branches touched the big tree's branches, providing a bridge to walk across. Mo studied the situation. If he could just reach out far enough, he might be able to grab that little branch on Nameless.",
+        "text": "There was a gap between the branch of the smaller tree and Nameless. From the ground, Mo hadn't noticed that gap, expecting that the little tree's branches touched the big tree's branches, providing a bridge to walk across. Mo studied the situation. If he could just reach out far enough, he might be able to grab that little branch on Nameless.",
+        "translated_text": "Ada satu celah antara cabang pohon kecil itu dan Nameless. Dari permukaan tanah, Mo tidak menyedari ada celah tersebut, menyangka bahawa cabang pohon kecil itu menyentuh cabang pohon besar itu, memberikan jambatan untuk berjalan di atasnya. Mo menganalisis situasi tersebut. Jika dia boleh mencapai jauh sehingga ke sana, mungkin sahaja dia dapat mengambil cengkeraman pada cabang kecil itu di Nameless."
+      },
+      {
+        "self_ref": "#/texts/28",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 117.01800000000003,
+              "r": 517.328,
+              "b": 52.773000000000025,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              428
+            ]
+          }
+        ],
+        "orig": "Trying not to think about how high up he was, Mo focused his mind on the problem. The gap was really not very large, he thought. He would have to let go of the small redwood and make a leap up into the big tree, and grasp a branch with his hands, like a circus performer catching the bar of a swinging trapeze. He had to jump high, or his body wouldn't clear the branches of the smaller tree and he'd get tangled and would fall.",
+        "text": "Trying not to think about how high up he was, Mo focused his mind on the problem. The gap was really not very large, he thought. He would have to let go of the small redwood and make a leap up into the big tree, and grasp a branch with his hands, like a circus performer catching the bar of a swinging trapeze. He had to jump high, or his body wouldn't clear the branches of the smaller tree and he'd get tangled and would fall.",
+        "translated_text": "Tanpa memikirkan betapa tingginya kedudukannya, Mo fokuskan fikirannya pada masalah tersebut. Jurang itu sebenarnya tidak terlalu lebar, fikirnya. Dia perlu melepaskan diri dari pohon kecil kayu merah dan melompat ke atas pohon besar, dan menangkap ranting dengan tangannya, seperti penampilan cirrus yang menangkap bar besi ayunan trapeze. Dia harus melompat tinggi, atau badannya tidak akan melewati ranting-ranting pohon yang lebih kecil dan dia akan tersangkut dan jatuh."
+      },
+      {
+        "self_ref": "#/texts/29",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 539.62,
+              "t": 611.075,
+              "r": 545.719,
+              "b": 598.836,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              1
+            ]
+          }
+        ],
+        "orig": "5",
+        "text": "5",
+        "translated_text": "5"
+      },
+      {
+        "self_ref": "#/texts/30",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 533.502,
+              "t": 533.066,
+              "r": 545.7,
+              "b": 520.827,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "10",
+        "text": "10",
+        "translated_text": "10"
+      },
+      {
+        "self_ref": "#/texts/31",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 533.502,
+              "t": 468.059,
+              "r": 545.7,
+              "b": 455.819,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "15",
+        "text": "15",
+        "translated_text": "15"
+      },
+      {
+        "self_ref": "#/texts/32",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 533.502,
+              "t": 390.049,
+              "r": 545.7,
+              "b": 377.81,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "20",
+        "text": "20",
+        "translated_text": " dua puluh"
+      },
+      {
+        "self_ref": "#/texts/33",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 533.502,
+              "t": 286.03700000000003,
+              "r": 545.7,
+              "b": 273.798,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "25",
+        "text": "25",
+        "translated_text": " dua puluh lima"
+      },
+      {
+        "self_ref": "#/texts/34",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 533.502,
+              "t": 208.02800000000002,
+              "r": 545.7,
+              "b": 195.789,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "30",
+        "text": "30",
+        "translated_text": "tiga puluh"
+      },
+      {
+        "self_ref": "#/texts/35",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 533.502,
+              "t": 117.01800000000003,
+              "r": 545.7,
+              "b": 104.779,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "35",
+        "text": "35",
+        "translated_text": "35"
+      },
+      {
+        "self_ref": "#/texts/36",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 49.613,
+              "t": 43.90999999999997,
+              "r": 229.796,
+              "b": 35.009000000000015,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              46
+            ]
+          }
+        ],
+        "orig": "© Cambridge University Press & Assessment 2021",
+        "text": "© Cambridge University Press & Assessment 2021",
+        "translated_text": "© Universiti Cambridge Press & Penilaian 2021"
+      },
+      {
+        "self_ref": "#/texts/37",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 273.059,
+              "t": 43.90999999999997,
+              "r": 322.275,
+              "b": 35.009000000000015,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              13
+            ]
+          }
+        ],
+        "orig": "1123/01/SI/24",
+        "text": "1123/01/SI/24",
+        "translated_text": "1123/01/SA/24"
+      },
+      {
+        "self_ref": "#/texts/38",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 294.616,
+              "t": 804.468,
+              "r": 300.716,
+              "b": 792.229,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              1
+            ]
+          }
+        ],
+        "orig": "3",
+        "text": "3",
+        "translated_text": "3"
+      },
+      {
+        "self_ref": "#/texts/39",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 49.613,
+              "t": 779.103,
+              "r": 517.357,
+              "b": 753.863,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              175
+            ]
+          }
+        ],
+        "orig": "If I was standing on the ground and I had to make this jump, I could do it, he thought. So why not up here? He tried to force his hand to just let go of the tree. Just let go.",
+        "text": "If I was standing on the ground and I had to make this jump, I could do it, he thought. So why not up here? He tried to force his hand to just let go of the tree. Just let go.",
+        "translated_text": "Jika dia berdiri di atas tanah dan dia perlu membuat lompatan ini, dia boleh melakukannya, fikirnya. Jadi mengapa tidak di sini? Dia cuba memaksa tangannya untuk hanya melepaskan pohon itu. Hanya melepaskan."
+      },
+      {
+        "self_ref": "#/texts/40",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 49.613,
+              "t": 740.099,
+              "r": 517.37,
+              "b": 714.858,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              128
+            ]
+          }
+        ],
+        "orig": "'I can't watch,' Marwood shouted furiously from below and closed his eyes. He dreaded hearing a scream followed by a meaty thud.",
+        "text": "'I can't watch,' Marwood shouted furiously from below and closed his eyes. He dreaded hearing a scream followed by a meaty thud.",
+        "translated_text": "'Tidak boleh nampak,' teriak Marwood dengan marah dari bawah dan menutup matanya. Dia takut mendengar sebual diikuti oleh suara daging yang jatuh."
+      },
+      {
+        "self_ref": "#/texts/41",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 49.613,
+              "t": 701.094,
+              "r": 263.02,
+              "b": 688.855,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              45
+            ]
+          }
+        ],
+        "orig": "In the top of the tree Mo let go, and jumped.",
+        "text": "In the top of the tree Mo let go, and jumped.",
+        "translated_text": "Di puncak pokok, Mo melepaskan diri dan terjun."
+      },
+      {
+        "self_ref": "#/texts/42",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 49.613,
+              "t": 675.091,
+              "r": 545.7,
+              "b": 610.846,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              399
+            ]
+          }
+        ],
+        "orig": "He felt gravity go to zero. The world stopped. Mo watched the branch of the large redwood approach in slow motion and saw his fingers extend towards it. There was a jerk and he found himself hanging from the branch by both hands, bouncing with his feet kicking the air. Swinging hand-over-hand, he got himself over to the trunk and climbed the next three precarious metres onto a stronger branch. 45",
+        "text": "He felt gravity go to zero. The world stopped. Mo watched the branch of the large redwood approach in slow motion and saw his fingers extend towards it. There was a jerk and he found himself hanging from the branch by both hands, bouncing with his feet kicking the air. Swinging hand-over-hand, he got himself over to the trunk and climbed the next three precarious metres onto a stronger branch. 45",
+        "translated_text": "Dia merasa graviti menjadi sifar. Dunia berhenti. Mo memandang ranting besar pohon redwood itu mendekat dalam gerakan lambat dan melihat jari-jarinya memanjang ke arahnya. Ada satu jeritan dan dia menemui dirinya tergantung pada ranting tersebut dengan kedua tangannya, bergoyang dengan kaki-kakinya mengayun di udara. Dengan bergerak dari tangan ke tangan, dia mendapatkan dirinya ke batang pohon dan merangkak naik tiga meter yang tidak stabil lagi ke ranting yang lebih kukuh. 45"
+      },
+      {
+        "self_ref": "#/texts/43",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 49.613,
+              "t": 597.082,
+              "r": 517.373,
+              "b": 467.829,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              871
+            ]
+          }
+        ],
+        "orig": "He had arrived somewhere in the lower tiers of Nameless, just below the crown of the huge tree. The branches here were bigger and closer together. There was foliage everywhere - above, below, and on all sides - layer upon layer of leaves, like tents within tents. The tree hadn't looked so big from the ground. Climbing upwards slowly and steadily through the labyrinth, Mo lost sight of the ground. It felt as if he was passing through a membrane and entering another world. His senses were overwhelmed by an impression of life all around. Flaky, grey-green, and brownish plants, in all manner of shapes, hung from branches - drippy, frizzy, stringy, and hairy. He began picking pieces off, tucking them into his pocket. As he neared the upper surface of the redwood canopy, the lacework of branches glowed with varied shades of green and he broke out into the sunlight.",
+        "text": "He had arrived somewhere in the lower tiers of Nameless, just below the crown of the huge tree. The branches here were bigger and closer together. There was foliage everywhere - above, below, and on all sides - layer upon layer of leaves, like tents within tents. The tree hadn't looked so big from the ground. Climbing upwards slowly and steadily through the labyrinth, Mo lost sight of the ground. It felt as if he was passing through a membrane and entering another world. His senses were overwhelmed by an impression of life all around. Flaky, grey-green, and brownish plants, in all manner of shapes, hung from branches - drippy, frizzy, stringy, and hairy. He began picking pieces off, tucking them into his pocket. As he neared the upper surface of the redwood canopy, the lacework of branches glowed with varied shades of green and he broke out into the sunlight.",
+        "translated_text": "Dia telah tiba di mana-mana di tingkat bawah dari Nama Tidak, hanya di bawah mahkota pokok raksasa itu. Cabang-cabang di sini lebih besar dan lebih rapat. Daun terdapat di mana-mana - di atas, di bawah, dan di semua sisi - lapisan demi lapisan daun, seperti tenda dalam tenda. Pokok itu tidak kelihatan begitu besar dari permukaan tanah. Sambil bergerak perlahan dan berterusan melalui labirin, Mo kehilangan pandangan daripada tanah. Ia terasa seperti dia melepasi sehelai membran dan memasuki dunia lain. Indranya dilanda oleh gambaran hidup yang mengelilinginya. Tumbuhan berlapis-lapis berwarna abu-abu hijau dan coklat, dalam pelbagai bentuk, tergantung pada cabang-cabang - berair, keriting, berjumbai, dan berbulu. Dia mula memetik pecahan-pecahan tersebut, menaruhnya ke dalam saku. Apabila dia semakin dekat dengan permukaan atap kayu merah, rangkaian cabang-cabang itu berkilauan dengan pelbagai warna hijau dan dia keluar ke cahaya matahari."
+      },
+      {
+        "self_ref": "#/texts/44",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 49.613,
+              "t": 454.065,
+              "r": 517.396,
+              "b": 428.825,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              102
+            ]
+          }
+        ],
+        "orig": "An hour after he'd jumped into it, Mo arrived at the top of Nameless. 'It's do-able.' he shouted down.",
+        "text": "An hour after he'd jumped into it, Mo arrived at the top of Nameless. 'It's do-able.' he shouted down.",
+        "translated_text": "Sejam setelah dia terjun ke dalamnya, Mo tiba di puncak Nama Tidak Diketahui. \"Ini boleh dilakukan,\" teriaknya ke bawah."
+      },
+      {
+        "self_ref": "#/texts/45",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 533.502,
+              "t": 597.082,
+              "r": 545.7,
+              "b": 584.843,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "50",
+        "text": "50",
+        "translated_text": "lima puluh"
+      },
+      {
+        "self_ref": "#/texts/46",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 533.502,
+              "t": 532.074,
+              "r": 545.7,
+              "b": 519.835,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "55",
+        "text": "55",
+        "translated_text": "55"
+      },
+      {
+        "self_ref": "#/texts/47",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 533.502,
+              "t": 454.065,
+              "r": 545.7,
+              "b": 441.826,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "60",
+        "text": "60",
+        "translated_text": " enam puluh"
+      },
+      {
+        "self_ref": "#/texts/48",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 533.502,
+              "t": 779.103,
+              "r": 545.7,
+              "b": 766.864,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "40",
+        "text": "40",
+        "translated_text": "empat puluh"
+      },
+      {
+        "self_ref": "#/texts/49",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 49.613,
+              "t": 43.90999999999997,
+              "r": 229.796,
+              "b": 35.009000000000015,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              46
+            ]
+          }
+        ],
+        "orig": "© Cambridge University Press & Assessment 2021",
+        "text": "© Cambridge University Press & Assessment 2021",
+        "translated_text": "© Universiti Cambridge Press & Penilaian 2021"
+      },
+      {
+        "self_ref": "#/texts/50",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 273.059,
+              "t": 43.90999999999997,
+              "r": 322.275,
+              "b": 35.009000000000015,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              13
+            ]
+          }
+        ],
+        "orig": "1123/01/SI/24",
+        "text": "1123/01/SI/24",
+        "translated_text": "1123/01/SA/24"
+      },
+      {
+        "self_ref": "#/texts/51",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 3,
+            "bbox": {
+              "l": 492.155,
+              "t": 46.615999999999985,
+              "r": 545.707,
+              "b": 34.37699999999995,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              10
+            ]
+          }
+        ],
+        "orig": "[Turn over",
+        "text": "[Turn over",
+        "translated_text": "[Balik halaman]"
+      },
+      {
+        "self_ref": "#/texts/52",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 294.616,
+              "t": 804.468,
+              "r": 300.716,
+              "b": 792.229,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              1
+            ]
+          }
+        ],
+        "orig": "4",
+        "text": "4",
+        "translated_text": "4"
+      },
+      {
+        "self_ref": "#/texts/53",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 779.103,
+              "r": 343.543,
+              "b": 766.864,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              56
+            ]
+          }
+        ],
+        "orig": "Read Text B and answer Question 3 on the question paper.",
+        "text": "Read Text B and answer Question 3 on the question paper.",
+        "translated_text": "Baca Teks B dan jawab Soalan 3 dalam kertas soalan."
+      },
+      {
+        "self_ref": "#/texts/54",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 753.1,
+              "r": 214.231,
+              "b": 740.861,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              31
+            ]
+          }
+        ],
+        "orig": "Text B: A night among the trees",
+        "text": "Text B: A night among the trees",
+        "level": 1,
+        "translated_text": "Malam di antara pohon-pohon"
+      },
+      {
+        "self_ref": "#/texts/55",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 728.089,
+              "r": 490.857,
+              "b": 715.85,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              94
+            ]
+          }
+        ],
+        "orig": "The writer of this review has just returned from a visit to the Treehotel, in northern Sweden.",
+        "text": "The writer of this review has just returned from a visit to the Treehotel, in northern Sweden.",
+        "translated_text": "Pengarang ulasan ini baru sahaja kembali dari mengunjungi Treehotel di utara Sweden."
+      },
+      {
+        "self_ref": "#/texts/56",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 702.086,
+              "r": 517.382,
+              "b": 650.842,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              310
+            ]
+          }
+        ],
+        "orig": "Recently, I watched a documentary film called 'The Tree Lover' - all about the link between trees and people. In the film, director Jonas Augustsén says: 'Imagine relaxing here on summer evenings …'. He's sitting in a treehouse he's spent months building, looking out over a wide forest lit by the setting sun.",
+        "text": "Recently, I watched a documentary film called 'The Tree Lover' - all about the link between trees and people. In the film, director Jonas Augustsén says: 'Imagine relaxing here on summer evenings …'. He's sitting in a treehouse he's spent months building, looking out over a wide forest lit by the setting sun.",
+        "translated_text": "Baru-baru ini, saya menonton filem dokumentari bernama 'Pecinta Pohon' - semua tentang hubungan antara pokok dan manusia. Dalam filem itu, pengarah Jonas Augustsén berkata: 'Imajinasikan bersantai di sini pada petang musim panas...'. Dia duduk dalam rumah pokok yang dia habiskan bulan-bulan membangunnya, melihat ke hutan luas yang terangkat oleh matahari senja."
+      },
+      {
+        "self_ref": "#/texts/57",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 637.078,
+              "r": 517.343,
+              "b": 598.836,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              244
+            ]
+          }
+        ],
+        "orig": "And guess what? It turns out you don't have to just imagine it. Since the Treehotel in northern Sweden opened last month, you too can live out your childhood dream and holiday in a treehouse, surveying the landscape. I simply had to try it out!",
+        "text": "And guess what? It turns out you don't have to just imagine it. Since the Treehotel in northern Sweden opened last month, you too can live out your childhood dream and holiday in a treehouse, surveying the landscape. I simply had to try it out!",
+        "translated_text": "Dan tahu apa lagi? Ternyata anda tidak perlu hanya membayangkan saja. Sejak Treehotel di utara Sweden dibuka bulan lalu, anda juga boleh mewujudkan impian masa kecil anda dan bercuti di sebuah rumah pokok, memandang pemandangan di sekeliling. Saya terpaksa cuba mengalaminya!"
+      },
+      {
+        "self_ref": "#/texts/58",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 585.072,
+              "r": 517.384,
+              "b": 546.83,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              218
+            ]
+          }
+        ],
+        "orig": "The well-hidden Treehotel is the creation of guesthouse owners, Britta and Kent Lindvall, who were inspired by Augustsén's film to create this back-to-nature retreat where guests can switch off and breathe more deeply.",
+        "text": "The well-hidden Treehotel is the creation of guesthouse owners, Britta and Kent Lindvall, who were inspired by Augustsén's film to create this back-to-nature retreat where guests can switch off and breathe more deeply.",
+        "translated_text": "Treehotel yang tersembunyi dengan baik adalah hasil cipta pemilik penginapan, Britta dan Kent Lindvall, yang terinspirasi oleh filem Augustsén untuk mencipta tempat pelarian semula alam ini di mana tamu boleh mematikan dan bernafas lebih dalam."
+      },
+      {
+        "self_ref": "#/texts/59",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 533.066,
+              "r": 517.382,
+              "b": 468.821,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              426
+            ]
+          }
+        ],
+        "orig": "An area of forest behind their guesthouse had been sold for logging. Instead of waiting for the inevitable to happen in a country where forestry is such an important industry, they persuaded the forest's new owner to sell it to them. With help from various architect friends, they planned the innovative designs of the Treehotel, determined to demonstrate that the natural forest environment had value beyond supplying timber.",
+        "text": "An area of forest behind their guesthouse had been sold for logging. Instead of waiting for the inevitable to happen in a country where forestry is such an important industry, they persuaded the forest's new owner to sell it to them. With help from various architect friends, they planned the innovative designs of the Treehotel, determined to demonstrate that the natural forest environment had value beyond supplying timber.",
+        "translated_text": "Sebuah kawasan hutan di belakang penginapan tamu mereka telah dijual untuk penanaman ulang. Sebaliknya daripada menunggu perkara yang tidak dapat dielakkan berlaku di negara di mana kehutanan adalah industri yang begitu penting, mereka meyakinkan pemilik hutan baru itu untuk menjualkannya kepada mereka. Dengan bantuan daripada rakan-rakan arkitek yang berbeza, mereka merancang corak inovatif bagi Treehotel, bertentangan untuk menunjukkan bahawa persekitaran alam semula jadi hutan mempunyai nilai lebih daripada hanya menyediakan kayu."
+      },
+      {
+        "self_ref": "#/texts/60",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 455.057,
+              "r": 517.375,
+              "b": 416.815,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              240
+            ]
+          }
+        ],
+        "orig": "On arrival, I was greeted by Britta, who explained, 'Guests usually leave their luggage here and just take a small overnight bag to the treehouses. We want them to get the feeling that they're leaving one world behind and entering another.'",
+        "text": "On arrival, I was greeted by Britta, who explained, 'Guests usually leave their luggage here and just take a small overnight bag to the treehouses. We want them to get the feeling that they're leaving one world behind and entering another.'",
+        "translated_text": "Pada kedatangan saya, saya disambut oleh Britta yang menjelaskan, \"Tamu biasanya meninggalkan bagasi mereka di sini dan hanya membawa beg semalam kecil ke rumah pohon. Kita ingin mereka merasakan perasaan seperti meninggalkan satu dunia dan memasuki dunia lain.\""
+      },
+      {
+        "self_ref": "#/texts/61",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 403.051,
+              "r": 517.367,
+              "b": 338.806,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              423
+            ]
+          }
+        ],
+        "orig": "Britta led me along a narrow path through a glade of birch trees, explaining as we walked why the couple want to share their passion for this beautiful forest environment with guests. We arrived at the Mirrorcube. The most striking of the treehouses, it's a glass box perched high in the forest. Like an architectural magic trick, it almost disappears into the foliage, so sharply are the surrounding trees reflected in it.",
+        "text": "Britta led me along a narrow path through a glade of birch trees, explaining as we walked why the couple want to share their passion for this beautiful forest environment with guests. We arrived at the Mirrorcube. The most striking of the treehouses, it's a glass box perched high in the forest. Like an architectural magic trick, it almost disappears into the foliage, so sharply are the surrounding trees reflected in it.",
+        "translated_text": "Britta membimbing saya melalui satu lorong sempit melalui hutan kecil yang dihuni oleh pokok-pokok birch, menjelaskan sambil berjalan mengapa pasangan itu mahu berkongsi minat mereka terhadap persekitaran hutan yang cantik ini dengan tetamu. Kami tiba di Mirrorcube. Yang paling menarik di antara rumah-rumah pokok itu, ia adalah sebuah kotak kaca yang diletakkan tinggi di dalam hutan. Seperti sihir arkitektonik, ia hampir hilang dalam dedaun, sebegitu tepat pantulan pokok-pokok sekeliling itu dalam kotak kaca tersebut."
+      },
+      {
+        "self_ref": "#/texts/62",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 325.0419999999999,
+              "r": 517.377,
+              "b": 260.797,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              475
+            ]
+          }
+        ],
+        "orig": "Inside, the Mirrorcube, like the hotel's other treehouses, facilities are fairly basic, not stretching much beyond an environmentally-friendly toilet - meals and showers are taken at the guesthouse, over 10 minutes' walk away. Still, underfloor heating will keep it cosy through winter. Reflective cladding means no one can see in but you can see out - you have an almost 360-degree view of the surrounding trees. There's even a window in the ceiling to look up into the sky.",
+        "text": "Inside, the Mirrorcube, like the hotel's other treehouses, facilities are fairly basic, not stretching much beyond an environmentally-friendly toilet - meals and showers are taken at the guesthouse, over 10 minutes' walk away. Still, underfloor heating will keep it cosy through winter. Reflective cladding means no one can see in but you can see out - you have an almost 360-degree view of the surrounding trees. There's even a window in the ceiling to look up into the sky.",
+        "translated_text": "Di dalam, Mirrorcube, seperti bilik pohon lain di hotel ini, fasilitasnya agak asas sahaja dan tidak meluas jauh ke luar dari sebuah longkang yang ramah alam - makanan dan mandi dilakukan di rumah tamu, lebih kurang 10 minit berjalan kaki. Walau bagaimanapun, pengepalan lantai panas akan menjadikan tempat ini hangat dan nyaman melalui musim sejuk. Kulit pantulan bermaksud tiada orang yang boleh melihat masuk tetapi anda boleh melihat keluar - anda mempunyai pandangan hampir 360 darjah kepada pokok-pokok di sekeliling. Malah terdapat jendela di langit-langit untuk melihat ke langit."
+      },
+      {
+        "self_ref": "#/texts/63",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 247.03300000000002,
+              "r": 517.363,
+              "b": 221.79200000000003,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              191
+            ]
+          }
+        ],
+        "orig": "When I woke the next morning, it was a shock to find a bird seeming to be peering back at me through the glass. It was tempting to spend the day in my own little nest but I wanted to explore.",
+        "text": "When I woke the next morning, it was a shock to find a bird seeming to be peering back at me through the glass. It was tempting to spend the day in my own little nest but I wanted to explore.",
+        "translated_text": "Apabila saya terbangun pada pagi hari esoknya, ini menjadi satu kejutan untuk menemui sejenis burung yang nampak memandang balik ke arah saya melalui kaca. Sangat menggoda untuk menghabiskan hari di dalam sarang kecil saya sendiri, tetapi saya ingin menjelajah."
+      },
+      {
+        "self_ref": "#/texts/64",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 208.02800000000002,
+              "r": 517.385,
+              "b": 130.78200000000004,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              507
+            ]
+          }
+        ],
+        "orig": "I went to take a peek at the Cabin, a sleek, organically-shaped space pod touched down in the treetops about 50 metres from the Mirrorcube. Also sleeping two, this one has a huge viewing platform - in summer you can actually sleep out under the open sky (safe from mosquitoes as they don't fly 10 metres up in the air). Just behind it is the four-person Bird's Nest, and the Blue Cone, scheduled for completion next month. A fifth and final treehouse in the collection, the UFO, opens at the end of October.",
+        "text": "I went to take a peek at the Cabin, a sleek, organically-shaped space pod touched down in the treetops about 50 metres from the Mirrorcube. Also sleeping two, this one has a huge viewing platform - in summer you can actually sleep out under the open sky (safe from mosquitoes as they don't fly 10 metres up in the air). Just behind it is the four-person Bird's Nest, and the Blue Cone, scheduled for completion next month. A fifth and final treehouse in the collection, the UFO, opens at the end of October.",
+        "translated_text": "Saya pergi untuk melihat Cabin, sebuah kapal ruang berbentuk organik dan licin yang mendarat di antara pepohonan kira-kira 50 meter dari Mirrorcube. Mengakomodasi dua orang juga, unit ini mempunyai platform penonton yang sangat besar - pada musim panas, anda sebenarnya boleh tidur di bawah langit terbuka (selamat daripada nyamuk kerana mereka tidak boleh terbang sehingga 10 meter di atas permukaan tanah). Di belakangnya terdapat Bird's Nest yang boleh mengakomodasi empat orang, dan Blue Cone yang dijadualkan akan siap bulan depan. Rumah pokok kelima dan terakhir dalam koleksi, UFO, akan dibuka pada akhir Oktober."
+      },
+      {
+        "self_ref": "#/texts/65",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 117.01800000000003,
+              "r": 517.346,
+              "b": 91.77700000000004,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              156
+            ]
+          }
+        ],
+        "orig": "Later, over breakfast, Kent talked enthusiastically about village walking tours where guests can stop for coffee, cake and conversation with a local family.",
+        "text": "Later, over breakfast, Kent talked enthusiastically about village walking tours where guests can stop for coffee, cake and conversation with a local family.",
+        "translated_text": "Kemudian, semasa sarapan, Kent bercakap dengan antusias tentang tur jalan kaki ke desa di mana tetamu boleh berhenti untuk minum kopi, makan kek dan berbual dengan keluarga tempatan."
+      },
+      {
+        "self_ref": "#/texts/66",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 539.62,
+              "t": 637.078,
+              "r": 545.719,
+              "b": 624.839,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              1
+            ]
+          }
+        ],
+        "orig": "5",
+        "text": "5",
+        "translated_text": "5"
+      },
+      {
+        "self_ref": "#/texts/67",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 533.502,
+              "t": 559.069,
+              "r": 545.7,
+              "b": 546.83,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "10",
+        "text": "10",
+        "translated_text": "10"
+      },
+      {
+        "self_ref": "#/texts/68",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 533.502,
+              "t": 481.06,
+              "r": 545.7,
+              "b": 468.821,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "15",
+        "text": "15",
+        "translated_text": "15"
+      },
+      {
+        "self_ref": "#/texts/69",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 533.502,
+              "t": 390.049,
+              "r": 545.7,
+              "b": 377.81,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "20",
+        "text": "20",
+        "translated_text": " dua puluh"
+      },
+      {
+        "self_ref": "#/texts/70",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 533.502,
+              "t": 312.03999999999996,
+              "r": 545.7,
+              "b": 299.80099999999993,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "25",
+        "text": "25",
+        "translated_text": "25"
+      },
+      {
+        "self_ref": "#/texts/71",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 533.502,
+              "t": 234.03099999999995,
+              "r": 545.7,
+              "b": 221.79200000000003,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "30",
+        "text": "30",
+        "translated_text": "tiga puluh"
+      },
+      {
+        "self_ref": "#/texts/72",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 533.502,
+              "t": 156.02199999999993,
+              "r": 545.7,
+              "b": 143.78300000000002,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "35",
+        "text": "35",
+        "translated_text": "35"
+      },
+      {
+        "self_ref": "#/texts/73",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 49.613,
+              "t": 43.90999999999997,
+              "r": 229.796,
+              "b": 35.009000000000015,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              46
+            ]
+          }
+        ],
+        "orig": "© Cambridge University Press & Assessment 2021",
+        "text": "© Cambridge University Press & Assessment 2021",
+        "translated_text": "© Universiti Cambridge Press & Penilaian 2021"
+      },
+      {
+        "self_ref": "#/texts/74",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 4,
+            "bbox": {
+              "l": 273.059,
+              "t": 43.90999999999997,
+              "r": 322.275,
+              "b": 35.009000000000015,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              13
+            ]
+          }
+        ],
+        "orig": "1123/01/SI/24",
+        "text": "1123/01/SI/24",
+        "translated_text": "1123/01/SI/24"
+      },
+      {
+        "self_ref": "#/texts/75",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 5,
+            "bbox": {
+              "l": 294.616,
+              "t": 804.468,
+              "r": 300.716,
+              "b": 792.229,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              1
+            ]
+          }
+        ],
+        "orig": "5",
+        "text": "5",
+        "translated_text": "5"
+      },
+      {
+        "self_ref": "#/texts/76",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 5,
+            "bbox": {
+              "l": 49.613,
+              "t": 779.103,
+              "r": 517.373,
+              "b": 727.86,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              334
+            ]
+          }
+        ],
+        "orig": "Unsurprisingly, given their deeply rooted commitment to the forest, the Lindvalls built the Treehotel sustainably - the Mirrorcube is even fitted with an infrared film, visible to birds only, that stops them flying into it - and activities such as noisy snowmobile safaris are definitely out! So, will I be visiting again? Absolutely.",
+        "text": "Unsurprisingly, given their deeply rooted commitment to the forest, the Lindvalls built the Treehotel sustainably - the Mirrorcube is even fitted with an infrared film, visible to birds only, that stops them flying into it - and activities such as noisy snowmobile safaris are definitely out! So, will I be visiting again? Absolutely.",
+        "translated_text": "Tidak mengherankan, berdasarkan komitmen mereka yang terpatri dalam terhadap hutan, Lindvalls membangun Treehotel secara lestari - Mirrorcube bahkan dilengkapi dengan pelamin inframerah yang hanya kelihatan oleh burung untuk mencegah mereka terbang ke arahnya - dan aktiviti seperti safari salju bising tentulah dilarang! Jadi, adakah saya akan mengunjungi lagi? Tanpa ragu-ragu."
+      },
+      {
+        "self_ref": "#/texts/77",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 5,
+            "bbox": {
+              "l": 533.502,
+              "t": 766.102,
+              "r": 545.7,
+              "b": 753.863,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              2
+            ]
+          }
+        ],
+        "orig": "40",
+        "text": "40",
+        "translated_text": "empat puluh"
+      },
+      {
+        "self_ref": "#/texts/78",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 5,
+            "bbox": {
+              "l": 49.613,
+              "t": 43.90999999999997,
+              "r": 229.796,
+              "b": 35.009000000000015,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              46
+            ]
+          }
+        ],
+        "orig": "© Cambridge University Press & Assessment 2021",
+        "text": "© Cambridge University Press & Assessment 2021",
+        "translated_text": "© Universiti Cambridge Press & Penilaian 2021"
+      },
+      {
+        "self_ref": "#/texts/79",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 5,
+            "bbox": {
+              "l": 273.059,
+              "t": 43.90999999999997,
+              "r": 322.275,
+              "b": 35.009000000000015,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              13
+            ]
+          }
+        ],
+        "orig": "1123/01/SI/24",
+        "text": "1123/01/SI/24",
+        "translated_text": "1123/01/SI/24"
+      },
+      {
+        "self_ref": "#/texts/80",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 49.613,
+              "t": 186.88200000000006,
+              "r": 144.255,
+              "b": 179.09400000000005,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              27
+            ]
+          }
+        ],
+        "orig": "Copyright Acknowledgements:",
+        "text": "Copyright Acknowledgements:",
+        "translated_text": "Kepastian Hak Cipta:"
+      },
+      {
+        "self_ref": "#/texts/81",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 49.613,
+              "t": 168.88,
+              "r": 68.734,
+              "b": 161.09199999999998,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              6
+            ]
+          }
+        ],
+        "orig": "Text A",
+        "text": "Text A",
+        "translated_text": "Teks A"
+      },
+      {
+        "self_ref": "#/texts/82",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 134.658,
+              "t": 168.88,
+              "r": 545.687,
+              "b": 152.091,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              154
+            ]
+          }
+        ],
+        "orig": "Adapted; From The Wild Trees by Richard Preston published by Penguin. Copyright © Richard Preston, 2007. Reprinted by permission of Penguin Books Limited.",
+        "text": "Adapted; From The Wild Trees by Richard Preston published by Penguin. Copyright © Richard Preston, 2007. Reprinted by permission of Penguin Books Limited.",
+        "translated_text": "Disediakan semula; daripada The Wild Trees oleh Richard Preston diterbitkan oleh Penguin. Hak cipta © Richard Preston, 2007. Diperuntukkan semula dengan izin daripada Penguin Books Limited."
+      },
+      {
+        "self_ref": "#/texts/83",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 49.613,
+              "t": 150.87799999999993,
+              "r": 68.734,
+              "b": 143.09000000000003,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              6
+            ]
+          }
+        ],
+        "orig": "Text A",
+        "text": "Text A",
+        "translated_text": "Teks A"
+      },
+      {
+        "self_ref": "#/texts/84",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 134.658,
+              "t": 150.87799999999993,
+              "r": 545.728,
+              "b": 134.08899999999994,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              227
+            ]
+          }
+        ],
+        "orig": "Adapted; Excerpt(s) from THE WILD TREES: A STORY OF PASSION AND DARING by Richard Preston, © 2007 by Richard Preston. Used by permission of Random House, an imprint and division of Penguin Random House LLC. All rights reserved.",
+        "text": "Adapted; Excerpt(s) from THE WILD TREES: A STORY OF PASSION AND DARING by Richard Preston, © 2007 by Richard Preston. Used by permission of Random House, an imprint and division of Penguin Random House LLC. All rights reserved.",
+        "translated_text": "Disahikan; Extract(s) daripada BUKU THE WILD TREES: SEBUAH STORI PERASAAN DAN KEPADAMAN oleh Richard Preston, © 2007 oleh Richard Preston. Digunakan dengan keizinan daripada Random House, sebuah cetakan dan bahagian daripada Penguin Random House LLC. Hak cipta terpelihara."
+      },
+      {
+        "self_ref": "#/texts/85",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 49.613,
+              "t": 132.87599999999998,
+              "r": 69.125,
+              "b": 125.08799999999997,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              6
+            ]
+          }
+        ],
+        "orig": "Text B",
+        "text": "Text B",
+        "translated_text": "Teks B"
+      },
+      {
+        "self_ref": "#/texts/86",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 134.658,
+              "t": 132.87599999999998,
+              "r": 545.715,
+              "b": 116.08699999999999,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              192
+            ]
+          }
+        ],
+        "orig": "© Adapted; Rhiannon Batten; Rooms at the top: Sweden's stylish new treehouse ; The Guardian News & Media Ltd; 28 Aug 2010; https://www.theguardian.com/travel/2010/aug/28/treehouse-sweden-hotel",
+        "text": "© Adapted; Rhiannon Batten; Rooms at the top: Sweden's stylish new treehouse ; The Guardian News & Media Ltd; 28 Aug 2010; https://www.theguardian.com/travel/2010/aug/28/treehouse-sweden-hotel",
+        "translated_text": "© Disalihkan; Rhiannon Batten; Kamar di atas: Rumah Pohon Baru yang Stylish di Sweden; The Guardian News & Media Ltd; 28 Ogos 2010; https://www.theguardian.com/travel/2010/aug/28/treehouse-sweden-hotel"
+      },
+      {
+        "self_ref": "#/texts/87",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 49.613,
+              "t": 105.87300000000005,
+              "r": 545.653,
+              "b": 80.082,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              418
+            ]
+          }
+        ],
+        "orig": "Permission to reproduce items where third-party owned material protected by copyright is included has been sought and cleared where possible. Every reasonable effort has been made by the publisher (Cambridge University Press & Assessment) to trace copyright holders, but if any items requiring clearance have unwittingly been included, the publisher will be pleased to make amends at the earliest possible opportunity.",
+        "text": "Permission to reproduce items where third-party owned material protected by copyright is included has been sought and cleared where possible. Every reasonable effort has been made by the publisher (Cambridge University Press & Assessment) to trace copyright holders, but if any items requiring clearance have unwittingly been included, the publisher will be pleased to make amends at the earliest possible opportunity.",
+        "translated_text": "Kepada lesen untuk memajakan item di mana bahan yang dimiliki pihak ketiga yang dilindungi oleh hak cipta termasuk telah dicari dan disahkan sejauh mungkin. Setiap usaha yang masuk akal telah dibuat oleh penerbit (Cambridge University Press & Assessment) untuk menjejaki pemegang hak cipta, tetapi jika sesuatu item yang memerlukan sijil tanpa sengaja termasuk, penerbit bersedia untuk membuat pengecualian pada peluang tercepat yang mungkin."
+      },
+      {
+        "self_ref": "#/texts/88",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 49.613,
+              "t": 69.86900000000003,
+              "r": 545.677,
+              "b": 53.07899999999995,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              184
+            ]
+          }
+        ],
+        "orig": "Cambridge Assessment International Education is part of Cambridge University Press & Assessment. Cambridge University Press & Assessment is a department of the University of Cambridge.",
+        "text": "Cambridge Assessment International Education is part of Cambridge University Press & Assessment. Cambridge University Press & Assessment is a department of the University of Cambridge.",
+        "translated_text": "Pendidikan Antarabangsa Cambridge adalah sebahagian daripada Cambridge University Press & Assessment. Cambridge University Press & Assessment ialah sebuah bahagian daripada Universiti Cambridge."
+      },
+      {
+        "self_ref": "#/texts/89",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 294.616,
+              "t": 804.468,
+              "r": 300.716,
+              "b": 792.229,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              1
+            ]
+          }
+        ],
+        "orig": "6",
+        "text": "6",
+        "translated_text": " enam"
+      },
+      {
+        "self_ref": "#/texts/90",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 261.717,
+              "t": 779.103,
+              "r": 333.611,
+              "b": 766.864,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              10
+            ]
+          }
+        ],
+        "orig": "BLANK PAGE",
+        "text": "BLANK PAGE",
+        "level": 1,
+        "translated_text": "HALAMAN KOSONG"
+      },
+      {
+        "self_ref": "#/texts/91",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 49.613,
+              "t": 43.90999999999997,
+              "r": 229.796,
+              "b": 35.009000000000015,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              46
+            ]
+          }
+        ],
+        "orig": "© Cambridge University Press & Assessment 2021",
+        "text": "© Cambridge University Press & Assessment 2021",
+        "translated_text": "© Universiti Cambridge Press & Penilaian 2021"
+      },
+      {
+        "self_ref": "#/texts/92",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "furniture",
+        "label": "page_footer",
+        "prov": [
+          {
+            "page_no": 6,
+            "bbox": {
+              "l": 273.059,
+              "t": 43.90999999999997,
+              "r": 322.275,
+              "b": 35.009000000000015,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              13
+            ]
+          }
+        ],
+        "orig": "1123/01/SI/24",
+        "text": "1123/01/SI/24",
+        "translated_text": "1123/01/SI/24"
+      }
+    ],
+    "pictures": [
+      {
+        "self_ref": "#/pictures/0",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "picture",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 261.5536804199219,
+              "t": 815.1662006378174,
+              "r": 446.2525634765625,
+              "b": 784.8999900817871,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              0
+            ]
+          }
+        ],
+        "captions": [],
+        "references": [],
+        "footnotes": [],
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 370,
+            "height": 60
+          }
+        },
+        "annotations": [],
+        "key": "img_0.png"
+      },
+      {
+        "self_ref": "#/pictures/1",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [
+          {
+            "$ref": "#/texts/1"
+          }
+        ],
+        "content_layer": "body",
+        "label": "picture",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 21.814355850219727,
+              "t": 618.1591339111328,
+              "r": 48.54130172729492,
+              "b": 515.031005859375,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              0
+            ]
+          }
+        ],
+        "captions": [],
+        "references": [],
+        "footnotes": [],
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 53,
+            "height": 206
+          }
+        },
+        "annotations": [],
+        "key": "img_1.png"
+      }
+    ],
+    "tables": [],
+    "key_value_items": [],
+    "form_items": [],
+    "pages": {
+      "1": {
+        "size": {
+          "width": 596,
+          "height": 842
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1684
+          }
+        },
+        "page_no": 1
+      },
+      "2": {
+        "size": {
+          "width": 596,
+          "height": 842
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1684
+          }
+        },
+        "page_no": 2
+      },
+      "3": {
+        "size": {
+          "width": 596,
+          "height": 842
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1684
+          }
+        },
+        "page_no": 3
+      },
+      "4": {
+        "size": {
+          "width": 596,
+          "height": 842
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1684
+          }
+        },
+        "page_no": 4
+      },
+      "5": {
+        "size": {
+          "width": 596,
+          "height": 842
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1684
+          }
+        },
+        "page_no": 5
+      },
+      "6": {
+        "size": {
+          "width": 596,
+          "height": 842
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1684
+          }
+        },
+        "page_no": 6
+      }
+    }
+  },
+  "source_lang": "en",
+  "target_lang": "malay"
+}
