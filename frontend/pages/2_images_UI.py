@@ -4,7 +4,11 @@ import asyncio
 import httpx
 import json
 import os
+from PIL import Image
+from io import BytesIO
 
+# Constants
+MAX_IMAGE_HEIGHT = 300  # Maximum height in pixels
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -79,29 +83,54 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
             # Display each image
             for i, image_data in enumerate(image_response["images"]):
                 with st.container():
-                    st.markdown('<div class="image-container">', unsafe_allow_html=True)
-                    
+                    # Create two columns for image and metadata
                     col1, col2 = st.columns([1, 2])
-                    
+        
+                    # Construct the correct URL using PDF_PROCESSOR_URL
+                    image_path = f"/images/{doc_id}/{image_data['image_key'].split('/')[-1]}"
+                    image_url = f"{PDF_PROCESSOR_URL}{image_path}"
+                    logger.info(f"Fetching image from: {image_url}")
+
                     with col1:
                         # Display actual image from URL
                         try:
-                            st.image(
-                                image_data["url"],
-                                caption=f"Image {i+1} (from {image_data["image_key"]})",
-                                use_container_width =True
-                            )
+                            if "detail" in image_data:
+                                st.error(image_data["detail"])
+                            else:
+                                # Fetch image with authenticated client
+                                with httpx.Client(cookies=st.session_state.httpx_cookies) as client:
+                                    img_response = client.get(image_url)
+                                    img_response.raise_for_status()
+                                    image_bytes = img_response.content
+                                    
+                                    # Open image with PIL for potential resizing
+                                    img = Image.open(BytesIO(image_bytes))
+                                    width, height = img.size
+                                    
+                                    # Display the image
+                                    st.image(
+                                        image_bytes,
+                                        caption=f"Image {i+1} ({width}x{height}px)",
+                                        use_container_width=True
+                                    )
+
                         except Exception as e:
                             logger.error(f"Error loading image {i+1}: {e}")
                             st.error(f"Error loading image {i+1}: {e}")
                     
                     with col2:
                         st.markdown(f"**Image Key:** {image_data["image_key"]}")
-                        st.markdown(f"**Image ID:** IMG_{i+1:03d}")
-                        st.markdown(f"**Image URL:** {image_data["url"]}")
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-                    st.divider()  # Add separator between images
+                        
+                        # Download button
+                        filename = f"image_{i+1}.png"
+                        st.download_button(
+                            label="Download",
+                            data=image_bytes,
+                            file_name=filename,
+                            mime="image/png",
+                            key=f"{filename}_download_btn_{image_data["image_key"]}"
+                        )
+                        
         else:
             st.info("No images found in the document")
             
