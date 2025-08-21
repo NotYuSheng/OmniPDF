@@ -70,8 +70,6 @@ services:
     container_name: metadata_service
     env_file:
       - ./metadata_service/.env
-    ports:
-      - "8181:8000"
     depends_on:
       - chromadb
 
