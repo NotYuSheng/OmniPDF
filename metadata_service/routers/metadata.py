@@ -92,76 +92,45 @@ async def get_model_response(
     return processed_response
 
 
-async def summarise_chunk(
-    context: str,
-    client: AsyncOpenAI = Depends(get_openai_client),
-):
-    summary_len = SUMMARY_LENGTH if SUMMARY_LENGTH < len(context) else len(context)
-    system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
-    user_prompt = prompt_templates.format_user_prompt(
-        f"Prepare a single paragraph summary of {summary_len} words. Return only the summary.",
-        context,
-        QueryType.SUMMARIZATION,
-    )
-    return await get_model_response(user_prompt, system_prompt, client)
-
-
-async def cascade_summaries(
-    summaries: list[str],
-    client: AsyncOpenAI = Depends(get_openai_client),
-):
-    # Not ideal, will consume a lot of memory as prev summaries will not be gc till final set is gotten
-    if len(summaries) < 8:
-        return summaries
-    new_summaries = []
-    for i in range(len(summaries), 8):
-        new_summary_context = "\n".join(summaries[i : i + 8])
-        system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
-        user_prompt = prompt_templates.format_user_prompt(
-            f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
-            new_summary_context,
-            QueryType.SUMMARIZATION,
-        )
-        new_summaries.append(
-            await get_model_response(user_prompt, system_prompt, client)
-        )
-
-    return await cascade_summaries(new_summaries)
-
-
-async def prepare_summaries(
-    doc_id: str,
-    client: AsyncOpenAI = Depends(get_openai_client),
-):
-    summaries = []
-    async for chunk in get_chunk(doc_id):
-        summaries.append(await summarise_chunk(chunk, client))
-
-    # naive assume that all chunks will fix in context
-    summary_context = "\n".join(await cascade_summaries(summaries))
-
-    system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
-    user_prompt = prompt_templates.format_user_prompt(
-        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
-        summary_context,
-        QueryType.SUMMARIZATION,
-    )
-    summary = await get_model_response(user_prompt, system_prompt, client)
-    user_prompt = prompt_templates.format_user_prompt(
-        f"Prepare a single paragraph summary of {SHORT_DSECRIPTION_LENGTH} words. Return only the summary.",
-        summary_context,
-        QueryType.SUMMARIZATION,
-    )
-    exacutive_summary = await get_model_response(user_prompt, system_prompt, client)
-    return {"summary": summary, "exacutive_summary": exacutive_summary}
-
-
 @router.get("/summary/{doc_id}")
 async def get_summary(
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
-    return await prepare_summaries(doc_id, client)
+    system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
+    user_prompt = prompt_templates.format_user_prompt(
+        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
+        r"{context}",
+        QueryType.SUMMARIZATION,
+    )
+    summaries = []
+    async for chunk in get_chunk(doc_id):
+        summaries.append(
+            await get_model_response(
+                system_prompt, user_prompt.format(context=chunk), client
+            )
+        )
+        return await cascade_query(summaries, user_prompt, system_prompt, client)
+
+
+@router.get("/short_description/{doc_id}")
+async def get_short_description(
+    doc_id: str,
+    summary: str,
+    client: AsyncOpenAI = Depends(get_openai_client),
+):
+    system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
+    user_prompt = f"""
+    **DOCUMENT CONTEXT:**
+    {summary}
+    **QUERY REQUEST:** Return a short description of the document, up to {SHORT_DSECRIPTION_LENGTH} words.
+
+    **INSTRUCTIONS:**
+    Preserve the original meaning of the document while summarizing it into a concise description.
+    Return only the short description.
+    """
+
+    return await get_model_response(user_prompt, system_prompt, client)
 
 
 async def cascade_query(
@@ -282,15 +251,17 @@ async def generate_metadata(
 ):
     client = get_openai_client()
     try:
-        filename = await get_filename(doc_id)
-        metadata = await prepare_summaries(doc_id, client)
-        keywords = await get_keywords(doc_id, client)
-        authors = await get_authors(doc_id, client)
-        title = await get_title(doc_id, client)
-        metadata["keywords"] = keywords
-        metadata["authors"] = authors
-        metadata["title"] = title
-        metadata["filename"] = filename
+        summary = await get_summary(doc_id, client)
+        metadata = {
+            "filename": await get_filename(doc_id),
+            "summary": summary,
+            "exacutive_summary": await get_short_description(
+                doc_id, summary["summary"], client
+            ),
+            "keywords": await get_keywords(doc_id, client),
+            "authors": await get_authors(doc_id, client),
+            "title": await get_title(doc_id, client),
+        }
         save_job(
             doc_id=doc_id,
             job_data=metadata,
@@ -303,13 +274,11 @@ async def generate_metadata(
         error_job = {
             "doc_id": doc_id,
             "status": "error",
-            "message": "Failed to download or generate metadata"
+            "message": "Failed to download or generate metadata",
         }
-        save_job(doc_id = doc_id, 
-                 job_data = error_job, 
-                 status = "failed", 
-                 job_type = "extraction"
-                 )
+        save_job(
+            doc_id=doc_id, job_data=error_job, status="failed", job_type="extraction"
+        )
 
 
 @router.post("/", status_code=202)
@@ -324,6 +293,7 @@ async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
     background_tasks.add_task(generate_metadata, doc_id)
     return None
 
+
 @router.get("/{doc_id}")
 async def get_status(doc_id: str):
     job = load_job(doc_id=doc_id, job_type="metadata")
@@ -333,11 +303,11 @@ async def get_status(doc_id: str):
     if job.get("status") == "failed":
         error_message = job.get("data", {}).get("message", "Processing failed")
         raise HTTPException(status_code=500, detail=error_message)
-    
+
     job_data = job.get("data", {})
 
     return {
-        "doc_id":doc_id,
-        "status":job.get("status", "unknown"),
-        "metadata":job_data
+        "doc_id": doc_id,
+        "status": job.get("status", "unknown"),
+        "metadata": job_data,
     }
