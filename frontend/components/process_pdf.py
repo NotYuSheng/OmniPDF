@@ -17,7 +17,11 @@ def is_pdf(file_obj):
         header = file_obj.read(5)
         file_obj.seek(0)
         return header == b"%PDF-"
-    except Exception:
+    except (IOError, AttributeError) as e:
+        logger.error(f"Failed to validate PDF header: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"Unexpected error while validating PDF: {e}")
         return False
 
 
@@ -51,11 +55,11 @@ async def check_backend():
     Returns a dictionary with service names and their health status.m
     """
     services = {
-        "PDF Processor": os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000"),
-        "PDF Extractor": os.getenv("PDF_EXTRACTOR_URL", "http://pdf_extraction_service:8000"),
-        "Chat Service": os.getenv("CHAT_URL", "http://chat_service:8000"),
-        "Translation Service": os.getenv("DOCLING_TRANSLATION_URL", "http://docling_translation_service:8000"),
-        "Embedder Service": os.getenv("EMBEDDER_URL", "http://embedder_service:8000")
+        "PDF Processor": os.getenv("PDF_PROCESSOR_URL"),
+        "PDF Extractor": os.getenv("PDF_EXTRACTOR_URL"),
+        "Chat Service": os.getenv("CHAT_URL"),
+        "Translation Service": os.getenv("DOCLING_TRANSLATION_URL"),
+        "Embedder Service": os.getenv("EMBEDDER_URL")
     }
 
     async def check_service(service_name, url):
@@ -71,12 +75,15 @@ async def check_backend():
                     logger.error(f'{service_name}, "status": {response.text}, "url": {url}')
                     logger.error(f"Health check: {response.text}")
                     return service_name, {"status": f"HTTP {response.status_code}", "url": url}
-        except httpx.ConnectError:
-            return service_name, {"status": "Connection Error", "url": url}
-        except httpx.TimeoutException:
-            return service_name, {"status": "Timeout", "url": url}
+        except httpx.ConnectError as e:
+            logger.error(f"Connection error for {service_name} at {url}: {e}")
+            return service_name, {"status": f"Connection Error at {url}"}
+        except httpx.TimeoutException as e:
+            logger.error(f"Timeout error for {service_name} at {url}: {e}")
+            return service_name, {"status": f"Timeout at {url}"}
         except Exception as e:
-            return service_name, {"status": f"Error: {str(e)}", "url": url}
+            logger.error(f"Unexpected error for {service_name} at {url}: {e}")
+            return service_name, {"status": f"Error at {url}"}
 
     try:
         results = await asyncio.gather(*(check_service(name, url) for name, url in services.items()))

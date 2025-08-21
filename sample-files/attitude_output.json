@@ -1,0 +1,634 @@
+{
+  "doc_id": "006dafd7-8d00-44ea-86e7-04acb3f7644b",
+  "status": "completed",
+  "result": {
+    "schema_name": "DoclingDocument",
+    "version": "1.5.0",
+    "name": "original",
+    "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 5273114691430362000,
+      "filename": "original.pdf"
+    },
+    "furniture": {
+      "self_ref": "#/furniture",
+      "children": [],
+      "content_layer": "furniture",
+      "name": "_root_",
+      "label": "unspecified"
+    },
+    "texts": [
+      {
+        "self_ref": "#/texts/0",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 192.758,
+              "t": 768.444,
+              "r": 408.788,
+              "b": 761.046,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              28
+            ]
+          }
+        ],
+        "orig": "Discerning Attitude and Tone",
+        "text": "Discerning Attitude and Tone",
+        "translated_text": "辨识态度与语气"
+      },
+      {
+        "self_ref": "#/texts/1",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 72.054,
+              "t": 741.557,
+              "r": 528.496,
+              "b": 663.808,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              867
+            ]
+          }
+        ],
+        "orig": "There   can    be    questions    in    the    GP    comprehension    paper   that   require   you   to   identify   and   explain   the writer's attitude -his or her thoughts    and    feelings towards    an    issue, situation    or    argument. Alternatively, you   can    be   tasked   with   evaluating   his   or   her   tone   from   the   choice   of   words   or   manner and   style   of writing   used   by   the   writer   in   a   particular   paragraph.   In   addition,   you   might   need   to   provide evidence   to back   up   your   interpretation.   Note   that   the   words   'attitude'   and   'tone'   might   not   appear   in the   questions. Sometimes   when   there   are   questions   on   attitude   or   tone,   it   might   be   helpful   to   decide   if it is positive or  negative first before using a specific word to express it.",
+        "text": "There   can    be    questions    in    the    GP    comprehension    paper   that   require   you   to   identify   and   explain   the writer's attitude -his or her thoughts    and    feelings towards    an    issue, situation    or    argument. Alternatively, you   can    be   tasked   with   evaluating   his   or   her   tone   from   the   choice   of   words   or   manner and   style   of writing   used   by   the   writer   in   a   particular   paragraph.   In   addition,   you   might   need   to   provide evidence   to back   up   your   interpretation.   Note   that   the   words   'attitude'   and   'tone'   might   not   appear   in the   questions. Sometimes   when   there   are   questions   on   attitude   or   tone,   it   might   be   helpful   to   decide   if it is positive or  negative first before using a specific word to express it.",
+        "translated_text": "在 GP 理解试卷中可能会出现要求你识别并解释作者态度的问题——即作者对某个问题、情境或论点的思想和感受。或者，你可能被要求通过选择的词语或作者在特定段落中使用的写作方式和风格来评估其语气。此外，您可能需要提供证据以支持您的解释。请注意，“态度”和“语气”这两个词可能不会出现在问题中。有时，当涉及态度或语气的问题时，先决定它是积极的还是消极的可能会有所帮助，然后使用具体的词语来表达。"
+      },
+      {
+        "self_ref": "#/texts/2",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 87.054,
+              "t": 646.915,
+              "r": 305.685,
+              "b": 636.945,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              42
+            ]
+          }
+        ],
+        "orig": "🖐 Some terms to describe Tone and Attitude",
+        "text": "🖐 Some terms to describe Tone and Attitude",
+        "translated_text": "🖐 描述语气和态度的一些术语"
+      },
+      {
+        "self_ref": "#/texts/3",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 77.304,
+              "t": 621.736,
+              "r": 300.596,
+              "b": 616.272,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              49
+            ]
+          }
+        ],
+        "orig": "Words to describe tone Words to describe attitude",
+        "text": "Words to describe tone Words to describe attitude",
+        "translated_text": "描述语气的词语 描述态度的词语"
+      },
+      {
+        "self_ref": "#/texts/4",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 77.743,
+              "t": 598.486,
+              "r": 166.867,
+              "b": 569.308,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              35
+            ]
+          }
+        ],
+        "orig": "sardonic caustic reassuring mocking",
+        "text": "sardonic caustic reassuring mocking",
+        "translated_text": "讽刺的 刻薄的 安慰的 嘲弄的"
+      },
+      {
+        "self_ref": "#/texts/5",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 77.743,
+              "t": 551.137,
+              "r": 169.099,
+              "b": 522.058,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              36
+            ]
+          }
+        ],
+        "orig": "sarcastic blunt patronising arrogant",
+        "text": "sarcastic blunt patronising arrogant",
+        "translated_text": "讽刺的 直率的 恩施的 傲慢的"
+      },
+      {
+        "self_ref": "#/texts/6",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 77.743,
+              "t": 503.862,
+              "r": 124.255,
+              "b": 486.808,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              19
+            ]
+          }
+        ],
+        "orig": "aggrieved inspiring",
+        "text": "aggrieved inspiring",
+        "translated_text": "受委屈的 鼓舞人心的"
+      },
+      {
+        "self_ref": "#/texts/7",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 268.993,
+              "t": 610.023,
+              "r": 452.786,
+              "b": 484.558,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              294
+            ]
+          }
+        ],
+        "orig": "cautionary  confident sombre reconciliatory defeatist deferential pessimistic modest capricious assertive  disapproving stately cynical open biased trusting sceptical hostile critical belligerent judgemental whimsical condescending realistic encouraging empathetic optimistic hopeful passionate",
+        "text": "cautionary  confident sombre reconciliatory defeatist deferential pessimistic modest capricious assertive  disapproving stately cynical open biased trusting sceptical hostile critical belligerent judgemental whimsical condescending realistic encouraging empathetic optimistic hopeful passionate",
+        "translated_text": "警示的 自信的 阴郁的 调解的 失败主义的 恭敬的 悲观的 谦虚的 反复无常的 自信的 不赞成的 庄重的 犹疑的 开放的 有偏见的 信任的 怀疑的 故意的 批判的 好战的 判断的 异想天开的 居高临下的 实际的 鼓励的 同理心强的 乐观的 充满希望 热情的"
+      },
+      {
+        "self_ref": "#/texts/8",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 77.743,
+              "t": 468.856,
+              "r": 120.379,
+              "b": 463.392,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              9
+            ]
+          }
+        ],
+        "orig": "placating",
+        "text": "placating",
+        "translated_text": "安抚的"
+      },
+      {
+        "self_ref": "#/texts/9",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 91.554,
+              "t": 437.518,
+              "r": 507.179,
+              "b": 420.057,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              126
+            ]
+          }
+        ],
+        "orig": "(17) What is the difference between the attitudes expressed in the two questions Furedi poses at the end of the paragraph? [1]",
+        "text": "(17) What is the difference between the attitudes expressed in the two questions Furedi poses at the end of the paragraph? [1]",
+        "translated_text": "(17) Furedi在段落末尾提出的两个问题中表达的态度有什么不同？[1]"
+      },
+      {
+        "self_ref": "#/texts/10",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 91.554,
+              "t": 401.522,
+              "r": 497.021,
+              "b": 384.058,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              154
+            ]
+          }
+        ],
+        "orig": "Instead of being preoccupied with 'what will happen to us', we should search for answers to the  question: 'What needs to be done to humanise the future?'",
+        "text": "Instead of being preoccupied with 'what will happen to us', we should search for answers to the  question: 'What needs to be done to humanise the future?'",
+        "translated_text": "与其过分关注‘我们会发生什么’，不如寻找答案来解决‘需要做些什么使未来更人性化？’"
+      },
+      {
+        "self_ref": "#/texts/11",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 91.554,
+              "t": 365.857,
+              "r": 503.099,
+              "b": 348.807,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              124
+            ]
+          }
+        ],
+        "orig": "Answer: Firstly, he is judgemental of the idea of 'what will happen to us', the he shifts his tone to being more open-minded",
+        "text": "Answer: Firstly, he is judgemental of the idea of 'what will happen to us', the he shifts his tone to being more open-minded",
+        "translated_text": "答案：首先，他对‘我们会发生什么’的想法较为批判，随后转变为更开放的语气。"
+      },
+      {
+        "self_ref": "#/texts/12",
+        "parent": {
+          "$ref": "#/groups/1"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 92.304,
+              "t": 763.768,
+              "r": 465.862,
+              "b": 746.307,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              93
+            ]
+          }
+        ],
+        "orig": "(18) Identify the writer's attitude towards parents who use the infant cramming approach. [2]",
+        "text": "(18) Identify the writer's attitude towards parents who use the infant cramming approach. [2]",
+        "translated_text": "(18) 确定作者对采用婴儿填鸭式方法的父母的态度。[2]"
+      },
+      {
+        "self_ref": "#/texts/13",
+        "parent": {
+          "$ref": "#/groups/1"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 728.009,
+              "r": 508.924,
+              "b": 674.308,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              525
+            ]
+          }
+        ],
+        "orig": "Today's   children   are   the   target   of   more   adult   intervention   and   anxiety   than   any   time   in   history, with    many    of    them    keeping    a    frenetic    schedule    that    will    exhaust    a    jet-setting    CEO.    Even infants are    being    shuttled    from    baby    yoga   to   baby   aerobics   to   baby   sign   language   lessons despite    research   concluding   that   infant   cramming   is   pointless   because   force-fed   skills   have   to be  relearned later in life.",
+        "text": "Today's   children   are   the   target   of   more   adult   intervention   and   anxiety   than   any   time   in   history, with    many    of    them    keeping    a    frenetic    schedule    that    will    exhaust    a    jet-setting    CEO.    Even infants are    being    shuttled    from    baby    yoga   to   baby   aerobics   to   baby   sign   language   lessons despite    research   concluding   that   infant   cramming   is   pointless   because   force-fed   skills   have   to be  relearned later in life.",
+        "translated_text": "现在的孩子们受到了历史上从未有过的成人干预和焦虑的影响，其中许多人保持着让飞行中的CEO也感到疲惫的繁忙日程。甚至婴儿也被从婴儿瑜伽带到婴儿健身，再到婴儿手语课程，尽管研究得出的结论是婴儿填鸭式教学毫无意义，因为强塞的技能最终仍需要在以后的生活中重新学习。"
+      },
+      {
+        "self_ref": "#/texts/14",
+        "parent": {
+          "$ref": "#/groups/1"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 656.087,
+              "r": 430.894,
+              "b": 650.622,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              76
+            ]
+          }
+        ],
+        "orig": "Answer :  The writer is very condescending towards   parents who infant cram",
+        "text": "Answer :  The writer is very condescending towards   parents who infant cram",
+        "translated_text": "答案：作者对采用婴儿填鸭式方法的父母非常居高临下。"
+      },
+      {
+        "self_ref": "#/texts/15",
+        "parent": {
+          "$ref": "#/groups/2"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 511.018,
+              "r": 502.403,
+              "b": 493.557,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              109
+            ]
+          }
+        ],
+        "orig": "(19) What does the phrase 'poses as a prophet-scientist' reveal about Furedi's attitude towards Lovelock? [2]",
+        "text": "(19) What does the phrase 'poses as a prophet-scientist' reveal about Furedi's attitude towards Lovelock? [2]",
+        "translated_text": "(19) 短语“冒充预言科学家”透露了Furedi对Lovelock的态度是什么？[2]"
+      },
+      {
+        "self_ref": "#/texts/16",
+        "parent": {
+          "$ref": "#/groups/2"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 475.138,
+              "r": 402.76,
+              "b": 469.677,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              65
+            ]
+          }
+        ],
+        "orig": "Answer: Furedi's attitude towards lovelock is that of judgemental",
+        "text": "Answer: Furedi's attitude towards lovelock is that of judgemental",
+        "translated_text": "答案：Furedi对Lovelock的态度是批判的。"
+      },
+      {
+        "self_ref": "#/texts/17",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 350.518,
+              "r": 499.486,
+              "b": 333.057,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              134
+            ]
+          }
+        ],
+        "orig": "(20) What is the writer's tone when he describes the Texas cattle ranchers and Detroit assembly line workers? Justify your answer. [2]",
+        "text": "(20) What is the writer's tone when he describes the Texas cattle ranchers and Detroit assembly line workers? Justify your answer. [2]",
+        "translated_text": "(20) 作者在描述德克萨斯州养牛场工人和底特律生产线工人的语气是什么？请证明您的答案。[2]"
+      },
+      {
+        "self_ref": "#/texts/18",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 314.64200000000005,
+              "r": 509.053,
+              "b": 249.058,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              658
+            ]
+          }
+        ],
+        "orig": "There   is   probably   widespread   agreement   that   it   is   a   wonderful   thing   that   most   of   us   own   cars. Is there   anyone   who   believes   that   the   reason   we   have   cars   is   because   Detroit   assembly-line workers   care   about   us?   It   is   also   wonderful   that   T exas   cattle   ranchers   make   the   sacrifices   of time    and   effort   caring   for   steer   so   that   New   Yorkers   can   enjoy   a   steak   now   and   then.   Again,   is there anyone   who   believes   that   ranchers   who   make   these   sacrifices   do   so   out   of   a   concern for and  feeling the pain of New Yorkers?",
+        "text": "There   is   probably   widespread   agreement   that   it   is   a   wonderful   thing   that   most   of   us   own   cars. Is there   anyone   who   believes   that   the   reason   we   have   cars   is   because   Detroit   assembly-line workers   care   about   us?   It   is   also   wonderful   that   T exas   cattle   ranchers   make   the   sacrifices   of time    and   effort   caring   for   steer   so   that   New   Yorkers   can   enjoy   a   steak   now   and   then.   Again,   is there anyone   who   believes   that   ranchers   who   make   these   sacrifices   do   so   out   of   a   concern for and  feeling the pain of New Yorkers?",
+        "translated_text": "可能有人广泛认同我们大多数人拥有汽车是一件美好的事情。有没有人相信我们拥有汽车是因为底特律生产线工人关心我们？同样，德州养牛场工人为了纽约人偶尔享受牛排而牺牲时间和精力照顾母牛，这也是一件美好的事情。再次问一句，有人相信那些作出这些牺牲的养牛工人是因为关心纽约人，并感受到他们的痛苦吗？"
+      },
+      {
+        "self_ref": "#/texts/19",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 230.98199999999997,
+              "r": 491.802,
+              "b": 213.808,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              172
+            ]
+          }
+        ],
+        "orig": "Answer :  His tone is sarcastic. He is making fun of   the idea that Texas cattle ranchers and Detroit  assembly line workers care for us rather than working to make money.",
+        "text": "Answer :  His tone is sarcastic. He is making fun of   the idea that Texas cattle ranchers and Detroit  assembly line workers care for us rather than working to make money.",
+        "translated_text": "答案：他的语气是讽刺的。他是在嘲笑德州养牛场工人和底特律生产线工人关心我们的想法，而不是为了挣钱而工作。"
+      }
+    ],
+    "pictures": [],
+    "tables": [],
+    "key_value_items": [],
+    "form_items": [],
+    "pages": {
+      "1": {
+        "size": {
+          "width": 595.9199829101562,
+          "height": 842.8800048828125
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1686
+          }
+        },
+        "page_no": 1
+      },
+      "2": {
+        "size": {
+          "width": 595.9199829101562,
+          "height": 842.8800048828125
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1686
+          }
+        },
+        "page_no": 2
+      },
+      "3": {
+        "size": {
+          "width": 595.9199829101562,
+          "height": 842.8800048828125
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1686
+          }
+        },
+        "page_no": 3
+      }
+    }
+  }
+}

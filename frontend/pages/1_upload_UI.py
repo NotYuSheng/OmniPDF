@@ -27,11 +27,11 @@ async def process_pdf(uploaded_files, status_text):
     
     for i in range(100):
         progress_bar.progress(i + 1)
-        if i < 30:
+        if i < 25:
             status_text.text('Extracting text and images...')
-        elif i < 60:
+        elif i < 50:
             status_text.text('Translating content...')
-        elif i < 80:
+        elif i < 75:
             status_text.text('Generating metadata...')
         else:
             status_text.text('Finalizing processing...')
@@ -83,7 +83,7 @@ async def process_pdf(uploaded_files, status_text):
     #     logger.error(f"Error processing PDF: {e}")
 
     except Exception as e:
-        st.error(f"Error processing PDF: {e}")
+        st.error("Error processing PDF")
         logger.error(f"Error processing PDF: {e}")
 
 st.markdown('<h1 class="main-header">🦸 OmniPDF</h1>', unsafe_allow_html=True)

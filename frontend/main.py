@@ -15,15 +15,14 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-status_placeholder = st.empty()  # Placeholder for status updates
 if "processed_data" not in st.session_state:
     st.session_state.processed_data = None
 
 if "httpx_cookies" not in st.session_state:
     st.session_state.httpx_cookies = Cookies()
 # Backend
-PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://pdf_processor_service:8000")
-CHAT_URL = os.getenv("CHAT_URL", "http://chat_service:8000")
+PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL")
+CHAT_URL = os.getenv("CHAT_URL")
 
     
 if __name__ == "__main__":

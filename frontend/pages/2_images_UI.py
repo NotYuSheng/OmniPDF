@@ -21,21 +21,26 @@ async def get_images(doc_id, max_retries=60, delay=1) -> dict:
         async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
             try:
                 response = await client.get(f"{PDF_PROCESSOR_URL}/images/{doc_id}")
+                
                 logger.info(f"Image extraction response status: {response.status_code}")
+                logger.info(f"Current session cookie: {st.session_state.httpx_cookies.get('OmniPDFSession')}")
+                
                 try:
                     data = response.json()
-                    if "detail" in data:
-                        server_status.info(data["detail"])
-                        logger.info(f"Info details: {data['detail']}")
-                    else:
-                        server_status.info("Successfully retrieved images")
-                        logger.info(f"Image extraction response: {response}")
-                except json.JSONDecodeError:
-                    logger.error(f"Failed to decode JSON from response: {response.text}")
+                except json.JSONDecodeError as e:
+                    logger.error(f"Failed to decode JSON from response: {response.text}: {e}")
                     server_status.error("Received an invalid response from the server.")
                 
+                # Use the decoded data for all subsequent checks
+                if "detail" in data:
+                    server_status.info(data["detail"])
+                    logger.info(f"Info details: {data['detail']}")
+                else:
+                    server_status.info("Successfully retrieved images")
+                    logger.info(f"Image extraction response: {response}")
+
                 if response.status_code == 200:
-                    return response.json()  # Success - return the actual data
+                    return data  # Success - return the actual data
                 elif response.status_code == 202:
                     # Still processing, continue polling
                     if attempt < max_retries - 1:
@@ -43,8 +48,8 @@ async def get_images(doc_id, max_retries=60, delay=1) -> dict:
                         if "detail" in response.json():
                             server_status.info(response.json()["detail"])
                         else:
-                            if len(response.json()) > 100:
-                                server_status.info(response.text[50:])
+                            if len(data) > 100:
+                                server_status.info(str(data)[:50] + "...")
                         await asyncio.sleep(delay)
                         continue
                     else:
@@ -59,7 +64,9 @@ async def get_images(doc_id, max_retries=60, delay=1) -> dict:
                 if attempt == max_retries - 1:
                     raise
                 await asyncio.sleep(delay)
-    
+            except Exception as e:
+                logger.error(f"Unexpected error on attempt {attempt + 1}: {e}")
+
     raise TimeoutError("Max retries exceeded")
 
 def display_images(image_response):
@@ -163,16 +170,15 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
 
             
     except TimeoutError as e:
-        st.error(f"Timeout error: {e}")
-        st.info("The document is taking longer than expected to process. Please try again later.")
+        logger.error(f"Timeout error: {e}")
         
     except httpx.RequestError as e:
-        st.error(f"Network error: {e}")
+        logger.error(f"Network error: {e}")
         st.info("There was a problem connecting to the server. Please check your connection and try again.")
         
     except Exception as e:
         logger.error(f"Unexpected error in image extraction: {e}")
-        st.error(f"An unexpected error occurred: {e}")
+        st.error("An unexpected error occurred at image extraction.")
         
 else:
     st.info("Please upload and process a PDF first to extract images")

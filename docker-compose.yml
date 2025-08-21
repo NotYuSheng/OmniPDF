@@ -44,7 +44,15 @@ services:
     container_name: docling_translation_service
     env_file:
       - ./docling_translation_service/.env
-      
+  
+  pdf_renderer_service:
+    build:
+      context: .
+      dockerfile: ./pdf_renderer_service/Dockerfile
+    container_name: pdf_renderer_service
+    env_file:
+      - ./pdf_renderer_service/.env
+
   embedder_service:
     build:
       context: .
@@ -69,6 +77,7 @@ services:
       - pdf_processor_service
       - chat_service
       - docling_translation_service
+      - pdf_renderer_service
       - embedder_service
       - minio
 
@@ -136,8 +145,7 @@ services:
     env_file:
       - ./frontend/.env
     ports:
-      - "8504:8504"
-
+      - "8501:8501"
 
 volumes:
   minio-data:

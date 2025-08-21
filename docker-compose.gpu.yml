@@ -32,6 +32,14 @@ services:
     container_name: docling_translation_service
     env_file:
       - ./docling_translation_service/.env
+  
+  pdf_renderer_service:
+    build:
+      context: .
+      dockerfile: ./pdf_renderer_service/Dockerfile
+    container_name: pdf_renderer_service
+    env_file:
+      - ./pdf_renderer_service/.env
       
   embedder_service:
     build:
@@ -114,7 +122,7 @@ services:
     env_file:
       - ./frontend/.env
     ports:
-      - "8504:8504"
+      - "8501:8501"
 
   vllm-qwen2.5:
     container_name: vllm-qwen2.5
