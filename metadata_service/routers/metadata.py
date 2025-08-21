@@ -301,7 +301,16 @@ async def generate_metadata(
         return metadata
     except Exception as e:
         logger.error(f"Error generating metadata for {doc_id}: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to generate metadata")
+        error_job = {
+            "doc_id": doc_id,
+            "status": "error",
+            "message": "Failed to download or generate metadata"
+        }
+        save_job(doc_id = doc_id, 
+                 job_data = error_job, 
+                 status = "failed", 
+                 job_type = "extraction"
+                 )
 
 
 @router.post("/", status_code=202)
