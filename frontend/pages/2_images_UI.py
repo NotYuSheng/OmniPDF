@@ -10,7 +10,6 @@ from io import BytesIO
 # Constants
 MAX_IMAGE_HEIGHT = 300  # Maximum height in pixels
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL")
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize cookies if not present

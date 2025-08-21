@@ -5,7 +5,6 @@ import httpx
 import os
 
 CHAT_URL = os.getenv("CHAT_URL", "http://chat_service:8000")
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 st.header("Chat")

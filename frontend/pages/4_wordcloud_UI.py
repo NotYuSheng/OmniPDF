@@ -6,7 +6,6 @@ from components.process_pdf import generate_wordcloud
 import io
 
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # WIP - this file is not fully functional yet

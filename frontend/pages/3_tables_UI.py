@@ -3,7 +3,6 @@ import logging
 import pandas as pd
 from io import StringIO
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 st.header("📋 Extract Tables")

@@ -6,7 +6,6 @@ import httpx
 import streamlit as st
 
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL")
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 if 'httpx_cookies' not in st.session_state:
