@@ -6,7 +6,6 @@ from shared_utils.redis import RedisStringStorage
 from shared_utils.s3_utils import save_job, load_job
 import logging
 import os
-from metadata_service.models.metadata import MetadataRequest
 from models.rag_config import (
     QwenRAGConfig,
     QwenPromptTemplates,
@@ -30,7 +29,7 @@ FILENAME_REDIS_PREFIX = "Filename"
 TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
 MAX_CHUNK_IN_MEMORY = 10
 SUMMARY_LENGTH = 500
-EXECUTIVE_SUMMARY_LENGTH = 50
+SHORT_DSECRIPTION_LENGTH = 20
 
 
 async def get_chunk(doc_id: str):
@@ -149,7 +148,7 @@ async def prepare_summaries(
     )
     summary = await get_model_response(user_prompt, system_prompt, client)
     user_prompt = prompt_templates.format_user_prompt(
-        f"Prepare a single paragraph summary of {EXECUTIVE_SUMMARY_LENGTH} words. Return only the summary.",
+        f"Prepare a single paragraph summary of {SHORT_DSECRIPTION_LENGTH} words. Return only the summary.",
         summary_context,
         QueryType.SUMMARIZATION,
     )
