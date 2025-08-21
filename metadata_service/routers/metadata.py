@@ -1,7 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chroma_client
+from shared_utils.redis import RedisStringStorage
+from shared_utils.s3_utils import save_job, load_job
 import logging
 import os
 from metadata_service.models.metadata import MetadataRequest
@@ -24,6 +26,7 @@ qwen_optimizer = QwenRAGOptimizer()
 OPENAI_MODEL_NAME = qwen_config.model_name
 TOP_K = int(os.getenv("MODEL_TOP_K"))
 
+FILENAME_REDIS_PREFIX = "Filename"
 TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
 MAX_CHUNK_IN_MEMORY = 10
 SUMMARY_LENGTH = 500
@@ -154,7 +157,7 @@ async def prepare_summaries(
     return {"summary": summary, "exacutive_summary": exacutive_summary}
 
 
-@router.get("/{doc_id}")
+@router.get("/summary/{doc_id}")
 async def get_summary(
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
@@ -264,3 +267,69 @@ async def get_keywords(
             continue
         keywords.extend(keywords_split[-1].split(", "))
     return list(set(keywords))
+
+
+@router.get("/filename/{doc_id}")
+async def get_filename(doc_id: str):
+    redis_filename_store = RedisStringStorage(prefix=FILENAME_REDIS_PREFIX)
+    filename = redis_filename_store[doc_id]
+    if not filename:
+        raise HTTPException(status_code=404, detail="Filename not found for document")
+    return filename
+
+
+async def generate_metadata(
+    doc_id: str,
+):
+    client = get_openai_client()
+    try:
+        filename = await get_filename(doc_id)
+        metadata = await prepare_summaries(doc_id, client)
+        keywords = await get_keywords(doc_id, client)
+        authors = await get_authors(doc_id, client)
+        title = await get_title(doc_id, client)
+        metadata["keywords"] = keywords
+        metadata["authors"] = authors
+        metadata["title"] = title
+        metadata["filename"] = filename
+        save_job(
+            doc_id=doc_id,
+            job_data=metadata,
+            status="completed",
+            job_type="metadata",
+        )
+        return metadata
+    except Exception as e:
+        logger.error(f"Error generating metadata for {doc_id}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to generate metadata")
+
+
+@router.post("/", status_code=202)
+async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
+    save_job(
+        doc_id=doc_id,
+        job_data={},
+        status="processing",
+        job_type="metadata",
+    )
+
+    background_tasks.add_task(generate_metadata, doc_id)
+    return None
+
+@router.get("/{doc_id}")
+async def get_status(doc_id: str):
+    job = load_job(doc_id=doc_id, job_type="metadata")
+    if not job:
+        raise HTTPException(status_code=404, detail="Document ID not found")
+
+    if job.get("status") == "failed":
+        error_message = job.get("data", {}).get("message", "Processing failed")
+        raise HTTPException(status_code=500, detail=error_message)
+    
+    job_data = job.get("data", {})
+
+    return {
+        "doc_id":doc_id,
+        "status":job.get("status", "unknown"),
+        "metadata":job_data
+    }
