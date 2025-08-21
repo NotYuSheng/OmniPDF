@@ -4,7 +4,8 @@ import asyncio
 import httpx
 import json
 import os
-from components.process_image import get_image_dimensions
+from PIL import Image
+from io import BytesIO
 
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://localhost:8080/pdf_processor")
 logging.basicConfig(level=logging.INFO)
@@ -84,10 +85,32 @@ def display_images(image_response):
                                         border=True,
                                         vertical_alignment="top")
                 
+                image_path = f"/images/{doc_id}/{image_data['image_key'].split('/')[-1]}"
+                image_url = f"{PDF_PROCESSOR_URL}{image_path}"
+                logger.info(f"Fetching image from: {image_url}")
+                        
                 with col1:
                     # Display actual image from URL
                     try:
-                        st.image(image_data["url"])
+                        if "detail" in image_data:
+                                st.error("An error occurred while loading the image.")
+                        else:
+                            # Fetch image with authenticated client
+                            with httpx.Client(cookies=st.session_state.httpx_cookies) as client:
+                                img_response = client.get(image_url)
+                                img_response.raise_for_status()
+                                image_bytes = img_response.content
+                                
+                                # Open image with PIL for potential resizing
+                                img = Image.open(BytesIO(image_bytes))
+                                width, height = img.size
+                                
+                                # Display the image
+                                st.image(
+                                    image_bytes,
+                                    caption=f"Image {i+1} ({width}x{height}px)",
+                                    use_container_width=True
+                                )
 
                     except Exception as e:
                         logger.error(f"Error loading image {i+1}: {e}")
