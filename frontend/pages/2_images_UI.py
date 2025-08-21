@@ -13,6 +13,9 @@ PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Initialize cookies if not present
+if 'httpx_cookies' not in st.session_state:
+    st.session_state.httpx_cookies = httpx.Cookies()
 
 st.header("🖼️ Image Extraction")
 image_status = st.empty()

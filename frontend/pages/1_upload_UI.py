@@ -45,8 +45,10 @@ async def process_pdf(uploaded_file):
                                   'application/pdf')}
         async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
             upload_response = await client.post(f"{PDF_PROCESSOR_URL}/documents/", files=files)
-            st.session_state.httpx_cookies = upload_response.cookies
+            if upload_response.cookies:
+                st.session_state.httpx_cookies = upload_response.cookies
             logger.info(f"Upload response cookies: {upload_response.cookies.get('OmniPDFSession')}")
+
             
         logger.info(f"Upload PDF response: {upload_response.text}")   
                 
