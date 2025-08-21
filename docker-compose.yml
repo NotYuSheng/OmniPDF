@@ -7,6 +7,16 @@ services:
     env_file:
       - ./pdf_processor_service/.env
 
+  cleaner:
+      build:
+        context: .
+        dockerfile: ./cleaner/Dockerfile
+      container_name: cleaner
+      env_file:
+        - ./cleaner/.env
+      depends_on:
+        - redis
+        
   chat_service:
     build:
       context: .
@@ -14,6 +24,8 @@ services:
     container_name: chat_service
     env_file:
       - ./chat_service/.env
+    depends_on:
+      - embedder_service
 
   pdf_extraction_service:
     build:
@@ -32,7 +44,15 @@ services:
     container_name: docling_translation_service
     env_file:
       - ./docling_translation_service/.env
-      
+  
+  pdf_renderer_service:
+    build:
+      context: .
+      dockerfile: ./pdf_renderer_service/Dockerfile
+    container_name: pdf_renderer_service
+    env_file:
+      - ./pdf_renderer_service/.env
+
   embedder_service:
     build:
       context: .
@@ -65,7 +85,9 @@ services:
       - pdf_processor_service
       - chat_service
       - docling_translation_service
+      - pdf_renderer_service
       - embedder_service
+      - minio
       - image_captioner_service
 
   redis:
@@ -77,9 +99,19 @@ services:
   chromadb:
     container_name: chromadb
     image: chromadb/chroma:1.0.13
+    volumes:
+      - chromadb-data:/data
+    environment:
+      IS_PERSISTENT: "true"
+      ANONYMIZED_TELEMETRY: "false"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://chromadb:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     expose:
-      - "5100"
-
+      - "8000"
+    
   minio:
     image: minio/minio
     container_name: minio
@@ -115,5 +147,16 @@ services:
         exit 0;
       "
 
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: frontend
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "8501:8501"
+
 volumes:
   minio-data:
+  chromadb-data:

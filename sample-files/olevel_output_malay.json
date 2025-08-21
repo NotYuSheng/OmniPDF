@@ -1,13 +1,13 @@
 {
-  "doc_id": "fe12f93f-530b-49b2-a6d4-88d79a981b0b",
+  "doc_id": "ccd31308-edf4-4479-929e-48306dc3f0b2",
   "docling": {
     "schema_name": "DoclingDocument",
     "version": "1.5.0",
-    "name": "fe12f93f-530b-49b2-a6d4-88d79a981b0b",
+    "name": "original",
     "origin": {
       "mimetype": "application/pdf",
       "binary_hash": 18163467616516796000,
-      "filename": "fe12f93f-530b-49b2-a6d4-88d79a981b0b.pdf"
+      "filename": "original.pdf"
     },
     "furniture": {
       "self_ref": "#/furniture",
@@ -386,7 +386,7 @@
         ],
         "orig": "This document has 6 pages. Any blank pages are indicated.",
         "text": "This document has 6 pages. Any blank pages are indicated.",
-        "translated_text": "Dokumen ini mempunyai 6 muka surat. Setiap muka surat kosong telah dinyatakan."
+        "translated_text": "Dokumen ini mempunyai 6 muka surat. Setiap muka surat kosong telah ditunjukkan."
       },
       {
         "self_ref": "#/texts/13",
@@ -779,7 +779,7 @@
         ],
         "orig": "Ten minutes later, Mo arrived at the top of the smaller tree. The tree had narrowed to a pole thinner than his wrist, and began swaying under his weight. Having got as high as he could go, Mo looked across at Nameless and spotted a spray of slender branches on the curving wall of its monstrous trunk. A little branch stuck out, directly in front of him. Mo wanted to grab that branch. He edged closer to it, and the smaller tree began to bend under his weight.",
         "text": "Ten minutes later, Mo arrived at the top of the smaller tree. The tree had narrowed to a pole thinner than his wrist, and began swaying under his weight. Having got as high as he could go, Mo looked across at Nameless and spotted a spray of slender branches on the curving wall of its monstrous trunk. A little branch stuck out, directly in front of him. Mo wanted to grab that branch. He edged closer to it, and the smaller tree began to bend under his weight.",
-        "translated_text": "Sepuluh minit kemudian, Mo telah tiba di puncak pokok yang lebih kecil. Pokok itu telah menyempit menjadi tiang yang lebih tipis daripada pergelangan tangannya, dan bermula bergetar di bawah beratnya. Setelah mencapai sejauh yang boleh dia capai, Mo memandang ke arah Nameless dan menjejaki semburan batang-batang halus pada dinding melengkung trunksiannya yang raksasa. Satu batang kecil keluar, tepat di hadapan beliau. Mo ingin mengambil batang tersebut. Dia mengerusi ke arahnya, dan pokok yang lebih kecil bermula membengkok di bawah beratnya."
+        "translated_text": "Sepuluh minit kemudian, Mo telah tiba di puncak pokok yang lebih kecil. Pokok itu telah menyempit menjadi tiang yang lebih tipis daripada pergelangan tangannya, dan bermula bergetar di bawah beratnya. Setelah mencapai sejauh yang boleh dia capai, Mo memandang ke arah Nameless dan menjejaki semburan batang-batang halus pada dinding melengkung trunksnya yang raksasa. Satu batang kecil keluar, tepat di hadapan beliau. Mo ingin mengambil batang tersebut. Dia mengerusi ke arahnya, dan pokok yang lebih kecil bermula membengkok di bawah beratnya."
       },
       {
         "self_ref": "#/texts/27",
@@ -807,7 +807,7 @@
         ],
         "orig": "There was a gap between the branch of the smaller tree and Nameless. From the ground, Mo hadn't noticed that gap, expecting that the little tree's branches touched the big tree's branches, providing a bridge to walk across. Mo studied the situation. If he could just reach out far enough, he might be able to grab that little branch on Nameless.",
         "text": "There was a gap between the branch of the smaller tree and Nameless. From the ground, Mo hadn't noticed that gap, expecting that the little tree's branches touched the big tree's branches, providing a bridge to walk across. Mo studied the situation. If he could just reach out far enough, he might be able to grab that little branch on Nameless.",
-        "translated_text": "Ada satu lubang antara cabang pokok kecil dan Nameless. Dari permukaan tanah, Mo tidak menyedari ada lubang tersebut, menjangka bahawa cabang-cabang kecil pokok itu menyentuh cabang-cabang besar pokok tersebut, memberikan jambatan untuk berjalan di atasnya. Mo menganalisis situasi tersebut. Jika dia boleh mencapai jauh dengan tangan, mungkin dia boleh memegang cabang kecil itu pada Nameless."
+        "translated_text": "Ada satu celah antara cabang pohon kecil itu dan Nameless. Dari permukaan tanah, Mo tidak menyedari ada celah tersebut, menyangka bahawa cabang pohon kecil itu menyentuh cabang pohon besar itu, memberikan jambatan untuk berjalan di atasnya. Mo menganalisis situasi tersebut. Jika dia boleh mencapai jauh sehingga ke sana, mungkin sahaja dia dapat mengambil cengkeraman pada cabang kecil itu di Nameless."
       },
       {
         "self_ref": "#/texts/28",
@@ -835,7 +835,7 @@
         ],
         "orig": "Trying not to think about how high up he was, Mo focused his mind on the problem. The gap was really not very large, he thought. He would have to let go of the small redwood and make a leap up into the big tree, and grasp a branch with his hands, like a circus performer catching the bar of a swinging trapeze. He had to jump high, or his body wouldn't clear the branches of the smaller tree and he'd get tangled and would fall.",
         "text": "Trying not to think about how high up he was, Mo focused his mind on the problem. The gap was really not very large, he thought. He would have to let go of the small redwood and make a leap up into the big tree, and grasp a branch with his hands, like a circus performer catching the bar of a swinging trapeze. He had to jump high, or his body wouldn't clear the branches of the smaller tree and he'd get tangled and would fall.",
-        "translated_text": "Tanpa memikirkan betapa tingginya kedudukannya, Mo fokuskan fikirannya pada masalah tersebut. Jurang itu sebenarnya tidak terlalu lebar, fikirnya. Dia perlu melepaskan diri dari pohon kecil kayu merah dan melompat ke atas pohon besar, dan menangkap ranting dengan tangannya, seperti penampilan cirrus yang menangkap bar besi ayunan trapeze. Dia perlu melompat tinggi, atau badannya tidak akan dapat melewati ranting-ranting pohon yang lebih kecil dan dia akan tersangkut dan jatuh."
+        "translated_text": "Tanpa memikirkan betapa tingginya kedudukannya, Mo fokuskan fikirannya pada masalah tersebut. Jurang itu sebenarnya tidak terlalu lebar, fikirnya. Dia perlu melepaskan diri dari pohon kecil kayu merah dan melompat ke atas pohon besar, dan menangkap ranting dengan tangannya, seperti penampilan cirrus yang menangkap bar besi ayunan trapeze. Dia harus melompat tinggi, atau badannya tidak akan melewati ranting-ranting pohon yang lebih kecil dan dia akan tersangkut dan jatuh."
       },
       {
         "self_ref": "#/texts/29",
@@ -1087,7 +1087,7 @@
         ],
         "orig": "1123/01/SI/24",
         "text": "1123/01/SI/24",
-        "translated_text": "1123/01/SI/24"
+        "translated_text": "1123/01/SA/24"
       },
       {
         "self_ref": "#/texts/38",
@@ -1255,7 +1255,7 @@
         ],
         "orig": "He had arrived somewhere in the lower tiers of Nameless, just below the crown of the huge tree. The branches here were bigger and closer together. There was foliage everywhere - above, below, and on all sides - layer upon layer of leaves, like tents within tents. The tree hadn't looked so big from the ground. Climbing upwards slowly and steadily through the labyrinth, Mo lost sight of the ground. It felt as if he was passing through a membrane and entering another world. His senses were overwhelmed by an impression of life all around. Flaky, grey-green, and brownish plants, in all manner of shapes, hung from branches - drippy, frizzy, stringy, and hairy. He began picking pieces off, tucking them into his pocket. As he neared the upper surface of the redwood canopy, the lacework of branches glowed with varied shades of green and he broke out into the sunlight.",
         "text": "He had arrived somewhere in the lower tiers of Nameless, just below the crown of the huge tree. The branches here were bigger and closer together. There was foliage everywhere - above, below, and on all sides - layer upon layer of leaves, like tents within tents. The tree hadn't looked so big from the ground. Climbing upwards slowly and steadily through the labyrinth, Mo lost sight of the ground. It felt as if he was passing through a membrane and entering another world. His senses were overwhelmed by an impression of life all around. Flaky, grey-green, and brownish plants, in all manner of shapes, hung from branches - drippy, frizzy, stringy, and hairy. He began picking pieces off, tucking them into his pocket. As he neared the upper surface of the redwood canopy, the lacework of branches glowed with varied shades of green and he broke out into the sunlight.",
-        "translated_text": "Dia telah tiba di mana-mana di tingkat bawah dari Nama Tidak, hanya di bawah mahkota pokok raksasa itu. Cabang-cabang di sini lebih besar dan lebih rapat. Daun terdapat di mana-mana - di atas, di bawah, dan di semua sisi - lapisan demi lapisan daun, seperti tenda dalam tenda. Pokok itu tidak kelihatan begitu besar dari permukaan tanah. Sambil bergerak perlahan dan berterusan melalui labirin, Mo kehilangan pandangan daripada tanah. Ia terasa seperti dia melepasi sehelai membran dan memasuki dunia lain. Indranya dilanda oleh gambaran hidup di sekelilingnya. Tumbuhan berlapis-lapis berwarna abu-abu hijau dan coklat, dalam pelbagai bentuk, menggantung dari cabang-cabang - berair, keriting, berjumbai, dan berbulu. Dia mula memetik pecahan-pecahan dan menyimpannya ke dalam saku. Apabila dia semakin dekat dengan permukaan atap kayu merah, rangkaian cabang-cabang itu berkilauan dengan pelbagai warna hijau dan dia menembusi cahaya matahari."
+        "translated_text": "Dia telah tiba di mana-mana di tingkat bawah dari Nama Tidak, hanya di bawah mahkota pokok raksasa itu. Cabang-cabang di sini lebih besar dan lebih rapat. Daun terdapat di mana-mana - di atas, di bawah, dan di semua sisi - lapisan demi lapisan daun, seperti tenda dalam tenda. Pokok itu tidak kelihatan begitu besar dari permukaan tanah. Sambil bergerak perlahan dan berterusan melalui labirin, Mo kehilangan pandangan daripada tanah. Ia terasa seperti dia melepasi sehelai membran dan memasuki dunia lain. Indranya dilanda oleh gambaran hidup yang mengelilinginya. Tumbuhan berlapis-lapis berwarna abu-abu hijau dan coklat, dalam pelbagai bentuk, tergantung pada cabang-cabang - berair, keriting, berjumbai, dan berbulu. Dia mula memetik pecahan-pecahan tersebut, menaruhnya ke dalam saku. Apabila dia semakin dekat dengan permukaan atap kayu merah, rangkaian cabang-cabang itu berkilauan dengan pelbagai warna hijau dan dia keluar ke cahaya matahari."
       },
       {
         "self_ref": "#/texts/44",
@@ -1451,7 +1451,7 @@
         ],
         "orig": "1123/01/SI/24",
         "text": "1123/01/SI/24",
-        "translated_text": "1123/01/SI/24"
+        "translated_text": "1123/01/SA/24"
       },
       {
         "self_ref": "#/texts/51",
@@ -1648,7 +1648,7 @@
         ],
         "orig": "And guess what? It turns out you don't have to just imagine it. Since the Treehotel in northern Sweden opened last month, you too can live out your childhood dream and holiday in a treehouse, surveying the landscape. I simply had to try it out!",
         "text": "And guess what? It turns out you don't have to just imagine it. Since the Treehotel in northern Sweden opened last month, you too can live out your childhood dream and holiday in a treehouse, surveying the landscape. I simply had to try it out!",
-        "translated_text": "Dan tahu apa lagi? Ternyata anda tidak perlu hanya membayangkannya. Sejak Treehotel di utara Sweden dibuka bulan lalu, anda juga boleh mewujudkan impian masa kecil anda dan bercuti di sebuah rumah pokok, memandang pemandangan di sekeliling. Saya terpaksa cuba mengalaminya!"
+        "translated_text": "Dan tahu apa lagi? Ternyata anda tidak perlu hanya membayangkan saja. Sejak Treehotel di utara Sweden dibuka bulan lalu, anda juga boleh mewujudkan impian masa kecil anda dan bercuti di sebuah rumah pokok, memandang pemandangan di sekeliling. Saya terpaksa cuba mengalaminya!"
       },
       {
         "self_ref": "#/texts/58",
@@ -1760,7 +1760,7 @@
         ],
         "orig": "Britta led me along a narrow path through a glade of birch trees, explaining as we walked why the couple want to share their passion for this beautiful forest environment with guests. We arrived at the Mirrorcube. The most striking of the treehouses, it's a glass box perched high in the forest. Like an architectural magic trick, it almost disappears into the foliage, so sharply are the surrounding trees reflected in it.",
         "text": "Britta led me along a narrow path through a glade of birch trees, explaining as we walked why the couple want to share their passion for this beautiful forest environment with guests. We arrived at the Mirrorcube. The most striking of the treehouses, it's a glass box perched high in the forest. Like an architectural magic trick, it almost disappears into the foliage, so sharply are the surrounding trees reflected in it.",
-        "translated_text": "Britta membimbing saya melalui lorong sempit di antara hutan kecil pohon-pohon birch, menjelaskan sambil berjalan mengapa pasangan itu ingin berkongsi minat mereka terhadap persekitaran hutan yang cantik ini dengan pengunjung. Kami tiba di Mirrorcube. Yang paling menarik di antara rumah-rumah pokok adalah kotak kaca yang diletakkan tinggi di dalam hutan. Seperti trik arsitektural sihir, ia hampir hilang dalam dedaun, sekeras bayangan pokok-pokok sekeliling dipantulkan di dalamnya."
+        "translated_text": "Britta membimbing saya melalui satu lorong sempit melalui hutan kecil yang dihuni oleh pokok-pokok birch, menjelaskan sambil berjalan mengapa pasangan itu mahu berkongsi minat mereka terhadap persekitaran hutan yang cantik ini dengan tetamu. Kami tiba di Mirrorcube. Yang paling menarik di antara rumah-rumah pokok itu, ia adalah sebuah kotak kaca yang diletakkan tinggi di dalam hutan. Seperti sihir arkitektonik, ia hampir hilang dalam dedaun, sebegitu tepat pantulan pokok-pokok sekeliling itu dalam kotak kaca tersebut."
       },
       {
         "self_ref": "#/texts/62",
@@ -1816,7 +1816,7 @@
         ],
         "orig": "When I woke the next morning, it was a shock to find a bird seeming to be peering back at me through the glass. It was tempting to spend the day in my own little nest but I wanted to explore.",
         "text": "When I woke the next morning, it was a shock to find a bird seeming to be peering back at me through the glass. It was tempting to spend the day in my own little nest but I wanted to explore.",
-        "translated_text": "Apabila saya terbangun pada pagi hari esoknya, ini menjadi satu kejutan untuk menemui seekor burung yang nampak memandang balik ke arah saya melalui kaca. Sangat menggoda untuk menghabiskan hari di dalam sarang kecil saya sendiri, tetapi saya ingin menjelajah."
+        "translated_text": "Apabila saya terbangun pada pagi hari esoknya, ini menjadi satu kejutan untuk menemui sejenis burung yang nampak memandang balik ke arah saya melalui kaca. Sangat menggoda untuk menghabiskan hari di dalam sarang kecil saya sendiri, tetapi saya ingin menjelajah."
       },
       {
         "self_ref": "#/texts/64",
@@ -1984,7 +1984,7 @@
         ],
         "orig": "20",
         "text": "20",
-        "translated_text": "20"
+        "translated_text": " dua puluh"
       },
       {
         "self_ref": "#/texts/70",
@@ -2348,7 +2348,7 @@
         ],
         "orig": "Adapted; From The Wild Trees by Richard Preston published by Penguin. Copyright © Richard Preston, 2007. Reprinted by permission of Penguin Books Limited.",
         "text": "Adapted; From The Wild Trees by Richard Preston published by Penguin. Copyright © Richard Preston, 2007. Reprinted by permission of Penguin Books Limited.",
-        "translated_text": "Disediakan semula; daripada The Wild Trees oleh Richard Preston diterbitkan oleh Penguin. Hak cipta © Richard Preston, 2007. Dipercayahkan semula dengan kebenaran daripada Penguin Books Limited."
+        "translated_text": "Disediakan semula; daripada The Wild Trees oleh Richard Preston diterbitkan oleh Penguin. Hak cipta © Richard Preston, 2007. Diperuntukkan semula dengan izin daripada Penguin Books Limited."
       },
       {
         "self_ref": "#/texts/83",

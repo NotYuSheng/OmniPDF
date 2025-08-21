@@ -32,6 +32,14 @@ services:
     container_name: docling_translation_service
     env_file:
       - ./docling_translation_service/.env
+  
+  pdf_renderer_service:
+    build:
+      context: .
+      dockerfile: ./pdf_renderer_service/Dockerfile
+    container_name: pdf_renderer_service
+    env_file:
+      - ./pdf_renderer_service/.env
       
   embedder_service:
     build:
@@ -131,6 +139,16 @@ services:
       "--enable-auto-tool-choice",
       "--tool-call-parser", "hermes"
     ]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: frontend
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "8501:8501"
 
 volumes:
   minio-data:

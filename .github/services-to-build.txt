@@ -1,0 +1,15 @@
+# Services to build and push to GHCR
+# One service name per line
+# Comments (lines starting with #) and empty lines are ignored
+
+# Core Application Services
+chat_service
+embedder_service
+pdf_processor_service
+pdf_extraction_service
+pdf_renderer_service
+docling_translation_service
+
+# Additional services
+cleaner
+nginx

@@ -1,0 +1,617 @@
+{
+  "doc_id": "006dafd7-8d00-44ea-86e7-04acb3f7644b",
+  "status": "completed",
+  "result": {
+    "schema_name": "DoclingDocument",
+    "version": "1.5.0",
+    "name": "original",
+    "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 5273114691430362000,
+      "filename": "original.pdf"
+    },
+    "furniture": {
+      "self_ref": "#/furniture",
+      "children": [],
+      "content_layer": "furniture",
+      "name": "_root_",
+      "label": "unspecified"
+    },
+    "texts": [
+      {
+        "self_ref": "#/texts/0",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 192.758,
+              "t": 768.444,
+              "r": 408.788,
+              "b": 761.046,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              28
+            ]
+          }
+        ],
+        "orig": "Discerning Attitude and Tone",
+        "text": "Discerning Attitude and Tone",
+        "level": 1
+      },
+      {
+        "self_ref": "#/texts/1",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 72.054,
+              "t": 741.557,
+              "r": 528.496,
+              "b": 663.808,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              867
+            ]
+          }
+        ],
+        "orig": "There   can    be    questions    in    the    GP    comprehension    paper   that   require   you   to   identify   and   explain   the writer's attitude -his or her thoughts    and    feelings towards    an    issue, situation    or    argument. Alternatively, you   can    be   tasked   with   evaluating   his   or   her   tone   from   the   choice   of   words   or   manner and   style   of writing   used   by   the   writer   in   a   particular   paragraph.   In   addition,   you   might   need   to   provide evidence   to back   up   your   interpretation.   Note   that   the   words   'attitude'   and   'tone'   might   not   appear   in the   questions. Sometimes   when   there   are   questions   on   attitude   or   tone,   it   might   be   helpful   to   decide   if it is positive or  negative first before using a specific word to express it.",
+        "text": "There   can    be    questions    in    the    GP    comprehension    paper   that   require   you   to   identify   and   explain   the writer's attitude -his or her thoughts    and    feelings towards    an    issue, situation    or    argument. Alternatively, you   can    be   tasked   with   evaluating   his   or   her   tone   from   the   choice   of   words   or   manner and   style   of writing   used   by   the   writer   in   a   particular   paragraph.   In   addition,   you   might   need   to   provide evidence   to back   up   your   interpretation.   Note   that   the   words   'attitude'   and   'tone'   might   not   appear   in the   questions. Sometimes   when   there   are   questions   on   attitude   or   tone,   it   might   be   helpful   to   decide   if it is positive or  negative first before using a specific word to express it."
+      },
+      {
+        "self_ref": "#/texts/2",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 87.054,
+              "t": 646.915,
+              "r": 305.685,
+              "b": 636.945,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              42
+            ]
+          }
+        ],
+        "orig": "🖐 Some terms to describe Tone and Attitude",
+        "text": "🖐 Some terms to describe Tone and Attitude",
+        "level": 1
+      },
+      {
+        "self_ref": "#/texts/3",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 77.304,
+              "t": 621.736,
+              "r": 300.596,
+              "b": 616.272,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              49
+            ]
+          }
+        ],
+        "orig": "Words to describe tone Words to describe attitude",
+        "text": "Words to describe tone Words to describe attitude"
+      },
+      {
+        "self_ref": "#/texts/4",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 77.743,
+              "t": 598.486,
+              "r": 166.867,
+              "b": 569.308,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              35
+            ]
+          }
+        ],
+        "orig": "sardonic caustic reassuring mocking",
+        "text": "sardonic caustic reassuring mocking"
+      },
+      {
+        "self_ref": "#/texts/5",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 77.743,
+              "t": 551.137,
+              "r": 169.099,
+              "b": 522.058,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              36
+            ]
+          }
+        ],
+        "orig": "sarcastic blunt patronising arrogant",
+        "text": "sarcastic blunt patronising arrogant"
+      },
+      {
+        "self_ref": "#/texts/6",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 77.743,
+              "t": 503.862,
+              "r": 124.255,
+              "b": 486.808,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              19
+            ]
+          }
+        ],
+        "orig": "aggrieved inspiring",
+        "text": "aggrieved inspiring"
+      },
+      {
+        "self_ref": "#/texts/7",
+        "parent": {
+          "$ref": "#/groups/0"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 268.993,
+              "t": 610.023,
+              "r": 452.786,
+              "b": 484.558,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              294
+            ]
+          }
+        ],
+        "orig": "cautionary  confident sombre reconciliatory defeatist deferential pessimistic modest capricious assertive  disapproving stately cynical open biased trusting sceptical hostile critical belligerent judgemental whimsical condescending realistic encouraging empathetic optimistic hopeful passionate",
+        "text": "cautionary  confident sombre reconciliatory defeatist deferential pessimistic modest capricious assertive  disapproving stately cynical open biased trusting sceptical hostile critical belligerent judgemental whimsical condescending realistic encouraging empathetic optimistic hopeful passionate"
+      },
+      {
+        "self_ref": "#/texts/8",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 77.743,
+              "t": 468.856,
+              "r": 120.379,
+              "b": 463.392,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              9
+            ]
+          }
+        ],
+        "orig": "placating",
+        "text": "placating"
+      },
+      {
+        "self_ref": "#/texts/9",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 91.554,
+              "t": 437.518,
+              "r": 507.179,
+              "b": 420.057,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              126
+            ]
+          }
+        ],
+        "orig": "(17) What is the difference between the attitudes expressed in the two questions Furedi poses at the end of the paragraph? [1]",
+        "text": "(17) What is the difference between the attitudes expressed in the two questions Furedi poses at the end of the paragraph? [1]"
+      },
+      {
+        "self_ref": "#/texts/10",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 91.554,
+              "t": 401.522,
+              "r": 497.021,
+              "b": 384.058,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              154
+            ]
+          }
+        ],
+        "orig": "Instead of being preoccupied with 'what will happen to us', we should search for answers to the  question: 'What needs to be done to humanise the future?'",
+        "text": "Instead of being preoccupied with 'what will happen to us', we should search for answers to the  question: 'What needs to be done to humanise the future?'"
+      },
+      {
+        "self_ref": "#/texts/11",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 1,
+            "bbox": {
+              "l": 91.554,
+              "t": 365.857,
+              "r": 503.099,
+              "b": 348.807,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              124
+            ]
+          }
+        ],
+        "orig": "Answer: Firstly, he is judgemental of the idea of 'what will happen to us', the he shifts his tone to being more open-minded",
+        "text": "Answer: Firstly, he is judgemental of the idea of 'what will happen to us', the he shifts his tone to being more open-minded"
+      },
+      {
+        "self_ref": "#/texts/12",
+        "parent": {
+          "$ref": "#/groups/1"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "section_header",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 92.304,
+              "t": 763.768,
+              "r": 465.862,
+              "b": 746.307,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              93
+            ]
+          }
+        ],
+        "orig": "(18) Identify the writer's attitude towards parents who use the infant cramming approach. [2]",
+        "text": "(18) Identify the writer's attitude towards parents who use the infant cramming approach. [2]",
+        "level": 1
+      },
+      {
+        "self_ref": "#/texts/13",
+        "parent": {
+          "$ref": "#/groups/1"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 728.009,
+              "r": 508.924,
+              "b": 674.308,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              525
+            ]
+          }
+        ],
+        "orig": "Today's   children   are   the   target   of   more   adult   intervention   and   anxiety   than   any   time   in   history, with    many    of    them    keeping    a    frenetic    schedule    that    will    exhaust    a    jet-setting    CEO.    Even infants are    being    shuttled    from    baby    yoga   to   baby   aerobics   to   baby   sign   language   lessons despite    research   concluding   that   infant   cramming   is   pointless   because   force-fed   skills   have   to be  relearned later in life.",
+        "text": "Today's   children   are   the   target   of   more   adult   intervention   and   anxiety   than   any   time   in   history, with    many    of    them    keeping    a    frenetic    schedule    that    will    exhaust    a    jet-setting    CEO.    Even infants are    being    shuttled    from    baby    yoga   to   baby   aerobics   to   baby   sign   language   lessons despite    research   concluding   that   infant   cramming   is   pointless   because   force-fed   skills   have   to be  relearned later in life."
+      },
+      {
+        "self_ref": "#/texts/14",
+        "parent": {
+          "$ref": "#/groups/1"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 656.087,
+              "r": 430.894,
+              "b": 650.622,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              76
+            ]
+          }
+        ],
+        "orig": "Answer :  The writer is very condescending towards   parents who infant cram",
+        "text": "Answer :  The writer is very condescending towards   parents who infant cram"
+      },
+      {
+        "self_ref": "#/texts/15",
+        "parent": {
+          "$ref": "#/groups/2"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 511.018,
+              "r": 502.403,
+              "b": 493.557,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              109
+            ]
+          }
+        ],
+        "orig": "(19) What does the phrase 'poses as a prophet-scientist' reveal about Furedi's attitude towards Lovelock? [2]",
+        "text": "(19) What does the phrase 'poses as a prophet-scientist' reveal about Furedi's attitude towards Lovelock? [2]"
+      },
+      {
+        "self_ref": "#/texts/16",
+        "parent": {
+          "$ref": "#/groups/2"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 475.138,
+              "r": 402.76,
+              "b": 469.677,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              65
+            ]
+          }
+        ],
+        "orig": "Answer: Furedi's attitude towards lovelock is that of judgemental",
+        "text": "Answer: Furedi's attitude towards lovelock is that of judgemental"
+      },
+      {
+        "self_ref": "#/texts/17",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 350.518,
+              "r": 499.486,
+              "b": 333.057,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              134
+            ]
+          }
+        ],
+        "orig": "(20) What is the writer's tone when he describes the Texas cattle ranchers and Detroit assembly line workers? Justify your answer. [2]",
+        "text": "(20) What is the writer's tone when he describes the Texas cattle ranchers and Detroit assembly line workers? Justify your answer. [2]"
+      },
+      {
+        "self_ref": "#/texts/18",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 314.64200000000005,
+              "r": 509.053,
+              "b": 249.058,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              658
+            ]
+          }
+        ],
+        "orig": "There   is   probably   widespread   agreement   that   it   is   a   wonderful   thing   that   most   of   us   own   cars. Is there   anyone   who   believes   that   the   reason   we   have   cars   is   because   Detroit   assembly-line workers   care   about   us?   It   is   also   wonderful   that   T exas   cattle   ranchers   make   the   sacrifices   of time    and   effort   caring   for   steer   so   that   New   Yorkers   can   enjoy   a   steak   now   and   then.   Again,   is there anyone   who   believes   that   ranchers   who   make   these   sacrifices   do   so   out   of   a   concern for and  feeling the pain of New Yorkers?",
+        "text": "There   is   probably   widespread   agreement   that   it   is   a   wonderful   thing   that   most   of   us   own   cars. Is there   anyone   who   believes   that   the   reason   we   have   cars   is   because   Detroit   assembly-line workers   care   about   us?   It   is   also   wonderful   that   T exas   cattle   ranchers   make   the   sacrifices   of time    and   effort   caring   for   steer   so   that   New   Yorkers   can   enjoy   a   steak   now   and   then.   Again,   is there anyone   who   believes   that   ranchers   who   make   these   sacrifices   do   so   out   of   a   concern for and  feeling the pain of New Yorkers?"
+      },
+      {
+        "self_ref": "#/texts/19",
+        "parent": {
+          "$ref": "#/body"
+        },
+        "children": [],
+        "content_layer": "body",
+        "label": "text",
+        "prov": [
+          {
+            "page_no": 2,
+            "bbox": {
+              "l": 91.554,
+              "t": 230.98199999999997,
+              "r": 491.802,
+              "b": 213.808,
+              "coord_origin": "BOTTOMLEFT"
+            },
+            "charspan": [
+              0,
+              172
+            ]
+          }
+        ],
+        "orig": "Answer :  His tone is sarcastic. He is making fun of   the idea that Texas cattle ranchers and Detroit  assembly line workers care for us rather than working to make money.",
+        "text": "Answer :  His tone is sarcastic. He is making fun of   the idea that Texas cattle ranchers and Detroit  assembly line workers care for us rather than working to make money."
+      }
+    ],
+    "pictures": [],
+    "tables": [],
+    "key_value_items": [],
+    "form_items": [],
+    "pages": {
+      "1": {
+        "size": {
+          "width": 595.9199829101562,
+          "height": 842.8800048828125
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1686
+          }
+        },
+        "page_no": 1
+      },
+      "2": {
+        "size": {
+          "width": 595.9199829101562,
+          "height": 842.8800048828125
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1686
+          }
+        },
+        "page_no": 2
+      },
+      "3": {
+        "size": {
+          "width": 595.9199829101562,
+          "height": 842.8800048828125
+        },
+        "image": {
+          "mimetype": "image/png",
+          "dpi": 144,
+          "size": {
+            "width": 1192,
+            "height": 1686
+          }
+        },
+        "page_no": 3
+      }
+    }
+  }
+}
