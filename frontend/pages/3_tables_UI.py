@@ -68,16 +68,29 @@ def table_json_to_df(table_json):
     grid = table_json.get("data", {}).get("grid", [])
     if not grid or not isinstance(grid, list):
         return None
+    
     # Extract headers (first row)
     headers = [cell.get("text", "") for cell in grid[0]]
+    
+    # Handle duplicate column names by adding suffixes
+    seen_headers = {}
+    unique_headers = []
+    for header in headers:
+        if header in seen_headers:
+            seen_headers[header] += 1
+            unique_headers.append(f"{header}_{seen_headers[header]}")
+        else:
+            seen_headers[header] = 0
+            unique_headers.append(header)
+    
     # Extract rows (remaining rows)
     rows = []
     for row in grid[1:]:
         rows.append([cell.get("text", "") for cell in row])
-    return pd.DataFrame(rows, columns=headers)
+    
+    return pd.DataFrame(rows, columns=unique_headers)
 
-
-def display_tables(table_response):
+def display_tables(table_response, doc_id=None):
     """
     Display tables extracted from the processed PDF document.
     """
@@ -96,7 +109,7 @@ def display_tables(table_response):
                     df = table_json_to_df(table_data)
 
                     # Display table title with page info and copy button
-                    if st.button(f"📋Table {i+1}", key=f"copy_icon_{i+1}", help=f"Copy table {i+1} to clipboard"):
+                    if st.button(f"📋Table {i+1}", key=f"copy_icon_{doc_id}_{i+1}", help=f"Copy table {i+1} to clipboard"):
                         if df is not None:
                             df.to_clipboard(index=False)
                             st.toast("Table copied to clipboard!")
@@ -190,7 +203,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         logger.info(f"Extracting tables for document ID: {doc_id}")
                         table_response = asyncio.run(get_tables(doc_id=doc_id))
                         table_responses.append(table_response)
-                        display_tables(table_response)
+                        display_tables(table_response, doc_id=doc_id)
 
             
     except TimeoutError as e:
