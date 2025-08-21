@@ -13,7 +13,7 @@ from models.rag_config import (
     QueryType,
 )
 
-router = APIRouter(prefix="/metadata")
+router = APIRouter(prefix="/metadata", tags=["metadata"])
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +92,6 @@ async def get_model_response(
     return processed_response
 
 
-@router.get("/summary/{doc_id}")
 async def get_summary(
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
@@ -113,7 +112,6 @@ async def get_summary(
         return await cascade_query(summaries, user_prompt, system_prompt, client)
 
 
-@router.get("/short_description/{doc_id}")
 async def get_short_description(
     doc_id: str,
     summary: str,
@@ -151,7 +149,6 @@ async def cascade_query(
     return await cascade_query(new_chunks, user_prompt, system_prompt, client)
 
 
-@router.get("/author/{doc_id}")
 async def get_authors(
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
@@ -177,7 +174,6 @@ async def get_authors(
     return await cascade_query(chunks, user_prompt, system_prompt, client)
 
 
-@router.get("/title/{doc_id}")
 async def get_title(
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
@@ -204,7 +200,6 @@ async def get_title(
     return await cascade_query(chunks, user_prompt, system_prompt, client)
 
 
-@router.get("/keywords/{doc_id}")
 async def get_keywords(
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
@@ -237,7 +232,6 @@ async def get_keywords(
     return list(set(keywords))
 
 
-@router.get("/filename/{doc_id}")
 async def get_filename(doc_id: str):
     redis_filename_store = RedisStringStorage(prefix=FILENAME_REDIS_PREFIX)
     filename = redis_filename_store[doc_id]
@@ -281,7 +275,7 @@ async def generate_metadata(
         )
 
 
-@router.post("/", status_code=202)
+@router.post("/{doc_id}", status_code=202)
 async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
     save_job(
         doc_id=doc_id,
