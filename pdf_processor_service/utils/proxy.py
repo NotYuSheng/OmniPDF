@@ -9,7 +9,7 @@ from shared_utils.s3_utils import load_job, generate_presigned_url
 
 logger = logging.getLogger(__name__)
 
-S3_ENDPOINT = os.getenv("MINIO_ENDPOINT", "http://minio:9000")  # MinIO-compatible
+EXTERNAL_ENDPOINT = os.getenv("EXTERNAL_ENDPOINT")
 EXTRACTION_URL = os.getenv("EXTRACTION_URL")
 if not EXTRACTION_URL:
     raise ValueError("EXTRACTION_URL is not set")
@@ -24,7 +24,7 @@ async def proxy_post(url: str, body: dict):
             logger.error(f"HTTP error retrieving from {url}: {e}")
             raise HTTPException(
                 status_code=e.response.status_code,
-                detail=f"Processor error: {e.response.text}",
+                detail=f"Processor error: {e.response.text}",102
             ) from e
         except httpx.RequestError as e:
             logger.error(f"Request error retrieving from {url}: {e}")
@@ -69,3 +69,11 @@ async def concat_text(doc_id: str) -> str:
     texts = job.get("data", {}).get("result", {}).get("texts", [])
     text_list = [entry.get("text", "") or entry.get("orig", "") for entry in texts]
     return "\n".join(text_list)
+  
+  
+def generate_external_image_url(doc_id: str, image_name: str):
+    return f"{EXTERNAL_ENDPOINT}/images/{doc_id}/{image_name}"
+
+
+def generate_external_doc_url(doc_id: str):
+    return f"{EXTERNAL_ENDPOINT}/documents/{doc_id}"
