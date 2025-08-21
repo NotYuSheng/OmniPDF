@@ -75,7 +75,10 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
             },
             {
                 "role": "user",
-                "content": encoded_image + "\n\n" + request.prompt # user prompt provided by user or set as fixed by system
+                "content": [
+                    {"type": "text", "text": request.prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}}
+                ]
             }
         ]
 
