@@ -52,9 +52,9 @@ async def process_pdf(uploaded_file):
         logger.info(f"Upload PDF response: {upload_response.text}")   
                 
         upload_data = upload_response.json()
-        doc_id = upload_data["doc_id"]
-        filename = upload_data["filename"]
-        download_url = upload_data["download_url"]
+        doc_id = upload_data.get("doc_id")
+        filename = upload_data.get("filename")
+        download_url = upload_data.get("download_url")
         st.session_state.processed_data = {
             "doc_id": doc_id,
             "filename": filename,
