@@ -11,5 +11,4 @@ logging.basicConfig(
 app = FastAPI(root_path="/pdf_processor")
 
 app.include_router(health.router)
-app.include_router(bypass.router)
 app.include_router(caption.router)
