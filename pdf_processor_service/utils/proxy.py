@@ -24,7 +24,7 @@ async def proxy_post(url: str, body: dict):
             logger.error(f"HTTP error retrieving from {url}: {e}")
             raise HTTPException(
                 status_code=e.response.status_code,
-                detail=f"Processor error: {e.response.text}",102
+                detail=f"Processor error: {e.response.text}",
             ) from e
         except httpx.RequestError as e:
             logger.error(f"Request error retrieving from {url}: {e}")
