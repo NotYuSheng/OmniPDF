@@ -21,7 +21,7 @@ optimizer = CaptionOptimizer()
 VLM_MODEL = vlm_config.model_name
 
 
-@router.post("/caption", response_model=ImageCaptioningResponse, status_code=200)
+@router.post("/", response_model=ImageCaptioningResponse, status_code=200)
 async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncOpenAI = Depends(get_openai_client)):
 
     logger.info(f"Generating caption with given prompt: '{request.prompt}'")
