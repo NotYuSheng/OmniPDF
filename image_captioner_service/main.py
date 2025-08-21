@@ -1,6 +1,5 @@
 from fastapi import FastAPI
-from routers import health
-from routers import document, images, session, tables, text_chunks, json_data
+from routers import health, bypass, caption
 import logging
 
 # Set up logger
@@ -12,9 +11,5 @@ logging.basicConfig(
 app = FastAPI(root_path="/pdf_processor")
 
 app.include_router(health.router)
-app.include_router(document.router)
-app.include_router(session.router)
-app.include_router(images.router)
-app.include_router(tables.router)
-app.include_router(text_chunks.router)
-app.include_router(json_data.router)
+app.include_router(bypass.router)
+app.include_router(caption.router)
