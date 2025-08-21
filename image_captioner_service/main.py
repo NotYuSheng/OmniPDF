@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import health, bypass, caption
+from routers import health, caption
 import logging
 
 # Set up logger
@@ -8,8 +8,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 
-app = FastAPI(root_path="/pdf_processor")
+app = FastAPI(root_path="/image_captioner")
 
 app.include_router(health.router)
-app.include_router(bypass.router)
 app.include_router(caption.router)
