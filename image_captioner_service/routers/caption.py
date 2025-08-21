@@ -37,7 +37,8 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
         logger.info(f"Image URL: {request.image_url}")
         logger.info(f"prompt: {request.prompt}")
 
-        response = await client.get(request.image_url, cast_to=httpx.Response)
+        async with httpx.AsyncClient() as http_client:
+            response = await http_client.get(request.image_url, follow_redirects=True)
 
     except Exception as e:
         logger.error(f"Error fetching image: {e}")
