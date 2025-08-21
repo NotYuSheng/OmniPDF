@@ -63,7 +63,7 @@ async def process_pdf(uploaded_file):
         status_text.success(f"PDF uploaded successfully! Document ID: {doc_id}")
 
     except Exception as e:
-        st.error(f"Error processing PDF: {e}")
+        st.error("Error processing PDF")
         logger.error(f"Error processing PDF: {e}")
 
 st.markdown('<h1 class="main-header">🦸 OmniPDF</h1>', unsafe_allow_html=True)

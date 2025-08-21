@@ -104,7 +104,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         # Display actual image from URL
                         try:
                             if "detail" in image_data:
-                                st.error(image_data["detail"])
+                                st.error("An error occurred while loading the image.")
                             else:
                                 # Fetch image with authenticated client
                                 with httpx.Client(cookies=st.session_state.httpx_cookies) as client:
@@ -125,7 +125,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
 
                         except Exception as e:
                             logger.error(f"Error loading image {i+1}: {e}")
-                            st.error(f"Error loading image {i+1}: {e}")
+                            st.error(f"Error loading image {i+1}")
                     
                     with col2:
                         st.markdown(f"**Image Key:** {image_data["image_key"]}")
@@ -152,7 +152,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
         
     except Exception as e:
         logger.error(f"Unexpected error in image extraction: {e}")
-        st.error(f"An unexpected error occurred: {e}")
+        st.error("An unexpected error occurred at image extraction.")
         
 else:
     st.info("Please upload and process a PDF first to extract images")
