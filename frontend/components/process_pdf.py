@@ -77,13 +77,13 @@ async def check_backend():
                     return service_name, {"status": f"HTTP {response.status_code}", "url": url}
         except httpx.ConnectError as e:
             logger.error(f"Connection error for {service_name} at {url}: {e}")
-            return service_name, {"status": "Connection Error", "url": url}
+            return service_name, {"status": f"Connection Error at {url}"}
         except httpx.TimeoutException as e:
             logger.error(f"Timeout error for {service_name} at {url}: {e}")
-            return service_name, {"status": "Timeout", "url": url}
+            return service_name, {"status": f"Timeout at {url}"}
         except Exception as e:
             logger.error(f"Unexpected error for {service_name} at {url}: {e}")
-            return service_name, {"status": f"Error: {str(e)}", "url": url}
+            return service_name, {"status": f"Error at {url}"}
 
     try:
         results = await asyncio.gather(*(check_service(name, url) for name, url in services.items()))
