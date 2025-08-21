@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 if 'httpx_cookies' not in st.session_state:
-    st.session_state.httpx_cookies = {}
+    st.session_state.httpx_cookies = httpx.Cookies()
 
 async def process_pdf(uploaded_file):
     """
