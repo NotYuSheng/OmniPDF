@@ -15,7 +15,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-status_placeholder = st.empty()  # Placeholder for status updates
 if "processed_data" not in st.session_state:
     st.session_state.processed_data = None
 
