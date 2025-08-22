@@ -21,15 +21,8 @@ optimizer = CaptionOptimizer()
 VLM_MODEL = vlm_config.model_name
 
 
-@router.post("/", response_model=ImageCaptioningResponse, status_code=200)
-async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncOpenAI = Depends(get_openai_client)):
-
-    logger.info(f"Generating caption with given prompt: '{request.prompt}'")
-
-    image_url = request.image_url
-    if not image_url:
-        logger.error("Image URL is required for caption generation.")
-        raise HTTPException(status_code=400, detail="Image URL is required")
+async def fetch_image(request: ImageCaptioningRequest):
+    """Retrieve image from processed PDF document"""
 
     try:
         logger.info(f"doc id: {request.doc_id}")
@@ -63,18 +56,32 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
         image_bytes = image_bytes.getvalue()
 
         logger.info("Successfully downloaded and processed image.")
+        return image_bytes
 
     except (Image.UnidentifiedImageError, IOError) as e:
         logger.error(f"Error processing image: {e}")
         raise HTTPException(status_code=500, detail="Failed to process image")
+
+
+@router.post("/", response_model=ImageCaptioningResponse, status_code=200)
+async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncOpenAI = Depends(get_openai_client)):
+    """Use Vision-Language Model (VLM) to create a caption for the retrieved image from the processed PDF"""
     
+    logger.info(f"Generating caption with given prompt: '{request.prompt}'")
+
+    image_url = request.image_url
+    if not image_url:
+        logger.error("Image URL is required for caption generation.")
+        raise HTTPException(status_code=400, detail="Image URL is required")
+
+    image_bytes = await fetch_image(request)
+
     try:
         # Base64 encode the image
         encoded_image = base64.b64encode(image_bytes).decode("utf-8")
 
-        system_prompt = prompt_templates.get_system_prompt()
-        
         # Prepare messages containing system prompt and encoded image for VLM
+        system_prompt = prompt_templates.get_system_prompt()
         messages = [
             {
                 "role": "system",
@@ -127,4 +134,3 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
     logger.info("Successfully generated caption and sending response.")
 
     return response_data
-
