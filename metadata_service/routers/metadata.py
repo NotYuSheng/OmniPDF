@@ -9,7 +9,6 @@ import os
 from models.rag_config import (
     QwenRAGConfig,
     QwenPromptTemplates,
-    QwenRAGOptimizer,
     QueryType,
 )
 
@@ -20,10 +19,8 @@ logger = logging.getLogger(__name__)
 # Initialize Qwen-2.5 RAG configuration
 qwen_config = QwenRAGConfig()
 prompt_templates = QwenPromptTemplates()
-qwen_optimizer = QwenRAGOptimizer()
 
 OPENAI_MODEL_NAME = qwen_config.model_name
-TOP_K = int(os.getenv("MODEL_TOP_K"))
 
 FILENAME_REDIS_PREFIX = "Filename"
 TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
@@ -264,7 +261,7 @@ async def generate_metadata(
         metadata = {
             "filename": await get_filename(doc_id),
             "summary": summary,
-            "exacutive_summary": await get_short_description(
+            "executive_summary": await get_short_description(
                 summary, client
             ),
             "keywords": await get_keywords(chunks, client),
