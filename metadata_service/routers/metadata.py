@@ -95,7 +95,6 @@ async def get_model_response(
 
 async def get_summary(
     chunks: list[str],
-    doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
     system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
@@ -155,7 +154,6 @@ async def cascade_query(
 
 async def get_authors(
     chunks: list[str],
-    doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
     system_prompt = "If the question cannot be answered, return only the stop token."
@@ -180,7 +178,6 @@ async def get_authors(
 
 async def get_title(
     chunks: list[str],
-    doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
     system_prompt = "If the question cannot be answered, return only the stop token."
@@ -205,7 +202,6 @@ async def get_title(
 
 async def get_keywords(
     chunks: list[str],
-    doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
     system_prompt = "If the question cannot be answered, return only the stop token."
@@ -250,7 +246,7 @@ async def generate_metadata(
     client = get_openai_client()
     chunks = await get_chunks(doc_id)
     try:
-        summary = await get_summary(chunks, doc_id, client)
+        summary = await get_summary(chunks, client)
         logger.info(summary)
         metadata = {
             "filename": await get_filename(doc_id),
@@ -258,9 +254,9 @@ async def generate_metadata(
             "exacutive_summary": await get_short_description(
                 summary, client
             ),
-            "keywords": await get_keywords(chunks, doc_id, client),
-            "authors": await get_authors(chunks, doc_id, client),
-            "title": await get_title(chunks, doc_id, client),
+            "keywords": await get_keywords(chunks, client),
+            "authors": await get_authors(chunks, client),
+            "title": await get_title(chunks, client),
         }
         save_job(
             doc_id=doc_id,
