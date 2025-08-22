@@ -173,7 +173,15 @@ async def get_authors(
                 system_prompt, user_prompt.format(context=chunk), client
             )
         )
-    return await cascade_query(author_chunks, user_prompt, system_prompt, client)
+
+    authors = []
+    for chunk in author_chunks:
+        logger.info(chunk)
+        author_split = chunk.split("Author:")
+        if len(author_split) <= 1:
+            continue
+        authors.extend(author_split[-1].split(", "))
+    return list(set(authors))
 
 
 async def get_title(
@@ -197,7 +205,12 @@ async def get_title(
                 system_prompt, user_prompt.format(context=chunk), client
             )
         )
-    return await cascade_query(title_chunks, user_prompt, system_prompt, client)
+    title_str = await cascade_query(title_chunks, user_prompt, system_prompt, client)
+    
+    title_split = title_str.split("Title:")
+    if len(title_split) <= 1:
+        return "UNKNOWN"
+    return title_split[-1]
 
 
 async def get_keywords(
