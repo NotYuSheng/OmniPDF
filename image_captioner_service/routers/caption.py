@@ -64,7 +64,7 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
 
         logger.info("Successfully downloaded and processed image.")
 
-    except Exception as e:
+    except (Image.UnidentifiedImageError, IOError) as e:
         logger.error(f"Error processing image: {e}")
         raise HTTPException(status_code=500, detail="Failed to process image")
     
