@@ -44,69 +44,99 @@ jobs:
             echo "✓ Created $(dirname "$f")/.env"
           done
 
-      - name: Build and run Compose Stack
+      - name: Test each *_service individually
         run: |
-          docker compose \
-            --file docker-compose.yml \
-            up --detach --build
-
-      - name: Delete Docker build cache
-        run: |
-          docker builder prune --all --force
-
-      - name: Wait for all *_service containers (direct health checks)
-        run: |
-          echo "Detecting *_service containers using docker filter..."
-          SERVICE_NAMES=$(docker ps --filter "name=.*_service$" --format "{{.Names}}")
-      
-          if [ -z "$SERVICE_NAMES" ]; then
-            echo "No *_service containers found. Listing all containers for debugging:"
-            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
+          echo "=== Getting all services from docker-compose.yml ==="
+          ALL_SERVICES=$(docker compose config --services)
+          SERVICE_LIST=$(echo "$ALL_SERVICES" | grep "_service$" || echo "")
+          
+          if [ -z "$SERVICE_LIST" ]; then
+            echo "No *_service services found in docker-compose.yml"
+            echo "Available services: $ALL_SERVICES"
             exit 1
           fi
-      
-          echo "Found services: $SERVICE_NAMES"
-      
-          for NAME in $SERVICE_NAMES; do
-            # Validate container name format for security
-            if ! echo "$NAME" | grep -E '^[a-zA-Z0-9][a-zA-Z0-9_.-]*$' > /dev/null; then
-              echo "Invalid container name format: $NAME"
-              exit 1
+          
+          echo "Found *_service services: $SERVICE_LIST"
+          echo "=== Initial disk space ==="
+          df -h
+          
+          FAILED_SERVICES=""
+          SUCCESSFUL_SERVICES=""
+          
+          # Test each service individually
+          for SERVICE in $SERVICE_LIST; do
+            echo ""
+            echo "=========================================="
+            echo "Testing $SERVICE"
+            echo "=========================================="
+            
+            # Build the service
+            echo "Building $SERVICE..."
+            docker compose build $SERVICE
+            
+            # Start the service
+            echo "Starting $SERVICE..."
+            docker compose up -d $SERVICE
+            
+            # Wait for service to be running
+            sleep 5
+            
+            # Check if container is running
+            if ! docker ps --filter "name=${SERVICE}" --format "{{.Names}}" | grep -q "${SERVICE}"; then
+              echo "✗ $SERVICE failed to start"
+              docker logs $SERVICE --tail 20 2>/dev/null || echo "No logs available"
+              FAILED_SERVICES="$FAILED_SERVICES $SERVICE"
+            else
+              echo "✓ $SERVICE container is running"
+              
+              # Health check
+              echo "Checking health of $SERVICE..."
+              HEALTHY=false
+              for i in {1..30}; do
+                STATUS=$(docker exec "$SERVICE" python3 -c 'import urllib.request; response = urllib.request.urlopen("http://localhost:8000/health", timeout=5); print(response.getcode())' 2>/dev/null || echo "000")
+                if [ "$STATUS" == "200" ]; then
+                  echo "✓ $SERVICE is healthy"
+                  SUCCESSFUL_SERVICES="$SUCCESSFUL_SERVICES $SERVICE"
+                  HEALTHY=true
+                  break
+                fi
+                echo "Still waiting for $SERVICE health check (attempt $i/30, HTTP $STATUS)..."
+                sleep 3
+              done
+              
+              if [ "$HEALTHY" = false ]; then
+                echo "✗ $SERVICE failed health check"
+                docker logs "$SERVICE" --tail 30
+                FAILED_SERVICES="$FAILED_SERVICES $SERVICE"
+              fi
             fi
             
-            echo "Waiting for $NAME to be healthy..."
-      
-            for i in {1..30}; do
-              # Execute health check using Python (available in all containers)
-              STATUS=$(docker exec "$NAME" python3 -c 'import urllib.request; response = urllib.request.urlopen("http://localhost:8000/health", timeout=5); print(response.getcode())' 2>/dev/null || echo "000")
-              if [ "$STATUS" == "200" ]; then
-                echo "$NAME is healthy"
-                break
-              fi
-              echo "Still waiting for $NAME (HTTP $STATUS)..."
-              sleep 3
-              if [ "$i" -eq 30 ]; then
-                echo "$NAME failed to become healthy. Exiting."
-                exit 1
-              fi
-            done
+            # Stop and remove the service
+            echo "Stopping and removing $SERVICE..."
+            docker compose stop $SERVICE
+            docker compose rm -f $SERVICE
+            
+            # Clean up build artifacts
+            docker builder prune --force
+            docker system prune --force
+            
+            echo "=== Disk space after testing $SERVICE ==="
+            df -h | grep -E "(/$)"
           done
-
-      # - name: Wait for Streamlit frontend to be available
-      #   run: |
-      #     for i in {1..30}; do
-      #       STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8501)
-      #       if [ "$STATUS" == "200" ]; then
-      #         echo "Frontend is ready"
-      #         break
-      #       fi
-      #       echo "Waiting for frontend on :8501 (HTTP $STATUS)..."
-      #       sleep 3
-      #       if [ "$i" -eq 30 ]; then
-      #         echo "Frontend did not become ready. Exiting."
-      #         exit 1
-      #       fi
-      #     done
+          
+          echo ""
+          echo "=========================================="
+          echo "TEST RESULTS SUMMARY"
+          echo "=========================================="
+          if [ ! -z "$SUCCESSFUL_SERVICES" ]; then
+            echo "✓ SUCCESSFUL SERVICES:$SUCCESSFUL_SERVICES"
+          fi
+          if [ ! -z "$FAILED_SERVICES" ]; then
+            echo "✗ FAILED SERVICES:$FAILED_SERVICES"
+            exit 1
+          fi
+          
+          echo "All *_service services passed individual testing!"
 
       - name: Set up Node.js for Cypress
         uses: actions/setup-node@v4
