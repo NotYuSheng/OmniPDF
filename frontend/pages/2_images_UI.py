@@ -119,10 +119,15 @@ def display_images(image_response, doc_id=None) -> None:
                 
                 with col2:
                     st.markdown(f"**Image Key:** {image_data["image_key"]}")
-                    st.markdown(f"**Image ID:** IMG_{i+1:03d}")
-                    st.markdown(f"**Image URL:** {image_data["url"]}")
-                
-                st.markdown('</div>', unsafe_allow_html=True)
+                    # Download button
+                    filename = f"image_{i+1}.png"
+                    st.download_button(
+                        label="Download",
+                        data=image_bytes,
+                        file_name=filename,
+                        mime="image/png",
+                        key=f"{filename}_download_btn_{image_data["image_key"]}"
+                    )
                 
     else:
         logger.info("No images found in the document")
