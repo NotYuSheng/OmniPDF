@@ -96,10 +96,12 @@ if uploaded_files:
         status_text = st.empty()
         with st.spinner("Processing PDF..."):
             # Process each selected file
-            for file_name in selection:
-                # Find the corresponding file object
-                file_to_process = next(file for file in uploaded_files if file.name == file_name)
-                asyncio.run(process_pdf(file_to_process, status_text))
+            async def _process_files():
+                for file_name in selection:
+                    # Find the corresponding file object
+                    file_to_process = next(file for file in uploaded_files if file.name == file_name)
+                    await process_pdf(file_to_process, status_text)
+            asyncio.run(_process_files())
 
 if uploaded_files is not None:
     st.session_state.uploaded_files = uploaded_files
