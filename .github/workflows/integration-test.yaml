@@ -21,6 +21,18 @@ jobs:
           remove-haskell: 'true'
           remove-codeql: 'true'
 
+      - name: Free up additional space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker system prune -af
+          sudo apt-get autoremove -y
+          sudo apt-get autoclean
+          echo "=== Disk space after cleanup ==="
+          df -h
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
