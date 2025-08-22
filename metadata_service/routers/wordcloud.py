@@ -46,6 +46,5 @@ async def get_wordcloud(
         img_file.seek(0)
         if not upload_fileobj(img_file, f"{doc_id}/wordcloud.png"):
             raise HTTPException(status_code=500, detail="failed to upload file")
-            
 
     return WordcloudResponse(doc_id=doc_id, top_words=top_words)
