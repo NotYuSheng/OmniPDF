@@ -17,7 +17,7 @@ if 'httpx_cookies' not in st.session_state:
     st.session_state.httpx_cookies = None
 
 
-async def process_pdf(uploaded_files, status_text):
+async def process_pdf(uploaded_file, status_text):
     """
     Placeholder function for PDF processing
     In real implementation, this would call your backend API
@@ -42,9 +42,9 @@ async def process_pdf(uploaded_files, status_text):
     # Process pdf through PDF_processor endpoint
     try:
         # Upload the PDF document
-        logger.info(f"Uploading PDF: {uploaded_files}")
-        bytes_data = uploaded_files.getvalue() # bytes
-        files = {'file': (uploaded_files.name, 
+        logger.info(f"Uploading PDF: {uploaded_file}")
+        bytes_data = uploaded_file.getvalue() # bytes
+        files = {'file': (uploaded_file.name, 
                                   bytes_data, 
                                   'application/pdf')}
         async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
@@ -64,23 +64,9 @@ async def process_pdf(uploaded_files, status_text):
             "doc_id": doc_id,
             "filename": filename,
             "download_url": download_url,
-            "uploaded_filename": uploaded_files.name
+            "uploaded_filename": uploaded_file.name
         }
-        status_text.success(f"Successfully processed! {uploaded_files.name}")
-        
-        # Display all processed files in this session
-
-        # Check Set-Cookie header
-        # set_cookie = upload_response.headers.get('Set-Cookie')
-        # if set_cookie:
-        #     logger.info(f"Set-Cookie: {set_cookie}")
-        #     logger.info(f"Set-Cookie: {set_cookie}")
-        #     st.session_state.set_cookie = set_cookie
-
-
-    # except requests.exceptions.ConnectionError as e:
-    #     st.error("Could not connect to PDF processor service. Please check if the service is running.")
-    #     logger.error(f"Error processing PDF: {e}")
+        status_text.success(f"Successfully processed! {uploaded_file.name}")
 
     except Exception as e:
         st.error("Error processing PDF")
