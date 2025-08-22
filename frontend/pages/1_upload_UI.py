@@ -55,9 +55,9 @@ async def process_pdf(uploaded_files, status_text):
         logger.info(f"Upload PDF response: {upload_response.text}")   
                 
         upload_data = upload_response.json()
-        doc_id = upload_data["doc_id"]
-        filename = upload_data["filename"]
-        download_url = upload_data["download_url"]
+        doc_id = upload_data.get("doc_id")
+        filename = upload_data.get("filename")
+        download_url = upload_data.get("download_url")
         if 'processed_data' not in st.session_state or st.session_state.processed_data is None:
             st.session_state.processed_data = {}
         st.session_state.processed_data[doc_id] = {
