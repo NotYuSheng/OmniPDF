@@ -168,15 +168,14 @@ async def get_authors(
     Return the list of authors in the following format:
     Author: Author1, Author2, Author3, etc
     """
-    chunks = []
+    author_chunks = []
     for chunk in chunks:
-        chunks.append(
+        author_chunks.append(
             await get_model_response(
                 system_prompt, user_prompt.format(context=chunk), client
             )
         )
-
-    return await cascade_query(chunks, user_prompt, system_prompt, client)
+    return await cascade_query(author_chunks, user_prompt, system_prompt, client)
 
 
 async def get_title(
@@ -194,16 +193,14 @@ async def get_title(
     Return the title in the following format:
     Title: Title
     """
-    chunks = []
+    title_chunks = []
     for chunk in chunks:
-        chunks.append(
+        title_chunks.append(
             await get_model_response(
                 system_prompt, user_prompt.format(context=chunk), client
             )
         )
-    for hunk in chunks:
-        logger.info(hunk)
-    return await cascade_query(chunks, user_prompt, system_prompt, client)
+    return await cascade_query(title_chunks, user_prompt, system_prompt, client)
 
 
 async def get_keywords(
@@ -221,16 +218,16 @@ async def get_keywords(
     Return the list of keywords in the following format:
     keywords: keyword1, keyword2, keyword3, etc
     """
-    chunks = []
+    keyword_chunks = []
     for chunk in chunks:
-        chunks.append(
+        keyword_chunks.append(
             await get_model_response(
                 system_prompt, user_prompt.format(context=chunk), client
             )
         )
 
     keywords = []
-    for chunk in chunks:
+    for chunk in keyword_chunks:
         logger.info(chunk)
         keywords_split = chunk.split("keywords:")
         if len(keywords_split) <= 1:
