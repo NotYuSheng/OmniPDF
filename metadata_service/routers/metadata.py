@@ -143,7 +143,7 @@ async def cascade_query(
     for i in range(0, len(chunks), 8):
         new_chunk_context = "\n".join(chunks[i : i + 8])
         user_prompt_with_context = user_prompt.format(context=new_chunk_context)
-        new_chunks.append(await get_model_response(user_prompt_with_context, system_prompt, client))
+        new_chunks.append(await get_model_response(system_prompt, user_prompt_with_context, client))
 
     logger.info(new_chunks)
     return await cascade_query(new_chunks, user_prompt, system_prompt, client)
