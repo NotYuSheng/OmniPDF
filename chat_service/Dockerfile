@@ -2,7 +2,7 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-ENV PYTHONPATH=/app/pdf_processor_service:/app/shared_utils
+ENV PYTHONPATH=/app/chat_service:/app/shared_utils
 
 RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
 
