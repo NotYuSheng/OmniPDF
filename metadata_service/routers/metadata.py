@@ -27,26 +27,27 @@ TOP_K = int(os.getenv("MODEL_TOP_K"))
 
 FILENAME_REDIS_PREFIX = "Filename"
 TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
-MAX_CHUNK_IN_MEMORY = 10
+MAX_CHUNK_PER_RETRIVAL = 100
 SUMMARY_LENGTH = 500
 SHORT_DSECRIPTION_LENGTH = 20
 
 
-async def get_chunk(doc_id: str):
+async def get_chunks(doc_id: str):
     chroma_client = await get_chroma_client()
     collection = await chroma_client.get_collection(TEXTUAL_EMBEDDING_COLLECTION)
     offset = 0
     results = await collection.get(
-        where={"doc_id": doc_id}, limit=MAX_CHUNK_IN_MEMORY, offset=offset
+        where={"doc_id": doc_id}, limit=MAX_CHUNK_PER_RETRIVAL, offset=offset
     )
     logger.info(results)
+    chunks = []
     while results["documents"]:
-        offset += MAX_CHUNK_IN_MEMORY
-        for result in results["documents"]:
-            yield result
+        offset += MAX_CHUNK_PER_RETRIVAL
+        chunks.extend(results["documents"])
         results = await collection.get(
-            where={"doc_id": doc_id}, limit=MAX_CHUNK_IN_MEMORY, offset=offset
+            where={"doc_id": doc_id}, limit=MAX_CHUNK_PER_RETRIVAL, offset=offset
         )
+    return chunks
 
 
 async def get_model_response(
@@ -93,6 +94,7 @@ async def get_model_response(
 
 
 async def get_summary(
+    chunks: list[str],
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
@@ -103,7 +105,7 @@ async def get_summary(
         QueryType.SUMMARIZATION,
     )
     summaries = []
-    async for chunk in get_chunk(doc_id):
+    for chunk in chunks:
         summaries.append(
             await get_model_response(
                 system_prompt, user_prompt.format(context=chunk), client
@@ -113,7 +115,6 @@ async def get_summary(
 
 
 async def get_short_description(
-    doc_id: str,
     summary: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
@@ -137,6 +138,8 @@ async def cascade_query(
     system_prompt: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
+    if not chunks:
+        return ""
     # Not ideal, will consume a lot of memory as prev chunks will not be gc till final set is gotten
     if len(chunks) == 1:
         return chunks[0]
@@ -146,10 +149,12 @@ async def cascade_query(
         user_prompt = user_prompt.format(context=new_chunk_context)
         new_chunks.append(await get_model_response(user_prompt, system_prompt, client))
 
+    logger.info(new_chunks)
     return await cascade_query(new_chunks, user_prompt, system_prompt, client)
 
 
 async def get_authors(
+    chunks: list[str],
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
@@ -164,7 +169,7 @@ async def get_authors(
     Author: Author1, Author2, Author3, etc
     """
     chunks = []
-    async for chunk in get_chunk(doc_id):
+    for chunk in chunks:
         chunks.append(
             await get_model_response(
                 system_prompt, user_prompt.format(context=chunk), client
@@ -175,6 +180,7 @@ async def get_authors(
 
 
 async def get_title(
+    chunks: list[str],
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
@@ -189,7 +195,7 @@ async def get_title(
     Title: Title
     """
     chunks = []
-    async for chunk in get_chunk(doc_id):
+    for chunk in chunks:
         chunks.append(
             await get_model_response(
                 system_prompt, user_prompt.format(context=chunk), client
@@ -201,6 +207,7 @@ async def get_title(
 
 
 async def get_keywords(
+    chunks: list[str],
     doc_id: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
@@ -215,7 +222,7 @@ async def get_keywords(
     keywords: keyword1, keyword2, keyword3, etc
     """
     chunks = []
-    async for chunk in get_chunk(doc_id):
+    for chunk in chunks:
         chunks.append(
             await get_model_response(
                 system_prompt, user_prompt.format(context=chunk), client
@@ -244,17 +251,19 @@ async def generate_metadata(
     doc_id: str,
 ):
     client = get_openai_client()
+    chunks = await get_chunks(doc_id)
     try:
-        summary = await get_summary(doc_id, client)
+        summary = await get_summary(chunks, doc_id, client)
+        logger.info(summary)
         metadata = {
             "filename": await get_filename(doc_id),
             "summary": summary,
             "exacutive_summary": await get_short_description(
-                doc_id, summary["summary"], client
+                summary, client
             ),
-            "keywords": await get_keywords(doc_id, client),
-            "authors": await get_authors(doc_id, client),
-            "title": await get_title(doc_id, client),
+            "keywords": await get_keywords(chunks, doc_id, client),
+            "authors": await get_authors(chunks, doc_id, client),
+            "title": await get_title(chunks, doc_id, client),
         }
         save_job(
             doc_id=doc_id,
@@ -271,7 +280,7 @@ async def generate_metadata(
             "message": "Failed to download or generate metadata",
         }
         save_job(
-            doc_id=doc_id, job_data=error_job, status="failed", job_type="extraction"
+            doc_id=doc_id, job_data=error_job, status="failed", job_type="metadata"
         )
 
 
