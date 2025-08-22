@@ -5,7 +5,6 @@ from shared_utils.chroma_client import get_chroma_client
 from shared_utils.redis import RedisStringStorage
 from shared_utils.s3_utils import save_job, load_job
 import logging
-import os
 from models.rag_config import (
     QwenRAGConfig,
     QwenPromptTemplates,
