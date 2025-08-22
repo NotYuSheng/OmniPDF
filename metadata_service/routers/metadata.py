@@ -110,7 +110,7 @@ async def get_summary(
                 system_prompt, user_prompt.format(context=chunk), client
             )
         )
-        return await cascade_query(summaries, user_prompt, system_prompt, client)
+    return await cascade_query(summaries, user_prompt, system_prompt, client)
 
 
 async def get_short_description(
@@ -128,7 +128,7 @@ async def get_short_description(
     Return only the short description.
     """
 
-    return await get_model_response(user_prompt, system_prompt, client)
+    return await get_model_response(system_prompt, user_prompt, client)
 
 
 async def cascade_query(
@@ -145,8 +145,8 @@ async def cascade_query(
     new_chunks = []
     for i in range(0, len(chunks), 8):
         new_chunk_context = "\n".join(chunks[i : i + 8])
-        user_prompt = user_prompt.format(context=new_chunk_context)
-        new_chunks.append(await get_model_response(user_prompt, system_prompt, client))
+        user_prompt_with_context = user_prompt.format(context=new_chunk_context)
+        new_chunks.append(await get_model_response(user_prompt_with_context, system_prompt, client))
 
     logger.info(new_chunks)
     return await cascade_query(new_chunks, user_prompt, system_prompt, client)
