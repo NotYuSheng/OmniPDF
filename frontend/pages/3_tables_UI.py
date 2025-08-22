@@ -39,11 +39,12 @@ async def get_tables(doc_id, max_retries=60, delay=1) -> dict:
                     # Still processing, continue polling
                     if attempt < max_retries - 1:
                         table_status.info(f"Document still processing... ({(attempt + 1)*delay}s)")
-                        if "detail" in response.json():
-                            server_status.info(response.json()["detail"])
+                        data = response.json()
+                        if "detail" in data:
+                            server_status.info(data["detail"])
                         else:
-                            if len(response.json()) > 100:
-                                server_status.info(response.text[50:])
+                            if len(data) > 100:
+                                server_status.info(str(data)[:50] + "...")
                         await asyncio.sleep(delay)
                         continue
                     else:
