@@ -40,7 +40,14 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
         async with httpx.AsyncClient() as http_client:
             response = await http_client.get(request.image_url, follow_redirects=True)
 
-    except Exception as e:
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 403:
+            logger.error(f"Invalid or expired S3 signed URL: {e.response.status_code}")
+            raise HTTPException(status_code=400, detail="Invalid or expired S3 signed URL")
+        else:
+            logger.error(f"Error fetching image: {e.response.status_code}")
+            raise HTTPException(status_code=500, detail="Failed to fetch image")
+    except httpx.RequestError as e:
         logger.error(f"Error fetching image: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch image")
 
