@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class WordcloudResponse(BaseModel):
     """
-    Response model for chat API endpoints.
+    Response model for wordcloud API endpoints.
     """
 
     doc_id: str
