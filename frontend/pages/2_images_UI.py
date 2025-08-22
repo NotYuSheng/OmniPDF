@@ -70,7 +70,7 @@ async def get_images(doc_id, max_retries=60, delay=1) -> dict:
 
     raise TimeoutError("Max retries exceeded")
 
-def display_images(image_response):
+def display_images(image_response, doc_id=None) -> None:
     """
     Display images extracted from the processed PDF document.
     """
@@ -189,7 +189,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         logger.info(f"Extracting images for document ID: {doc_id}")
                         image_response = asyncio.run(get_images(doc_id=doc_id))
                         image_responses.append(image_response)
-                        display_images(image_response)
+                        display_images(image_response, doc_id)
 
             
     except TimeoutError as e:
