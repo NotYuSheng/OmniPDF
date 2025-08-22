@@ -68,7 +68,7 @@ class CaptionOptimizer:
         cleaned_response = '\n'.join(filtered_lines)
         
         # Ensure response ends properly
-        if cleaned_response and not cleaned_response.rstrip().endswith(('.', '!', '?', ':')):
+        if cleaned_response.strip() and not cleaned_response.rstrip().endswith(('.', '!', '?', ':')):
             cleaned_response = cleaned_response.rstrip() + '.'
         
         return cleaned_response.strip()
