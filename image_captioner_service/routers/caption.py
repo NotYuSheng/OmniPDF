@@ -6,7 +6,7 @@ from PIL import Image
 import io
 import base64
 
-from models.caption import ImageCaptioningRequest
+from models.caption import ImageCaptioningRequest, ImageCaptioningResponse
 from shared_utils.openai_client import get_openai_client
 from models.vlm_config import PromptTemplates, VLMConfig, CaptionOptimizer
 
@@ -59,7 +59,7 @@ async def fetch_image(request: ImageCaptioningRequest):
         raise HTTPException(status_code=500, detail="Failed to process image")
 
 
-@router.post("/", status_code=200)
+@router.post("/", response_model=ImageCaptioningResponse, status_code=200)
 async def generate_image_caption(
     request: ImageCaptioningRequest, 
     client: AsyncOpenAI = Depends(get_openai_client)
@@ -131,6 +131,11 @@ async def generate_image_caption(
         processed_caption = first_choice.message.content
     
     logger.info(f"Received caption from LLM: '{processed_caption}'")
+
+    response_data = ImageCaptioningResponse(
+        doc_id=request.doc_id, 
+        image_id=request.image_id, 
+        caption=processed_caption
+    )
     logger.info("Successfully generated caption and sending response.")
-    response_data = {"caption": processed_caption}
     return response_data
