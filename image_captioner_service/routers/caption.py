@@ -60,7 +60,10 @@ async def fetch_image(request: ImageCaptioningRequest):
 
 
 @router.post("/", response_model=ImageCaptioningResponse, status_code=200)
-async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncOpenAI = Depends(get_openai_client)):
+async def generate_image_caption(
+    request: ImageCaptioningRequest, 
+    client: AsyncOpenAI = Depends(get_openai_client)
+):
     """Use Vision-Language Model (VLM) to create a caption for the retrieved image from the processed PDF"""
     
     logger.info(f"Generating caption with given prompt: '{request.prompt}'")
@@ -87,7 +90,10 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
                 "role": "user",
                 "content": [
                     {"type": "text", "text": request.prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}}
+                    {
+                        "type": "image_url", 
+                        "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}
+                    }
                 ]
             }
         ]
@@ -126,7 +132,10 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
     
     logger.info(f"Received caption from LLM: '{processed_caption}'")
 
-    response_data = ImageCaptioningResponse(doc_id=request.doc_id, image_id=request.image_id, caption=processed_caption)
+    response_data = ImageCaptioningResponse(
+        doc_id=request.doc_id, 
+        image_id=request.image_id, 
+        caption=processed_caption
+    )
     logger.info("Successfully generated caption and sending response.")
-
     return response_data
