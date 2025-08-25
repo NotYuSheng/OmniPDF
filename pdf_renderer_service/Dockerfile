@@ -17,4 +17,4 @@ COPY pdf_renderer_service ./pdf_renderer_service
 EXPOSE 8000
 
 # Start the FastAPI server
-CMD ["sh", "-c", "PYTHONPATH=/app/pdf_renderer_service uvicorn pdf_renderer_service.main:app --host 0.0.0.0 --port 8000"]
+CMD ["uvicorn", "pdf_renderer_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
