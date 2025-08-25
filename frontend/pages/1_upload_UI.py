@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import random
 import httpx
 
 import streamlit as st
@@ -12,9 +13,12 @@ logger = logging.getLogger(__name__)
 if 'processed_data' not in st.session_state or st.session_state.processed_data is None:
     st.session_state.processed_data = {}
 
-# Ensure httpx_cookies is initialized
 if 'httpx_cookies' not in st.session_state:
-    st.session_state.httpx_cookies = None
+    from httpx import Cookies
+    st.session_state.httpx_cookies = Cookies()
+
+if 'uploaded_files' not in st.session_state:
+    st.session_state.uploaded_files = None
 
 
 async def process_pdf(uploaded_file, status_text):
@@ -22,23 +26,7 @@ async def process_pdf(uploaded_file, status_text):
     Placeholder function for PDF processing
     In real implementation, this would call your backend API
     """
-    # Simulate processing time
-    progress_bar = st.progress(0)
-    
-    for i in range(100):
-        progress_bar.progress(i + 1)
-        if i < 25:
-            status_text.text('Extracting text and images...')
-        elif i < 50:
-            status_text.text('Translating content...')
-        elif i < 75:
-            status_text.text('Generating metadata...')
-        else:
-            status_text.text('Finalizing processing...')
-        await asyncio.sleep(0.02)
-    
-    progress_bar.empty()
-    status_text.empty()
+
     # Process pdf through PDF_processor endpoint
     try:
         # Upload the PDF document
@@ -58,8 +46,7 @@ async def process_pdf(uploaded_file, status_text):
         doc_id = upload_data.get("doc_id")
         filename = upload_data.get("filename")
         download_url = upload_data.get("download_url")
-        if 'processed_data' not in st.session_state or st.session_state.processed_data is None:
-            st.session_state.processed_data = {}
+        
         st.session_state.processed_data[doc_id] = {
             "doc_id": doc_id,
             "filename": filename,
@@ -71,6 +58,27 @@ async def process_pdf(uploaded_file, status_text):
     except Exception as e:
         st.error("Error processing PDF")
         logger.error(f"Error processing PDF: {e}")
+
+
+async def loader():
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    
+    for i in range(100):
+        progress_bar.progress(i + 1)
+        if i < 25:
+            status_text.text('Extracting text and images...')
+        elif i < 50:
+            status_text.text('Translating content...')
+        elif i < 75:
+            status_text.text('Generating metadata...')
+        else:
+            status_text.text('Finalizing processing...')
+
+        await asyncio.sleep(random.uniform(0.001, 0.03))
+
+    progress_bar.empty()
+    status_text.empty()
 
 st.markdown('<h1 class="main-header">🦸 OmniPDF</h1>', unsafe_allow_html=True)
 st.header("📁 Upload PDF")
@@ -102,6 +110,8 @@ if uploaded_files:
                     file_to_process = next(file for file in uploaded_files if file.name == file_name)
                     await process_pdf(file_to_process, status_text)
             asyncio.run(_process_files())
+            # Simulate processing time
+            asyncio.run(loader())
 
 if uploaded_files is not None:
     st.session_state.uploaded_files = uploaded_files
