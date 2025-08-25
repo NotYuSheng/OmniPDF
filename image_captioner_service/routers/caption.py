@@ -132,10 +132,6 @@ async def generate_image_caption(
     
     logger.info(f"Received caption from LLM: '{processed_caption}'")
 
-    response_data = ImageCaptioningResponse(
-        doc_id=request.doc_id, 
-        image_id=request.image_id, 
-        caption=processed_caption
-    )
+    response_data = ImageCaptioningResponse(caption=processed_caption)
     logger.info("Successfully generated caption and sending response.")
     return response_data
