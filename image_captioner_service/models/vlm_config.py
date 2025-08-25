@@ -5,7 +5,7 @@ class VLMConfig:
     """Configuration class for the optimization of the model's caption generation"""
     
     def __init__(self):
-        self.model_name = os.getenv("OPENAI_VLM")
+        self.model_name = os.environ["OPENAI_VLM"]
         
         # LLM's Generation parameters
         self.generation_params = {
