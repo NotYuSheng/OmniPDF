@@ -173,10 +173,11 @@ async def get_authors(
     authors = []
     for chunk in author_chunks:
         logger.info(chunk)
-        author_split = chunk.split("Author:")
-        if len(author_split) <= 1:
+        author_split = chunk.split(":")
+        if author_split[0].lower() != "author":
+            logger.info(author_split)
             continue
-        authors.extend(author_split[-1].split(", "))
+        authors.extend([author.strip() for author in author_split[-1].split(",")])
     return list(set(authors))
 
 
@@ -203,8 +204,8 @@ async def get_title(
         )
     title_str = await cascade_query(title_chunks, user_prompt, system_prompt, client)
     
-    title_split = title_str.split("Title:")
-    if len(title_split) <= 1:
+    title_split = title_str.split(":")
+    if title_split[0].lower() != "title":
         return "UNKNOWN"
     return title_split[-1]
 
@@ -234,10 +235,10 @@ async def get_keywords(
     keywords = []
     for chunk in keyword_chunks:
         logger.info(chunk)
-        keywords_split = chunk.split("keywords:")
-        if len(keywords_split) <= 1:
+        keywords_split = chunk.split(":", 1)
+        if keywords_split[0].lower() != "keywords":
             continue
-        keywords.extend(keywords_split[-1].split(", "))
+        keywords.extend([keyword.strip() for keyword in keywords_split[-1].split(",")])
     return list(set(keywords))
 
 
