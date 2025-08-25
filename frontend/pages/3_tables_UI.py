@@ -110,7 +110,7 @@ def display_tables(table_response, doc_id=None):
                     df = table_json_to_df(table_data)
 
                     # Display table title with page info and copy button
-                    if st.button(f"📋Table {i+1}", key=f"copy_icon_{doc_id}_{i+1}", help=f"Copy table {i+1} to clipboard"):
+                    if st.button(f"📋 Copy Table {i+1}", key=f"copy_icon_{doc_id}_{i+1}", help=f"Copy table {i+1} to clipboard"):
                         if df is not None:
                             df.to_clipboard(index=False)
                             st.toast("Table copied to clipboard!")
