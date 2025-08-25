@@ -21,4 +21,4 @@ COPY docling_translation_service ./docling_translation_service
 EXPOSE 8000
 
 # Start the FastAPI server
-CMD ["sh", "-c", "PYTHONPATH=/app/docling_translation_service uvicorn docling_translation_service.main:app --host 0.0.0.0 --port 8000"]
+CMD ["uvicorn", "docling_translation_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
