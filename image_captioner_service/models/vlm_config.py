@@ -62,7 +62,7 @@ class CaptionOptimizer:
         for i in range(1, len(lines)):
             current_line_stripped = lines[i].strip()
             prev_line_stripped = lines[i-1].strip()
-            if current_line_stripped or current_line_stripped != prev_line_stripped:
+            if current_line_stripped != prev_line_stripped:
                 filtered_lines.append(lines[i])
         
         cleaned_response = '\n'.join(filtered_lines)
