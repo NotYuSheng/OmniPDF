@@ -13,7 +13,8 @@ from models.vlm_config import PromptTemplates, VLMConfig, CaptionOptimizer
 router = APIRouter(prefix="/caption", tags=["caption"])
 logger = logging.getLogger(__name__)
 
-VLM_MODEL = VLMConfig().model_name
+vlm_config = VLMConfig()
+VLM_MODEL = vlm_config.model_name
 
 
 async def fetch_image(request: ImageCaptioningRequest):
@@ -76,7 +77,7 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
         encoded_image = base64.b64encode(image_bytes).decode("utf-8")
 
         # Prepare messages containing system prompt and encoded image for VLM
-        system_prompt = PromptTemplates().get_system_prompt()
+        system_prompt = PromptTemplates.get_system_prompt()
         messages = [
             {
                 "role": "system",
@@ -95,7 +96,7 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
         response = await client.chat.completions.create(
             model=VLM_MODEL,
             messages=messages,
-            **VLMConfig().generation_params
+            **vlm_config.generation_params
         )
         
     except APIError as e:
@@ -118,8 +119,8 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
         )
     
     # Post-process the response
-    if VLMConfig().enable_response_post_processing:
-        processed_caption = CaptionOptimizer().post_process_llm_response(first_choice.message.content)
+    if vlm_config.enable_response_post_processing:
+        processed_caption = CaptionOptimizer.post_process_llm_response(first_choice.message.content)
     else:
         processed_caption = first_choice.message.content
     
