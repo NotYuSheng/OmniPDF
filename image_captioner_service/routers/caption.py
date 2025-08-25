@@ -42,9 +42,9 @@ async def fetch_image(request: ImageCaptioningRequest):
 
     try:
         image = Image.open(io.BytesIO(response.content))
-        if image.mode != "RGB":
-            logger.info("Converting image to RGB mode.")
-            image = image.convert("RGB")
+        # (Optional): Set mode of image
+        # if image.mode != "RGB":
+        #     image = image.convert("RGB")
         
         # Convert the image to bytes
         image_bytes = io.BytesIO()
