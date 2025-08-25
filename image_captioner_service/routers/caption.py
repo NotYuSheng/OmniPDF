@@ -13,6 +13,7 @@ from models.vlm_config import PromptTemplates, VLMConfig, CaptionOptimizer
 router = APIRouter(prefix="/caption", tags=["caption"])
 logger = logging.getLogger(__name__)
 
+http_client = httpx.AsyncClient()
 vlm_config = VLMConfig()
 VLM_MODEL = vlm_config.model_name
 
@@ -26,8 +27,7 @@ async def fetch_image(request: ImageCaptioningRequest):
         logger.info(f"Image URL: {request.image_url}")
         logger.info(f"prompt: {request.prompt}")
 
-        async with httpx.AsyncClient() as http_client:
-            response = await http_client.get(request.image_url, follow_redirects=True)
+        response = await http_client.get(request.image_url, follow_redirects=True)
 
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 403:
