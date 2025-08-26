@@ -118,7 +118,7 @@ services:
     ipc: host
     volumes:
       - ./llm_models/Qwen2.5-14B-Instruct:/mnt/model/
-    # - ./llm_models/Qwen2.5-0.5B-Instruct:/mnt/model/
+      # - ./llm_models/Qwen2.5-0.5B-Instruct:/mnt/model/
     ports:
       - "1234:8000"
     environment:
