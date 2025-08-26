@@ -20,11 +20,11 @@ class QwenRAGConfig:
         
         # Qwen-2.5 generation parameters optimized for RAG
         self.generation_params = {
-            "temperature": float(os.getenv("QWEN_TEMPERATURE", "0.1")),
-            "max_tokens": int(os.getenv("QWEN_MAX_TOKENS", "2000")),
-            "top_p": float(os.getenv("QWEN_TOP_P", "0.8")),
-            "frequency_penalty": float(os.getenv("QWEN_FREQ_PENALTY", "0.1")),
-            "presence_penalty": float(os.getenv("QWEN_PRESENCE_PENALTY", "0.1")),
+            "temperature": float(os.getenv("MODEL_TEMPERATURE", "0.1")),
+            "max_tokens": int(os.getenv("MODEL_MAX_TOKENS", "2000")),
+            "top_p": float(os.getenv("MODEL_TOP_P", "0.8")),
+            "frequency_penalty": float(os.getenv("MODEL_FREQ_PENALTY", "0.1")),
+            "presence_penalty": float(os.getenv("MODEL_PRESENCE_PENALTY", "0.1")),
         }
         
         # Query classification parameters (lighter settings for classification)
@@ -46,11 +46,11 @@ class QwenRAGConfig:
         }
         
         # Context management
-        self.max_context_length = int(os.getenv("QWEN_MAX_CONTEXT", "4000"))
+        self.max_context_length = int(os.getenv("MODEL_MAX_CONTEXT", "4000"))
         
         # RAG-specific settings
-        self.min_similarity_score = float(os.getenv("QWEN_MIN_SIMILARITY", "0.1"))
-        self.enable_reranking = os.getenv("QWEN_ENABLE_RERANKING", "true").lower() == "true"
+        self.min_similarity_score = float(os.getenv("MODEL_MIN_SIMILARITY", "0.1"))
+        self.enable_reranking = os.getenv("MODEL_ENABLE_RERANKING", "true").lower() == "true"
 
         # RAG Optimization flags
         self.enable_llm_query_classification = os.getenv("ENABLE_LLM_QUERY_CLASSIFICATION", "true").lower() == "true"
