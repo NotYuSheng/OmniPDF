@@ -2,6 +2,7 @@ import logging
 
 from shared_utils.redis import RedisBase, RedisSetStorage, SEPERATOR
 from shared_utils.s3_utils import delete_file, delete_folder, get_job_s3_key
+from shared_utils.chroma_client import get_chroma_client
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +11,9 @@ pubsub = redis_store.client.pubsub()
 
 # UNABLE TO HANDLE srem AND OTHERS DUE TO ONLY HAVING EVENT AND KEY INFO
 REMOVAL_EVENTS = ["del", "expired"]
-
+SEMANTIC_EMBEDDING_COLLECTION = "SemanticEmbeds"
+TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
+EMBEDDING_COLLECTIONS = [SEMANTIC_EMBEDDING_COLLECTION, TEXTUAL_EMBEDDING_COLLECTION]
 
 def empty_function(_):
     pass
@@ -47,15 +50,18 @@ def clean_s3_file(key: str):
     delete_file(key)
 
 
-def clean_chromadb(key):
-    pass
+async def clean_chromadb(key):
+    chroma_client = await get_chroma_client()
+    for collection_name in EMBEDDING_COLLECTIONS:
+        collection = await chroma_client.get_or_create_collection(name=collection_name)
+        await collection.delete(where={"doc_id": key})
 
 DELETION_PREFIX_CALLBACK_DICT = {
     "S3Key": clean_s3_files,
     "SessionHeader": clean_s3_folder,
     "S3_File": clean_s3_file,
     "RedisKey": clean_redis_key,
-    "ChromaDBKey": clean_chromadb,
+    "ChromaDB": clean_chromadb,
 }
 
 
