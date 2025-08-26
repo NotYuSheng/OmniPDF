@@ -17,7 +17,7 @@ st.header("🖼️ Image Extraction")
 image_status = st.empty()
 server_status = st.empty()
 
-async def get_images(doc_id, max_retries=60, delay=1) -> dict:
+async def get_images(doc_id, max_retries=600, delay=1) -> dict:
     for attempt in range(max_retries):
         async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
             try:
