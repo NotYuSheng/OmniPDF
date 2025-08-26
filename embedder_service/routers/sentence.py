@@ -37,8 +37,9 @@ def split_in_segments_by_sentences(text:str, max_length:int):
 
         try:
             sentence_start = text.index(sentence, last_match_end)
-        except ValueError:
+        except ValueError as e:
             # if sentences can't be located raise an error, as the tokenizer should not modify the text.
+            logger.error(f"Failed to locate sentence {{{sentence}}} in orignal text.\n{e}")
             raise HTTPException(status_code=500, detail="Embedder failure.")
 
         if word_count > 0 and word_count + new_word_count > max_length:
