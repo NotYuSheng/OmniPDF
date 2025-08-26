@@ -61,11 +61,8 @@ services:
     env_file:
       - ./nginx/.env
     depends_on:
-      - pdf_extraction_service
       - pdf_processor_service
       - chat_service
-      - docling_translation_service
-      - embedder_service
 
   redis:
     container_name: redis
@@ -121,7 +118,7 @@ services:
     ipc: host
     volumes:
       - ./llm_models/Qwen2.5-14B-Instruct:/mnt/model/
-      # - ./llm_models/Qwen2.5-0.5B-Instruct:/mnt/model/
+    # - ./llm_models/Qwen2.5-0.5B-Instruct:/mnt/model/
     ports:
       - "1234:8000"
     environment:
