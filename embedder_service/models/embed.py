@@ -26,14 +26,13 @@ class ProcessingConfig(BaseModel):
     max_chunk_size: int = Field(default=1000, description="Maximum chunk size")
     store_in_chroma: bool = Field(
         default=True, description="Store embeddings in ChromaDB")
-    collection_name: str = Field(
-        default="my_documents", description="ChromaDB collection name")
 
 
 class DataRequest(BaseModel):
     """Request model for embed API endpoint."""
     
     doc_id: str
+    session_id: str
     text: str
     config: ProcessingConfig
     pages_info: List[Dict]

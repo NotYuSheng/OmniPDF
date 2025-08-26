@@ -18,7 +18,7 @@ if not EMBED_URL:
 
 @router.post("/{embed_type}/{doc_id}")
 async def text_embed_proxy(
-    embed_type: Literal["embed"],
+    embed_type: Literal["sentence", "semantic"],
     doc_id: str,
     request: Request,
     session_id: str = Depends(get_session_id),
@@ -35,6 +35,7 @@ async def text_embed_proxy(
         config = {}
     param = {
         "doc_id": doc_id,
+        "session_id": session_id,
         "text": full_text,
         "config": config,
         "pages_info": pages_info,
