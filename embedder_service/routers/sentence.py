@@ -85,7 +85,6 @@ async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
             chunk_content = chunk
             logger.info(f"Length of chunk: {len(chunk_content.strip())}")
 
-
             # Include doc_id and session_id in metadata of each chunk
             chunk_metadata = {}
             chunk_metadata["doc_id"] = request.doc_id
@@ -102,7 +101,6 @@ async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
                     "metadata": chunk_metadata,
                 }
             )
-
 
         logger.info(chunk_data)
         return chunk_data
