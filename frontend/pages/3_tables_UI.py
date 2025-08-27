@@ -6,7 +6,7 @@ import httpx
 import json
 import os
 
-PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL", "http://localhost:8080/pdf_processor")
+PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
