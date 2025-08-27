@@ -3,7 +3,6 @@ from openai import AsyncOpenAI, APIError
 import logging
 import httpx
 from PIL import Image
-import io
 import base64
 
 from models.caption import ImageCaptioningRequest, ImageCaptioningResponse
