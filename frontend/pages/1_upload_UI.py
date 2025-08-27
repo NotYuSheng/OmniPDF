@@ -20,6 +20,7 @@ if 'httpx_cookies' not in st.session_state:
 if 'uploaded_files' not in st.session_state:
     st.session_state.uploaded_files = None
 
+client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
 
 async def process_pdf(uploaded_file, status_text):
     """
@@ -35,10 +36,11 @@ async def process_pdf(uploaded_file, status_text):
         files = {'file': (uploaded_file.name, 
                                   bytes_data, 
                                   'application/pdf')}
-        async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
-            upload_response = await client.post(f"{PDF_PROCESSOR_URL}/documents/", files=files)
-            if upload_response.cookies:
-                st.session_state.httpx_cookies = upload_response.cookies
+
+        upload_response = await client.post(f"{PDF_PROCESSOR_URL}/documents/", files=files)
+        if upload_response.cookies:
+            st.session_state.httpx_cookies = upload_response.cookies
+            
                 
         logger.info(f"Upload PDF response: {upload_response.text}")   
                 

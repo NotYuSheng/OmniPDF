@@ -10,6 +10,7 @@ PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+client =  httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
 
 st.header("📋 Table Extraction")
 table_status = st.empty()
@@ -17,48 +18,47 @@ server_status = st.empty()
 
 async def get_tables(doc_id, max_retries=60, delay=1) -> dict:
     for attempt in range(max_retries):
-        async with httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
+        try:
+            response = await client.get(f"{PDF_PROCESSOR_URL}/tables/{doc_id}")
+            logger.info(f"Table extraction response status: {response.status_code}")
             try:
-                response = await client.get(f"{PDF_PROCESSOR_URL}/tables/{doc_id}")
-                logger.info(f"Table extraction response status: {response.status_code}")
-                try:
+                data = response.json()
+                if "detail" in data:
+                    server_status.info(data["detail"])
+                    logger.info(f"Info details: {data['detail']}")
+                else:
+                    server_status.info("Successfully retrieved tables")
+                    logger.info(f"Table extraction response: {response}")
+            except json.JSONDecodeError:
+                logger.error(f"Failed to decode JSON from response: {response.text}")
+                server_status.error("Received an invalid response from the server.")
+            
+            if response.status_code == 200:
+                return response.json()  # Success - return the actual data
+            elif response.status_code == 202:
+                # Still processing, continue polling
+                if attempt < max_retries - 1:
+                    table_status.info(f"Document still processing... ({(attempt + 1)*delay}s)")
                     data = response.json()
                     if "detail" in data:
                         server_status.info(data["detail"])
-                        logger.info(f"Info details: {data['detail']}")
                     else:
-                        server_status.info("Successfully retrieved tables")
-                        logger.info(f"Table extraction response: {response}")
-                except json.JSONDecodeError:
-                    logger.error(f"Failed to decode JSON from response: {response.text}")
-                    server_status.error("Received an invalid response from the server.")
-                
-                if response.status_code == 200:
-                    return response.json()  # Success - return the actual data
-                elif response.status_code == 202:
-                    # Still processing, continue polling
-                    if attempt < max_retries - 1:
-                        table_status.info(f"Document still processing... ({(attempt + 1)*delay}s)")
-                        data = response.json()
-                        if "detail" in data:
-                            server_status.info(data["detail"])
-                        else:
-                            if len(data) > 100:
-                                server_status.info(str(data)[:50] + "...")
-                        await asyncio.sleep(delay)
-                        continue
-                    else:
-                        raise TimeoutError("Document processing timed out after maximum retries")
+                        if len(data) > 100:
+                            server_status.info(str(data)[:50] + "...")
+                    await asyncio.sleep(delay)
+                    continue
                 else:
-                    # Handle other HTTP errors
-                    logger.error(f"HTTP error {response.status_code}: {response.text}")
-                    response.raise_for_status()
-                    
-            except httpx.RequestError as e:
-                logger.error(f"Request error on attempt {attempt + 1}: {e}")
-                if attempt == max_retries - 1:
-                    raise
-                await asyncio.sleep(delay)
+                    raise TimeoutError("Document processing timed out after maximum retries")
+            else:
+                # Handle other HTTP errors
+                logger.error(f"HTTP error {response.status_code}: {response.text}")
+                response.raise_for_status()
+                
+        except httpx.RequestError as e:
+            logger.error(f"Request error on attempt {attempt + 1}: {e}")
+            if attempt == max_retries - 1:
+                raise
+            await asyncio.sleep(delay)
     
     raise TimeoutError("Max retries exceeded")
 
