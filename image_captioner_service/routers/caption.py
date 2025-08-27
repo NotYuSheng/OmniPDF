@@ -13,23 +13,13 @@ from models.vlm_config import PromptTemplates, VLMConfig, CaptionOptimizer
 router = APIRouter(prefix="/caption", tags=["caption"])
 logger = logging.getLogger(__name__)
 
-# Initialize configuration for VLM
+http_client = httpx.AsyncClient()
 vlm_config = VLMConfig()
-prompt_templates = PromptTemplates()
-optimizer = CaptionOptimizer()
-
 VLM_MODEL = vlm_config.model_name
 
 
-@router.post("/caption", response_model=ImageCaptioningResponse, status_code=200)
-async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncOpenAI = Depends(get_openai_client)):
-
-    logger.info(f"Generating caption with given prompt: '{request.prompt}'")
-
-    image_url = request.image_url
-    if not image_url:
-        logger.error("Image URL is required for caption generation.")
-        raise HTTPException(status_code=400, detail="Image URL is required")
+async def fetch_image(request: ImageCaptioningRequest):
+    """Retrieve image from processed PDF document"""
 
     try:
         logger.info(f"doc id: {request.doc_id}")
@@ -37,18 +27,24 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
         logger.info(f"Image URL: {request.image_url}")
         logger.info(f"prompt: {request.prompt}")
 
-        async with httpx.AsyncClient() as http_client:
-            response = await http_client.get(request.image_url, follow_redirects=True)
+        response = await http_client.get(request.image_url, follow_redirects=True)
 
-    except Exception as e:
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 403:
+            logger.error(f"Invalid or expired S3 signed URL: {e.response.status_code}")
+            raise HTTPException(status_code=400, detail="Invalid or expired S3 signed URL")
+        else:
+            logger.error(f"Error fetching image: {e.response.status_code}")
+            raise HTTPException(status_code=500, detail="Failed to fetch image")
+    except httpx.RequestError as e:
         logger.error(f"Error fetching image: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch image")
 
     try:
         image = Image.open(io.BytesIO(response.content))
-        if image.mode != "RGB":
-            logger.info("Converting image to RGB mode.")
-            image = image.convert("RGB")
+        # (Optional): Set mode of image
+        # if image.mode != "RGB":
+        #     image = image.convert("RGB")
         
         # Convert the image to bytes
         image_bytes = io.BytesIO()
@@ -56,18 +52,35 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
         image_bytes = image_bytes.getvalue()
 
         logger.info("Successfully downloaded and processed image.")
+        return image_bytes
 
-    except Exception as e:
+    except (Image.UnidentifiedImageError, IOError) as e:
         logger.error(f"Error processing image: {e}")
         raise HTTPException(status_code=500, detail="Failed to process image")
+
+
+@router.post("/", response_model=ImageCaptioningResponse, status_code=200)
+async def generate_image_caption(
+    request: ImageCaptioningRequest, 
+    client: AsyncOpenAI = Depends(get_openai_client)
+):
+    """Use Vision-Language Model (VLM) to create a caption for the retrieved image from the processed PDF"""
     
+    logger.info(f"Generating caption with given prompt: '{request.prompt}'")
+
+    image_url = request.image_url
+    if not image_url:
+        logger.error("Image URL is required for caption generation.")
+        raise HTTPException(status_code=400, detail="Image URL is required")
+
+    image_bytes = await fetch_image(request)
+
     try:
         # Base64 encode the image
         encoded_image = base64.b64encode(image_bytes).decode("utf-8")
 
-        system_prompt = prompt_templates.get_system_prompt()
-        
         # Prepare messages containing system prompt and encoded image for VLM
+        system_prompt = PromptTemplates.get_system_prompt()
         messages = [
             {
                 "role": "system",
@@ -75,7 +88,13 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
             },
             {
                 "role": "user",
-                "content": encoded_image + "\n\n" + request.prompt # user prompt provided by user or set as fixed by system
+                "content": [
+                    {"type": "text", "text": request.prompt},
+                    {
+                        "type": "image_url", 
+                        "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}
+                    }
+                ]
             }
         ]
 
@@ -107,13 +126,12 @@ async def generate_image_caption(request: ImageCaptioningRequest, client: AsyncO
     
     # Post-process the response
     if vlm_config.enable_response_post_processing:
-        processed_caption = optimizer.post_process_llm_response(first_choice.message.content)
+        processed_caption = CaptionOptimizer.post_process_llm_response(first_choice.message.content)
     else:
         processed_caption = first_choice.message.content
     
     logger.info(f"Received caption from LLM: '{processed_caption}'")
 
-    response_data = ImageCaptioningResponse(doc_id=request.doc_id, image_id=request.image_id, caption=processed_caption)
+    response_data = ImageCaptioningResponse(caption=processed_caption)
     logger.info("Successfully generated caption and sending response.")
-
     return response_data

@@ -5,7 +5,7 @@ class VLMConfig:
     """Configuration class for the optimization of the model's caption generation"""
     
     def __init__(self):
-        self.model_name = os.getenv("OPENAI_VLM")
+        self.model_name = os.environ["OPENAI_VLM"]
         
         # LLM's Generation parameters
         self.generation_params = {
@@ -62,13 +62,13 @@ class CaptionOptimizer:
         for i in range(1, len(lines)):
             current_line_stripped = lines[i].strip()
             prev_line_stripped = lines[i-1].strip()
-            if not current_line_stripped or current_line_stripped != prev_line_stripped:
+            if current_line_stripped != prev_line_stripped:
                 filtered_lines.append(lines[i])
         
         cleaned_response = '\n'.join(filtered_lines)
         
         # Ensure response ends properly
-        if cleaned_response and not cleaned_response.rstrip().endswith(('.', '!', '?', ':')):
+        if cleaned_response.strip() and not cleaned_response.rstrip().endswith(('.', '!', '?', ':')):
             cleaned_response = cleaned_response.rstrip() + '.'
         
         return cleaned_response.strip()

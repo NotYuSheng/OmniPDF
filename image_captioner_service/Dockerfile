@@ -16,4 +16,4 @@ COPY image_captioner_service ./image_captioner_service
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "PYTHONPATH=/app/image_captioner_service uvicorn image_captioner_service.main:app --host 0.0.0.0 --port 8000"]
+CMD ["uvicorn", "image_captioner_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
