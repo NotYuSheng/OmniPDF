@@ -7,7 +7,7 @@ import os
 from PIL import Image
 from io import BytesIO
 
-PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL")
+PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
