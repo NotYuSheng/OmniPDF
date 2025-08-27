@@ -10,7 +10,7 @@ PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-client =  httpx.AsyncClient(cookies=st.session_state.httpx_cookies) as client:
+client =  httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
 
 st.header("📋 Table Extraction")
 table_status = st.empty()
