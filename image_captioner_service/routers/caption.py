@@ -91,7 +91,7 @@ async def generate_image_caption(
                     {"type": "text", "text": request.prompt},
                     {
                         "type": "image_url", 
-                        "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}
+                        "image_url": {"url": f"data:image;base64,{encoded_image}"}
                     }
                 ]
             }
