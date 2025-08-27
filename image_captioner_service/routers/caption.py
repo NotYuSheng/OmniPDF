@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from openai import AsyncOpenAI, APIError
 import logging
 import httpx
+import io
 from PIL import Image
 import base64
 
@@ -41,6 +42,10 @@ async def get_image(request: ImageCaptioningRequest):
 
     try:
         image_bytes = response.content
+        # Validate image can be opened
+        image = Image.open(io.BytesIO(image_bytes))  
+        width, height = image.size
+        logger.info(f"Image dimensions: {width}x{height}")
         # (Optional): Set mode of image
         # if image.mode != "RGB":
         #     image = image.convert("RGB")
