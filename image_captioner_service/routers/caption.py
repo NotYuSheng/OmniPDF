@@ -18,7 +18,7 @@ vlm_config = VLMConfig()
 VLM_MODEL = vlm_config.model_name
 
 
-async def fetch_image(request: ImageCaptioningRequest):
+async def get_image(request: ImageCaptioningRequest):
     """Retrieve image from processed PDF document"""
 
     try:
@@ -28,7 +28,7 @@ async def fetch_image(request: ImageCaptioningRequest):
         logger.info(f"prompt: {request.prompt}")
 
         response = await http_client.get(request.image_url, follow_redirects=True)
-
+        response.raise_for_status()
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 403:
             logger.error(f"Invalid or expired S3 signed URL: {e.response.status_code}")
@@ -41,15 +41,10 @@ async def fetch_image(request: ImageCaptioningRequest):
         raise HTTPException(status_code=500, detail="Failed to fetch image")
 
     try:
-        image = Image.open(io.BytesIO(response.content))
+        image_bytes = response.content
         # (Optional): Set mode of image
         # if image.mode != "RGB":
         #     image = image.convert("RGB")
-        
-        # Convert the image to bytes
-        image_bytes = io.BytesIO()
-        image.save(image_bytes, format="JPEG")
-        image_bytes = image_bytes.getvalue()
 
         logger.info("Successfully downloaded and processed image.")
         return image_bytes
@@ -73,7 +68,7 @@ async def generate_image_caption(
         logger.error("Image URL is required for caption generation.")
         raise HTTPException(status_code=400, detail="Image URL is required")
 
-    image_bytes = await fetch_image(request)
+    image_bytes = await get_image(request)
 
     try:
         # Base64 encode the image
