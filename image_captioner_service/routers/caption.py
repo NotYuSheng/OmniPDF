@@ -22,11 +22,6 @@ async def get_image(request: ImageCaptioningRequest):
     """Retrieve image from processed PDF document"""
 
     try:
-        logger.info(f"doc id: {request.doc_id}")
-        logger.info(f"Image ID: {request.image_id}")
-        logger.info(f"Image URL: {request.image_url}")
-        logger.info(f"prompt: {request.prompt}")
-
         response = await http_client.get(request.image_url, follow_redirects=True)
         response.raise_for_status()
     except httpx.HTTPStatusError as e:
