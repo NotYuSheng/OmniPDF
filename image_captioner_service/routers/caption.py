@@ -18,11 +18,11 @@ vlm_config = VLMConfig()
 VLM_MODEL = vlm_config.model_name
 
 
-async def get_image(request: ImageCaptioningRequest):
+async def get_image(image_url: str) -> tuple[bytes, str]:
     """Retrieve image from processed PDF document"""
 
     try:
-        response = await http_client.get(request.image_url, follow_redirects=True)
+        response = await http_client.get(image_url, follow_redirects=True)
         response.raise_for_status()
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 403:
@@ -37,16 +37,15 @@ async def get_image(request: ImageCaptioningRequest):
 
     try:
         image_bytes = response.content
-        # Validate image can be opened
-        image = Image.open(io.BytesIO(image_bytes))  
-        width, height = image.size
-        logger.info(f"Image dimensions: {width}x{height}")
+        # Get image format
+        image = Image.open(io.BytesIO(image_bytes))
+        image_format = image.format.lower() if image.format else "jpeg"
         # (Optional): Set mode of image
         # if image.mode != "RGB":
         #     image = image.convert("RGB")
 
         logger.info("Successfully downloaded and processed image.")
-        return image_bytes
+        return image_bytes, image_format
 
     except (Image.UnidentifiedImageError, IOError) as e:
         logger.error(f"Error processing image: {e}")
@@ -67,11 +66,12 @@ async def generate_image_caption(
         logger.error("Image URL is required for caption generation.")
         raise HTTPException(status_code=400, detail="Image URL is required")
 
-    image_bytes = await get_image(request)
+    image_bytes, image_format = await get_image(image_url)
 
     try:
         # Base64 encode the image
         encoded_image = base64.b64encode(image_bytes).decode("utf-8")
+        logger.info("Image successfully encoded to base64.")
 
         # Prepare messages containing system prompt and encoded image for VLM
         system_prompt = PromptTemplates.get_system_prompt()
@@ -86,7 +86,7 @@ async def generate_image_caption(
                     {"type": "text", "text": request.prompt},
                     {
                         "type": "image_url", 
-                        "image_url": {"url": f"data:image;base64,{encoded_image}"}
+                        "image_url": {"url": f"data:image/{image_format};base64,{encoded_image}"}
                     }
                 ]
             }
