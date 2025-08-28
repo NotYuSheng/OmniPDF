@@ -169,17 +169,3 @@ class RedisSetWithFlagExpiry(RedisSetStorage):
 
     def flag_prefixed(self, key: str):
         return self.flag_prefix + SEPERATOR + self.prefixed(key)
-
-def get_json_storage() -> Generator:
-    storage = RedisJSONStorage()
-    yield storage
-
-
-def get_set_storage() -> Generator:
-    service_cache = RedisSetStorage()
-    yield service_cache
-
-
-def get_string_storage() -> Generator:
-    service_cache = RedisStringStorage()
-    yield service_cache
