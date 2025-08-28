@@ -3,23 +3,21 @@
 
 from os import getenv
 from datetime import timedelta
-from typing import Any, Generator
+from typing import Any
 import logging
 import json
-from enum import Enum
+from enum import StrEnum
 
 from redis import Redis
 
 
 logger = logging.getLogger(__name__)
 
-class RedisPrefix(Enum):
-    CHROMADB = "ChromaDB"
+class RedisPrefix(StrEnum):
     DOC_FLAG = "DocumentFlag"
     DOC_FILE_LIST = "DocumentFiles"
-    FILEPATH = "Filepath"
     SESSION_DOC_LIST = "SessionDocuments"
-    SESSION_FLAG = "SessionHeader"
+    SESSION_FLAG = "SessionFlag"
 
 class Config:
     redis_url: str = getenv("REDIS_URL")
@@ -169,3 +167,12 @@ class RedisSetWithFlagExpiry(RedisSetStorage):
 
     def flag_prefixed(self, key: str):
         return self.flag_prefix + SEPERATOR + self.prefixed(key)
+
+
+class RedisDocumentFileList(RedisSetWithFlagExpiry):
+    def __init__(self, redis_client=None, prefix=RedisPrefix.DOC_FILE_LIST, flag_prefix=RedisPrefix.DOC_FLAG, default_expiry=timedelta(hours=1)):
+        super().__init__(redis_client, prefix, flag_prefix, default_expiry)
+    
+    def init_doc_id(self, doc_id) -> str:
+        if not self.client.set(self.flag_prefixed(doc_id), 1, ex=self.flag_expiry, nx=True):
+            raise ValueError("doc_id already exists. doc_id: {doc_id}")

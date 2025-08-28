@@ -8,7 +8,7 @@ from pydantic import BaseModel
 import json
 from io import BytesIO
 
-from shared_utils.redis import RedisSimpleFileFlag
+from shared_utils.redis import RedisDocumentFileList
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ s3_client = boto3.client(
     aws_secret_access_key=S3_SECRET_KEY,
     region_name=REGION_NAME,
 )
-redis_flag_store = RedisSimpleFileFlag()
+document_files = RedisDocumentFileList()
 
 
 def upload_fileobj(file_obj, key: str, content_type: str = "application/pdf") -> bool:
@@ -153,7 +153,7 @@ def save_job(
         file_obj = BytesIO(json.dumps(wrapped).encode("utf-8"))
 
         job_key = get_job_s3_key(doc_id, job_type)
-        redis_flag_store.set(job_key)
+        document_files.add(doc_id, job_key)
         return upload_fileobj(
             file_obj,
             key=job_key,
@@ -172,7 +172,8 @@ def load_job(doc_id: str, job_type: str) -> Optional[dict]:
         job_key = get_job_s3_key(doc_id, job_type)
         response = s3_client.get_object(Bucket=S3_BUCKET, Key=job_key)
         job = json.loads(response["Body"].read().decode("utf-8"))
-        redis_flag_store.set(job_key)
+        # Extend Expiry for document file list
+        document_files[doc_id]
         return {
             "doc_id": doc_id,
             "status": job.get("status", "unknown"),
