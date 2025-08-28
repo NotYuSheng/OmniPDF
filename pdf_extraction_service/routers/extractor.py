@@ -17,11 +17,11 @@ from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling.datamodel.accelerator_options import AcceleratorDevice, AcceleratorOptions
-from shared_utils.redis import RedisSetWithFlagExpiry
+from shared_utils.redis import RedisSetWithFlagExpiry, RedisPrefix
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 logger = logging.getLogger(__name__)
-redis_image_sets = RedisSetWithFlagExpiry(prefix="ImageFiles", flag_prefix="S3Key", default_expiry=timedelta(hours=1))
+redis_image_sets = RedisSetWithFlagExpiry(prefix=RedisPrefix.DOC_FILE_LIST, flag_prefix=RedisPrefix.DOC_FLAG, default_expiry=timedelta(hours=1))
 
 def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
     start_time = time.time()

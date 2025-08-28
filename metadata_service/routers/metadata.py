@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
-from shared_utils.chroma_client import get_chroma_client
-from shared_utils.redis import RedisStringStorage
+from shared_utils.chroma_client import get_chroma_client, TEXTUAL_EMBEDDING_COLLECTION
+from shared_utils.redis import RedisStringStorage, RedisPrefix
 from shared_utils.s3_utils import save_job, load_job
 import logging
 from models.rag_config import (
@@ -21,8 +21,6 @@ prompt_templates = QwenPromptTemplates()
 
 OPENAI_MODEL_NAME = qwen_config.model_name
 
-FILENAME_REDIS_PREFIX = "Filename"
-TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
 MAX_CHUNK_PER_RETRIVAL = 100
 SUMMARY_LENGTH = 500
 SHORT_DSECRIPTION_LENGTH = 20
@@ -243,7 +241,7 @@ async def get_keywords(
 
 
 async def get_filename(doc_id: str):
-    redis_filename_store = RedisStringStorage(prefix=FILENAME_REDIS_PREFIX)
+    redis_filename_store = RedisStringStorage(prefix=RedisPrefix.FILEPATH)
     filename = redis_filename_store[doc_id]
     if not filename:
         raise HTTPException(status_code=404, detail="Filename not found for document")

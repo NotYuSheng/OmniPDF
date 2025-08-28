@@ -7,16 +7,13 @@ from uuid import uuid4
 
 from fastapi import Depends, Request, Response, HTTPException
 
-import shared_utils.redis
+from shared_utils.redis import RedisSetWithFlagExpiry, RedisStringStorage, RedisPrefix
 
 
 SESSION_COOKIE_NAME: str = "OmniPDFSession"
-SESSION_REDIS_PREFIX = "Session_Files"
-SESSION_FLAG_PREFIX = "SessionHeader"
-FILENAME_REDIS_PREFIX = "Filename"
 
-class SessionStorage(shared_utils.redis.RedisSetWithFlagExpiry):
-    def __init__(self, redis_client=None, prefix=SESSION_REDIS_PREFIX, flag_prefix=SESSION_FLAG_PREFIX, default_expiry=timedelta(days=1)):
+class SessionStorage(RedisSetWithFlagExpiry):
+    def __init__(self, redis_client=None, prefix=RedisPrefix.SESSION_DOC_LIST, flag_prefix=RedisPrefix.SESSION_FLAG, default_expiry=timedelta(days=1)):
         super().__init__(redis_client, prefix, flag_prefix, default_expiry)
 
     def generate_session(self) -> str:
@@ -83,7 +80,7 @@ def get_doc_list_append_function(
 ) -> Callable[[str], None]:
     if not validate_session_id(session_id, session_storage):
         session_id = create_new_session(response, session_storage=session_storage)
-    redis_filename_store = shared_utils.redis.RedisStringStorage(redis_client=session_storage.client, prefix=FILENAME_REDIS_PREFIX)
+    redis_filename_store = RedisStringStorage(redis_client=session_storage.client, prefix=RedisPrefix.FILEPATH)
 
     def append_doc(doc_id: str, filename: str):
         session_storage.add(session_id, doc_id)
@@ -96,7 +93,7 @@ def get_doc_list_remove_function(
     session_id: str = Depends(get_session_id),
     session_storage: SessionStorage = Depends(get_session_storage),
 ) -> Callable[[str], None]:
-    redis_filename_store = shared_utils.redis.RedisStringStorage(redis_client=session_storage.client, prefix=FILENAME_REDIS_PREFIX)
+    redis_filename_store = RedisStringStorage(redis_client=session_storage.client, prefix=RedisPrefix.FILEPATH)
     def remove_doc(doc_id: str):
         session_storage.remove(session_id, doc_id)
         del redis_filename_store[doc_id]

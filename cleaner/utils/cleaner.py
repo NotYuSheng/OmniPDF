@@ -1,6 +1,6 @@
 import logging
 
-from shared_utils.redis import RedisBase, RedisSetStorage, SEPERATOR
+from shared_utils.redis import RedisBase, RedisPrefix, RedisSetStorage, SEPERATOR
 from shared_utils.s3_utils import delete_file, delete_folder, get_job_s3_key
 from shared_utils.chroma_client import get_chroma_client
 
@@ -57,11 +57,11 @@ async def clean_chromadb(key):
         await collection.delete(where={"doc_id": key})
 
 DELETION_PREFIX_CALLBACK_DICT = {
-    "S3Key": clean_s3_files,
-    "SessionHeader": clean_s3_folder,
-    "S3_File": clean_s3_file,
-    "RedisKey": clean_redis_key,
-    "ChromaDB": clean_chromadb,
+    RedisPrefix.SESSION_DOC_LIST: clean_s3_files,
+    RedisPrefix.DOC_FLAG: clean_s3_folder,
+    RedisPrefix.FILEPATH: clean_s3_file,
+    RedisPrefix.SESSION_FLAG: clean_redis_key,
+    RedisPrefix.CHROMADB: clean_chromadb,
 }
 
 
@@ -76,6 +76,7 @@ def event_handler(msg):
         msg_data: str = msg["data"]
         try:
             flag, key = msg_data.split(SEPERATOR, maxsplit=1)
+            logger.info(f"Handling {msg_origin} for {flag} with key {key}")
             DELETION_PREFIX_CALLBACK_DICT.get(flag, empty_function)(key)
         except ValueError:
             logger.warning(f"Could not split message data, malformed key: {msg_data}")

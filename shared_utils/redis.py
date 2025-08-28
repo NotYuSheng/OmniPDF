@@ -6,12 +6,20 @@ from datetime import timedelta
 from typing import Any, Generator
 import logging
 import json
+from enum import Enum
 
 from redis import Redis
 
 
 logger = logging.getLogger(__name__)
 
+class RedisPrefix(Enum):
+    CHROMADB = "ChromaDB"
+    DOC_FLAG = "DocumentFlag"
+    DOC_FILE_LIST = "DocumentFiles"
+    FILEPATH = "Filepath"
+    SESSION_DOC_LIST = "SessionDocuments"
+    SESSION_FLAG = "SessionHeader"
 
 class Config:
     redis_url: str = getenv("REDIS_URL")
