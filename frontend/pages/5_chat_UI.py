@@ -41,7 +41,7 @@ async def chat_with_rag(prompt: str, doc_id: str = None, max_retries: int = 600,
     """
     for attempt in range(max_retries):
         try:
-            response = await client.post(url=f"{CHAT_URL}/chat",
+            response = await client.post(url=f"{CHAT_URL}/chat/chat/",
                                         json={"message": prompt,
                                               "doc_id": doc_id,
                                               "collection_name": "default_collection"
@@ -52,6 +52,8 @@ async def chat_with_rag(prompt: str, doc_id: str = None, max_retries: int = 600,
             logger.info(f"Current session cookie: {st.session_state.httpx_cookies.get('OmniPDFSession')}")
             
             try:
+                logger.info(f"FDecode JSON from response: {response}")
+                logger.info(f"Decode JSON from headers: {response.headers}")
                 data = response.json()
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to decode JSON from response: {response.text}: {e}")
@@ -66,8 +68,8 @@ async def chat_with_rag(prompt: str, doc_id: str = None, max_retries: int = 600,
                 server_status.success("Successfully generated response")
                 logger.info(f"Chat response: {data}")
 
-            if response.status_code == 200:
-                return data.get("response", "No response generated")  # Success - return the actual response
+            if response.status_code == 201:
+                return data["response"]
             elif response.status_code == 202:
                 # Still processing, continue polling
                 if attempt < max_retries - 1:
@@ -120,7 +122,7 @@ col1, col2 = st.columns(2)
 with col1:
     if st.button("What is the main topic?"):
         prompt = "What is the main topic?"
-        response = asyncio.run(chat_with_rag(prompt, doc_id))
+        response = asyncio.run(chat_with_rag(prompt))
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.messages.append({"role": "assistant", "content": response})
         st.rerun()
@@ -155,6 +157,8 @@ if prompt := st.chat_input("Ask about the document"):
     # Generate and display assistant response
     response = asyncio.run(chat_with_rag(prompt, doc_id))
 
+    response = response.json()
+    
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": response})
 
