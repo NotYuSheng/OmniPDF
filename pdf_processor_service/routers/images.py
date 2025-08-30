@@ -9,14 +9,12 @@ from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
 from utils.proxy import load_or_create_job, generate_external_image_url
 from shared_utils.s3_utils import get_object_stream, list_folder
-from shared_utils.redis import RedisSetWithFlagExpiry
+from shared_utils.redis import RedisDocumentFileList
 
 
 router = APIRouter(prefix="/images", tags=["images"])
 logger = logging.getLogger(__name__)
-redis_image_sets = RedisSetWithFlagExpiry(
-    prefix="ImageFiles", flag_prefix="S3Key", default_expiry=timedelta(hours=1)
-)
+document_files = RedisDocumentFileList()
 
 
 @router.get("/{doc_id}", response_model=ImageResponse)
@@ -58,6 +56,6 @@ async def get_pdf_image(
         raise HTTPException(status_code=500, detail="Failed to check Image")
 
     # To extend expiry time for the images
-    _ = redis_image_sets[doc_id]
+    _ = document_files[doc_id]
 
     return StreamingResponse(file_stream, media_type="image/png")
