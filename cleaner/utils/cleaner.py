@@ -82,8 +82,8 @@ def event_handler(msg):
             flag, key = msg_data.split(SEPERATOR, maxsplit=1)
             logger.info(f"Handling {msg_origin} for {flag} with key {key}")
             runner.run(DELETION_PREFIX_CALLBACK_DICT.get(flag, empty_function)(key))
-        except ValueError:
-            logger.warning("Skipping deletion due to malformed data. {e}")
+        except ValueError as e:
+            logger.warning(f"Skipping deletion due to malformed data. {e}")
 
 
 def setup_redis_watcher_thread():
