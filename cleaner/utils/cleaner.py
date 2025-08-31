@@ -60,9 +60,17 @@ async def handle_doc_file_list(prefixed_doc_id: str):
 
 async def clean_chromadb(doc_id):
     chroma_client = await get_chroma_client()
-    for collection_name in EMBEDDING_COLLECTIONS:
+    
+    async def delete_from_collection(collection_name):
         collection = await chroma_client.get_or_create_collection(name=collection_name)
         await collection.delete(where={"doc_id": doc_id})
+        logger.info(f"Deleted documents with doc_id '{doc_id}' from collection '{collection_name}'")
+    
+    # Process all collections concurrently using asyncio.gather
+    await asyncio.gather(*[
+        delete_from_collection(collection_name) 
+        for collection_name in EMBEDDING_COLLECTIONS
+    ])
 
 
 DELETION_PREFIX_CALLBACK_DICT = {
