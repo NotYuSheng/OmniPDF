@@ -175,4 +175,4 @@ class RedisDocumentFileList(RedisSetWithFlagExpiry):
     
     def init_doc_id(self, doc_id) -> str:
         if not self.client.set(self.flag_prefixed(doc_id), 1, ex=self.flag_expiry, nx=True):
-            raise ValueError("doc_id already exists. doc_id: {doc_id}")
+            raise ValueError(f"doc_id already exists. doc_id: {doc_id}")
