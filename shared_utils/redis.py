@@ -177,6 +177,19 @@ class RedisDocumentFileList(RedisSetWithFlagExpiry):
     def init_doc_id(self, doc_id) -> str:
         if not self.client.set(self.flag_prefixed(doc_id), 1, ex=self.flag_expiry, nx=True):
             raise ValueError(f"doc_id already exists. doc_id: {doc_id}")
+    
+    def refresh_document_expiries(self, doc_ids: set[str]):
+        """
+        Refreshes the expiry for a set of document flags using a single pipeline.
+        """
+        if not doc_ids:
+            return
+
+        pipe = self.client.pipeline()
+        for doc_id in doc_ids:
+            pipe.expire(self.flag_prefixed(doc_id), self.flag_expiry)
+        pipe.execute()
+        logger.info(f"Refreshed expiry for {len(doc_ids)} document flags.")
 
 class RedisDocumentName(RedisStringStorage):
     def __init__(self, redis_client=None, prefix=RedisPrefix.FILENAME, default_expiry = timedelta(hours=1)):
