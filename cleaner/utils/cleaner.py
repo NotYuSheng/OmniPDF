@@ -9,7 +9,7 @@ from shared_utils.redis import (
     RedisPrefix,
     SEPERATOR,
 )
-from shared_utils.s3_utils import delete_file
+from shared_utils.s3_utils import delete_files
 from shared_utils.chroma_client import get_chroma_client
 
 logger = logging.getLogger(__name__)
@@ -51,9 +51,7 @@ async def handle_session_doc_list(prefixed_session_id: str):
 
 async def handle_doc_file_list(prefixed_doc_id: str):
     logger.info(f"deleting doc file list for doc_id: {prefixed_doc_id}")
-    for file_path in redis_set_store[prefixed_doc_id]:
-        logger.info(f"deleting {file_path}")
-        delete_file(file_path)
+    delete_files(redis_set_store[prefixed_doc_id])
     doc_id = get_key_from_prefixed(prefixed_doc_id)
     await clean_chromadb(doc_id)
     del document_names[doc_id]
