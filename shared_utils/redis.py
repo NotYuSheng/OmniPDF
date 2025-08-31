@@ -50,6 +50,12 @@ class RedisBase:
 
     def prefixed(self, key: str):
         return f"{self.prefix}{SEPERATOR}{key}" if self.prefix else key
+    
+    def delete_set(self, key_list: set[str]):
+        pipe = self.client.pipeline()
+        for key in key_list:
+            pipe.delete(key)
+        pipe.execute()
 
 
 # Stores the data as string

@@ -44,8 +44,8 @@ async def empty_function(_):
 
 async def handle_session_doc_list(prefixed_session_id: str):
     logger.info(f"deleting session_id: {prefixed_session_id}")
-    for doc_id in redis_set_store[prefixed_session_id]:
-        del document_files[doc_id]
+    prefixed_keys = [document_files.flag_prefixed(doc_id) for doc_id in redis_set_store[prefixed_session_id]]
+    redis_store.delete_set(prefixed_keys)
     del redis_set_store[prefixed_session_id]
 
 
