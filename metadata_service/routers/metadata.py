@@ -173,7 +173,7 @@ async def get_authors(
     authors = []
     for chunk in author_chunks:
         logger.info(chunk)
-        author_split = chunk.split(":")
+        author_split = chunk.split(":", 1)
         if author_split[0].lower() != "author":
             logger.info(author_split)
             continue
@@ -204,7 +204,7 @@ async def get_title(
         )
     title_str = await cascade_query(title_chunks, user_prompt, system_prompt, client)
     
-    title_split = title_str.split(":")
+    title_split = title_str.split(":", 1)
     if title_split[0].lower() != "title":
         return "UNKNOWN"
     return title_split[-1]
