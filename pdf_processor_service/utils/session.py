@@ -7,7 +7,7 @@ from uuid import uuid4
 
 from fastapi import Depends, Request, Response, HTTPException
 
-from shared_utils.redis import RedisDocumentFileList, RedisSetWithFlagExpiry, RedisPrefix
+from shared_utils.redis import RedisDocumentFileList, RedisDocumentName, RedisSetWithFlagExpiry, RedisPrefix
 
 SESSION_COOKIE_NAME: str = "OmniPDFSession"
 
@@ -81,11 +81,14 @@ def get_doc_list_append_function(
     if not validate_session_id(session_id, session_storage):
         session_id = create_new_session(response, session_storage=session_storage)
     document_files = RedisDocumentFileList()
+    document_names = RedisDocumentName()
 
-    def append_doc(doc_id: str, filename: str):
+    def append_doc(doc_id: str, file_key: str, filename: str):
         session_storage.add(session_id, doc_id)
         document_files.init_doc_id(doc_id)
-        document_files.add(doc_id, filename)
+        document_files.add(doc_id, file_key)
+        document_names[doc_id] = filename
+
 
     return append_doc
 

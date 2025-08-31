@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 class RedisPrefix(StrEnum):
     DOC_FLAG = "DocumentFlag"
     DOC_FILE_LIST = "DocumentFiles"
+    FILENAME = "DocumentName"
     SESSION_DOC_LIST = "SessionDocuments"
     SESSION_FLAG = "SessionFlag"
 
@@ -176,3 +177,7 @@ class RedisDocumentFileList(RedisSetWithFlagExpiry):
     def init_doc_id(self, doc_id) -> str:
         if not self.client.set(self.flag_prefixed(doc_id), 1, ex=self.flag_expiry, nx=True):
             raise ValueError(f"doc_id already exists. doc_id: {doc_id}")
+
+class RedisDocumentName(RedisStringStorage):
+    def __init__(self, redis_client=None, prefix=RedisPrefix.FILENAME, default_expiry = timedelta(hours=1)):
+        super().__init__(redis_client, prefix, default_expiry)

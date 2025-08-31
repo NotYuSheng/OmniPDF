@@ -50,7 +50,7 @@ async def upload_document(
         logger.error(f"Unexpected error during upload: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
 
-    append_doc(doc_id, key)
+    append_doc(doc_id, key, file.filename)
     return DocumentUploadResponse(
         doc_id=doc_id, filename=key, download_url=url
     )
