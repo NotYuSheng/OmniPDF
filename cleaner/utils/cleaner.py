@@ -4,6 +4,7 @@ import logging
 from shared_utils.redis import (
     RedisBase,
     RedisDocumentFileList,
+    RedisDocumentName,
     RedisSetStorage,
     RedisPrefix,
     SEPERATOR,
@@ -16,6 +17,7 @@ runner = asyncio.Runner()
 
 redis_store = RedisBase()
 document_files = RedisDocumentFileList(redis_client=redis_store.client)
+document_names = RedisDocumentName(redis_client=redis_store.client)
 redis_set_store = RedisSetStorage(redis_client=document_files.client)
 pubsub = redis_store.client.pubsub()
 
@@ -52,7 +54,9 @@ async def handle_doc_file_list(prefixed_doc_id: str):
     for file_path in redis_set_store[prefixed_doc_id]:
         logger.info(f"deleting {file_path}")
         delete_file(file_path)
-    await clean_chromadb(get_key_from_prefixed(prefixed_doc_id))
+    doc_id = get_key_from_prefixed(prefixed_doc_id)
+    await clean_chromadb(doc_id)
+    del document_names[doc_id]
     del redis_set_store[prefixed_doc_id]
 
 
