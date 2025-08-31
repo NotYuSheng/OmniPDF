@@ -18,7 +18,9 @@ S3_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
 S3_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
 S3_BUCKET = os.getenv("MINIO_BUCKET", "omnifiles")
 REGION_NAME = os.getenv("AWS_REGION", "ap-southeast-1")  # Optional; ignored by MinIO
-EXTERNAL_ENDPOINT = os.getenv("EXTERNAL_ENDPOINT", "http://localhost:8080/pdf_processor")
+EXTERNAL_ENDPOINT = os.getenv(
+    "EXTERNAL_ENDPOINT", "http://localhost:8080/pdf_processor"
+)
 
 # Instantiate boto3 S3 client
 s3_client = boto3.client(
@@ -100,6 +102,28 @@ def delete_file(key: str) -> bool:
         return False
 
 
+def delete_files(key_list: set[str]) -> bool:
+    """
+    Deletes a list of files from S3 using the given set.
+    Returns True if all files was deleted, False if an error occured.
+    """
+    DELETE_OBJECT_LIMIT = 1000
+    try:
+        chunked_keys = [
+            key_list[i : i + DELETE_OBJECT_LIMIT]
+            for i in range(0, len(key_list), DELETE_OBJECT_LIMIT)
+        ]
+        for chunk in chunked_keys:
+            s3_client.delete_objects(
+                Bucket=S3_BUCKET,
+                Delete={"Objects": [{"Key": key} for key in chunk], "Quiet": True},
+            )
+        return True
+    except (BotoCoreError, ClientError) as e:
+        logger.exception(f"Failed to delete file from S3: {e}")
+        return False
+
+
 def list_folder(folder_prefix: str) -> list[str]:
     paginator = s3_client.get_paginator("list_objects_v2")
     pages = paginator.paginate(Bucket=S3_BUCKET, Prefix=folder_prefix)
@@ -112,19 +136,9 @@ def delete_folder(folder_prefix: str) -> bool:
     Deletes a folder from S3 using the given key.
     Returns True if the folder was deleted, False if an error occured.
     """
-    DELETE_OBJECT_LIMIT = 1000
     try:
         keys = list_folder(folder_prefix)
-        chunked_keys = [
-            keys[i : i + DELETE_OBJECT_LIMIT]
-            for i in range(0, len(keys), DELETE_OBJECT_LIMIT)
-        ]
-        for chunk in chunked_keys:
-            s3_client.delete_objects(
-                Bucket=S3_BUCKET,
-                Delete={"Objects": [{"Key": key} for key in chunk], "Quiet": True},
-            )
-        return True
+        delete_files(keys)
     except (BotoCoreError, ClientError) as e:
         logger.exception(f"Failed to delete file from S3: {e}")
         return False
