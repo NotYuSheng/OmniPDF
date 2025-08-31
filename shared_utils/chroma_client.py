@@ -41,10 +41,10 @@ async def query_chroma(doc_id: str, collection_name: str, query: str, max_result
     if doc_id:
         query_params["where"] = {"doc_id": doc_id}
         logger.info(f"Filtering results to document ID: {doc_id}")
+        document_list[doc_id]
     else:
         logger.info("Searching across all documents in collection")
 
-    document_list[doc_id]
     return await collection.query(**query_params)
 
 
