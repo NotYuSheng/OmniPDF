@@ -112,10 +112,12 @@ def delete_files(key_list: set[str]) -> bool:
     try:
         # Use itertools.islice for memory-efficient chunking
         for i in range(0, len(key_list), DELETE_OBJECT_LIMIT):
-            chunk = [itertools.islice(key_list, i, i + DELETE_OBJECT_LIMIT)]
+            chunk_keys = list(itertools.islice(key_list, i, i + DELETE_OBJECT_LIMIT))
+            if not chunk_keys:
+                break
             s3_client.delete_objects(
                 Bucket=S3_BUCKET,
-                Delete={"Objects": [{"Key": key} for key in chunk], "Quiet": True},
+                Delete={"Objects": [{"Key": key} for key in chunk_keys], "Quiet": True},
             )
         return True
     except (BotoCoreError, ClientError) as e:
