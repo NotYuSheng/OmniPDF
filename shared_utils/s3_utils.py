@@ -4,6 +4,7 @@ import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 from typing import Optional, Union
 from pydantic import BaseModel
+import itertools
 
 import json
 from io import BytesIO
@@ -109,11 +110,9 @@ def delete_files(key_list: set[str]) -> bool:
     """
     DELETE_OBJECT_LIMIT = 1000
     try:
-        chunked_keys = [
-            key_list[i : i + DELETE_OBJECT_LIMIT]
-            for i in range(0, len(key_list), DELETE_OBJECT_LIMIT)
-        ]
-        for chunk in chunked_keys:
+        # Use itertools.islice for memory-efficient chunking
+        for i in range(0, len(key_list), DELETE_OBJECT_LIMIT):
+            chunk = [itertools.islice(key_list, i, i + DELETE_OBJECT_LIMIT)]
             s3_client.delete_objects(
                 Bucket=S3_BUCKET,
                 Delete={"Objects": [{"Key": key} for key in chunk], "Quiet": True},
