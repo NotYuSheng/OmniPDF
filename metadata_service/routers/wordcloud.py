@@ -37,7 +37,8 @@ async def get_wordcloud(
     doc_text = await concat_text(doc_id)
     wordcloud = WordCloud(max_words=MAX_WORDS)
     words = wordcloud.process_text(doc_text)
-    top_words = dict(sorted(words.items(), key=lambda item: item[1], reverse=True)[0:MAX_WORDS]).keys()
+    top_words_items = sorted(words.items(), key=lambda item: item[1], reverse=True)[:MAX_WORDS]
+    top_words = [item[0] for item in top_words_items]
 
     wordcloud.generate_from_frequencies(words)
     with BytesIO() as img_file:
