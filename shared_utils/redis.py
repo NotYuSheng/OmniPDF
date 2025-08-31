@@ -209,6 +209,6 @@ class RedisDocumentName(RedisStringStorage):
         self,
         redis_client=None,
         prefix=RedisPrefix.FILENAME,
-        default_expiry=timedelta(hours=1),
+        default_expiry=None,
     ):
         super().__init__(redis_client, prefix, default_expiry)
