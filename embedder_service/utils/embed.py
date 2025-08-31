@@ -2,7 +2,6 @@
 from fastapi import HTTPException
 from typing import List, Dict, Any
 import logging
-from datetime import timedelta
 
 from models.embed import ProcessingConfig
 from models.helper import get_embedding_model
