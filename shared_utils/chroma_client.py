@@ -3,9 +3,8 @@ import os
 
 # For data chunking and embedding
 import logging
-from datetime import timedelta
 
-from shared_utils.redis import RedisSimpleFileFlag
+from shared_utils.redis import RedisDocumentFileList
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +14,7 @@ CHROMADB_PORT = os.getenv("CHROMADB_PORT", "8000")
 TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
 MAX_CHUNK_PER_RETRIVAL = 100
 
-redis_flag_store = RedisSimpleFileFlag(
-    prefix="ChromaDB", default_expiry=timedelta(hours=1)
-)
+document_list = RedisDocumentFileList()
 
 
 async def get_chroma_client():
@@ -47,7 +44,7 @@ async def query_chroma(doc_id: str, collection_name: str, query: str, max_result
     else:
         logger.info("Searching across all documents in collection")
 
-    redis_flag_store[doc_id]
+    document_list[doc_id]
     return await collection.query(**query_params)
 
 
@@ -67,5 +64,5 @@ async def get_chunks(doc_id: str):
             where={"doc_id": doc_id}, limit=MAX_CHUNK_PER_RETRIVAL, offset=offset
         )
 
-    redis_flag_store[doc_id]
+    document_list[doc_id]
     return chunks
