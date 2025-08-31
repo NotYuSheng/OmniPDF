@@ -5,12 +5,13 @@ from fastapi import APIRouter, HTTPException
 from wordcloud import WordCloud
 
 from shared_utils.s3_utils import load_job, upload_fileobj
+from shared_utils.redis import RedisDocumentFileList
 from models.wordcloud import WordcloudResponse
 
 router = APIRouter(prefix="/wordcloud", tags=["wordcloud"])
 
 logger = logging.getLogger(__name__)
-
+document_files = RedisDocumentFileList()
 MAX_WORDS = 50
 
 
@@ -40,11 +41,12 @@ async def get_wordcloud(
     top_words = dict(sorted(words.items(), key=lambda item: item[1], reverse=True)[0:MAX_WORDS]).keys()
 
     wordcloud.generate_from_frequencies(words)
+    img_filepath = f"{doc_id}/wordcloud.png"
     with BytesIO() as img_file:
         img = wordcloud.to_image()
         img.save(img_file, format="PNG")
         img_file.seek(0)
-        if not upload_fileobj(img_file, f"{doc_id}/wordcloud.png"):
+        if not upload_fileobj(img_file, img_filepath):
             raise HTTPException(status_code=500, detail="failed to upload file")
-
+    document_files.add(doc_id, img_filepath)
     return WordcloudResponse(doc_id=doc_id, top_words=top_words)
