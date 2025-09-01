@@ -1,18 +1,17 @@
 # Original code from https://github.com/duyixian1234/fastapi-redis-session
 # Updated for package versions listed in requirements.txt
 
-from datetime import timedelta
 from typing import Callable, Generator
 from uuid import uuid4
 
 from fastapi import Depends, Request, Response, HTTPException
 
-from shared_utils.redis import RedisDocumentFileList, RedisDocumentName, RedisSetWithFlagExpiry, RedisPrefix
+from shared_utils.redis import RedisDocumentFileList, RedisDocumentName, RedisSetWithFlagExpiry, RedisPrefix, EXPIRY_DAY
 
 SESSION_COOKIE_NAME: str = "OmniPDFSession"
 
 class SessionStorage(RedisSetWithFlagExpiry):
-    def __init__(self, redis_client=None, prefix=RedisPrefix.SESSION_DOC_LIST, flag_prefix=RedisPrefix.SESSION_FLAG, default_expiry=timedelta(days=1)):
+    def __init__(self, redis_client=None, prefix=RedisPrefix.SESSION_DOC_LIST, flag_prefix=RedisPrefix.SESSION_FLAG, default_expiry=EXPIRY_DAY):
         super().__init__(redis_client, prefix, flag_prefix, default_expiry)
 
     def generate_session(self) -> str:

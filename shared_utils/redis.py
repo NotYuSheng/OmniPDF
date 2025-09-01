@@ -1,7 +1,7 @@
 # Original code from https://github.com/duyixian1234/fastapi-redis-session
 # Updated for package versions listed in requirements.txt
 
-from os import getenv
+from os import environ
 from datetime import timedelta
 from typing import Any
 import logging
@@ -13,6 +13,11 @@ from redis import Redis
 
 logger = logging.getLogger(__name__)
 
+REDIS_URL = environ["REDIS_URL"]
+EXPIRY_DAY = timedelta(days=1)
+EXPIRY_HOUR = timedelta(hours=1)
+SEPERATOR = ":"
+
 
 class RedisPrefix(StrEnum):
     DOC_FLAG = "DocumentFlag"
@@ -22,23 +27,14 @@ class RedisPrefix(StrEnum):
     SESSION_FLAG = "SessionFlag"
 
 
-class Config:
-    redis_url: str = getenv("REDIS_URL")
-    expire_time: timedelta = timedelta(hours=24)
-
-
-config = Config()
-SEPERATOR = ":"
-
-
 class RedisBase:
     def __init__(
         self,
         redis_client=None,
         prefix="",
-        default_expiry: timedelta | None = config.expire_time,
+        default_expiry: timedelta | None = EXPIRY_HOUR,
     ):
-        self.client = redis_client if redis_client else Redis.from_url(config.redis_url)
+        self.client = redis_client if redis_client else Redis.from_url(REDIS_URL)
         self.prefix = prefix
         self.default_expiry = default_expiry
 
@@ -50,7 +46,7 @@ class RedisBase:
 
     def prefixed(self, key: str):
         return f"{self.prefix}{SEPERATOR}{key}" if self.prefix else key
-    
+
     def delete_set(self, key_list: set[str]):
         pipe = self.client.pipeline()
         for key in key_list:
@@ -89,7 +85,7 @@ class RedisJSONStorage(RedisStringStorage):
 
 
 class RedisSetStorage(RedisBase):
-    def __init__(self, redis_client=None, prefix="", default_expiry=config.expire_time):
+    def __init__(self, redis_client=None, prefix="", default_expiry=EXPIRY_HOUR):
         super().__init__(redis_client, prefix, default_expiry)
         self.pipeline = self.client.pipeline()
 
@@ -126,7 +122,7 @@ class RedisSetStorage(RedisBase):
 
 class RedisSimpleFileFlag(RedisStringStorage):
     def __init__(
-        self, redis_client=None, prefix="S3_File:", default_expiry=timedelta(hours=1)
+        self, redis_client=None, prefix="S3_File:", default_expiry=EXPIRY_HOUR
     ):
         super().__init__(redis_client, prefix, default_expiry)
 
@@ -144,7 +140,7 @@ class RedisSetWithFlagExpiry(RedisSetStorage):
         redis_client=None,
         prefix="",
         flag_prefix="Set_Flag:",
-        default_expiry=config.expire_time,
+        default_expiry=EXPIRY_HOUR,
     ):
         super().__init__(redis_client, prefix, None)
         self.flag_expiry = default_expiry
@@ -186,7 +182,7 @@ class RedisDocumentFileList(RedisSetWithFlagExpiry):
         redis_client=None,
         prefix=RedisPrefix.DOC_FILE_LIST,
         flag_prefix=RedisPrefix.DOC_FLAG,
-        default_expiry=timedelta(hours=1),
+        default_expiry=EXPIRY_HOUR,
     ):
         super().__init__(redis_client, prefix, flag_prefix, default_expiry)
 
