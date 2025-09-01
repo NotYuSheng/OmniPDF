@@ -25,7 +25,7 @@ FILENAME_REDIS_PREFIX = "Filename"
 TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
 MAX_CHUNK_PER_RETRIVAL = 100
 SUMMARY_LENGTH = 500
-SHORT_DSECRIPTION_LENGTH = 20
+SHORT_DESCRIPTION_LENGTH = 20
 
 
 async def get_chunks(doc_id: str):
@@ -117,7 +117,7 @@ async def get_short_description(
     user_prompt = f"""
     **DOCUMENT CONTEXT:**
     {summary}
-    **QUERY REQUEST:** Return a short description of the document, up to {SHORT_DSECRIPTION_LENGTH} words.
+    **QUERY REQUEST:** Return a short description of the document, up to {SHORT_DESCRIPTION_LENGTH} words.
 
     **INSTRUCTIONS:**
     Preserve the original meaning of the document while summarizing it into a concise description.
