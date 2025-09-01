@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chunks
-from shared_utils.redis import RedisDocumentName
+from shared_utils.redis import RedisDocumentFileList
 from shared_utils.s3_utils import save_job, load_job
 import logging
 from models.rag_config import (
@@ -14,6 +14,7 @@ from models.rag_config import (
 router = APIRouter(prefix="/metadata", tags=["metadata"])
 
 logger = logging.getLogger(__name__)
+document_list = RedisDocumentFileList()
 
 # Initialize Qwen-2.5 RAG configuration
 qwen_config = QwenRAGConfig()
@@ -223,8 +224,7 @@ async def get_keywords(
 
 
 async def get_filename(doc_id: str):
-    document_names = RedisDocumentName()
-    filename = document_names[doc_id]
+    filename = document_list.get_document_name(doc_id)
     if not filename:
         raise HTTPException(status_code=404, detail="Filename not found for document")
     return filename
