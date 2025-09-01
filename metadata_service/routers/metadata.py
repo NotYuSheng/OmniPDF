@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
-from shared_utils.chroma_client import get_chroma_client
-from shared_utils.redis import RedisStringStorage
+from shared_utils.chroma_client import get_chunks
+from shared_utils.redis import RedisDocumentFileList
 from shared_utils.s3_utils import save_job, load_job
 import logging
 from models.rag_config import (
@@ -14,6 +14,7 @@ from models.rag_config import (
 router = APIRouter(prefix="/metadata", tags=["metadata"])
 
 logger = logging.getLogger(__name__)
+document_list = RedisDocumentFileList()
 
 # Initialize Qwen-2.5 RAG configuration
 qwen_config = QwenRAGConfig()
@@ -21,29 +22,9 @@ prompt_templates = QwenPromptTemplates()
 
 OPENAI_MODEL_NAME = qwen_config.model_name
 
-FILENAME_REDIS_PREFIX = "Filename"
-TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
 MAX_CHUNK_PER_RETRIVAL = 100
 SUMMARY_LENGTH = 500
 SHORT_DESCRIPTION_LENGTH = 20
-
-
-async def get_chunks(doc_id: str):
-    chroma_client = await get_chroma_client()
-    collection = await chroma_client.get_collection(TEXTUAL_EMBEDDING_COLLECTION)
-    offset = 0
-    results = await collection.get(
-        where={"doc_id": doc_id}, limit=MAX_CHUNK_PER_RETRIVAL, offset=offset
-    )
-    logger.info(results)
-    chunks = []
-    while results["documents"]:
-        offset += MAX_CHUNK_PER_RETRIVAL
-        chunks.extend(results["documents"])
-        results = await collection.get(
-            where={"doc_id": doc_id}, limit=MAX_CHUNK_PER_RETRIVAL, offset=offset
-        )
-    return chunks
 
 
 async def get_model_response(
@@ -243,8 +224,7 @@ async def get_keywords(
 
 
 async def get_filename(doc_id: str):
-    redis_filename_store = RedisStringStorage(prefix=FILENAME_REDIS_PREFIX)
-    filename = redis_filename_store[doc_id]
+    filename = document_list.get_document_name(doc_id)
     if not filename:
         raise HTTPException(status_code=404, detail="Filename not found for document")
     return filename
