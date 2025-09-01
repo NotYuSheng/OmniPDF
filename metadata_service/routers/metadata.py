@@ -5,6 +5,7 @@ from shared_utils.chroma_client import get_chunks
 from shared_utils.redis import RedisDocumentFileList
 from shared_utils.s3_utils import save_job, load_job
 import logging
+from models.metadata import MetadataResponse
 from models.rag_config import (
     QwenRAGConfig,
     QwenPromptTemplates,
@@ -230,31 +231,38 @@ async def get_filename(doc_id: str):
     return filename
 
 
-async def generate_metadata(
-    doc_id: str,
-):
+async def generate_metadata(doc_id: str):
+    """Generate metadata for a document synchronously."""
     client = get_openai_client()
     chunks = await get_chunks(doc_id)
     try:
+        # Generate metadata components
         summary = await get_summary(chunks, client)
-        logger.info(summary)
-        metadata = {
+        metadata_result = {
             "filename": await get_filename(doc_id),
             "summary": summary,
-            "executive_summary": await get_short_description(
-                summary, client
-            ),
+            "executive_summary": await get_short_description(summary, client),
             "keywords": await get_keywords(chunks, client),
             "authors": await get_authors(chunks, client),
             "title": await get_title(chunks, client),
         }
+        
+        # Save successful job
+        job_data = {
+            "doc_id": doc_id,
+            "status": "completed",
+            "result": metadata_result
+        }
+        
         save_job(
             doc_id=doc_id,
-            job_data=metadata,
+            job_data=job_data,
             status="completed",
             job_type="metadata",
         )
-        return metadata
+        
+        return metadata_result
+        
     except Exception as e:
         logger.error(f"Error generating metadata for {doc_id}: {e}", exc_info=True)
         error_job = {
@@ -265,9 +273,10 @@ async def generate_metadata(
         save_job(
             doc_id=doc_id, job_data=error_job, status="failed", job_type="metadata"
         )
+        return None
 
 
-@router.post("/{doc_id}", status_code=202)
+@router.post("/{doc_id}", response_model=MetadataResponse, status_code=202)
 async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
     save_job(
         doc_id=doc_id,
@@ -277,10 +286,10 @@ async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
     )
 
     background_tasks.add_task(generate_metadata, doc_id)
-    return None
+    return MetadataResponse(doc_id=doc_id, status="processing")
 
 
-@router.get("/{doc_id}")
+@router.get("/{doc_id}", response_model=MetadataResponse)
 async def get_status(doc_id: str):
     job = load_job(doc_id=doc_id, job_type="metadata")
     if not job:
@@ -291,9 +300,10 @@ async def get_status(doc_id: str):
         raise HTTPException(status_code=500, detail=error_message)
 
     job_data = job.get("data", {})
+    result = job_data.get("result", None)
 
-    return {
-        "doc_id": doc_id,
-        "status": job.get("status", "unknown"),
-        "metadata": job_data,
-    }
+    return MetadataResponse(
+        doc_id=doc_id,
+        status=job.get("status", "unknown"),
+        result=result
+    )
