@@ -63,6 +63,14 @@ services:
     depends_on:
       - chromadb
 
+  image_captioner_service:
+    build:
+      context: .
+      dockerfile: ./image_captioner_service/Dockerfile
+    container_name: image_captioner_service
+    env_file:
+      - ./image_captioner_service/.env
+
   nginx:
     container_name: nginx
     build: 
