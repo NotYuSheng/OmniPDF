@@ -30,7 +30,10 @@ def handle_status_error(response: httpx.Response, url: str) -> None:
     status_code = response.status_code
     
     # Handle specific status codes with meaningful messages
-    if status_code == 400:
+    if 200 <= status_code < 300:
+        # No error, successful response
+        return
+    elif status_code == 400:
         logger.error(f"Bad request to {url}: {response.text}")
         raise HTTPException(
             status_code=400,
