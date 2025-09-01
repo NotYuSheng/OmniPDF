@@ -136,8 +136,7 @@ async def load_or_create_job(doc_id: str) -> dict | Response:
 async def load_or_create_metadata_job(doc_id: str) -> dict | Response:
     job = load_job(doc_id=doc_id, job_type="metadata")
     if not job:
-        param = {"doc_id": doc_id}
-        return await proxy_post(f"{METADATA_URL}?{urlencode(param)}", body={})
+        return await proxy_post(f"{METADATA_URL}/metadata/{doc_id}", body={})
 
     handle_job_status(job, "metadata")
     return job
