@@ -10,6 +10,7 @@ from io import BytesIO
 PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+runner = asyncio.Runner()
 
 FIXED_IMAGE_HEIGHT = 200  # Set your desired fixed height in pixels
 
@@ -194,7 +195,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         st.markdown(f"**Document ID:** {doc_id}")
                         st.markdown(f"**Filename:** [{data['filename']}]({data['download_url']})") # Download link
                         logger.info(f"Extracting images for document ID: {doc_id}")
-                        image_response = asyncio.run(get_images(doc_id=doc_id))
+                        image_response = runner.run(get_images(doc_id=doc_id))
                         image_responses.append(image_response)
                         display_images(image_response, doc_id)
 

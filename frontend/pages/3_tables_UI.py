@@ -15,6 +15,7 @@ client =  httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
 st.header("📋 Table Extraction")
 table_status = st.empty()
 server_status = st.empty()
+runner = asyncio.Runner()
 
 async def get_tables(doc_id, max_retries=60, delay=1) -> dict:
     for attempt in range(max_retries):
@@ -202,7 +203,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         st.markdown(f"**Document ID:** {doc_id}")
                         st.markdown(f"**Filename:** [{data['filename']}]({data['download_url']})") # Download link
                         logger.info(f"Extracting tables for document ID: {doc_id}")
-                        table_response = asyncio.run(get_tables(doc_id=doc_id))
+                        table_response = runner.run(get_tables(doc_id=doc_id))
                         table_responses.append(table_response)
                         display_tables(table_response, doc_id=doc_id)
 
