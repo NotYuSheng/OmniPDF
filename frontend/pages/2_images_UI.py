@@ -10,15 +10,26 @@ from io import BytesIO
 PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-runner = asyncio.Runner()
+
+if 'processed_data' not in st.session_state or st.session_state.processed_data is None:
+    st.session_state.processed_data = {}
+
+if 'httpx_cookies' not in st.session_state:
+    from httpx import Cookies   
+    st.session_state.httpx_cookies = Cookies()
+
+if 'uploaded_files' not in st.session_state:
+    st.session_state.uploaded_files = None
+
 
 FIXED_IMAGE_HEIGHT = 200  # Set your desired fixed height in pixels
+
+client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
 
 st.header("🖼️ Image Extraction")
 image_status = st.empty()
 server_status = st.empty()
-
-client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
+runner = asyncio.Runner()
 
 async def get_images(doc_id, max_retries=600, delay=1) -> dict:
     for attempt in range(max_retries):

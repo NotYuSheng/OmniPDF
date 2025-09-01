@@ -10,14 +10,24 @@ PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-client =  httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
+if 'processed_data' not in st.session_state or st.session_state.processed_data is None:
+    st.session_state.processed_data = {}
+
+if 'httpx_cookies' not in st.session_state:
+    from httpx import Cookies
+    st.session_state.httpx_cookies = Cookies()
+
+if 'uploaded_files' not in st.session_state:
+    st.session_state.uploaded_files = None
+
+client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
 
 st.header("📋 Table Extraction")
 table_status = st.empty()
 server_status = st.empty()
 runner = asyncio.Runner()
 
-async def get_tables(doc_id, max_retries=60, delay=1) -> dict:
+async def get_tables(doc_id, max_retries=600, delay=1) -> dict:
     for attempt in range(max_retries):
         try:
             response = await client.get(f"{PDF_PROCESSOR_URL}/tables/{doc_id}")
