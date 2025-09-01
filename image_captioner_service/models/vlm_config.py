@@ -40,8 +40,8 @@ class PromptTemplates:
 **Content-Specific Instructions:**
 -   **For Tables:** Do not transcribe the entire table. Instead, describe its structure and content (e.g., "A table with 5 columns and 10 rows showing sales data, with columns for 'Product', 'Region', and 'Revenue'.").
 -   **For Charts & Graphs:** Identify the chart type (e.g., 'bar chart', 'pie chart'). Describe what the axes represent and the main trend or finding it illustrates (e.g., "A bar chart illustrating a steady increase in user engagement from 2020 to 2024.").
--   **For Photographs or Scans:** Describe the main subject(s), the setting, and any significant actions or objects, in the context of the photograph or scan.
--   **For Diagrams & Flowcharts:** Briefly explain the process or system the diagram illustrates.
+-   **For Photographs or Scans:** Describe the main subject(s), the setting, and any significant actions or objects, in the context of the photograph or scan (e.g., "A festive Christmas archway adorned with lights and ornaments spans over Orchard Road in Singapore, decorated with 'Merry Christmas' signage and surrounded by illuminated trees and holiday decorations at night.").
+-   **For Diagrams & Flowcharts:** Briefly explain the process or system the diagram illustrates (e.g., "A flowchart depicting the user journey through the project management application, from onboarding to task completion.").
         """
         
         return system_prompt
