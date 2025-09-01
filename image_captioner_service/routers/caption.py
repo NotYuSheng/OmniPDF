@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 from openai import AsyncOpenAI, APIError
+from PIL import Image
 import logging
 import httpx
 import io
-from PIL import Image
 import base64
 
 from models.caption import ImageCaptioningRequest, ImageCaptioningResponse
