@@ -174,7 +174,7 @@ def save_job(
             key=job_key,
             content_type="application/json",
         )
-    except Exception as e:
+    except (BotoCoreError, ClientError) as e:
         logger.exception(f"Failed to save job for doc_id: {doc_id} - {e}")
         return False
 
