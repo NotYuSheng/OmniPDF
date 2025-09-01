@@ -139,7 +139,7 @@ def delete_folder(folder_prefix: str) -> bool:
     """
     try:
         keys = list_folder(folder_prefix)
-        delete_files(keys)
+        return delete_files(set(keys))
     except (BotoCoreError, ClientError) as e:
         logger.exception(f"Failed to delete file from S3: {e}")
         return False
