@@ -65,6 +65,16 @@ services:
     depends_on:
       - chromadb
 
+  metadata_service:
+    build:
+      context: .
+      dockerfile: ./metadata_service/Dockerfile
+    container_name: metadata_service
+    env_file:
+      - ./metadata_service/.env
+    depends_on:
+      - chromadb
+
   image_captioner_service:
     build:
       context: .
