@@ -91,6 +91,7 @@ async def perform_rag_query(
     query: str, 
     collection_name: str, 
     top_k: int,
+    session_id: str,
     doc_id: Optional[str] = None,
     enable_reranking: bool = True,
     openai_client: AsyncOpenAI = None
@@ -111,7 +112,7 @@ async def perform_rag_query(
         }
 
         if doc_id:
-            query_params["where"] = {"doc_id": doc_id}
+            query_params["where"] = {"$and": [{"doc_id": doc_id}, {"session_id": session_id}]}
             logger.info(f"Filtering results to document ID: {doc_id}")
         else:
             logger.info("Searching across all documents in collection")
@@ -258,6 +259,7 @@ async def handle_chat(
         else:
             # Perform RAG query with enhanced classification if user query is valid
             user_prompt, relevant_chunks, system_prompt, detected_query_type = await perform_rag_query(
+                session_id=chat_request.session_id,
                 openai_client=client,
                 query=chat_request.message,
                 collection_name=chat_request.collection_name,
