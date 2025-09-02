@@ -14,8 +14,6 @@ The integration tests validate that services can:
 
 - `test_all_services.py` - Core Python test runner for all 7 services
 - `test_service_before_trivy.sh` - Bash wrapper for individual service testing
-- `test_chat_service.py` - Legacy single-service test (kept for reference)
-- `test_before_trivy.sh` - Legacy single-service wrapper (kept for reference)
 
 ## Setup Instructions
 
