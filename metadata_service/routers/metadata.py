@@ -6,7 +6,7 @@ from shared_utils.redis import RedisDocumentFileList
 from shared_utils.s3_utils import save_job, load_job
 import logging
 import os
-from models.rag_config import (
+from metadata_service.models.llm_config import (
     ModelConfig,
     PromptTemplates, 
     ModelResponseOptimizer
