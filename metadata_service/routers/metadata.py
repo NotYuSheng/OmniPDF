@@ -6,9 +6,8 @@ from shared_utils.redis import RedisDocumentFileList
 from shared_utils.s3_utils import save_job, load_job
 import logging
 from models.rag_config import (
-    QwenRAGConfig,
-    QwenPromptTemplates,
-    QueryType,
+    ModelConfig,
+    PromptTemplates
 )
 
 router = APIRouter(prefix="/metadata", tags=["metadata"])
@@ -17,8 +16,8 @@ logger = logging.getLogger(__name__)
 document_list = RedisDocumentFileList()
 
 # Initialize Qwen-2.5 RAG configuration
-qwen_config = QwenRAGConfig()
-prompt_templates = QwenPromptTemplates()
+qwen_config = ModelConfig()
+prompt_templates = PromptTemplates()
 
 OPENAI_MODEL_NAME = qwen_config.model_name
 
@@ -74,11 +73,10 @@ async def get_summary(
     chunks: list[str],
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
-    system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
+    system_prompt = prompt_templates.get_system_prompt()
     user_prompt = prompt_templates.format_user_prompt(
         f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
-        r"{context}",
-        QueryType.SUMMARIZATION,
+        r"{context}"
     )
     summaries = []
     for chunk in chunks:
@@ -94,7 +92,7 @@ async def get_short_description(
     summary: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
-    system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
+    system_prompt = prompt_templates.get_system_prompt()
     user_prompt = f"""
     **DOCUMENT CONTEXT:**
     {summary}
