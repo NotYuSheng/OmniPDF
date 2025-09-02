@@ -44,7 +44,7 @@ Your summarization strategy:
     def get_summary_user_prompt(question: str, context: str) -> str:
         """Generate user prompt with context and question"""
         
-        summary_user_prompt = """
+        summary_user_prompt = f"""
 **DOCUMENT CONTEXT:** {context}
 
 **SUMMARIZATION REQUEST:** {question}
