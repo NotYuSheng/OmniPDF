@@ -6,6 +6,16 @@ import httpx
 import json
 import os
 
+if 'processed_data' not in st.session_state or st.session_state.processed_data is None:
+    st.session_state.processed_data = {}
+
+if 'httpx_cookies' not in st.session_state:
+    from httpx import Cookies
+    st.session_state.httpx_cookies = Cookies()
+
+if 'uploaded_files' not in st.session_state:
+    st.session_state.uploaded_files = None
+
 PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,7 +30,7 @@ if 'httpx_cookies' not in st.session_state:
 if 'uploaded_files' not in st.session_state:
     st.session_state.uploaded_files = None
 
-client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
+table_client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
 
 st.header("📋 Table Extraction")
 table_status = st.empty()
@@ -30,23 +40,23 @@ runner = asyncio.Runner()
 async def get_tables(doc_id, max_retries=600, delay=1) -> dict:
     for attempt in range(max_retries):
         try:
-            response = await client.get(f"{PDF_PROCESSOR_URL}/tables/{doc_id}")
+            response = await table_client.get(f"{PDF_PROCESSOR_URL}/tables/{doc_id}")
             logger.info(f"Table extraction response status: {response.status_code}")
             try:
                 data = response.json()
-                if "detail" in data:
-                    server_status.info(data["detail"])
-                    logger.info(f"Info details: {data['detail']}")
-                else:
-                    server_status.info("Successfully retrieved tables")
-                    logger.info(f"Table extraction response: {response}")
             except json.JSONDecodeError:
                 logger.error(f"Failed to decode JSON from response: {response.text}")
                 server_status.error("Received an invalid response from the server.")
-            
-            if response.status_code == 200:
+
+            if response.status_code == 200 or response.status_code == 201:
+                server_status.info("Successfully retrieved tables")
+                logger.info(f"Table extraction response: {response}")
                 return response.json()  # Success - return the actual data
             elif response.status_code == 202:
+                if "detail" in data:
+                    server_status.info(data["detail"])
+                    logger.info(f"Info details: {data['detail']}")
+           
                 # Still processing, continue polling
                 if attempt < max_retries - 1:
                     table_status.info(f"Document still processing... ({(attempt + 1)*delay}s)")
@@ -70,7 +80,7 @@ async def get_tables(doc_id, max_retries=600, delay=1) -> dict:
             if attempt == max_retries - 1:
                 raise
             await asyncio.sleep(delay)
-    
+
     raise TimeoutError("Max retries exceeded")
 
 def table_json_to_df(table_json):
@@ -106,8 +116,11 @@ def display_tables(table_response, doc_id=None):
     """
     Display tables extracted from the processed PDF document.
     """
+    # for doc_id, _data in response_lst:
+    #     init_table_request(doc_id=doc_id)
+
      # Check if we have tables in the response
-    if table_response:
+    if "tables" in table_response and table_response["tables"]:
         table_status.success(f"Found {len(table_response)} tables in the document")
         for i, table_data in enumerate(table_response):
             with st.container():
@@ -153,7 +166,7 @@ def display_tables(table_response, doc_id=None):
         logger.info("No tables found in the document")
         st.info("No tables found in the document")
 
-def describe_table(table_data):
+async def describe_table(table_data):
     """
     Placeholder function to describe the table.
     In a real application, this could call an AI model or service to generate a description.
@@ -189,7 +202,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
         st.session_state.expander_states[doc_name] = doc_name in expanded_docs
 
     try:
-        table_responses = []
         # Show loading message
         with st.spinner("Extracting tables from document..."):
             for doc_id, data in response_lst:
@@ -214,21 +226,19 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         st.markdown(f"**Filename:** [{data['filename']}]({data['download_url']})") # Download link
                         logger.info(f"Extracting tables for document ID: {doc_id}")
                         table_response = runner.run(get_tables(doc_id=doc_id))
-                        table_responses.append(table_response)
                         display_tables(table_response, doc_id=doc_id)
 
-            
     except TimeoutError as e:
-        st.error(f"Timeout error: {e}")
+        logger.error(f"Timeout error: {e}")
         st.info("The document is taking longer than expected to process. Please try again later.")
         
     except httpx.RequestError as e:
-        st.error(f"Network error: {e}")
+        logger.error(f"Network error: {e}")
         st.info("There was a problem connecting to the server. Please check your connection and try again.")
         
     except Exception as e:
-        logger.error(f"Unexpected error in table extraction: {e}")
-        st.error(f"An unexpected error occurred: {e}")
+        logger.error(f"Unexpected error in table extraction: {e}", exc_info=True)
+        st.error("An unexpected error occurred")
         
 else:
     st.info("Please upload and process a PDF first to extract tables")
