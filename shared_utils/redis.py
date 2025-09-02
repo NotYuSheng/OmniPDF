@@ -5,7 +5,6 @@ from os import environ
 from datetime import timedelta
 from typing import Any
 import logging
-import os
 import json
 from enum import StrEnum
 
@@ -14,7 +13,7 @@ from redis import Redis
 
 logger = logging.getLogger(__name__)
 
-REDIS_URL = os.environ["REDIS_URL"]
+REDIS_URL = environ["REDIS_URL"]
 EXPIRY_DAY = timedelta(days=1)
 EXPIRY_HOUR = timedelta(hours=1)
 SEPERATOR = ":"
