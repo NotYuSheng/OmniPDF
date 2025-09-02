@@ -19,4 +19,4 @@ COPY metadata_service ./metadata_service
 
 EXPOSE 8000
 
-CMD ["uvicorn", "metadata_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "PYTHONPATH=/app/metadata_service uvicorn metadata_service.main:app --host 0.0.0.0 --port 8000"]
