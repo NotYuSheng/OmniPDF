@@ -41,12 +41,10 @@ Your summarization strategy:
         return system_prompt
     
     @staticmethod
-    def get_summary_user_prompt(question: str, context: str) -> str:
+    def get_summary_user_prompt(question: str) -> str:
         """Generate user prompt with context and question"""
         
         summary_user_prompt = f"""
-**DOCUMENT CONTEXT:** {context}
-
 **SUMMARIZATION REQUEST:** {question}
 
 **INSTRUCTIONS:** Create a well-structured summary addressing the request. Organize the information logically and maintain the document's key insights and perspective."""
