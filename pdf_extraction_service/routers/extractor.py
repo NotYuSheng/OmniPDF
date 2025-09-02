@@ -73,7 +73,7 @@ async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
         #captioning
         for idx, pic in enumerate(data.get("pictures", [])):
             image_url = generate_presigned_url(get_image_s3_key(doc_id, pic["key"]))
-            caption = await get_caption(image_url)
+            caption = await get_caption(doc_id, pic["key"],image_url)
             data["pictures"][idx]["caption"] = caption
 
         pages = data.get("pages", {})

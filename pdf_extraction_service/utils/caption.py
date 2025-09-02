@@ -6,10 +6,10 @@ logger = logging.getLogger(__name__)
 IMAGE_CAPTIONER_URL = environ["IMAGE_CAPTIONER_URL"]
 
 
-async def get_caption(image_url: str) -> str:
+async def get_caption(doc_id: str,image_id: str ,image_url: str) -> str:
     payload = {
-        "doc_id": "temp_doc",
-        "image_id": "temp_image",
+        "doc_id": doc_id,
+        "image_id": image_id,
         "image_url": image_url
     }
 
