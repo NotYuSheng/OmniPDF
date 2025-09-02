@@ -120,18 +120,18 @@ def display_tables(table_response, doc_id=None):
                     # Convert and display table data
                     df = table_json_to_df(table_data)
 
-                    # Display table title with page info and copy button
-                    if st.button(f"📋 Copy Table {i+1}", key=f"copy_icon_{doc_id}_{i+1}", help=f"Copy table {i+1} to clipboard"):
-                        if df is not None:
-                            df.to_clipboard(index=False)
-                            st.toast("Table copied to clipboard!")
+                    st.text(f"Table {i+1}")
 
-
+                    # Show dataframe
                     if df is not None:
                         st.dataframe(df, use_container_width=True)
                     else:
                         st.warning("Could not parse table data.")
-                    
+
+                    # Display title with page info and copy button
+                    csv_string = df.to_csv(index=False)
+                    st.code(csv_string, language='csv')
+
                 with col2:
                     # Metadata display
                     st.markdown(f"**Location:** Page {page_num}")
