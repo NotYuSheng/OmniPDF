@@ -82,7 +82,9 @@ async def get_summary(
 ):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
     user_prompt = prompt_templates.get_user_prompt(
-        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary."
+        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.", 
+        PROMPT_PURPOSE[1],
+        r"{context}"
     )
     summaries = []
     for chunk in chunks:
@@ -99,15 +101,11 @@ async def get_short_description(
     client: AsyncOpenAI
 ):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
-    user_prompt = f"""
-    **DOCUMENT CONTEXT:**
-    {summary}
-    **QUERY REQUEST:** Return a short description of the document, up to {SHORT_DSECRIPTION_LENGTH} words.
-
-    **INSTRUCTIONS:**
-    Preserve the original meaning of the document while summarizing it into a concise description.
-    Return only the short description.
-    """
+    user_prompt = prompt_templates.get_user_prompt(
+        f"Return a short description of the document, up to {SHORT_DSECRIPTION_LENGTH} words. Return only the short description.",
+        PROMPT_PURPOSE[1],
+        summary
+    )
 
     return await get_model_response(system_prompt, user_prompt, client)
 
@@ -143,7 +141,7 @@ async def get_authors(
 ):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
     user_prompt = prompt_templates.get_user_prompt(
-        "Identify the Authors in the given document", PROMPT_PURPOSE[4]
+        "Identify the Authors in the given document", PROMPT_PURPOSE[4], r"{context}"
     )
 
     author_chunks = []
@@ -158,7 +156,7 @@ async def get_authors(
     for chunk in author_chunks:
         logger.info(chunk)
         author_split = chunk.split(":")
-        if author_split[0].lower() != "author":
+        if author_split[0].lower() != "authors":
             logger.info(author_split)
             continue
         authors.extend([author.strip() for author in author_split[-1].split(",")])
@@ -171,7 +169,7 @@ async def get_title(
 ):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
     user_prompt = prompt_templates.get_user_prompt(
-        "Identify the title in the given document", PROMPT_PURPOSE[2]
+        "Identify the title in the given document", PROMPT_PURPOSE[2], r"{context}"
     )
     
     title_chunks = []
@@ -195,7 +193,7 @@ async def get_keywords(
 ):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
     user_prompt = prompt_templates.get_user_prompt(
-        "Identify the Keywords in the given document", PROMPT_PURPOSE[3]
+        "Identify the Keywords in the given document", PROMPT_PURPOSE[3], r"{context}"
     )
     
     keyword_chunks = []

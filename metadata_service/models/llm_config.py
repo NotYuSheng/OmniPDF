@@ -45,18 +45,23 @@ Your summarization strategy:
         return system_prompts.get(purpose)
 
     @staticmethod
-    def get_user_prompt(question: str, purpose: str) -> str:
+    def get_user_prompt(question: str, purpose: str, context: str) -> str:
         """Generate user prompt"""
 
         user_prompts = {
             "summary": f"""
 **SUMMARIZATION REQUEST:** {question}
 
-**INSTRUCTIONS:** Create a well-structured summary addressing the request. Organize the information logically and maintain the document's key insights and perspective.""",
+**INSTRUCTIONS:** Create a well-structured summary addressing the request. Organize the information logically and maintain the document's key insights and perspective.
+
+**CONTEXT:** {context}
+""",
             "title": f"""
 **QUERY REQUEST:** {question}
 
 **INSTRUCTIONS:** Return the title in the following format:
+
+**CONTEXT:** {context}
     Title: Title
 """,
             "authors": f"""
@@ -64,12 +69,24 @@ Your summarization strategy:
 
 **INSTRUCTIONS:** Return the list of authors in the following format:
     Authors: Author1, Author2, Author3, etc
+
+**CONTEXT:** {context}
 """,
             "keywords": f"""
 **QUERY REQUEST:** {question}
 
 **INSTRUCTIONS:** Return the list of keywords in the following format:
     Keywords: keyword1, keyword2, keyword3, etc
+
+**CONTEXT:** {context}
+""",
+            "short_description": f"""
+**QUERY REQUEST:** {question}
+
+**INSTRUCTIONS:** Preserve the original meaning of the document while summarizing it into a concise description.
+    Return only the short description.
+
+**CONTEXT:** {context}
 """
 }
 
