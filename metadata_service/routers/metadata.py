@@ -20,7 +20,6 @@ qwen_config = ModelConfig()
 prompt_templates = PromptTemplates()
 
 OPENAI_MODEL_NAME = qwen_config.model_name
-
 MAX_CHUNK_PER_RETRIVAL = 100
 SUMMARY_LENGTH = 500
 SHORT_DSECRIPTION_LENGTH = 20

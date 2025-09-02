@@ -7,7 +7,7 @@ class ModelConfig:
     """Configuration class for the model"""
     
     def __init__(self):
-        self.model_name = os.getenv("OPENAI_MODEL", "qwen2.5-0.5b-instruct")
+        self.model_name = os.environ["OPENAI_MODEL"]
         
         # Qwen-2.5 generation parameters optimized for RAG
         self.generation_params = {
