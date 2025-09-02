@@ -79,6 +79,7 @@ services:
       dockerfile: ./image_captioner_service/Dockerfile
     container_name: image_captioner_service
     env_file:
+      - ./image_captioner_service/.env
 
   nginx:
     container_name: nginx
