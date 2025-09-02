@@ -101,3 +101,4 @@ class ModelResponseOptimizer:
             cleaned_response = cleaned_response.rstrip() + '.'
         
         return cleaned_response.strip()
+    
