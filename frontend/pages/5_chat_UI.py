@@ -13,6 +13,33 @@ st.header("Chat")
 st.markdown("💬 Ask questions about the document content")
 runner = asyncio.Runner()
 
+# CSS to style the suggested questions container
+st.markdown("""
+<style>
+.suggested-questions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--background-color);
+    border-top: 1px solid var(--border-color);
+    padding: 0.5rem;
+    z-index: 999;
+    margin-bottom: 70px; /* Space for chat input */
+}
+.stButton > button {
+    width: 100%;
+    margin: 0.1rem 0;
+}
+.suggested-questions .stContainer {
+    padding: 0;
+}
+.suggested-questions .stSelectbox {
+    margin-bottom: 0.25rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Status containers for user feedback
 chat_status = st.empty()
 server_status = st.empty()
@@ -106,49 +133,73 @@ def simulate_rag_response(prompt, _document_content):
     return f"This is a simulated response for: {prompt}"
 
 # Get document ID from session state
-if "processed_data" in st.session_state and st.session_state.processed_data is not None:
-    if "doc_id" in st.session_state.processed_data:
-        doc_id = st.session_state.processed_data.get("doc_id")
-        if not doc_id:
+if "processed_data" in st.session_state:
+    if st.session_state.processed_data is not None:
+        first_key = next(iter(st.session_state.processed_data))
+        first_nested_dictionary = st.session_state.processed_data[first_key]
+        if "doc_id" in first_nested_dictionary:
+            doc_id = first_nested_dictionary.get("doc_id")
+            logger.info(f"Using document ID: {doc_id} for chat")
+        else:
+            logger.warning("No document ID found. Please upload and process a document first.")
             st.warning("No document ID found. Please upload and process a document first.")
     else:
-        st.warning("No document ID found. Please upload and process a document first.")
-else:
-    st.warning("No document processed. Please upload and process a document first.")
+        logger.warning("No document processed. Please upload and process a document first.")
+        st.warning("No document processed. Please upload and process a document first.")
 
-# Suggested questions
-st.text("💡 Suggested Questions")
-col1, col2 = st.columns(2)
+# Suggested questions - positioned at bottom using container
+st.markdown('<div class="suggested-questions">', unsafe_allow_html=True)
+with st.container():
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.session_state.processed_data:
+            # Create a mapping of filenames to doc_ids
+            file_options = {}
+            for doc_id, doc_data in st.session_state.processed_data.items():
+                filename = doc_data.get('uploaded_filename', doc_id)
+                file_options[filename] = doc_id
+            
+            selected_file = st.selectbox(
+                "Select file:",
+                options=list(file_options.keys()),
+                key="file_selector"
+            )
 
-with col1:
-    if st.button("What is the main topic?"):
-        prompt = "What is the main topic?"
-        response = runner.run(chat_with_rag(prompt))
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        st.rerun()
+            logger.info(f"Selected file: {selected_file}")
+
+            # Update doc_id based on selected filename
+            if selected_file:
+                doc_id = file_options[selected_file]
+
+    with col2:
+        # Create sub-columns for side-by-side buttons
+        btn_col1, btn_col2, btn_col3 = st.columns(3)
+
+        with btn_col1:
+            if st.button("Summarize", key="summary_btn"):
+                prompt = "Summarize the document"
+                response = runner.run(chat_with_rag(prompt, doc_id))
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                st.session_state.messages.append({"role": "assistant", "content": response})
+                st.rerun()
         
-    if st.button("Who are the authors?"):
-        prompt = "Who are the authors?"
-        response = runner.run(chat_with_rag(prompt, doc_id))
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        st.rerun()
+        with btn_col2:    
+            if st.button("Main Topic", key="topic_btn"):
+                prompt = "What is the main topic?"
+                response = runner.run(chat_with_rag(prompt))
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                st.session_state.messages.append({"role": "assistant", "content": response})
+                st.rerun()
+        
+        with btn_col3:
+            if st.button("Key Findings", key="findings_btn"):
+                prompt = "What are the key findings?"
+                response = runner.run(chat_with_rag(prompt, doc_id))
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                st.session_state.messages.append({"role": "assistant", "content": response})
+                st.rerun()
 
-with col2:
-    if st.button("Summarize the document"):
-        prompt = "Summarize the document"
-        response = runner.run(chat_with_rag(prompt, doc_id))
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        st.rerun()
-    
-    if st.button("What are the key findings?"):
-        prompt = "What are the key findings?"
-        response = runner.run(chat_with_rag(prompt, doc_id))
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        st.rerun()
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Chat input
 if prompt := st.chat_input("Ask about the document"):
@@ -165,3 +216,4 @@ if prompt := st.chat_input("Ask about the document"):
 
     # Rerun to update the interface
     st.rerun()
+
