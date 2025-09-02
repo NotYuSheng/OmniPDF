@@ -81,7 +81,7 @@ async def get_summary(
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
     system_prompt = prompt_templates.get_system_prompt()
-    user_prompt = prompt_templates.format_user_prompt(
+    user_prompt = prompt_templates.get_summary_user_prompt(
         f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
         r"{context}"
     )
@@ -236,7 +236,7 @@ async def get_filename(doc_id: str):
 
 
 async def generate_metadata(
-    doc_id: str,
+    doc_id: str
 ):
     client = get_openai_client()
     chunks = await get_chunks(doc_id)
