@@ -93,6 +93,7 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
         json_key = f"{doc_id}/original.json"
         if not upload_fileobj(json_bytes, json_key, "application/json"):
             raise IOError(f"Failed to upload original JSON to S3 for doc_id={doc_id}")
+        document_files.add(doc_id, json_key)
 
         save_job(doc_id = doc_id, 
                  job_data = job_data, 
