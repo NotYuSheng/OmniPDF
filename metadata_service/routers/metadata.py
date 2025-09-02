@@ -81,7 +81,7 @@ async def get_summary(
     client: AsyncOpenAI
 ):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
-    user_prompt = prompt_templates.get_summary_user_prompt(
+    user_prompt = prompt_templates.get_user_prompt(
         f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary."
     )
     summaries = []
