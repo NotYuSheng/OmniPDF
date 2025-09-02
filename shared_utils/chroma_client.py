@@ -12,7 +12,7 @@ CHROMADB_HOST = os.getenv("CHROMADB_HOST", "chromadb")
 CHROMADB_PORT = os.getenv("CHROMADB_PORT", "8000")
 
 TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
-MAX_CHUNK_PER_RETRIVAL = 100
+MAX_CHUNK_PER_RETRIVAL = int(os.getenv("MAX_CHUNK_PER_RETRIVAL", "100"))
 
 document_list = RedisDocumentFileList()
 
