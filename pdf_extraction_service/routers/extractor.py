@@ -9,7 +9,9 @@ from shared_utils.s3_utils import (
     save_job, 
     load_job,
     upload_fileobj,
+    generate_presigned_url,
 )
+from pdf_extraction_service.utils.caption import get_caption
 
 from docling_core.types.doc import PictureItem
 from docling.datamodel.base_models import InputFormat
@@ -22,7 +24,7 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 logger = logging.getLogger(__name__)
 document_files = RedisDocumentFileList()
 
-def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
+async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
     start_time = time.time()
 
     opts = PdfPipelineOptions()
@@ -65,7 +67,13 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
                 
             else:
                 continue
-            
+        
+        #captioning
+        for idx, pic in enumerate(data.get("pictures", [])):
+            image_url = generate_presigned_url(f'{doc_id}/images/{pic["key"]}')
+            caption = await get_caption(image_url)
+            data["pictures"][idx]["caption"] = caption
+
         pages = data.get("pages", {})
         for page in pages.values():
             page.get("image", {}).pop("uri", None)
