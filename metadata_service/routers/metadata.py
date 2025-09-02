@@ -5,6 +5,7 @@ from shared_utils.chroma_client import get_chunks
 from shared_utils.redis import RedisDocumentFileList
 from shared_utils.s3_utils import save_job, load_job
 import logging
+import os
 from models.rag_config import (
     ModelConfig,
     PromptTemplates, 
@@ -16,15 +17,14 @@ router = APIRouter(prefix="/metadata", tags=["metadata"])
 logger = logging.getLogger(__name__)
 document_list = RedisDocumentFileList()
 
-# Initialize Qwen-2.5 RAG configuration
 model_config = ModelConfig()
 prompt_templates = PromptTemplates()
 response_optimizer = ModelResponseOptimizer()
 
 OPENAI_MODEL_NAME = model_config.model_name
-MAX_CHUNK_PER_RETRIVAL = 100
-SUMMARY_LENGTH = 500
-SHORT_DSECRIPTION_LENGTH = 20
+SUMMARY_LENGTH = int(os.getenv("SUMMARY_LENGTH", "500"))
+SHORT_DSECRIPTION_LENGTH = int(os.getenv("SHORT_DSECRIPTION_LENGTH", "20"))
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", "8"))
 
 
 async def get_model_response(
@@ -124,7 +124,6 @@ async def cascade_query(
     if len(chunks) == 1:
         return chunks[0]
     
-    BATCH_SIZE = 8
     current_chunks = chunks
     while len(current_chunks) > 1:
         new_chunks = []
