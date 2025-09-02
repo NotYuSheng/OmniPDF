@@ -72,7 +72,6 @@ async def get_model_response(
     else:
         processed_response = first_choice.message.content
 
-    processed_response = first_choice.message.content
     return processed_response
 
 
