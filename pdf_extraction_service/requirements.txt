@@ -6,3 +6,4 @@ docling==2.36.1
 redis==6.2.0
 pymupdf==1.26.1
 pypdf==5.6.0
+httpx==0.24.1
