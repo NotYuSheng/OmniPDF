@@ -25,6 +25,7 @@ OPENAI_MODEL_NAME = model_config.model_name
 SUMMARY_LENGTH = int(os.getenv("SUMMARY_LENGTH", "500"))
 SHORT_DSECRIPTION_LENGTH = int(os.getenv("SHORT_DSECRIPTION_LENGTH", "20"))
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", "8"))
+PROMPT_PURPOSE = ["default", "summary", "title", "keywords", "authors"]
 
 
 async def get_model_response(
@@ -79,10 +80,9 @@ async def get_summary(
     chunks: list[str],
     client: AsyncOpenAI
 ):
-    system_prompt = prompt_templates.get_system_prompt()
+    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
     user_prompt = prompt_templates.get_summary_user_prompt(
-        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
-        r"{context}"
+        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary."
     )
     summaries = []
     for chunk in chunks:
@@ -98,7 +98,7 @@ async def get_short_description(
     summary: str,
     client: AsyncOpenAI
 ):
-    system_prompt = prompt_templates.get_system_prompt()
+    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
     user_prompt = f"""
     **DOCUMENT CONTEXT:**
     {summary}
@@ -136,30 +136,16 @@ async def cascade_query(
 
     return current_chunks[0]
 
-    # new_chunks = []
-    # for i in range(0, len(chunks), 8):
-    #     new_chunk_context = "\n".join(chunks[i : i + 8])
-    #     user_prompt_with_context = user_prompt.format(context=new_chunk_context)
-    #     new_chunks.append(await get_model_response(system_prompt, user_prompt_with_context, client))
-
-    # logger.info(new_chunks)
-    # return await cascade_query(new_chunks, user_prompt, system_prompt, client)
-
 
 async def get_authors(
     chunks: list[str],
     client: AsyncOpenAI
 ):
-    system_prompt = "If the question cannot be answered, return only the stop token."
-    user_prompt = """
-    **DOCUMENT CONTEXT:**
-    {context}
-    **QUERY REQUEST:** Identify the Authors in the given document
+    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
+    user_prompt = prompt_templates.get_user_prompt(
+        "Identify the Authors in the given document", PROMPT_PURPOSE[4]
+    )
 
-    **INSTRUCTIONS:**
-    Return the list of authors in the following format:
-    Author: Author1, Author2, Author3, etc
-    """
     author_chunks = []
     for chunk in chunks:
         author_chunks.append(
@@ -183,16 +169,11 @@ async def get_title(
     chunks: list[str],
     client: AsyncOpenAI
 ):
-    system_prompt = "If the question cannot be answered, return only the stop token."
-    user_prompt = """
-    **DOCUMENT CONTEXT:**
-    {context}
-    **QUERY REQUEST:** Identify the title in the given document. If the title cannot be found, generate one based on the contents of the document.
-
-    **INSTRUCTIONS:**
-    Return the title in the following format:
-    Title: Title
-    """
+    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
+    user_prompt = prompt_templates.get_user_prompt(
+        "Identify the title in the given document", PROMPT_PURPOSE[2]
+    )
+    
     title_chunks = []
     for chunk in chunks:
         title_chunks.append(
@@ -212,16 +193,11 @@ async def get_keywords(
     chunks: list[str],
     client: AsyncOpenAI
 ):
-    system_prompt = "If the question cannot be answered, return only the stop token."
-    user_prompt = """
-    **DOCUMENT CONTEXT:**
-    {context}
-    **QUERY REQUEST:** Identify the keywords in the given document.
-
-    **INSTRUCTIONS:**
-    Return the list of keywords in the following format:
-    keywords: keyword1, keyword2, keyword3, etc
-    """
+    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
+    user_prompt = prompt_templates.get_user_prompt(
+        "Identify the Keywords in the given document", PROMPT_PURPOSE[3]
+    )
+    
     keyword_chunks = []
     for chunk in chunks:
         keyword_chunks.append(

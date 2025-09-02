@@ -24,10 +24,11 @@ class PromptTemplates:
     """Specialized prompt templates"""
 
     @staticmethod
-    def get_system_prompt() -> str:
+    def get_system_prompt(purpose: str) -> str:
         """Generate system prompt for model based on query context and purpose of service"""
         
-        system_prompt = """You are an expert at document summarization and synthesis.
+        system_prompts = {
+            "summary": """You are an expert at document summarization and synthesis.
 
 Your summarization strategy:
 - Identify the main themes and key points from the context
@@ -36,20 +37,43 @@ Your summarization strategy:
 - Maintain the original document's tone and perspective
 - Create coherent summaries that capture essential information
 - Use bullet points or structured format when appropriate for clarity
-- Ensure summaries are concise yet comprehensive"""
-        
-        return system_prompt
-    
+- Ensure summaries are concise yet comprehensive
+""",
+            "default": """If the question cannot be answered, return only the stop token."""
+}
+
+        return system_prompts.get(purpose)
+
     @staticmethod
-    def get_summary_user_prompt(question: str) -> str:
-        """Generate user prompt with context and question"""
-        
-        summary_user_prompt = f"""
+    def get_user_prompt(question: str, purpose: str) -> str:
+        """Generate user prompt"""
+
+        user_prompts = {
+            "summary": f"""
 **SUMMARIZATION REQUEST:** {question}
 
-**INSTRUCTIONS:** Create a well-structured summary addressing the request. Organize the information logically and maintain the document's key insights and perspective."""
+**INSTRUCTIONS:** Create a well-structured summary addressing the request. Organize the information logically and maintain the document's key insights and perspective.""",
+            "title": f"""
+**QUERY REQUEST:** {question}
 
-        return summary_user_prompt
+**INSTRUCTIONS:** Return the title in the following format:
+    Title: Title
+""",
+            "authors": f"""
+**QUERY REQUEST:** {question}
+
+**INSTRUCTIONS:** Return the list of authors in the following format:
+    Authors: Author1, Author2, Author3, etc
+""",
+            "keywords": f"""
+**QUERY REQUEST:** {question}
+
+**INSTRUCTIONS:** Return the list of keywords in the following format:
+    Keywords: keyword1, keyword2, keyword3, etc
+"""
+}
+
+        return user_prompts.get(purpose)
 
 class ModelResponseOptimizer:
     """Advanced optimization techniques for the model"""
