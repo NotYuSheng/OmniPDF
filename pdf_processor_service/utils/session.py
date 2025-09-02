@@ -24,7 +24,7 @@ class SessionStorage(shared_utils.redis.RedisSetWithFlagExpiry):
             session_id = uuid4().hex
         return session_id
 
-def get_session_storage() -> Generator[SessionStorage]:
+def get_session_storage() -> Generator[SessionStorage, None, None]:
     storage = SessionStorage()
     yield storage
 

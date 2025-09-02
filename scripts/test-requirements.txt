@@ -1,0 +1,10 @@
+# Core testing framework
+pytest==8.0.0
+pytest-asyncio==0.23.5
+pytest-mock==3.12.0
+
+# HTTP testing (use same version as main requirements for compatibility)
+httpx==0.28.1
+
+# Include main requirements for testing
+-r ../requirements.txt

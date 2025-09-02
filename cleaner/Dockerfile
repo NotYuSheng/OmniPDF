@@ -17,4 +17,11 @@ COPY shared_utils ./cleaner/shared_utils
 # Copy cleaner folder from root context into /app/cleaner
 COPY cleaner ./cleaner
 
+# Remove unnecessary system packages
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get remove --purge -y linux-libc-dev && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 CMD ["python3", "cleaner/main.py"]

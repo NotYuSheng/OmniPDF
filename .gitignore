@@ -7,6 +7,8 @@ __pycache__/
 
 # Virtual environment
 .venv/
+.venv_tests/
+.venv_integration/
 env/
 venv/
 
@@ -39,3 +41,12 @@ data/
 
 llm_models/
 .llm_models
+
+# Integration testing
+trivy_scan_results/
+*.scan
+*.sarif
+
+# Temporary testing files
+test_results/
+coverage/
