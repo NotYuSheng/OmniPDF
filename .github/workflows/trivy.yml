@@ -12,8 +12,27 @@ jobs:
       TRIVY_EXCLUDE_SERVICES: ${{ secrets.TRIVY_EXCLUDE_SERVICES }}
 
     steps:
+      - name: Maximize build space
+        uses: AdityaGarg8/remove-unwanted-software@v4.1
+        with:
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+
+      - name: Free up additional space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker system prune -af
+          sudo apt-get autoremove -y
+          sudo apt-get autoclean
+          echo "=== Disk space after cleanup ==="
+          df -h
+
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -45,29 +64,66 @@ jobs:
             echo "✓ Created $(dirname "$f")/.env"
           done
 
-      - name: Build all Docker Compose services
+      - name: Run Trivy scan for each service individually
         run: |
-          echo "Building services from docker-compose.yml..."
-          docker compose build
+          echo "=== Getting all services from docker-compose.yml ==="
+          ALL_SERVICES=$(docker compose config --services)
 
-      - name: Run Trivy scan for all services
-        run: |
-          echo "Running Trivy scans..."
-          SERVICES=$(docker compose config --services)
+          FAILED_SERVICES=""
+          SUCCESSFUL_SERVICES=""
 
-          for SERVICE in $SERVICES; do
+          for SERVICE in $ALL_SERVICES; do
             if [[ " $TRIVY_EXCLUDE_SERVICES " =~ " $SERVICE " ]]; then
               echo "Skipping $SERVICE (excluded via secret)"
               continue
             fi
 
+            echo ""
+            echo "=========================================="
+            echo "Scanning $SERVICE"
+            echo "=========================================="
+
+            # Build the service
+            echo "Building $SERVICE..."
+            docker compose build $SERVICE
+
+            # Get image ID for this service
             IMAGE_ID=$(docker images --filter=reference="*${SERVICE}*" --format "{{.ID}}" | head -n1)
 
             if [[ -z "$IMAGE_ID" ]]; then
-              echo "Skipping $SERVICE (no image built)"
+              echo "✗ No image found for $SERVICE after build"
+              FAILED_SERVICES="$FAILED_SERVICES $SERVICE"
               continue
             fi
 
-            echo "Scanning $SERVICE ($IMAGE_ID)..."
-            trivy image --exit-code 1 --severity CRITICAL,HIGH --no-progress "$IMAGE_ID"
+            echo "Running Trivy scan on $SERVICE ($IMAGE_ID)..."
+            if trivy image --exit-code 1 --severity CRITICAL,HIGH --no-progress "$IMAGE_ID"; then
+              echo "✓ $SERVICE passed Trivy scan"
+              SUCCESSFUL_SERVICES="$SUCCESSFUL_SERVICES $SERVICE"
+            else
+              echo "✗ $SERVICE failed Trivy scan"
+              FAILED_SERVICES="$FAILED_SERVICES $SERVICE"
+            fi
+
+            # Clean up this service’s build artifacts
+            docker compose rm -f $SERVICE || true
+            docker builder prune --force
+            docker system prune --force
+
+            echo "=== Disk space after scanning $SERVICE ==="
+            df -h | grep -E "(/$)"
           done
+
+          echo ""
+          echo "=========================================="
+          echo "TRIVY SCAN SUMMARY"
+          echo "=========================================="
+          if [ ! -z "$SUCCESSFUL_SERVICES" ]; then
+            echo "✓ PASSED:$SUCCESSFUL_SERVICES"
+          fi
+          if [ ! -z "$FAILED_SERVICES" ]; then
+            echo "✗ FAILED:$FAILED_SERVICES"
+            exit 1
+          fi
+
+          echo "All services passed Trivy scan!"
