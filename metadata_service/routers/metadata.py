@@ -7,7 +7,8 @@ from shared_utils.s3_utils import save_job, load_job
 import logging
 from models.rag_config import (
     ModelConfig,
-    PromptTemplates
+    PromptTemplates, 
+    ModelResponseOptimizer
 )
 
 router = APIRouter(prefix="/metadata", tags=["metadata"])
@@ -16,10 +17,11 @@ logger = logging.getLogger(__name__)
 document_list = RedisDocumentFileList()
 
 # Initialize Qwen-2.5 RAG configuration
-qwen_config = ModelConfig()
+model_config = ModelConfig()
 prompt_templates = PromptTemplates()
+response_optimizer = ModelResponseOptimizer()
 
-OPENAI_MODEL_NAME = qwen_config.model_name
+OPENAI_MODEL_NAME = model_config.model_name
 MAX_CHUNK_PER_RETRIVAL = 100
 SUMMARY_LENGTH = 500
 SHORT_DSECRIPTION_LENGTH = 20
@@ -30,7 +32,7 @@ async def get_model_response(
     user_prompt: str,
     client: AsyncOpenAI = Depends(get_openai_client),
 ):
-    # Prepare messages for Qwen-2.5
+    # Prepare messages for model
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
@@ -40,7 +42,7 @@ async def get_model_response(
         response = await client.chat.completions.create(
             model=OPENAI_MODEL_NAME,
             messages=messages,
-            **qwen_config.generation_params,
+            **model_config.generation_params,
         )
 
     except APIError as e:
@@ -63,6 +65,12 @@ async def get_model_response(
             status_code=500,
             detail="Malformed choice in OpenAI response",
         )
+    
+    # Post-process the response
+    if model_config.enable_response_post_processing:
+        processed_response = response_optimizer.post_process_llm_response(first_choice.message.content)
+    else:
+        processed_response = first_choice.message.content
 
     processed_response = first_choice.message.content
     return processed_response

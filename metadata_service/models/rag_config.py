@@ -18,6 +18,8 @@ class ModelConfig:
             "presence_penalty": float(os.getenv("MODEL_PRESENCE_PENALTY", "0.1")),
         }
 
+        self.enable_response_post_processing = os.getenv("ENABLE_RESPONSE_POST_PROCESSING", "true").lower() == "true"
+
 class PromptTemplates:
     """Specialized prompt templates"""
 
@@ -50,3 +52,30 @@ Your summarization strategy:
 **INSTRUCTIONS:** Create a well-structured summary addressing the request. Organize the information logically and maintain the document's key insights and perspective."""
 
         return summary_user_prompt
+
+class ModelResponseOptimizer:
+    """Advanced optimization techniques for the model"""
+
+    @staticmethod
+    def post_process_llm_response(response: str) -> str:
+        """Post-process LLM response for better formatting"""
+        
+        # Remove only consecutive duplicate lines to avoid breaking formatted content.
+        lines = response.split('\n')
+        if not lines:
+            return ""
+
+        filtered_lines = [lines[0]]
+        for i in range(1, len(lines)):
+            current_line_stripped = lines[i].strip()
+            prev_line_stripped = lines[i-1].strip()
+            if not current_line_stripped or current_line_stripped != prev_line_stripped:
+                filtered_lines.append(lines[i])
+        
+        cleaned_response = '\n'.join(filtered_lines)
+        
+        # Ensure response ends properly
+        if cleaned_response and not cleaned_response.rstrip().endswith(('.', '!', '?', ':')):
+            cleaned_response = cleaned_response.rstrip() + '.'
+        
+        return cleaned_response.strip()
