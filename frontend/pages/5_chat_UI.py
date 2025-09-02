@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 st.header("Chat")
 st.markdown("💬 Ask questions about the document content")
+runner = asyncio.Runner()
 
 # Status containers for user feedback
 chat_status = st.empty()
@@ -122,14 +123,14 @@ col1, col2 = st.columns(2)
 with col1:
     if st.button("What is the main topic?"):
         prompt = "What is the main topic?"
-        response = asyncio.run(chat_with_rag(prompt))
+        response = runner.run(chat_with_rag(prompt))
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.messages.append({"role": "assistant", "content": response})
         st.rerun()
         
     if st.button("Who are the authors?"):
         prompt = "Who are the authors?"
-        response = asyncio.run(chat_with_rag(prompt, doc_id))
+        response = runner.run(chat_with_rag(prompt, doc_id))
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.messages.append({"role": "assistant", "content": response})
         st.rerun()
@@ -137,14 +138,14 @@ with col1:
 with col2:
     if st.button("Summarize the document"):
         prompt = "Summarize the document"
-        response = asyncio.run(chat_with_rag(prompt, doc_id))
+        response = runner.run(chat_with_rag(prompt, doc_id))
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.messages.append({"role": "assistant", "content": response})
         st.rerun()
     
     if st.button("What are the key findings?"):
         prompt = "What are the key findings?"
-        response = asyncio.run(chat_with_rag(prompt, doc_id))
+        response = runner.run(chat_with_rag(prompt, doc_id))
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.messages.append({"role": "assistant", "content": response})
         st.rerun()
