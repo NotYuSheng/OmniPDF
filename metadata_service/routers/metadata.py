@@ -85,14 +85,28 @@ async def get_summary(
         f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
         r"{context}"
     )
-    summaries = []
-    for chunk in chunks:
-        summaries.append(
-            await get_model_response(
-                system_prompt, user_prompt.format(context=chunk), client
-            )
-        )
-    return await cascade_query(summaries, user_prompt, system_prompt, client)
+    
+    BATCH_SIZE = 8
+    current_chunks = chunks
+    while len(current_chunks) > 1:
+        new_chunks = []
+        for i in range(0, len(current_chunks), BATCH_SIZE):
+            new_chunk_context = "\n".join(current_chunks[i : i + BATCH_SIZE])
+            user_prompt_with_context = user_prompt.format(context=new_chunk_context)
+            new_chunks.append(await get_model_response(system_prompt, user_prompt_with_context, client))
+        current_chunks = new_chunks
+        logger.info(f"Reduced to {len(current_chunks)} chunks.")
+
+    return current_chunks[0]
+
+    # summaries = []
+    # for chunk in chunks:
+    #     summaries.append(
+    #         await get_model_response(
+    #             system_prompt, user_prompt.format(context=chunk), client
+    #         )
+    #     )
+    # return await cascade_query(summaries, user_prompt, system_prompt, client)
 
 
 async def get_short_description(
