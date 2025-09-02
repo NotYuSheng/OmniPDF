@@ -10,6 +10,7 @@ from shared_utils.s3_utils import (
     load_job,
     upload_fileobj,
     generate_presigned_url,
+    get_image_s3_key
 )
 from pdf_extraction_service.utils.caption import get_caption
 
@@ -51,18 +52,19 @@ async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
         for element, _ in result.document.iterate_items():
             if isinstance(element, PictureItem):
                 pic_cnt += 1
-                key = f"{doc_id}/images/img_{pic_cnt}.png"
+                key = f"img_{pic_cnt}"
+                s3_key = get_image_s3_key(doc_id, key)
                 img = element.get_image(result.document)
                 buffer = io.BytesIO()
                 img.save(buffer, format="PNG")
                 buffer.seek(0)
 
-                success = upload_fileobj(buffer, key, content_type="image/png")
-                document_files.add(doc_id, key)
+                success = upload_fileobj(buffer, s3_key, content_type="image/png")
+                document_files.add(doc_id, s3_key)
                 if not success:
                     logger.warning(detail=f"Failed to upload picture {pic_cnt} to S3")
 
-                data["pictures"][pic_cnt]["key"] = f"img_{pic_cnt}.png"
+                data["pictures"][pic_cnt]["key"] = key
                 data["pictures"][pic_cnt].get("image", {}).pop("uri", None)
                 
             else:
@@ -70,7 +72,7 @@ async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
         
         #captioning
         for idx, pic in enumerate(data.get("pictures", [])):
-            image_url = generate_presigned_url(f'{doc_id}/images/{pic["key"]}')
+            image_url = generate_presigned_url(get_image_s3_key(doc_id, pic["key"]))
             caption = await get_caption(image_url)
             data["pictures"][idx]["caption"] = caption
 

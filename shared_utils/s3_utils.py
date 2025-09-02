@@ -149,6 +149,10 @@ def get_job_s3_key(doc_id: str, job_type: str):
     return f"jobs/{job_type}/{doc_id}.json"
 
 
+def get_image_s3_key(doc_id: str, image_name: str):
+    return f"{doc_id}/images/{image_name}.png"
+
+
 def save_job(
     doc_id: str, job_data: Union[dict, BaseModel], status: str, job_type: str
 ) -> bool:

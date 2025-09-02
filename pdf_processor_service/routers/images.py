@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
 from utils.proxy import load_or_create_job, generate_external_image_url
-from shared_utils.s3_utils import get_object_stream, list_folder
+from shared_utils.s3_utils import get_object_stream, get_image_s3_key
 from shared_utils.redis import RedisDocumentFileList
 
 
@@ -28,10 +28,9 @@ async def get_pdf_images(
     images = job.get("data", {}).get("result", {}).get("pictures", [])
 
     image_list = []
-    prefix = f"{doc_id}/images/"
     for img_data in images:
         image_name = img_data["key"]
-        key = prefix + image_name
+        key = get_image_s3_key(doc_id, image_name)
         url = generate_external_image_url(doc_id, image_name)
         image_list.append(ImageData(image_key=key, url=url, caption=img_data["caption"]))
 
@@ -44,7 +43,7 @@ async def get_pdf_image(
     img_name: str,
     _validated: bool = Depends(validate_session_doc_pair),
 ):
-    file_key = f"{doc_id}/images/{img_name}"
+    file_key = get_image_s3_key(doc_id, img_name)
 
     # Check if object exists
     try:
