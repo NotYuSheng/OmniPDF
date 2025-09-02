@@ -24,18 +24,18 @@ async def get_pdf_images(
 ):
     if isinstance(job_or_response, Response):
         return job_or_response
+    job: dict = job_or_response
+    images = job.get("data", {}).get("result", {}).get("pictures", [])
 
-    url_list = []
-
+    image_list = []
     prefix = f"{doc_id}/images/"
-    keys = list_folder(prefix)
-
-    for key in keys:
-        image_name = key.rsplit("/", 1)[-1]
+    for img_data in images:
+        image_name = img_data["key"]
+        key = prefix + image_name
         url = generate_external_image_url(doc_id, image_name)
-        url_list.append(ImageData(image_key=key, url=url))
+        image_list.append(ImageData(image_key=key, url=url, caption=img_data["caption"]))
 
-    return ImageResponse(doc_id=doc_id, filename=f"{doc_id}.pdf", images=url_list)
+    return ImageResponse(doc_id=doc_id, filename=f"{doc_id}.pdf", images=image_list)
 
 
 @router.get("/{doc_id}/{img_name}", response_class=StreamingResponse)
