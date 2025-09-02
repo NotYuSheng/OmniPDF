@@ -124,14 +124,28 @@ async def cascade_query(
     # Not ideal, will consume a lot of memory as prev chunks will not be gc till final set is gotten
     if len(chunks) == 1:
         return chunks[0]
-    new_chunks = []
-    for i in range(0, len(chunks), 8):
-        new_chunk_context = "\n".join(chunks[i : i + 8])
-        user_prompt_with_context = user_prompt.format(context=new_chunk_context)
-        new_chunks.append(await get_model_response(system_prompt, user_prompt_with_context, client))
+    
+    BATCH_SIZE = 8
+    current_chunks = chunks
+    while len(current_chunks) > 1:
+        new_chunks = []
+        for i in range(0, len(current_chunks), BATCH_SIZE):
+            new_chunk_context = "\n".join(current_chunks[i : i + BATCH_SIZE])
+            user_prompt_with_context = user_prompt.format(context=new_chunk_context)
+            new_chunks.append(await get_model_response(system_prompt, user_prompt_with_context, client))
+        current_chunks = new_chunks
+        logger.info(f"Reduced to {len(current_chunks)} chunks.")
 
-    logger.info(new_chunks)
-    return await cascade_query(new_chunks, user_prompt, system_prompt, client)
+    return current_chunks[0]
+
+    # new_chunks = []
+    # for i in range(0, len(chunks), 8):
+    #     new_chunk_context = "\n".join(chunks[i : i + 8])
+    #     user_prompt_with_context = user_prompt.format(context=new_chunk_context)
+    #     new_chunks.append(await get_model_response(system_prompt, user_prompt_with_context, client))
+
+    # logger.info(new_chunks)
+    # return await cascade_query(new_chunks, user_prompt, system_prompt, client)
 
 
 async def get_authors(
