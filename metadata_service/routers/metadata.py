@@ -180,7 +180,6 @@ async def get_title(
             )
         )
     title_str = await cascade_query(title_chunks, user_prompt, system_prompt, client)
-    
     title_split = title_str.split(":")
     if title_split[0].lower() != "title":
         return "UNKNOWN"
@@ -195,7 +194,7 @@ async def get_keywords(
     user_prompt = prompt_templates.get_user_prompt(
         "Identify the Keywords in the given document", PROMPT_PURPOSE[3], r"{context}"
     )
-    
+ 
     keyword_chunks = []
     for chunk in chunks:
         keyword_chunks.append(
@@ -260,6 +259,7 @@ async def generate_metadata(
 
 @router.post("/{doc_id}", status_code=202)
 async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks, client: AsyncOpenAI = Depends(get_openai_client)):
+
     save_job(
         doc_id=doc_id,
         job_data={},

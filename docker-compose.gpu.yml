@@ -113,6 +113,16 @@ services:
         mc policy set none local/omnifiles
         exit 0;
       "
+  
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: frontend
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "8501:8501"
 
   vllm-qwen2.5:
     container_name: vllm-qwen2.5
@@ -139,16 +149,6 @@ services:
       "--enable-auto-tool-choice",
       "--tool-call-parser", "hermes"
     ]
-
-  frontend:
-    build:
-      context: .
-      dockerfile: ./frontend/Dockerfile
-    container_name: frontend
-    env_file:
-      - ./frontend/.env
-    ports:
-      - "8501:8501"
 
 volumes:
   minio-data:

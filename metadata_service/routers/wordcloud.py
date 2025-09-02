@@ -43,6 +43,7 @@ async def get_wordcloud(
 
     wordcloud.generate_from_frequencies(words)
     img_filepath = f"{doc_id}/wordcloud.png"
+
     with BytesIO() as img_file:
         img = wordcloud.to_image()
         img.save(img_file, format="PNG")
@@ -50,4 +51,5 @@ async def get_wordcloud(
         if not upload_fileobj(img_file, img_filepath):
             raise HTTPException(status_code=500, detail="failed to upload file")
     document_files.add(doc_id, img_filepath)
+
     return WordcloudResponse(doc_id=doc_id, top_words=top_words)
