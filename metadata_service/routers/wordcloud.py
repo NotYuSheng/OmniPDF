@@ -1,4 +1,5 @@
 import logging
+import os
 from io import BytesIO
 
 from fastapi import APIRouter, HTTPException
@@ -12,7 +13,7 @@ router = APIRouter(prefix="/wordcloud", tags=["wordcloud"])
 
 logger = logging.getLogger(__name__)
 document_files = RedisDocumentFileList()
-MAX_WORDS = 50
+MAX_WORDS = int(os.getenv("WORDCLOUD_MAX_WORDS", "50"))
 
 
 async def concat_text(doc_id: str) -> str:
