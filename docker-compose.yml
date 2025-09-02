@@ -145,7 +145,6 @@ services:
         mc policy set none local/omnifiles
         exit 0;
       "
-
   frontend:
     build:
       context: .
