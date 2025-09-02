@@ -30,7 +30,7 @@ SHORT_DSECRIPTION_LENGTH = 20
 async def get_model_response(
     system_prompt: str,
     user_prompt: str,
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
     # Prepare messages for model
     messages = [
@@ -78,7 +78,7 @@ async def get_model_response(
 
 async def get_summary(
     chunks: list[str],
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
     system_prompt = prompt_templates.get_system_prompt()
     user_prompt = prompt_templates.get_summary_user_prompt(
@@ -97,7 +97,7 @@ async def get_summary(
 
 async def get_short_description(
     summary: str,
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
     system_prompt = prompt_templates.get_system_prompt()
     user_prompt = f"""
@@ -117,7 +117,7 @@ async def cascade_query(
     chunks: list[str],
     user_prompt: str,
     system_prompt: str,
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
     if not chunks:
         return ""
@@ -136,7 +136,7 @@ async def cascade_query(
 
 async def get_authors(
     chunks: list[str],
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
     system_prompt = "If the question cannot be answered, return only the stop token."
     user_prompt = """
@@ -169,7 +169,7 @@ async def get_authors(
 
 async def get_title(
     chunks: list[str],
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
     system_prompt = "If the question cannot be answered, return only the stop token."
     user_prompt = """
@@ -198,7 +198,7 @@ async def get_title(
 
 async def get_keywords(
     chunks: list[str],
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
     system_prompt = "If the question cannot be answered, return only the stop token."
     user_prompt = """
@@ -236,9 +236,9 @@ async def get_filename(doc_id: str):
 
 
 async def generate_metadata(
-    doc_id: str
+    doc_id: str,
+    client: AsyncOpenAI
 ):
-    client = get_openai_client()
     chunks = await get_chunks(doc_id)
     try:
         summary = await get_summary(chunks, client)
@@ -273,7 +273,7 @@ async def generate_metadata(
 
 
 @router.post("/{doc_id}", status_code=202)
-async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
+async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks, client: AsyncOpenAI = Depends(get_openai_client)):
     save_job(
         doc_id=doc_id,
         job_data={},
@@ -281,7 +281,7 @@ async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
         job_type="metadata",
     )
 
-    background_tasks.add_task(generate_metadata, doc_id)
+    background_tasks.add_task(generate_metadata, doc_id, client)
     return None
 
 
