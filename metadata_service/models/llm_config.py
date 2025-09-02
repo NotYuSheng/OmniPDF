@@ -9,7 +9,7 @@ class ModelConfig:
     def __init__(self):
         self.model_name = os.environ["OPENAI_MODEL"]
         
-        # Qwen-2.5 generation parameters optimized for RAG
+        # Response generation parameters optimized for the model
         self.generation_params = {
             "temperature": float(os.getenv("MODEL_TEMPERATURE", "0.1")),
             "max_tokens": int(os.getenv("MODEL_MAX_TOKENS", "2000")),
