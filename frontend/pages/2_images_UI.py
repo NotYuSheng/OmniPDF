@@ -44,6 +44,7 @@ async def get_images(doc_id, max_retries=600, delay=1) -> dict:
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to decode JSON from response: {response.text}: {e}")
                 server_status.error("Received an invalid response from the server.")
+                return {"error": "Invalid JSON response from server"}
             
             if response.status_code == 200 or response.status_code == 201:
                 server_status.info("Successfully retrieved images")
@@ -79,6 +80,9 @@ async def get_images(doc_id, max_retries=600, delay=1) -> dict:
             await asyncio.sleep(delay)
         except Exception as e:
             logger.error(f"Unexpected error on attempt {attempt + 1}: {e}")
+            if attempt == max_retries - 1:
+                raise
+            await asyncio.sleep(delay)
 
     raise TimeoutError("Max retries exceeded")
 
@@ -86,6 +90,11 @@ def display_images(image_response, doc_id=None) -> None:
     """
     Display images extracted from the processed PDF document.
     """
+    # Check if we have a valid response first
+    if not image_response or "error" in image_response:
+        st.error(f"Error in image response: {image_response.get('error', 'Unknown error')}")
+        return
+        
     # Check if we have images in the response
     if "images" in image_response and image_response["images"]:
         image_status.success(f"Found {len(image_response['images'])} images in the document")
@@ -230,9 +239,8 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         logger.info(f"Image response: {image_response}")
                         display_images(image_response, doc_id)
 
-                        embed_response = runner.run(embed_pdf(doc_id=doc_id))
+                        embed_response = runner.run(embed_pdf(embed_type="sentence", doc_id=doc_id))
                         logger.info(f"Embedding response: {embed_response}")
-                        st.toast(f"Embedding completed for document ID: {doc_id}")
         
         
     except TimeoutError as e:
