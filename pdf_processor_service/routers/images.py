@@ -20,11 +20,8 @@ document_files = RedisDocumentFileList()
 async def get_pdf_images(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job_or_response=Depends(load_or_create_job),
+    job=Depends(load_or_create_job),
 ):
-    if isinstance(job_or_response, Response):
-        return job_or_response
-
     url_list = []
 
     prefix = f"{doc_id}/images/"

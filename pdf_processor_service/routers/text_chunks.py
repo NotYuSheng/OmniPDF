@@ -14,12 +14,12 @@ logger = logging.getLogger(__name__)
 async def get_pdf_text_chunks(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job_or_response = Depends(load_or_create_job)
+    job = Depends(load_or_create_job)
 ):
-    if isinstance(job_or_response, Response):
-        return job_or_response
+    if isinstance(job, Response):
+        return job
     
-    texts = job_or_response.get("data", {}).get("result", {}).get("texts")
+    texts = job.get("data", {}).get("result", {}).get("texts")
     if texts is None:
         logger.error(f"Could not find 'texts' in job result for doc_id: {doc_id}")
         raise HTTPException(status_code=500, detail="A server error has occurred.")

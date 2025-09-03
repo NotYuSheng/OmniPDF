@@ -31,19 +31,16 @@ async def submit_pdf_for_extraction(
 async def get_pdf_extraction(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job_or_response=Depends(load_or_create_job),
+    job=Depends(load_or_create_job),
 ):
     """Get extraction results for a processed PDF."""
-    if isinstance(job_or_response, Response):
-        return job_or_response
-
     # Extract result from job data
-    job_data = job_or_response.get("data", {}).get("result", None)
+    job_data = job.get("data", {}).get("result", None)
     
     # Convert the job data to our response model
     extraction_response = ExtractorResponse(
         doc_id=doc_id,
-        status=job_or_response.get("status", "unknown"),
+        status=job.get("status", "unknown"),
         result=job_data if job_data else None
     )
     

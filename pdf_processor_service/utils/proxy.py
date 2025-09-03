@@ -106,7 +106,9 @@ async def load_or_create_job(doc_id: str) -> dict | Response:
         response = await proxy_post(f"{EXTRACTION_URL}?{urlencode(param)}", body=None)
         if response.status_code == 202:
             raise_processing_error(job_type)
-        return response
+        else:
+            logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
+            raise HTTPException(status_code=500, details=f"{job_type} has returned an unexpected response.")
 
     handle_job_status(job, "document")
     return job
@@ -119,7 +121,9 @@ async def load_or_create_metadata_job(doc_id: str, session_id: str = Depends(get
         response = await proxy_post(f"{METADATA_URL}/metadata/{doc_id}", body={})
         if response.status_code == 202:
             raise_processing_error(job_type)
-        return response
+        else:
+            logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
+            raise HTTPException(status_code=500, details=f"{job_type} has returned an unexpected response.")
 
     handle_job_status(job, job_type)
     return job
@@ -156,7 +160,9 @@ async def load_or_create_semantic_embedder_job(
         response = await proxy_post(f"{EMBED_URL}/semantic/", body=embedder_request)
         if response.status_code == 202:
             raise_processing_error(job_type)
-        return response
+        else:
+            logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
+            raise HTTPException(status_code=500, details=f"{job_type} has returned an unexpected response.")
 
     handle_job_status(job, job_type)
     return job
@@ -193,21 +199,18 @@ async def load_or_create_sentence_embedder_job(
         response = await proxy_post(f"{EMBED_URL}/sentence/", body=embedder_request)
         if response.status_code == 202:
             raise_processing_error("sentence embedder service")
-        return response
+        else:
+            logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
+            raise HTTPException(status_code=500, details=f"{job_type} has returned an unexpected response.")
 
     handle_job_status(job, job_type)
     return job
 
 
 async def concat_text(doc_id: str) -> str:
-    job_or_response = await load_or_create_job(doc_id)
-    if isinstance(job_or_response, Response):
-        raise HTTPException(
-            status_code=500,
-            details="An unknown error has occured extracting the PDF. Please try agian.",
-        )
+    job = await load_or_create_job(doc_id)
 
-    texts = job_or_response.get("data", {}).get("result", {}).get("texts", [])
+    texts = job.get("data", {}).get("result", {}).get("texts", [])
     text_list = [entry.get("text", "") or entry.get("orig", "") for entry in texts]
     return "\n".join(text_list)
 

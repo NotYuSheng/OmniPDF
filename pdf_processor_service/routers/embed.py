@@ -47,19 +47,16 @@ async def text_embed_proxy(
 async def get_semantic_embedding_status(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job_or_response=Depends(load_or_create_semantic_embedder_job),
+    job=Depends(load_or_create_semantic_embedder_job),
 ):
     """Get the status and results of semantic embedding processing"""
-    if isinstance(job_or_response, Response):
-        return job_or_response
-
     # Extract result from job data
-    job_data = job_or_response.get("data", {})
+    job_data = job.get("data", {})
     
     return {
         "doc_id": doc_id,
-        "status": job_or_response.get("status", "unknown"),
-        "result": job_data if job_or_response.get("status") == "completed" else None
+        "status": job.get("status", "unknown"),
+        "result": job_data if job.get("status") == "completed" else None
     }
 
 
@@ -67,17 +64,14 @@ async def get_semantic_embedding_status(
 async def get_sentence_embedding_status(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job_or_response=Depends(load_or_create_sentence_embedder_job),
+    job=Depends(load_or_create_sentence_embedder_job),
 ):
     """Get the status and results of sentence embedding processing"""
-    if isinstance(job_or_response, Response):
-        return job_or_response
-
     # Extract result from job data
-    job_data = job_or_response.get("data", {})
+    job_data = job.get("data", {})
     
     return {
         "doc_id": doc_id,
-        "status": job_or_response.get("status", "unknown"),
-        "result": job_data if job_or_response.get("status") == "completed" else None
+        "status": job.get("status", "unknown"),
+        "result": job_data if job.get("status") == "completed" else None
     }
