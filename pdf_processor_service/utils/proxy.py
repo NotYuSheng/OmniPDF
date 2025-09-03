@@ -16,7 +16,7 @@ if not EXTRACTION_URL:
 
 
 async def proxy_post(url: str, body: dict):
-    async with httpx.AsyncClient(timeout=30) as client:
+    async with httpx.AsyncClient(timeout=300) as client:
         try:
             req = await client.post(url, json=body)
             req.raise_for_status()  # Raise an exception for bad status codes
