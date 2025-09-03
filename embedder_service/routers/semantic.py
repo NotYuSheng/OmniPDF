@@ -1,6 +1,6 @@
 # For data chunking and embedding
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from typing import List, Dict, Any
 import logging
 import uuid
@@ -8,6 +8,7 @@ import uuid
 from models.embed import DataRequest
 from models.helper import get_chunking_model
 from shared_utils.chroma_client import get_chroma_client
+from shared_utils.s3_utils import save_job, load_job
 from langchain_core.documents import Document
 from utils.embed import vectorize_chromadb
 
@@ -99,41 +100,102 @@ async def data_chunking(request:DataRequest) -> List[Dict[str, Any]]:
         raise HTTPException(status_code=500, detail="Chunking failed.")
 
 
-@router.post("/")
-async def pdf_embedder_service(request: DataRequest):
-    "Chunk up and embed data from PDF document into ChromaDB AsyncHTTPClient instance"
-
+async def process_semantic_embedding(request: DataRequest):
+    """Background task to process semantic embedding"""
     try:
         # Extracted data has to be chunked up first
         chunk_data = await data_chunking(request)
 
         if not chunk_data:
-            raise HTTPException(status_code=400, detail="No chunks were created from the input text") 
+            error_job = {
+                "doc_id": request.doc_id,
+                "status": "error",
+                "message": "No chunks were created from the input text"
+            }
+            save_job(
+                doc_id=request.doc_id,
+                job_data=error_job,
+                status="failed",
+                job_type="semantic_embedding"
+            )
+            return
         
         # Once chunking is done, embed into ChromaDB with the specified embedding model
         embed_results = await vectorize_chromadb(chunk_data, request.config, SEMANTIC_EMBEDDING_COLLECTION)
         
-        return {
-                "status": "success",
-                "doc_id": request.doc_id,
-                "chunks_created": len(chunk_data),
-                "embedding_results": embed_results,
-                "chunk_details": [
-                    {
-                        "chunk_id": chunk["chunk_id"],
-                        "chunk_index": chunk["chunk_index"],
-                        "content": chunk["content"],
-                        "content_length": len(chunk["content"]),
-                        "start_char": chunk["start_char"],
-                        "end_char": chunk["end_char"]
-                    }
-                    for chunk in chunk_data
-                ]
-            }
+        result_data = {
+            "status": "success",
+            "doc_id": request.doc_id,
+            "chunks_created": len(chunk_data),
+            "embedding_results": embed_results,
+            "chunk_details": [
+                {
+                    "chunk_id": chunk["chunk_id"],
+                    "chunk_index": chunk["chunk_index"],
+                    "content": chunk["content"],
+                    "content_length": len(chunk["content"]),
+                    "start_char": chunk["start_char"],
+                    "end_char": chunk["end_char"]
+                }
+                for chunk in chunk_data
+            ]
+        }
+        
+        save_job(
+            doc_id=request.doc_id,
+            job_data=result_data,
+            status="completed",
+            job_type="semantic_embedding"
+        )
+        
     except Exception as e:
-        logger.error(f"PDF embedder service failed: {e}")
-        raise HTTPException(status_code=500, detail="PDF embedder service failed")
+        logger.error(f"Semantic embedding failed: {e}")
+        error_job = {
+            "doc_id": request.doc_id,
+            "status": "error",
+            "message": f"Semantic embedding failed: {str(e)}"
+        }
+        save_job(
+            doc_id=request.doc_id,
+            job_data=error_job,
+            status="failed",
+            job_type="semantic_embedding"
+        )
+
+
+@router.post("/", status_code=202)
+async def submit_semantic_embedding(request: DataRequest, background_tasks: BackgroundTasks):
+    """Submit a document for semantic embedding processing"""
+    save_job(
+        doc_id=request.doc_id,
+        job_data={},
+        status="processing",
+        job_type="semantic_embedding"
+    )
+
+    background_tasks.add_task(process_semantic_embedding, request)
+    return {"doc_id": request.doc_id, "status": "processing"}
     
+
+@router.get("/{doc_id}")
+async def get_semantic_embedding_status(doc_id: str):
+    """Get the status and results of semantic embedding processing"""
+    job = load_job(doc_id=doc_id, job_type="semantic_embedding")
+    if not job:
+        raise HTTPException(status_code=404, detail="Document ID not found")
+
+    if job.get("status") == "failed":
+        error_message = job.get("data", {}).get("message", "Processing failed")
+        raise HTTPException(status_code=500, detail=error_message)
+    
+    job_data = job.get("data", {})
+    
+    return {
+        "doc_id": doc_id,
+        "status": job.get("status", "unknown"),
+        "result": job_data if job.get("status") == "completed" else None
+    }
+
 
 @router.get("/status/{doc_id}")
 async def verify_document_embedding(doc_id: str):
