@@ -1,25 +1,30 @@
 # Original code from https://github.com/duyixian1234/fastapi-redis-session
 # Updated for package versions listed in requirements.txt
 
-from os import getenv
+from os import environ
 from datetime import timedelta
-from typing import Any, Generator
+from typing import Any
 import logging
 import json
+from enum import StrEnum
 
 from redis import Redis
 
 
 logger = logging.getLogger(__name__)
 
-
-class Config:
-    redis_url: str = getenv("REDIS_URL")
-    expire_time: timedelta = timedelta(hours=24)
-
-
-config = Config()
+REDIS_URL = environ["REDIS_URL"]
+EXPIRY_DAY = timedelta(days=1)
+EXPIRY_HOUR = timedelta(hours=1)
 SEPERATOR = ":"
+
+
+class RedisPrefix(StrEnum):
+    DOC_FLAG = "DocumentFlag"
+    DOC_FILE_LIST = "DocumentFiles"
+    FILENAME = "DocumentName"
+    SESSION_DOC_LIST = "SessionDocuments"
+    SESSION_FLAG = "SessionFlag"
 
 
 class RedisBase:
@@ -27,9 +32,9 @@ class RedisBase:
         self,
         redis_client=None,
         prefix="",
-        default_expiry: timedelta | None = config.expire_time,
+        default_expiry: timedelta | None = EXPIRY_HOUR,
     ):
-        self.client = redis_client if redis_client else Redis.from_url(config.redis_url)
+        self.client = redis_client if redis_client else Redis.from_url(REDIS_URL)
         self.prefix = prefix
         self.default_expiry = default_expiry
 
@@ -38,9 +43,15 @@ class RedisBase:
 
     def __contains__(self, key: str):
         return self.client.exists(self.prefixed(key))
-    
+
     def prefixed(self, key: str):
         return f"{self.prefix}{SEPERATOR}{key}" if self.prefix else key
+
+    def delete_set(self, key_list: set[str]):
+        pipe = self.client.pipeline()
+        for key in key_list:
+            pipe.delete(key)
+        pipe.execute()
 
 
 # Stores the data as string
@@ -74,7 +85,7 @@ class RedisJSONStorage(RedisStringStorage):
 
 
 class RedisSetStorage(RedisBase):
-    def __init__(self, redis_client=None, prefix="", default_expiry=config.expire_time):
+    def __init__(self, redis_client=None, prefix="", default_expiry=EXPIRY_HOUR):
         super().__init__(redis_client, prefix, default_expiry)
         self.pipeline = self.client.pipeline()
 
@@ -110,7 +121,9 @@ class RedisSetStorage(RedisBase):
 
 
 class RedisSimpleFileFlag(RedisStringStorage):
-    def __init__(self, redis_client=None, prefix="S3_File:", default_expiry = timedelta(hours=1)):
+    def __init__(
+        self, redis_client=None, prefix="S3_File:", default_expiry=EXPIRY_HOUR
+    ):
         super().__init__(redis_client, prefix, default_expiry)
 
     def set(self, key: str):
@@ -127,7 +140,7 @@ class RedisSetWithFlagExpiry(RedisSetStorage):
         redis_client=None,
         prefix="",
         flag_prefix="Set_Flag:",
-        default_expiry=config.expire_time,
+        default_expiry=EXPIRY_HOUR,
     ):
         super().__init__(redis_client, prefix, None)
         self.flag_expiry = default_expiry
@@ -142,12 +155,12 @@ class RedisSetWithFlagExpiry(RedisSetStorage):
     def __getitem__(self, key: str):
         self.pipeline.getex(self.flag_prefixed(key), ex=self.flag_expiry)
         return super().__getitem__(key)
-    
+
     def __setitem__(self, key: str, values: set):
         if key not in self:
             self.init(key)
         super().__setitem__(key, values)
-    
+
     def init(self, key: str):
         self.client.set(self.flag_prefixed(key), 1, ex=self.flag_expiry)
 
@@ -162,16 +175,43 @@ class RedisSetWithFlagExpiry(RedisSetStorage):
     def flag_prefixed(self, key: str):
         return self.flag_prefix + SEPERATOR + self.prefixed(key)
 
-def get_json_storage() -> Generator:
-    storage = RedisJSONStorage()
-    yield storage
 
+class RedisDocumentFileList(RedisSetWithFlagExpiry):
+    def __init__(
+        self,
+        redis_client=None,
+        prefix=RedisPrefix.DOC_FILE_LIST,
+        flag_prefix=RedisPrefix.DOC_FLAG,
+        default_expiry=EXPIRY_HOUR,
+    ):
+        super().__init__(redis_client, prefix, flag_prefix, default_expiry)
+        self.document_names = RedisStringStorage(self.client, RedisPrefix.FILENAME, None)
 
-def get_set_storage() -> Generator:
-    service_cache = RedisSetStorage()
-    yield service_cache
+    def __delitem__(self, key):
+        del self.document_names[key]
+        return super().__delitem__(key)
+    
+    def init_doc_id(self, doc_id) -> str:
+        if not self.client.set(
+            self.flag_prefixed(doc_id), 1, ex=self.flag_expiry, nx=True
+        ):
+            raise ValueError(f"doc_id already exists. doc_id: {doc_id}")
 
+    def refresh_document_expiries(self, doc_ids: set[str]):
+        """
+        Refreshes the expiry for a set of document flags using a single pipeline.
+        """
+        if not doc_ids:
+            return
 
-def get_string_storage() -> Generator:
-    service_cache = RedisStringStorage()
-    yield service_cache
+        pipe = self.client.pipeline()
+        for doc_id in doc_ids:
+            pipe.expire(self.flag_prefixed(doc_id), self.flag_expiry)
+        pipe.execute()
+        logger.info(f"Refreshed expiry for {len(doc_ids)} document flags.")
+
+    def set_document_name(self, doc_id: str, name: str):
+        self.document_names[doc_id] = name
+
+    def get_document_name(self, doc_id: str) -> str | None:
+        return self.document_names[doc_id]

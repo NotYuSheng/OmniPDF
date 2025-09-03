@@ -1,57 +1,39 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
-from shared_utils.chroma_client import get_chroma_client
-from shared_utils.redis import RedisStringStorage
+from shared_utils.chroma_client import get_chunks
+from shared_utils.redis import RedisDocumentFileList
 from shared_utils.s3_utils import save_job, load_job
 import logging
-from models.rag_config import (
-    QwenRAGConfig,
-    QwenPromptTemplates,
-    QueryType,
+import os
+from metadata_service.models.llm_config import (
+    ModelConfig,
+    PromptTemplates, 
+    ModelResponseOptimizer
 )
 
 router = APIRouter(prefix="/metadata", tags=["metadata"])
 
 logger = logging.getLogger(__name__)
+document_list = RedisDocumentFileList()
 
-# Initialize Qwen-2.5 RAG configuration
-qwen_config = QwenRAGConfig()
-prompt_templates = QwenPromptTemplates()
+model_config = ModelConfig()
+prompt_templates = PromptTemplates()
+response_optimizer = ModelResponseOptimizer()
 
-OPENAI_MODEL_NAME = qwen_config.model_name
-
-FILENAME_REDIS_PREFIX = "Filename"
-TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
-MAX_CHUNK_PER_RETRIVAL = 100
-SUMMARY_LENGTH = 500
-SHORT_DESCRIPTION_LENGTH = 20
-
-
-async def get_chunks(doc_id: str):
-    chroma_client = await get_chroma_client()
-    collection = await chroma_client.get_collection(TEXTUAL_EMBEDDING_COLLECTION)
-    offset = 0
-    results = await collection.get(
-        where={"doc_id": doc_id}, limit=MAX_CHUNK_PER_RETRIVAL, offset=offset
-    )
-    logger.info(results)
-    chunks = []
-    while results["documents"]:
-        offset += MAX_CHUNK_PER_RETRIVAL
-        chunks.extend(results["documents"])
-        results = await collection.get(
-            where={"doc_id": doc_id}, limit=MAX_CHUNK_PER_RETRIVAL, offset=offset
-        )
-    return chunks
+OPENAI_MODEL_NAME = model_config.model_name
+SUMMARY_LENGTH = int(os.getenv("SUMMARY_LENGTH", "500"))
+SHORT_DSECRIPTION_LENGTH = int(os.getenv("SHORT_DSECRIPTION_LENGTH", "20"))
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", "8"))
+PROMPT_PURPOSE = ["default", "summary", "title", "keywords", "authors"]
 
 
 async def get_model_response(
     system_prompt: str,
     user_prompt: str,
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
-    # Prepare messages for Qwen-2.5
+    # Prepare messages for model
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
@@ -61,7 +43,7 @@ async def get_model_response(
         response = await client.chat.completions.create(
             model=OPENAI_MODEL_NAME,
             messages=messages,
-            **qwen_config.generation_params,
+            **model_config.generation_params,
         )
 
     except APIError as e:
@@ -84,20 +66,25 @@ async def get_model_response(
             status_code=500,
             detail="Malformed choice in OpenAI response",
         )
+    
+    # Post-process the response
+    if model_config.enable_response_post_processing:
+        processed_response = response_optimizer.post_process_llm_response(first_choice.message.content)
+    else:
+        processed_response = first_choice.message.content
 
-    processed_response = first_choice.message.content
     return processed_response
 
 
 async def get_summary(
     chunks: list[str],
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
-    system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
-    user_prompt = prompt_templates.format_user_prompt(
-        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
-        r"{context}",
-        QueryType.SUMMARIZATION,
+    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
+    user_prompt = prompt_templates.get_user_prompt(
+        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.", 
+        PROMPT_PURPOSE[1],
+        r"{context}"
     )
     summaries = []
     for chunk in chunks:
@@ -111,18 +98,14 @@ async def get_summary(
 
 async def get_short_description(
     summary: str,
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
-    system_prompt = prompt_templates.get_system_prompt(QueryType.SUMMARIZATION)
-    user_prompt = f"""
-    **DOCUMENT CONTEXT:**
-    {summary}
-    **QUERY REQUEST:** Return a short description of the document, up to {SHORT_DESCRIPTION_LENGTH} words.
-
-    **INSTRUCTIONS:**
-    Preserve the original meaning of the document while summarizing it into a concise description.
-    Return only the short description.
-    """
+    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
+    user_prompt = prompt_templates.get_user_prompt(
+        f"Return a short description of the document, up to {SHORT_DSECRIPTION_LENGTH} words. Return only the short description.",
+        PROMPT_PURPOSE[1],
+        summary
+    )
 
     return await get_model_response(system_prompt, user_prompt, client)
 
@@ -131,37 +114,36 @@ async def cascade_query(
     chunks: list[str],
     user_prompt: str,
     system_prompt: str,
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
     if not chunks:
         return ""
     # Not ideal, will consume a lot of memory as prev chunks will not be gc till final set is gotten
     if len(chunks) == 1:
         return chunks[0]
-    new_chunks = []
-    for i in range(0, len(chunks), 8):
-        new_chunk_context = "\n".join(chunks[i : i + 8])
-        user_prompt_with_context = user_prompt.format(context=new_chunk_context)
-        new_chunks.append(await get_model_response(system_prompt, user_prompt_with_context, client))
+    
+    current_chunks = chunks
+    while len(current_chunks) > 1:
+        new_chunks = []
+        for i in range(0, len(current_chunks), BATCH_SIZE):
+            new_chunk_context = "\n".join(current_chunks[i : i + BATCH_SIZE])
+            user_prompt_with_context = user_prompt.format(context=new_chunk_context)
+            new_chunks.append(await get_model_response(system_prompt, user_prompt_with_context, client))
+        current_chunks = new_chunks
+        logger.info(f"Reduced to {len(current_chunks)} chunks.")
 
-    logger.info(new_chunks)
-    return await cascade_query(new_chunks, user_prompt, system_prompt, client)
+    return current_chunks[0]
 
 
 async def get_authors(
     chunks: list[str],
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
-    system_prompt = "If the question cannot be answered, return only the stop token."
-    user_prompt = """
-    **DOCUMENT CONTEXT:**
-    {context}
-    **QUERY REQUEST:** Identify the Authors in the given document
+    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
+    user_prompt = prompt_templates.get_user_prompt(
+        "Identify the Authors in the given document", PROMPT_PURPOSE[4], r"{context}"
+    )
 
-    **INSTRUCTIONS:**
-    Return the list of authors in the following format:
-    Author: Author1, Author2, Author3, etc
-    """
     author_chunks = []
     for chunk in chunks:
         author_chunks.append(
@@ -173,8 +155,8 @@ async def get_authors(
     authors = []
     for chunk in author_chunks:
         logger.info(chunk)
-        author_split = chunk.split(":", 1)
-        if author_split[0].lower() != "author":
+        author_split = chunk.split(":")
+        if author_split[0].lower() != "authors":
             logger.info(author_split)
             continue
         authors.extend([author.strip() for author in author_split[-1].split(",")])
@@ -183,18 +165,13 @@ async def get_authors(
 
 async def get_title(
     chunks: list[str],
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
-    system_prompt = "If the question cannot be answered, return only the stop token."
-    user_prompt = """
-    **DOCUMENT CONTEXT:**
-    {context}
-    **QUERY REQUEST:** Identify the title in the given document. If the title cannot be found, generate one based on the contents of the document.
-
-    **INSTRUCTIONS:**
-    Return the title in the following format:
-    Title: Title
-    """
+    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
+    user_prompt = prompt_templates.get_user_prompt(
+        "Identify the title in the given document", PROMPT_PURPOSE[2], r"{context}"
+    )
+    
     title_chunks = []
     for chunk in chunks:
         title_chunks.append(
@@ -203,8 +180,7 @@ async def get_title(
             )
         )
     title_str = await cascade_query(title_chunks, user_prompt, system_prompt, client)
-    
-    title_split = title_str.split(":", 1)
+    title_split = title_str.split(":")
     if title_split[0].lower() != "title":
         return "UNKNOWN"
     return title_split[-1]
@@ -212,18 +188,13 @@ async def get_title(
 
 async def get_keywords(
     chunks: list[str],
-    client: AsyncOpenAI = Depends(get_openai_client),
+    client: AsyncOpenAI
 ):
-    system_prompt = "If the question cannot be answered, return only the stop token."
-    user_prompt = """
-    **DOCUMENT CONTEXT:**
-    {context}
-    **QUERY REQUEST:** Identify the keywords in the given document.
-
-    **INSTRUCTIONS:**
-    Return the list of keywords in the following format:
-    keywords: keyword1, keyword2, keyword3, etc
-    """
+    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
+    user_prompt = prompt_templates.get_user_prompt(
+        "Identify the Keywords in the given document", PROMPT_PURPOSE[3], r"{context}"
+    )
+ 
     keyword_chunks = []
     for chunk in chunks:
         keyword_chunks.append(
@@ -243,8 +214,7 @@ async def get_keywords(
 
 
 async def get_filename(doc_id: str):
-    redis_filename_store = RedisStringStorage(prefix=FILENAME_REDIS_PREFIX)
-    filename = redis_filename_store[doc_id]
+    filename = document_list.get_document_name(doc_id)
     if not filename:
         raise HTTPException(status_code=404, detail="Filename not found for document")
     return filename
@@ -252,8 +222,8 @@ async def get_filename(doc_id: str):
 
 async def generate_metadata(
     doc_id: str,
+    client: AsyncOpenAI
 ):
-    client = get_openai_client()
     chunks = await get_chunks(doc_id)
     try:
         summary = await get_summary(chunks, client)
@@ -288,7 +258,8 @@ async def generate_metadata(
 
 
 @router.post("/{doc_id}", status_code=202)
-async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
+async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks, client: AsyncOpenAI = Depends(get_openai_client)):
+
     save_job(
         doc_id=doc_id,
         job_data={},
@@ -296,7 +267,7 @@ async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
         job_type="metadata",
     )
 
-    background_tasks.add_task(generate_metadata, doc_id)
+    background_tasks.add_task(generate_metadata, doc_id, client)
     return None
 
 

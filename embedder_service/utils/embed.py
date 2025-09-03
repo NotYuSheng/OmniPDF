@@ -6,8 +6,10 @@ import logging
 from models.embed import ProcessingConfig
 from models.helper import get_embedding_model
 from shared_utils.chroma_client import get_chroma_client
+from shared_utils.redis import RedisDocumentFileList
 
 logger = logging.getLogger(__name__)
+document_list = RedisDocumentFileList()
 
 
 async def vectorize_chromadb(chunk_data: List[Dict[str, Any]], config: ProcessingConfig, collection_name:str):
@@ -39,6 +41,9 @@ async def vectorize_chromadb(chunk_data: List[Dict[str, Any]], config: Processin
             documents=documents,
             metadatas=metadatas
         )
+        #refresh document expiry
+        doc_id_list = {metadata["doc_id"] for metadata in metadatas}
+        document_list.refresh_document_expiries(doc_id_list)
         logger.info(f"Added {len(ids)} chunks to collection '{collection_name}'")
 
         return {
