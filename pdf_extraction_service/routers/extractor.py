@@ -5,11 +5,8 @@ import io
 import json
 
 from models.extractor import ExtractResponse
-from shared_utils.s3_utils import (
-    save_job, 
-    load_job,
-    upload_fileobj,
-)
+from shared_utils.s3_utils import upload_fileobj
+from shared_utils.job_status import save_job, load_job
 
 from docling_core.types.doc import PictureItem
 from docling.datamodel.base_models import InputFormat
@@ -21,6 +18,7 @@ from shared_utils.redis import RedisDocumentFileList
 router = APIRouter(prefix="/documents", tags=["documents"])
 logger = logging.getLogger(__name__)
 document_files = RedisDocumentFileList()
+
 
 def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
     start_time = time.time()

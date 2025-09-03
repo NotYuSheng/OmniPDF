@@ -7,7 +7,7 @@ import uuid
 
 from models.embed import DataRequest
 from shared_utils.chroma_client import get_chroma_client
-from shared_utils.s3_utils import save_job, load_job
+from shared_utils.job_status import save_job, load_job
 from utils.embed import vectorize_chromadb
 from nltk.tokenize import sent_tokenize
 

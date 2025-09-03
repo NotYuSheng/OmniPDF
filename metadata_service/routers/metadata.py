@@ -3,7 +3,7 @@ from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chunks
 from shared_utils.redis import RedisDocumentFileList
-from shared_utils.s3_utils import save_job, load_job
+from shared_utils.job_status import save_job, load_job
 import logging
 from models.metadata import MetadataResponse
 from models.rag_config import (

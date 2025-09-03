@@ -4,7 +4,8 @@ from io import BytesIO
 from fastapi import APIRouter, HTTPException
 from wordcloud import WordCloud
 
-from shared_utils.s3_utils import load_job, upload_fileobj
+from shared_utils.s3_utils import upload_fileobj
+from shared_utils.job_status import load_job
 from shared_utils.redis import RedisDocumentFileList
 from models.wordcloud import WordcloudResponse
 

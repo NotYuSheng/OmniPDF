@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
 from models.translate import TranslateResponse
-from shared_utils.s3_utils import save_job, load_job, upload_fileobj
+from shared_utils.s3_utils import upload_fileobj
+from shared_utils.job_status import save_job, load_job
 
 import os
 import logging

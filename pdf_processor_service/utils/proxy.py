@@ -6,7 +6,8 @@ import httpx
 
 from urllib.parse import urlencode
 from utils.session import get_session_id
-from shared_utils.s3_utils import load_job, generate_presigned_url
+from shared_utils.s3_utils import generate_presigned_url
+from shared_utils.job_status import load_job, handle_job_status, raise_processing_error
 
 logger = logging.getLogger(__name__)
 
@@ -76,48 +77,6 @@ def handle_status_error(response: httpx.Response, url: str) -> None:
         raise HTTPException(
             status_code=status_code, detail=f"Processor error: {response.text}"
         )
-
-
-def handle_job_status(job: dict, job_type: str = "document") -> None:
-    """
-    Handle job status validation and raise appropriate HTTPExceptions.
-
-    Args:
-        job: The job dictionary containing status information
-        job_type: Type of job for error messaging (default: "document")
-
-    Raises:
-        HTTPException: With appropriate status code and error message
-    """
-    if not job:
-        raise HTTPException(
-            status_code=404,
-            detail=f"{job_type.capitalize()} not found or not processed yet",
-        )
-
-    if job.get("status") == "processing":
-        raise_processing_error(job_type)
-
-    if job.get("status") == "failed":
-        raise HTTPException(
-            status_code=450, detail=f"The {job_type} has failed. Please retry the job."
-        )
-
-
-def raise_processing_error(process_name: str) -> None:
-    """
-    Raise a 202 HTTP error indicating that a process is still running.
-
-    Args:
-        process_name: Name of the process that is still running
-
-    Raises:
-        HTTPException: With status code 202 and appropriate message
-    """
-    raise HTTPException(
-        status_code=202,
-        detail=f"The {process_name} is still processing. Please try again later.",
-    )
 
 
 async def proxy_post(url: str, body: dict):

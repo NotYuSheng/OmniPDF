@@ -8,7 +8,7 @@ import uuid
 from models.embed import DataRequest
 from models.helper import get_chunking_model
 from shared_utils.chroma_client import get_chroma_client
-from shared_utils.s3_utils import save_job, load_job
+from shared_utils.job_status import save_job, load_job
 from langchain_core.documents import Document
 from utils.embed import vectorize_chromadb
 
