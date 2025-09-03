@@ -124,7 +124,8 @@ async def perform_rag_query(
             ]}
             logger.info(f"Filtering results to document ID list: {doc_ids}")
         else:
-            logger.info("Searching across all documents in collection")
+            query_params["where"] = {"session_id": session_id}
+            logger.info(f"Searching across all documents for session {session_id}")
 
         results = await collection.query(**query_params)
         
