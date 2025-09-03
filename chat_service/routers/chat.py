@@ -92,7 +92,7 @@ async def perform_rag_query(
     collection_name: str, 
     top_k: int,
     session_id: str,
-    doc_id_list: list[str] = None,
+    doc_id_list: list[str] = [],
     enable_reranking: bool = True,
     openai_client: AsyncOpenAI = None
 ) -> tuple[str, List[Dict[str, Any]], str, str]:
