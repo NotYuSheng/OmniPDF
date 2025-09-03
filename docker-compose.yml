@@ -74,7 +74,6 @@ services:
       - ./nginx/.env
     depends_on:
       - pdf_processor_service
-      - chat_service
 
   redis:
     container_name: redis

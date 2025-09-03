@@ -12,8 +12,4 @@ server {
     location /pdf_processor/ {
         proxy_pass ${PDF_PROCESSOR_URL}/;
     }
-
-    location /chat/ {
-        proxy_pass ${CHAT_URL}/;
-    }
 }
