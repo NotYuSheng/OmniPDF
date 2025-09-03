@@ -9,7 +9,7 @@ class ChatRequest(BaseModel):
 
     message: str
     session_id: str
-    doc_id_list: List[str] = None
+    doc_ids: List[str] = None
     collection_name: str = Field(default="default_collection", description="ChromaDB collection name")
 
 

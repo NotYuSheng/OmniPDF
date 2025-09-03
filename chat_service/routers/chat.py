@@ -92,7 +92,7 @@ async def perform_rag_query(
     collection_name: str, 
     top_k: int,
     session_id: str,
-    doc_id_list: list[str] = [],
+    doc_ids: list[str] = [],
     enable_reranking: bool = True,
     openai_client: AsyncOpenAI = None
 ) -> tuple[str, List[Dict[str, Any]], str, str]:
@@ -111,18 +111,18 @@ async def perform_rag_query(
             "include": ["distances", "documents", "metadatas", "embeddings"]
         }
 
-        if len(doc_id_list) == 1:
+        if len(doc_ids) == 1:
             query_params["where"] = {"$and": [
                 {"session_id": session_id},
-                {"doc_id": doc_id_list[0]} 
+                {"doc_id": doc_ids[0]} 
             ]}
-            logger.info(f"Filtering results to document ID: {doc_id_list[0]}")
-        elif len(doc_id_list) > 1:
+            logger.info(f"Filtering results to document ID: {doc_ids[0]}")
+        elif len(doc_ids) > 1:
             query_params["where"] = {"$and": [
                 {"session_id": session_id},
-                {"$or": [{"doc_id": doc_id} for doc_id in doc_id_list]}
+                {"$or": [{"doc_id": doc_id} for doc_id in doc_ids]}
             ]}
-            logger.info(f"Filtering results to document ID list: {doc_id_list}")
+            logger.info(f"Filtering results to document ID list: {doc_ids}")
         else:
             logger.info("Searching across all documents in collection")
 
@@ -272,7 +272,7 @@ async def handle_chat(
                 openai_client=client,
                 query=chat_request.message,
                 collection_name=chat_request.collection_name,
-                doc_id_list=chat_request.doc_id_list,
+                doc_ids=chat_request.doc_ids,
                 top_k=TOP_K,
                 enable_reranking=rag_config.enable_reranking,
             )

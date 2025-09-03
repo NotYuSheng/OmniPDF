@@ -23,12 +23,12 @@ async def handle_chat(
     Handle chat requests with session validation and document access control.
     If doc_id is provided, validates that the user has access to that document.
     """
-    for doc_id in chat_request.doc_id_list:
+    for doc_id in chat_request.doc_ids:
         validate_session_doc_pair(doc_id, session_id, session_storage, _valid_session)
 
     logger.info(f"Processing chat request for session {session_id}")
     logger.info(f"Query: {chat_request.message}")
-    logger.info(f"Document IDs: {chat_request.doc_id_list}")
+    logger.info(f"Document IDs: {chat_request.doc_ids}")
     logger.info(f"Collection: {chat_request.collection_name}")
     
     # Proxy request to chat service
