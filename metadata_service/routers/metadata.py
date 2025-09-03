@@ -3,7 +3,7 @@ from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chunks
 from shared_utils.redis import RedisDocumentFileList
-from shared_utils.job_status import save_job, load_job
+from shared_utils.job_status import save_job, load_job, JobType
 import logging
 from models.metadata import MetadataResponse
 from models.rag_config import (
@@ -258,7 +258,7 @@ async def generate_metadata(doc_id: str):
             doc_id=doc_id,
             job_data=job_data,
             status="completed",
-            job_type="metadata",
+            job_type=JobType.METADATA,
         )
         
         return metadata_result
@@ -271,7 +271,7 @@ async def generate_metadata(doc_id: str):
             "message": "Failed to download or generate metadata",
         }
         save_job(
-            doc_id=doc_id, job_data=error_job, status="failed", job_type="metadata"
+            doc_id=doc_id, job_data=error_job, status="failed", job_type=JobType.METADATA
         )
         return None
 
@@ -282,7 +282,7 @@ async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
         doc_id=doc_id,
         job_data={},
         status="processing",
-        job_type="metadata",
+        job_type=JobType.METADATA,
     )
 
     background_tasks.add_task(generate_metadata, doc_id)
@@ -291,7 +291,7 @@ async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
 
 @router.get("/{doc_id}", response_model=MetadataResponse)
 async def get_status(doc_id: str):
-    job = load_job(doc_id=doc_id, job_type="metadata")
+    job = load_job(doc_id=doc_id, job_type=JobType.METADATA)
     if not job:
         raise HTTPException(status_code=404, detail="Document ID not found")
 

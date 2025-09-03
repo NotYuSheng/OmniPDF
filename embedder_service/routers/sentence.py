@@ -7,7 +7,7 @@ import uuid
 
 from models.embed import DataRequest
 from shared_utils.chroma_client import get_chroma_client
-from shared_utils.job_status import save_job, load_job
+from shared_utils.job_status import save_job, load_job, JobType
 from utils.embed import vectorize_chromadb
 from nltk.tokenize import sent_tokenize
 
@@ -127,7 +127,7 @@ async def process_sentence_embedding(request: DataRequest):
                 doc_id=request.doc_id,
                 job_data=error_job,
                 status="failed",
-                job_type="sentence_embedding"
+                job_type=JobType.SENTENCEEMBEDDER
             )
             return
 
@@ -156,7 +156,7 @@ async def process_sentence_embedding(request: DataRequest):
             doc_id=request.doc_id,
             job_data=result_data,
             status="completed",
-            job_type="sentence_embedding"
+            job_type=JobType.SENTENCEEMBEDDER
         )
         
     except Exception as e:
@@ -170,7 +170,7 @@ async def process_sentence_embedding(request: DataRequest):
             doc_id=request.doc_id,
             job_data=error_job,
             status="failed",
-            job_type="sentence_embedding"
+            job_type=JobType.SENTENCEEMBEDDER
         )
 
 
@@ -181,7 +181,7 @@ async def submit_sentence_embedding(request: DataRequest, background_tasks: Back
         doc_id=request.doc_id,
         job_data={},
         status="processing",
-        job_type="sentence_embedding"
+        job_type=JobType.SENTENCEEMBEDDER
     )
 
     background_tasks.add_task(process_sentence_embedding, request)
@@ -191,7 +191,7 @@ async def submit_sentence_embedding(request: DataRequest, background_tasks: Back
 @router.get("/{doc_id}")
 async def get_sentence_embedding_status(doc_id: str):
     """Get the status and results of sentence embedding processing"""
-    job = load_job(doc_id=doc_id, job_type="sentence_embedding")
+    job = load_job(doc_id=doc_id, job_type=JobType.SENTENCEEMBEDDER)
     if not job:
         raise HTTPException(status_code=404, detail="Document ID not found")
 

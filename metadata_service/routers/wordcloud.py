@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from wordcloud import WordCloud
 
 from shared_utils.s3_utils import upload_fileobj
-from shared_utils.job_status import load_job
+from shared_utils.job_status import load_job, JobType
 from shared_utils.redis import RedisDocumentFileList
 from models.wordcloud import WordcloudResponse
 
@@ -17,7 +17,7 @@ MAX_WORDS = 50
 
 
 async def concat_text(doc_id: str) -> str:
-    job = load_job(doc_id=doc_id, job_type="extraction")
+    job = load_job(doc_id=doc_id, job_type=JobType.EXTRACTION)
     if not job:
         raise HTTPException(
             status_code=404, detail="Document not found or not processed yet"

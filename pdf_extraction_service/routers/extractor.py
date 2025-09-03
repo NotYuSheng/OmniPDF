@@ -6,7 +6,7 @@ import json
 
 from models.extractor import ExtractResponse
 from shared_utils.s3_utils import upload_fileobj
-from shared_utils.job_status import save_job, load_job
+from shared_utils.job_status import save_job, load_job, JobType
 
 from docling_core.types.doc import PictureItem
 from docling.datamodel.base_models import InputFormat
@@ -95,7 +95,7 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
         save_job(doc_id = doc_id, 
                  job_data = job_data, 
                  status = "completed", 
-                 job_type = "extraction"
+                 job_type = JobType.EXTRACTION
                  )
         
         logger.info(f"Time to process PDF: {time.time() - start_time}")
@@ -110,7 +110,7 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
         save_job(doc_id = doc_id, 
                  job_data = error_job, 
                  status = "failed", 
-                 job_type = "extraction"
+                 job_type = JobType.EXTRACTION
                  )
 
 @router.post("/extract", response_model=ExtractResponse, status_code=202)
@@ -118,7 +118,7 @@ async def submit_pdf(doc_id: str, download_url: str, background_tasks: Backgroun
     save_job(doc_id = doc_id, 
              job_data = {}, 
              status = "processing", 
-             job_type = "extraction"
+             job_type = JobType.EXTRACTION
              )
 
     background_tasks.add_task(process_pdf, doc_id, download_url)
@@ -126,7 +126,7 @@ async def submit_pdf(doc_id: str, download_url: str, background_tasks: Backgroun
 
 @router.get("/{doc_id}", response_model=ExtractResponse)
 async def get_status(doc_id: str):
-    job = load_job(doc_id=doc_id, job_type="extraction")
+    job = load_job(doc_id=doc_id, job_type=JobType.EXTRACTION)
     if not job:
         raise HTTPException(status_code=404, detail="Document ID not found")
 

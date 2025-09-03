@@ -7,7 +7,7 @@ import httpx
 from urllib.parse import urlencode
 from utils.session import get_session_id
 from shared_utils.s3_utils import generate_presigned_url
-from shared_utils.job_status import load_job, handle_job_status, raise_processing_error
+from shared_utils.job_status import load_job, handle_job_status, raise_processing_error, JobType
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +98,7 @@ async def proxy_post(url: str, body: dict):
 
 
 async def load_or_create_job(doc_id: str) -> dict | Response:
-    job_type = "extraction"
+    job_type = JobType.EXTRACTION
     job = load_job(doc_id=doc_id, job_type=job_type)
     if not job:
         presign_url = generate_presigned_url(f"{doc_id}/original.pdf")
@@ -113,7 +113,7 @@ async def load_or_create_job(doc_id: str) -> dict | Response:
 
 
 async def load_or_create_metadata_job(doc_id: str, session_id: str = Depends(get_session_id)) -> dict | Response:
-    job_type = "metadata"
+    job_type = JobType.METADATA
     job = load_job(doc_id=doc_id, job_type=job_type)
     if not job:
         response = await proxy_post(f"{METADATA_URL}/metadata/{doc_id}", body={})
@@ -129,7 +129,7 @@ async def load_or_create_semantic_embedder_job(
     doc_id: str, session_id: str = Depends(get_session_id)
 ) -> dict | Response:
     """Load existing semantic embedding job or create a new one if it doesn't exist"""
-    job_type = "semantic_embedding"
+    job_type = JobType.SEMANTICEMBEDDER
     job = load_job(doc_id=doc_id, job_type=job_type)
     if not job:
         # Get text content using existing concat_text function
@@ -166,7 +166,7 @@ async def load_or_create_sentence_embedder_job(
     doc_id: str, session_id: str = Depends(get_session_id)
 ) -> dict | Response:
     """Load existing sentence embedding job or create a new one if it doesn't exist"""
-    job_type = "sentence_embedding"
+    job_type = JobType.SENTENCEEMBEDDER
     job = load_job(doc_id=doc_id, job_type=job_type)
     if not job:
         # Get text content using existing concat_text function

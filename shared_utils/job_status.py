@@ -1,5 +1,6 @@
 import logging
 import json
+from enum import StrEnum
 from io import BytesIO
 from typing import Optional
 
@@ -14,8 +15,17 @@ logger = logging.getLogger(__name__)
 
 document_files = RedisDocumentFileList()
 
+class JobType(StrEnum):
+    EXTRACTION = "extraction"
+    SEMANTICEMBEDDER = "semantic_embedder"
+    SENTENCEEMBEDDER = "sentence_embedder"
+    METADATA = "metadata"
+    TRANSLATION = "translation"
+    RENDERER = "renderer"
+    WORDCLOUD = "wordcloud"
 
-def get_job_s3_key(doc_id: str, job_type: str) -> str:
+
+def get_job_s3_key(doc_id: str, job_type: JobType) -> str:
     """
     Generate S3 key for job storage.
     
@@ -30,7 +40,7 @@ def get_job_s3_key(doc_id: str, job_type: str) -> str:
 
 
 def save_job(
-    doc_id: str, job_data: dict, status: str, job_type: str
+    doc_id: str, job_data: dict, status: str, job_type: JobType
 ) -> bool:
     """
     Saves job data with metadata to S3 under a key based on the doc_id.
@@ -58,7 +68,7 @@ def save_job(
     return upload_fileobj(file_obj, job_key, "application/json")
 
 
-def load_job(doc_id: str, job_type: str) -> Optional[dict]:
+def load_job(doc_id: str, job_type: JobType) -> Optional[dict]:
     """
     Loads job metadata and data from S3 given a doc_id.
     
@@ -86,7 +96,7 @@ def load_job(doc_id: str, job_type: str) -> Optional[dict]:
         return None
 
 
-def handle_job_status(job: dict, job_type: str = "document") -> None:
+def handle_job_status(job: dict, job_type: JobType) -> None:
     """
     Handle job status validation and raise appropriate HTTPExceptions.
 

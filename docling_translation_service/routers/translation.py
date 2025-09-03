@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
 from models.translate import TranslateResponse
 from shared_utils.s3_utils import upload_fileobj
-from shared_utils.job_status import save_job, load_job
+from shared_utils.job_status import save_job, load_job, JobType
 
 import os
 import logging
@@ -97,7 +97,7 @@ async def doc_translate(payload: TranslateResponse = Body(...)):
     target_lang = payload.target_lang or "English"
 
     logger.info(f"Received translation request: doc_id={doc_id}")
-    save_job(doc_id=doc_id, job_data={}, status="processing", job_type="translation")
+    save_job(doc_id=doc_id, job_data={}, status="processing", job_type=JobType.TRANSLATION)
 
     try:
         # Translate texts concurrently
@@ -129,7 +129,7 @@ async def doc_translate(payload: TranslateResponse = Body(...)):
         if not upload_fileobj(json_bytes, json_key, "application/json"):
             raise IOError(f"Failed to upload translated JSON to S3 for doc_id={doc_id}")
 
-        save_job(doc_id=doc_id, job_data=data, status="completed", job_type="translation")
+        save_job(doc_id=doc_id, job_data=data, status="completed", job_type=JobType.TRANSLATION)
         logger.info(f"Translation completed: doc_id={doc_id}")
 
         return TranslateResponse(
@@ -143,7 +143,7 @@ async def doc_translate(payload: TranslateResponse = Body(...)):
         save_job(doc_id=doc_id, 
                  job_data={}, 
                  status="failed", 
-                 job_type="translation"
+                 job_type=JobType.TRANSLATION
                  )
         
         return JSONResponse(content={"error": f"LLM API error: {e.response.text}"}, status_code=e.response.status_code)
@@ -153,7 +153,7 @@ async def doc_translate(payload: TranslateResponse = Body(...)):
         save_job(doc_id=doc_id, 
                  job_data={}, 
                  status="failed", 
-                 job_type="translation"
+                 job_type=JobType.TRANSLATION
                  )
         
         return JSONResponse(content={"error": "Failed to parse LLM response."}, status_code=500)
@@ -164,14 +164,14 @@ async def doc_translate(payload: TranslateResponse = Body(...)):
         save_job(doc_id=doc_id, 
                  job_data={}, 
                  status="failed", 
-                 job_type="translation"
+                 job_type=JobType.TRANSLATION
                  )
         
         return JSONResponse(content={"error": "Translation failed."}, status_code=500)
 
 @router.get("/status/{doc_id}")
 async def get_status(doc_id: str):
-    job = load_job(doc_id=doc_id, job_type="translation")
+    job = load_job(doc_id=doc_id, job_type=JobType.TRANSLATION)
     if job is None:
         return JSONResponse(content={"status": "failed"}, status_code=404)
     return JSONResponse(
