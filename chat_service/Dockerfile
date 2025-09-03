@@ -19,4 +19,4 @@ COPY chat_service ./chat_service
 
 EXPOSE 8000
 
-CMD ["uvicorn", "chat_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "PYTHONPATH=/app/chat_service uvicorn chat_service.main:app --host 0.0.0.0 --port 8000"]

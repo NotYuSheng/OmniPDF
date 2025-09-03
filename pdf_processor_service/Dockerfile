@@ -19,4 +19,4 @@ COPY pdf_processor_service ./pdf_processor_service
 
 EXPOSE 8000
 
-CMD ["uvicorn", "pdf_processor_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "PYTHONPATH=/app/pdf_processor_service uvicorn pdf_processor_service.main:app --host 0.0.0.0 --port 8000"]
