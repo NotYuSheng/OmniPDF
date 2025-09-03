@@ -10,8 +10,8 @@ class ChatRequest(BaseModel):
     Request model for chat API endpoints.
     """
     message: str
-    doc_id: Optional[str] = None
-    collection_name: str = Field(default=SEMANTIC_EMBEDDING_COLLECTION, description="ChromaDB collection name")
+    doc_id_list: list[str] = None
+    collection_name: Optional[str] = Field(default=SEMANTIC_EMBEDDING_COLLECTION, description="ChromaDB collection name")
 
 
 class ChatResponse(BaseModel):

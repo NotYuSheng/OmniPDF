@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi.responses import Response
 import os
 import logging
 import json
@@ -30,7 +29,7 @@ async def proxy_chat_request(chat_request: ChatRequest, session_id: str) -> dict
     except json.JSONDecodeError as e:
         logger.error(f"Failed to parse JSON response from chat service: {e}")
         raise HTTPException(status_code=500, detail="Invalid response from chat service") from e
-    except Exception as e:
+    except Exception:
         # proxy_post already handles HTTPException raising, so we just re-raise
         raise
 
@@ -46,12 +45,12 @@ async def handle_chat(
     Handle chat requests with session validation and document access control.
     If doc_id is provided, validates that the user has access to that document.
     """
-    validate_session_doc_pair(chat_request.doc_id, session_id, session_storage, _valid_session)
+    for doc_id in chat_request.doc_id_list:
+        validate_session_doc_pair(doc_id, session_id, session_storage, _valid_session)
     try:
         logger.info(f"Processing chat request for session {session_id}")
         logger.info(f"Query: {chat_request.message}")
-        if chat_request.doc_id:
-            logger.info(f"Document ID: {chat_request.doc_id}")
+        logger.info(f"Document IDs: {chat_request.doc_id_list}")
         logger.info(f"Collection: {chat_request.collection_name}")
         
         # Proxy request to chat service
