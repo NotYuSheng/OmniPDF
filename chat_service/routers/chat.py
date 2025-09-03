@@ -91,7 +91,8 @@ async def perform_rag_query(
     query: str, 
     collection_name: str, 
     top_k: int,
-    doc_id: Optional[str] = None,
+    session_id: str,
+    doc_ids: list[str] = [],
     enable_reranking: bool = True,
     openai_client: AsyncOpenAI = None
 ) -> tuple[str, List[Dict[str, Any]], str, str]:
@@ -110,11 +111,21 @@ async def perform_rag_query(
             "include": ["distances", "documents", "metadatas", "embeddings"]
         }
 
-        if doc_id:
-            query_params["where"] = {"doc_id": doc_id}
-            logger.info(f"Filtering results to document ID: {doc_id}")
+        if len(doc_ids) == 1:
+            query_params["where"] = {"$and": [
+                {"session_id": session_id},
+                {"doc_id": doc_ids[0]} 
+            ]}
+            logger.info(f"Filtering results to document ID: {doc_ids[0]}")
+        elif len(doc_ids) > 1:
+            query_params["where"] = {"$and": [
+                {"session_id": session_id},
+                {"$or": [{"doc_id": doc_id} for doc_id in doc_ids]}
+            ]}
+            logger.info(f"Filtering results to document ID list: {doc_ids}")
         else:
-            logger.info("Searching across all documents in collection")
+            query_params["where"] = {"session_id": session_id}
+            logger.info(f"Searching across all documents for session {session_id}")
 
         results = await collection.query(**query_params)
         
@@ -258,10 +269,11 @@ async def handle_chat(
         else:
             # Perform RAG query with enhanced classification if user query is valid
             user_prompt, relevant_chunks, system_prompt, detected_query_type = await perform_rag_query(
+                session_id=chat_request.session_id,
                 openai_client=client,
                 query=chat_request.message,
                 collection_name=chat_request.collection_name,
-                doc_id=chat_request.doc_id,
+                doc_ids=chat_request.doc_ids,
                 top_k=TOP_K,
                 enable_reranking=rag_config.enable_reranking,
             )
