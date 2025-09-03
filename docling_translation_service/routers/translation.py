@@ -2,6 +2,7 @@ from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
 from models.translate import TranslateResponse
 from shared_utils.s3_utils import save_job, load_job, upload_fileobj
+from shared_utils.redis import RedisDocumentFileList
 
 import os
 import logging
@@ -15,6 +16,7 @@ import json
 
 router = APIRouter(prefix="/translation", tags=["translation"])
 logger = logging.getLogger(__name__)
+document_files = RedisDocumentFileList()
 
 LLM_URL = os.getenv("LLM_URL")
 TOKEN = os.getenv("LLM_API_TOKEN")
@@ -127,6 +129,7 @@ async def doc_translate(payload: TranslateResponse = Body(...)):
         json_key = f"{doc_id}/translated.json"
         if not upload_fileobj(json_bytes, json_key, "application/json"):
             raise IOError(f"Failed to upload translated JSON to S3 for doc_id={doc_id}")
+        document_files.add(doc_id, json_key)
 
         save_job(doc_id=doc_id, job_data=data, status="completed", job_type="translation")
         logger.info(f"Translation completed: doc_id={doc_id}")
