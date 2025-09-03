@@ -4,7 +4,7 @@ import logging
 from fastapi import APIRouter, Depends, Response
 from models.metadata import MetadataResponse
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_metadata_job, proxy_post
+from utils.proxy import load_or_create_metadata_job, load_or_create_sentence_embedder_job, proxy_post
 
 router = APIRouter(prefix="/metadata", tags=["metadata"])
 logger = logging.getLogger(__name__)
@@ -18,8 +18,10 @@ if not METADATA_URL:
 async def submit_pdf_for_metadata(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
+    _pre_req: dict = Depends(load_or_create_sentence_embedder_job)
 ):
-    """Submit a PDF for metadata processing."""
+    """Submit a PDF for metadata processing."""    
+    # Then proceed with metadata processing
     return await proxy_post(f"{METADATA_URL}/metadata/{doc_id}", body={})
 
 
@@ -27,7 +29,7 @@ async def submit_pdf_for_metadata(
 async def get_pdf_metadata(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job_or_response=Depends(load_or_create_metadata_job),
+    job_or_response=Depends(load_or_create_sentence_embedder_job),
 ):
     """Get metadata for a processed PDF."""
     if isinstance(job_or_response, Response):
