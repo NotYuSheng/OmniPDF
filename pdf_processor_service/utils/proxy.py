@@ -118,6 +118,7 @@ async def load_or_create_metadata_job(doc_id: str, session_id: str = Depends(get
     job_type = JobType.METADATA
     job = load_job(doc_id=doc_id, job_type=job_type)
     if not job:
+        _pre_req_job = await load_or_create_sentence_embedder_job(doc_id, session_id)
         response = await proxy_post(f"{METADATA_URL}/metadata/{doc_id}", body={})
         if response.status_code == 202:
             raise_processing_error(job_type)
