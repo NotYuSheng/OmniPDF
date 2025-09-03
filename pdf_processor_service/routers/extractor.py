@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 from fastapi import APIRouter, Depends, Response
 from models.extractor import ExtractorResponse
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_job, proxy_post
+from utils.proxy import load_or_create_extraction_job, proxy_post
 from shared_utils.s3_utils import generate_presigned_url
 
 router = APIRouter(prefix="/extractor", tags=["extractor"])
@@ -31,7 +31,7 @@ async def submit_pdf_for_extraction(
 async def get_pdf_extraction(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job=Depends(load_or_create_job),
+    job=Depends(load_or_create_extraction_job),
 ):
     """Get extraction results for a processed PDF."""
     # Extract result from job data

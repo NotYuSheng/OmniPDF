@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.responses import JSONResponse
 
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_job
+from utils.proxy import load_or_create_extraction_job
 
 router = APIRouter(prefix="/text-chunks", tags=["text-chunks"])
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 async def get_pdf_text_chunks(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job = Depends(load_or_create_job)
+    job = Depends(load_or_create_extraction_job)
 ):
     if isinstance(job, Response):
         return job

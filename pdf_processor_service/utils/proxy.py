@@ -97,7 +97,7 @@ async def proxy_post(url: str, body: dict):
         )
 
 
-async def load_or_create_job(doc_id: str) -> dict | Response:
+async def load_or_create_extraction_job(doc_id: str) -> dict | Response:
     job_type = JobType.EXTRACTION
     job = load_job(doc_id=doc_id, job_type=job_type)
     if not job:
@@ -208,7 +208,7 @@ async def load_or_create_sentence_embedder_job(
 
 
 async def concat_text(doc_id: str) -> str:
-    job = await load_or_create_job(doc_id)
+    job = await load_or_create_extraction_job(doc_id)
 
     texts = job.get("data", {}).get("result", {}).get("texts", [])
     text_list = [entry.get("text", "") or entry.get("orig", "") for entry in texts]

@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 
 from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_job, generate_external_image_url
+from utils.proxy import load_or_create_extraction_job, generate_external_image_url
 from shared_utils.s3_utils import get_object_stream, list_folder
 from shared_utils.redis import RedisDocumentFileList
 
@@ -20,7 +20,7 @@ document_files = RedisDocumentFileList()
 async def get_pdf_images(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job=Depends(load_or_create_job),
+    job=Depends(load_or_create_extraction_job),
 ):
     url_list = []
 

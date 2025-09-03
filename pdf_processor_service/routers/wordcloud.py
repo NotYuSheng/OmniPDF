@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 
 from models.metadata import WordcloudResponse
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_job, handle_status_error
+from utils.proxy import load_or_create_extraction_job, handle_status_error
 from shared_utils.s3_utils import get_object_stream
 from shared_utils.redis import RedisDocumentFileList
 import httpx
@@ -27,7 +27,7 @@ if not METADATA_URL:
 async def get_pdf_wordcloud(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job: dict = Depends(load_or_create_job)
+    job: dict = Depends(load_or_create_extraction_job)
 ):
     """Get wordcloud data for a processed PDF."""
     # Make request to metadata service wordcloud endpoint
