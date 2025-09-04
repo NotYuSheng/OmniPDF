@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chunks
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 from shared_utils.s3_utils import save_job, load_job
 import logging
 import os

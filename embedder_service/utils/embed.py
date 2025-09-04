@@ -6,7 +6,7 @@ import logging
 from models.embed import ProcessingConfig
 from models.helper import get_embedding_model
 from shared_utils.chroma_client import get_chroma_client
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 
 logger = logging.getLogger(__name__)
 document_list = RedisDocumentFileList()

@@ -4,7 +4,7 @@ import os
 # For data chunking and embedding
 import logging
 
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 
 logger = logging.getLogger(__name__)
 

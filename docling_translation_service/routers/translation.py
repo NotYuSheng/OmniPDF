@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
 from models.translate import TranslateResponse
 from shared_utils.s3_utils import save_job, load_job, upload_fileobj
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 
 import os
 import logging

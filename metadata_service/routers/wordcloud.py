@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException
 from wordcloud import WordCloud
 
 from shared_utils.s3_utils import load_job, upload_fileobj
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 from models.wordcloud import WordcloudResponse
 
 router = APIRouter(prefix="/wordcloud", tags=["wordcloud"])
