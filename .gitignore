@@ -42,7 +42,8 @@ llm_models/
 .llm_models
 
 # Integration testing
-trivy_scan_results/
+trivy_scan_results/*
+!trivy_scan_results/.gitkeep
 *.scan
 *.sarif
 
