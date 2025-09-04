@@ -40,6 +40,9 @@ run_service_tests() {
     echo -e "\n${BLUE}📦 Testing $service${NC}"
     echo "----------------------------------------"
     
+    # Clean up any existing containers first
+    docker compose down > /dev/null 2>&1
+    
     # Run the test via the unit test script with timeout
     if timeout 300 ./scripts/test-single-service.sh "$service" > "/tmp/${service}_test.log" 2>&1; then
         echo -e "${GREEN}✅ $service tests PASSED${NC}"
@@ -86,6 +89,9 @@ done
 
 echo ""
 echo -e "${BLUE}Final Results: $passed_services/$total_services services passed${NC}"
+
+# Final cleanup
+docker compose down > /dev/null 2>&1
 
 if [ $passed_services -eq $total_services ]; then
     echo -e "${GREEN}🎉 All unit tests passed!${NC}"
