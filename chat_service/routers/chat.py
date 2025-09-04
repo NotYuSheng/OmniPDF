@@ -6,7 +6,13 @@ from shared_utils.chroma_client import get_chroma_client
 import logging
 import os
 from models.chat import ChatRequest, ChatResponse
-from models.rag_config import RAGConfig, PromptTemplates, RAGOptimizer, QueryType, EnhancedQueryValidator
+from models.rag_config import (
+    RAGConfig,
+    PromptTemplates,
+    RAGOptimizer,
+    QueryType,
+    EnhancedQueryValidator,
+)
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -25,31 +31,38 @@ TOP_K = int(os.getenv("MODEL_TOP_K"))
 def prepare_retrieval_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Convert ChromaDB results to structured chunks for RAG using OPENAI_MODEL"""
     chunks = []
-    
-    if not results or not results.get('documents'):
+
+    if not results or not results.get("documents"):
         return chunks
-    
+
     # Get the first (and typically only) query results
-    documents = results.get('documents', [[]])[0]
-    metadatas = results.get('metadatas', [[]])[0]
-    distances = results.get('distances', [[]])[0]
-    ids = results.get('ids', [[]])[0]
-    
+    documents = results.get("documents", [[]])[0]
+    metadatas = results.get("metadatas", [[]])[0]
+    distances = results.get("distances", [[]])[0]
+    ids = results.get("ids", [[]])[0]
+
     for doc, metadata, distance, chunk_id in zip(documents, metadatas, distances, ids):
-        chunk={
-            'content': doc,
-            'chunk_id': chunk_id,
-            'similarity_score': 1 / (1 + distance), # Convert L2 distance (default distance metric adopted by ChromaDB) to similarity score
-            'metadata': metadata or {},
-            'doc_id': metadata.get('doc_id') if metadata else None,
+        chunk = {
+            "content": doc,
+            "chunk_id": chunk_id,
+            "similarity_score": 1
+            / (
+                1 + distance
+            ),  # Convert L2 distance (default distance metric adopted by ChromaDB) to similarity score
+            "metadata": metadata or {},
+            "doc_id": metadata.get("doc_id") if metadata else None,
         }
 
         chunks.append(chunk)
-    
+
     # Filter chunks by minimum similarity if configured
     if rag_config.min_similarity_score > 0:
-        chunks = [chunk for chunk in chunks if chunk['similarity_score'] >= rag_config.min_similarity_score]
-    
+        chunks = [
+            chunk
+            for chunk in chunks
+            if chunk["similarity_score"] >= rag_config.min_similarity_score
+        ]
+
     return chunks
 
 
@@ -60,17 +73,17 @@ async def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     # Group chunks by doc_id
     doc_chunks = {}
     for chunk in chunks:
-        doc_id = chunk.get('doc_id')
+        doc_id = chunk.get("doc_id")
         if doc_id not in doc_chunks:
             doc_chunks[doc_id] = []
         doc_chunks[doc_id].append(chunk)
-    
+
     # Sort chunks within each doc_id by similarity score
     for doc_id in doc_chunks:
-        doc_chunks[doc_id].sort(key=lambda x: x['similarity_score'], reverse=True)
-    
+        doc_chunks[doc_id].sort(key=lambda x: x["similarity_score"], reverse=True)
+
     reranked_chunks = []
-    
+
     # Determine the number of rounds based on the document with the most chunks
     if doc_chunks:
         max_depth = max(len(chunks) for chunks in doc_chunks.values())
@@ -82,18 +95,18 @@ async def rerank_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         for doc_id in doc_chunks:
             if i < len(doc_chunks[doc_id]):
                 reranked_chunks.append(doc_chunks[doc_id][i])
-    
+
     logger.info(f"Reranked {len(chunks)} chunks from {len(doc_chunks)} documents")
     return reranked_chunks
 
 
 async def perform_rag_query(
-    query: str, 
-    collection_name: str, 
+    query: str,
+    collection_name: str,
     top_k: int,
     doc_id: Optional[str] = None,
     enable_reranking: bool = True,
-    openai_client: AsyncOpenAI = None
+    openai_client: AsyncOpenAI = None,
 ) -> tuple[str, List[Dict[str, Any]], str, str]:
     """
     Perform complete RAG query: retrieve relevant chunks and generate response
@@ -103,11 +116,11 @@ async def perform_rag_query(
         chroma_client = await get_chroma_client()
         # Step 1: Retrieve relevant chunks from ChromaDB
         collection = await chroma_client.get_collection(collection_name)
-        
+
         query_params = {
             "query_texts": [query],
             "n_results": top_k,
-            "include": ["distances", "documents", "metadatas", "embeddings"]
+            "include": ["distances", "documents", "metadatas", "embeddings"],
         }
 
         if doc_id:
@@ -117,48 +130,59 @@ async def perform_rag_query(
             logger.info("Searching across all documents in collection")
 
         results = await collection.query(**query_params)
-        
+
         # Step 2: Process retrieval results
         chunks = prepare_retrieval_results(results)
-        
+
         if not chunks:
             logger.warning(f"No relevant chunks found for query: {query}")
-            return ("I couldn't find any relevant information in the document collection to answer your question.", 
-                   [], "", QueryType.GENERAL.value)
-        
+            return (
+                "I couldn't find any relevant information in the document collection to answer your question.",
+                [],
+                "",
+                QueryType.GENERAL.value,
+            )
+
         # Step 3: Rerank chunks for more diverse results across multiple documents
         if enable_reranking and len(chunks) > 1:
             chunks = await rerank_chunks(chunks)
-        
+
         # Step 4: Optimize chunks for LLM
         optimized_chunks, context = rag_optimizer.chunk_optimization(
-            chunks, 
-            max_context_length=rag_config.max_context_length
+            chunks, max_context_length=rag_config.max_context_length
         )
 
-        num_of_docs = len(set(chunk.get('doc_id') for chunk in optimized_chunks if chunk.get('doc_id')))
+        num_of_docs = len(
+            set(
+                chunk.get("doc_id") for chunk in optimized_chunks if chunk.get("doc_id")
+            )
+        )
         logger.info(f"Relevant chunks from {num_of_docs} documents")
-        logger.info(f"Using {len(optimized_chunks)} chunks for context (total length: {len(context)} chars)")
+        logger.info(
+            f"Using {len(optimized_chunks)} chunks for context (total length: {len(context)} chars)"
+        )
 
         # Step 5: Enhanced query type detection
         detected_query_type = await rag_optimizer.detect_query_type(
             question=query,
             model_name=OPENAI_MODEL_NAME,
             config=rag_config,
-            openai_client=openai_client
+            openai_client=openai_client,
         )
         logger.info(f"Auto-detected query type: {detected_query_type}")
-        
+
         # Step 6: Prepare system and user prompts
         system_prompt = prompt_templates.get_system_prompt(detected_query_type)
-        user_prompt = prompt_templates.format_user_prompt(query, context, detected_query_type)
-        
+        user_prompt = prompt_templates.format_user_prompt(
+            query, context, detected_query_type
+        )
+
         logger.info(f"Final query type: {detected_query_type}")
         logger.debug(f"System prompt length: {len(system_prompt)} chars")
         logger.debug(f"User prompt length: {len(user_prompt)} chars")
 
         return user_prompt, optimized_chunks, system_prompt, detected_query_type
-        
+
     except Exception as e:
         logger.error(f"RAG query failed: {e}")
         raise HTTPException(status_code=500, detail="RAG query failed")
@@ -174,43 +198,42 @@ async def validate_query_with_llm(
     Use LLM to validate if query is meaningful and can be answered with documents.
     """
     collection_info = ""
-    
+
     if collection_name:
         # List out all documents in ChromaDB collection
-        # collection_info = f"Available documents in {collection_name}:\n{filename}: {exec_summary}" 
-        collection_info=f"{collection_name} collection in ChromaDB."
+        # collection_info = f"Available documents in {collection_name}:\n{filename}: {exec_summary}"
+        collection_info = f"{collection_name} collection in ChromaDB."
         logger.info(collection_info)
-        
-    validation_prompt = query_validator.get_enhanced_validation_prompt(query, collection_info)
+
+    validation_prompt = query_validator.get_enhanced_validation_prompt(
+        query, collection_info
+    )
 
     try:
         # Prepare messages for LLM
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert query analysis system. Follow the instructions precisely and provide structured responses."
+                "content": "You are an expert query analysis system. Follow the instructions precisely and provide structured responses.",
             },
-            {
-                "role": "user",
-                "content": validation_prompt
-            }
+            {"role": "user", "content": validation_prompt},
         ]
 
         response = await openai_client.chat.completions.create(
-            model=model_name,
-            messages=messages,
-            **rag_config.validation_params
+            model=model_name, messages=messages, **rag_config.validation_params
         )
-        
+
         result = response.choices[0].message.content.strip()
         logger.info(f"Result: {result}")
-        decision_line = next((line for line in result.split('\n') if line.startswith("DECISION:")), "")
-        
+        decision_line = next(
+            (line for line in result.split("\n") if line.startswith("DECISION:")), ""
+        )
+
         if "PROCEED_WITH_RAG" in decision_line:
             return True, None
 
         return False, result
-            
+
     except APIError as e:
         logger.warning(f"LLM validation failed: {e}")
         raise HTTPException(status_code=500, detail="LLM validation failed")
@@ -224,18 +247,20 @@ async def handle_chat(
     """
     Handle incoming chat requests and return AI responses with enhanced query classification.
     """
-    try:        
-        logger.info(f"Processing chat request for collection: {chat_request.collection_name}")
+    try:
+        logger.info(
+            f"Processing chat request for collection: {chat_request.collection_name}"
+        )
         logger.info(f"User query: {chat_request.message}")
 
         # Simple logic to call RAG if needed
         should_rag, validation_error = await validate_query_with_llm(
             chat_request.message,
-            chat_request.collection_name, 
-            client, 
-            OPENAI_MODEL_NAME
+            chat_request.collection_name,
+            client,
+            OPENAI_MODEL_NAME,
         )
-        
+
         # Do not perform RAG if user query is invalid
         if not should_rag:
             logger.info("LLM query validation failed")
@@ -247,17 +272,22 @@ async def handle_chat(
                 "total_context_length": 0,
                 "model_used": OPENAI_MODEL_NAME,
                 "collection_name": chat_request.collection_name,
-                "rag_performed": False
+                "rag_performed": False,
             }
 
             return ChatResponse(
                 response=f"""I'm sorry, but I couldn't process your query based on the documents in {chat_request.collection_name} that you want to query data from. {validation_error} Please provide a clear, specific question that I can help answer using the available documents in {chat_request.collection_name}.""",
                 relevant_chunks=[],
-                metadata=metadata_without_rag
+                metadata=metadata_without_rag,
             )
         else:
             # Perform RAG query with enhanced classification if user query is valid
-            user_prompt, relevant_chunks, system_prompt, detected_query_type = await perform_rag_query(
+            (
+                user_prompt,
+                relevant_chunks,
+                system_prompt,
+                detected_query_type,
+            ) = await perform_rag_query(
                 openai_client=client,
                 query=chat_request.message,
                 collection_name=chat_request.collection_name,
@@ -274,45 +304,45 @@ async def handle_chat(
                 "total_context_length": len(user_prompt) if user_prompt else 0,
                 "model_used": OPENAI_MODEL_NAME,
                 "collection_name": chat_request.collection_name,
-                "rag_performed": True
+                "rag_performed": True,
             }
 
             if relevant_chunks:
                 # Analyze document diversity in results if relevant chunks are found
-                doc_ids = set(chunk.get('doc_id') for chunk in relevant_chunks if chunk.get('doc_id'))
+                doc_ids = set(
+                    chunk.get("doc_id")
+                    for chunk in relevant_chunks
+                    if chunk.get("doc_id")
+                )
                 metadata_with_rag["documents_searched_count"] = len(doc_ids)
                 metadata_with_rag["document_ids"] = list(doc_ids)
-            
+
             else:
                 logger.error("No relevant chunks found!")
                 return ChatResponse(
-                    response=user_prompt,
-                    relevant_chunks=[],
-                    metadata=metadata_with_rag
+                    response=user_prompt, relevant_chunks=[], metadata=metadata_with_rag
                 )
-            
+
             # Prepare messages for LLM
             messages = [
-                {
-                    "role": "system",
-                    "content": system_prompt
-                },
-                {
-                    "role": "user", 
-                    "content": user_prompt
-                }
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
             ]
 
-            logger.info(f"Sending request to {OPENAI_MODEL_NAME} with {len(messages)} messages")
+            logger.info(
+                f"Sending request to {OPENAI_MODEL_NAME} with {len(messages)} messages"
+            )
             response = await client.chat.completions.create(
                 model=OPENAI_MODEL_NAME,
                 messages=messages,
                 **rag_config.generation_params,
             )
-        
+
     except APIError as e:
         logger.error(f"Unexpected error during chat completion: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Unexpected error during chat completion")
+        raise HTTPException(
+            status_code=500, detail="Unexpected error during chat completion"
+        )
 
     if not response.choices:
         logger.error("No choices found in OpenAI response: %s", response)
@@ -328,19 +358,21 @@ async def handle_chat(
             status_code=500,
             detail="Malformed choice in OpenAI response",
         )
-    
+
     # Post-process the response
     if rag_config.enable_response_post_processing:
-        processed_response = rag_optimizer.post_process_llm_response(first_choice.message.content)
+        processed_response = rag_optimizer.post_process_llm_response(
+            first_choice.message.content
+        )
     else:
         processed_response = first_choice.message.content
-    
+
     logger.info(f"Generated response with {len(processed_response)} characters")
     logger.info(f"Final metadata: {metadata_with_rag}")
-    
+
     # Return structured ChatResponse if relevant chunks are found
     return ChatResponse(
         response=processed_response,
         relevant_chunks=relevant_chunks,
-        metadata=metadata_with_rag
+        metadata=metadata_with_rag,
     )

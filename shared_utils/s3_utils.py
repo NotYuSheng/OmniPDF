@@ -9,7 +9,7 @@ import itertools
 import json
 from io import BytesIO
 
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 
 logger = logging.getLogger(__name__)
 

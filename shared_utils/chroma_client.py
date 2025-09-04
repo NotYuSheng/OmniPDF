@@ -4,7 +4,7 @@ import os
 # For data chunking and embedding
 import logging
 
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,9 @@ async def get_chroma_client():
     return chroma_client
 
 
-async def query_chroma(doc_id: str, collection_name: str, query: str, max_results: int = 5):
+async def query_chroma(
+    doc_id: str, collection_name: str, query: str, max_results: int = 5
+):
     chroma_client = await get_chroma_client()
     # Step 1: Retrieve relevant chunks from ChromaDB
     collection = await chroma_client.get_collection(collection_name)

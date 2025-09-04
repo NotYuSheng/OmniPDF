@@ -13,6 +13,7 @@ from shared_utils.s3_utils import (
 router = APIRouter(prefix="/bypass", tags=["bypass"])
 logger = logging.getLogger(__name__)
 
+
 def s3_upload(file_bytes: bytes, key: str) -> str:
     """
     Sync helper: upload bytes to S3 and return a presigned URL.
@@ -23,6 +24,7 @@ def s3_upload(file_bytes: bytes, key: str) -> str:
     if not success:
         raise RuntimeError(f"S3 upload returned False for key {key}")
     return generate_presigned_url(key)
+
 
 @router.post("/{doc_id}")
 async def dump_files(
@@ -38,11 +40,7 @@ async def dump_files(
 
     try:
         # offload both upload + URL generation to threadpool
-        presigned_url = await run_in_threadpool(
-            s3_upload,
-            file_bytes,
-            key
-        )
+        presigned_url = await run_in_threadpool(s3_upload, file_bytes, key)
 
         logger.info(f"✅ Uploaded {key} to S3")
 
@@ -54,4 +52,6 @@ async def dump_files(
 
     except Exception as e:
         logger.warning(f"Upload failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Upload failed due to an internal error.")
+        raise HTTPException(
+            status_code=500, detail="Upload failed due to an internal error."
+        )

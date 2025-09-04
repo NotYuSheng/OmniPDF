@@ -3,12 +3,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class ModelConfig:
     """Configuration class for the model"""
-    
+
     def __init__(self):
         self.model_name = os.environ["OPENAI_MODEL"]
-        
+
         # Response generation parameters optimized for the model
         self.generation_params = {
             "temperature": float(os.getenv("MODEL_TEMPERATURE", "0.1")),
@@ -18,7 +19,10 @@ class ModelConfig:
             "presence_penalty": float(os.getenv("MODEL_PRESENCE_PENALTY", "0.1")),
         }
 
-        self.enable_response_post_processing = os.getenv("ENABLE_RESPONSE_POST_PROCESSING", "true").lower() == "true"
+        self.enable_response_post_processing = (
+            os.getenv("ENABLE_RESPONSE_POST_PROCESSING", "true").lower() == "true"
+        )
+
 
 class PromptTemplates:
     """Specialized prompt templates"""
@@ -26,7 +30,7 @@ class PromptTemplates:
     @staticmethod
     def get_system_prompt(purpose: str) -> str:
         """Generate system prompt for model based on query context and purpose of service"""
-        
+
         system_prompts = {
             "summary": """You are an expert at document summarization and synthesis.
 
@@ -39,8 +43,8 @@ Your summarization strategy:
 - Use bullet points or structured format when appropriate for clarity
 - Ensure summaries are concise yet comprehensive
 """,
-            "default": """If the question cannot be answered, return only the stop token."""
-}
+            "default": """If the question cannot be answered, return only the stop token.""",
+        }
 
         return system_prompts.get(purpose)
 
@@ -87,10 +91,11 @@ Your summarization strategy:
     Return only the short description.
 
 **CONTEXT:** {context}
-"""
-}
+""",
+        }
 
         return user_prompts.get(purpose)
+
 
 class ModelResponseOptimizer:
     """Advanced optimization techniques for the model"""
@@ -98,24 +103,25 @@ class ModelResponseOptimizer:
     @staticmethod
     def post_process_llm_response(response: str) -> str:
         """Post-process LLM response for better formatting"""
-        
+
         # Remove only consecutive duplicate lines to avoid breaking formatted content.
-        lines = response.split('\n')
+        lines = response.split("\n")
         if not lines:
             return ""
 
         filtered_lines = [lines[0]]
         for i in range(1, len(lines)):
             current_line_stripped = lines[i].strip()
-            prev_line_stripped = lines[i-1].strip()
+            prev_line_stripped = lines[i - 1].strip()
             if not current_line_stripped or current_line_stripped != prev_line_stripped:
                 filtered_lines.append(lines[i])
-        
-        cleaned_response = '\n'.join(filtered_lines)
-        
+
+        cleaned_response = "\n".join(filtered_lines)
+
         # Ensure response ends properly
-        if cleaned_response and not cleaned_response.rstrip().endswith(('.', '!', '?', ':')):
-            cleaned_response = cleaned_response.rstrip() + '.'
-        
+        if cleaned_response and not cleaned_response.rstrip().endswith(
+            (".", "!", "?", ":")
+        ):
+            cleaned_response = cleaned_response.rstrip() + "."
+
         return cleaned_response.strip()
-    

@@ -3,10 +3,10 @@ import os
 
 class VLMConfig:
     """Configuration class for the optimization of the model's caption generation"""
-    
+
     def __init__(self):
         self.model_name = os.environ["OPENAI_VLM"]
-        
+
         # LLM's Generation parameters
         self.generation_params = {
             "temperature": float(os.getenv("MODEL_TEMPERATURE", "0.1")),
@@ -15,9 +15,11 @@ class VLMConfig:
             "frequency_penalty": float(os.getenv("MODEL_FREQ_PENALTY", "0.1")),
             "presence_penalty": float(os.getenv("MODEL_PRESENCE_PENALTY", "0.1")),
         }
-        
+
         # Context management
-        self.enable_response_post_processing = os.getenv("ENABLE_RESPONSE_POST_PROCESSING", "true").lower() == "true"
+        self.enable_response_post_processing = (
+            os.getenv("ENABLE_RESPONSE_POST_PROCESSING", "true").lower() == "true"
+        )
 
 
 class PromptTemplates:
@@ -27,7 +29,7 @@ class PromptTemplates:
     def get_system_prompt() -> str:
         """System prompt instructing the VLM to act as an expert image analyst.
         It emphasizes accuracy and objectivity, tailored for document images."""
-        
+
         system_prompt = """
             You are a highly specialized AI assistant for visual analysis and image captioning. Your sole purpose is to analyze an image and generate a concise, factual, and descriptive image caption, in the context of the image to be analyzed.
 
@@ -43,8 +45,9 @@ class PromptTemplates:
 -   **For Photographs or Scans:** Describe the main subject(s), the setting, and any significant actions or objects, in the context of the photograph or scan (e.g., "A festive Christmas archway adorned with lights and ornaments spans over Orchard Road in Singapore, decorated with 'Merry Christmas' signage and surrounded by illuminated trees and holiday decorations at night.").
 -   **For Diagrams & Flowcharts:** Briefly explain the process or system the diagram illustrates (e.g., "A flowchart depicting the user journey through the project management application, from onboarding to task completion.").
         """
-        
+
         return system_prompt
+
 
 class CaptionOptimizer:
     """Applies advanced post-processing to clean and format the generated caption."""
@@ -52,9 +55,9 @@ class CaptionOptimizer:
     @staticmethod
     def post_process_llm_response(response: str) -> str:
         """Cleans and standardizes the raw LLM output to ensure it's a high-quality caption."""
-        
+
         # Remove only consecutive duplicate lines to avoid breaking formatted content.
-        lines = response.split('\n')
+        lines = response.split("\n")
         if not lines:
             return ""
 
@@ -62,11 +65,13 @@ class CaptionOptimizer:
         for prev_line, current_line in zip(lines, lines[1:]):
             if prev_line.strip() != current_line.strip():
                 filtered_lines.append(current_line)
-        
-        cleaned_response = '\n'.join(filtered_lines)
-        
+
+        cleaned_response = "\n".join(filtered_lines)
+
         # Ensure response ends properly
-        if cleaned_response.strip() and not cleaned_response.rstrip().endswith(('.', '!', '?', ':')):
-            cleaned_response = cleaned_response.rstrip() + '.'
-        
+        if cleaned_response.strip() and not cleaned_response.rstrip().endswith(
+            (".", "!", "?", ":")
+        ):
+            cleaned_response = cleaned_response.rstrip() + "."
+
         return cleaned_response.strip()

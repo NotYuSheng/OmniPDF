@@ -12,13 +12,13 @@ logger = logging.getLogger(__name__)
 st.header("☁️ Word Cloud")
 if "processed_data" in st.session_state and st.session_state.processed_data:
     # Generate word cloud from keywords
-    metadata = st.session_state.processed_data.get('metadata', {})
-    all_keywords = metadata.get('keywords', []) + metadata.get('image_keywords', [])
-    
+    metadata = st.session_state.processed_data.get("metadata", {})
+    all_keywords = metadata.get("keywords", []) + metadata.get("image_keywords", [])
+
     if all_keywords:
         fig = generate_wordcloud(all_keywords)
         buf = io.BytesIO()
-        fig.savefig(buf, format="png", bbox_inches='tight')
+        fig.savefig(buf, format="png", bbox_inches="tight")
         buf.seek(0)
         encoded = base64.b64encode(buf.read()).decode("utf-8")
         # Custom HTML for zoomable image
