@@ -42,7 +42,7 @@ assignees: ''
 
 ### Workarounds
 - [ ] Configuration changes
-- [ ] Network controls  
+- [ ] Network controls
 - [ ] Access controls
 - [ ] Monitoring enhancements
 - [ ] Component replacement
@@ -55,20 +55,20 @@ assignees: ''
 
 ## Recommended Action
 - [ ] **Fix Immediately** - Patch/update component
-- [ ] **Schedule Fix** - Plan update in next sprint  
+- [ ] **Schedule Fix** - Plan update in next sprint
 - [ ] **Accept Risk** - Document and monitor
 - [ ] **Not Applicable** - Component not actually used
 
 ## Acceptance Criteria (if fixing)
 - [ ] Vulnerability patched/mitigated
 - [ ] No functionality regression
-- [ ] Security testing completed  
+- [ ] Security testing completed
 - [ ] Documentation updated
 
 ## Decision
-**Action Taken**: [Fix/Schedule/Accept/N/A]  
-**Owner**: [Team/Person responsible]  
-**Target Date**: YYYY-MM-DD  
+**Action Taken**: [Fix/Schedule/Accept/N/A]
+**Owner**: [Team/Person responsible]
+**Target Date**: YYYY-MM-DD
 **Next Review**: YYYY-MM-DD
 
 ## Notes
