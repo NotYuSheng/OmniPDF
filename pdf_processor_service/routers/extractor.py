@@ -2,7 +2,7 @@ import os
 import logging
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 from models.extractor import ExtractorResponse
 from utils.session import validate_session_doc_pair
 from utils.proxy import load_or_create_extraction_job, proxy_post

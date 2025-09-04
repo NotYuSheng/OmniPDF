@@ -4,7 +4,6 @@ from enum import StrEnum
 from io import BytesIO
 from typing import Optional
 
-import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import HTTPException
 

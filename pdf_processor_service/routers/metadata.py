@@ -1,10 +1,10 @@
 import os
 import logging
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 from models.metadata import MetadataResponse
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_metadata_job, load_or_create_sentence_embedder_job, proxy_post
+from utils.proxy import load_or_create_sentence_embedder_job, proxy_post
 
 router = APIRouter(prefix="/metadata", tags=["metadata"])
 logger = logging.getLogger(__name__)

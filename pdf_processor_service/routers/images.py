@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Depends, Response, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from botocore.exceptions import ClientError
 

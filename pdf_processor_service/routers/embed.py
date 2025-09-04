@@ -3,7 +3,7 @@ import os
 from typing import Literal
 from json import JSONDecodeError
 
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, Request
 
 from utils.session import validate_session_doc_pair, get_session_id
 from utils.proxy import concat_text, proxy_post, load_or_create_semantic_embedder_job, load_or_create_sentence_embedder_job
