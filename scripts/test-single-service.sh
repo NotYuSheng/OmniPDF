@@ -62,7 +62,7 @@ run_service_tests() {
     echo "----------------------------------------"
     
     # Install pytest and run tests in the service container
-    if docker compose exec -T "$service" sh -c "pip install pytest > /dev/null 2>&1 && python -m pytest ${service}/tests/ -v --tb=short"; then
+    if docker compose exec -T "$service" sh -c "python -m pytest ${service}/tests/ -v --tb=short"; then
         echo -e "${GREEN}✅ $service tests PASSED${NC}"
         test_results[$service]="PASS"
         ((passed_services++))
