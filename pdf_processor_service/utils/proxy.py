@@ -108,7 +108,7 @@ async def load_or_create_extraction_job(doc_id: str) -> dict | Response:
             raise_processing_error(job_type)
         else:
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
-            raise HTTPException(status_code=500, details=f"{job_type} has returned an unexpected response.")
+            raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
 
     handle_job_status(job, job_type)
     return job
@@ -124,7 +124,7 @@ async def load_or_create_metadata_job(doc_id: str, session_id: str = Depends(get
             raise_processing_error(job_type)
         else:
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
-            raise HTTPException(status_code=500, details=f"{job_type} has returned an unexpected response.")
+            raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
 
     handle_job_status(job, job_type)
     return job
@@ -163,7 +163,7 @@ async def load_or_create_semantic_embedder_job(
             raise_processing_error(job_type)
         else:
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
-            raise HTTPException(status_code=500, details=f"{job_type} has returned an unexpected response.")
+            raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
 
     handle_job_status(job, job_type)
     return job
@@ -202,7 +202,7 @@ async def load_or_create_sentence_embedder_job(
             raise_processing_error(job_type)
         else:
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
-            raise HTTPException(status_code=500, details=f"{job_type} has returned an unexpected response.")
+            raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
 
     handle_job_status(job, job_type)
     return job
