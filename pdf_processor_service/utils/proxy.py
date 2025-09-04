@@ -199,7 +199,7 @@ async def load_or_create_sentence_embedder_job(
 
         response = await proxy_post(f"{EMBED_URL}/sentence/", body=embedder_request)
         if response.status_code == 202:
-            raise_processing_error("sentence embedder service")
+            raise_processing_error(job_type)
         else:
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
             raise HTTPException(status_code=500, details=f"{job_type} has returned an unexpected response.")
