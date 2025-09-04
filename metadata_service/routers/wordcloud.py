@@ -51,4 +51,5 @@ async def get_wordcloud(
         if not upload_fileobj(img_file, img_filepath):
             raise HTTPException(status_code=500, detail="failed to upload file")
     document_files.add(doc_id, img_filepath)
+    
     return WordcloudResponse(doc_id=doc_id, top_words=top_words)
