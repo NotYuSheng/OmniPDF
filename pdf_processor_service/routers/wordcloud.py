@@ -1,91 +1,55 @@
-import os
 import logging
+import os
+from io import BytesIO
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import StreamingResponse
-from botocore.exceptions import ClientError
+from fastapi import APIRouter, HTTPException
+from wordcloud import WordCloud
 
-from models.metadata import WordcloudResponse
-from utils.session import validate_session_doc_pair
-from utils.proxy import handle_status_error, handle_job_status
-from shared_utils.s3_utils import get_object_stream, load_job
+from shared_utils.s3_utils import load_job, upload_fileobj
 from shared_utils.redis import RedisDocumentFileList
-import httpx
+from models.wordcloud import WordcloudResponse
 
 router = APIRouter(prefix="/wordcloud", tags=["wordcloud"])
+
 logger = logging.getLogger(__name__)
-
-# Redis cache for wordcloud files
 document_files = RedisDocumentFileList()
+MAX_WORDS = int(os.getenv("WORDCLOUD_MAX_WORDS", "50"))
 
-METADATA_URL = os.getenv("METADATA_URL")
-if not METADATA_URL:
-    raise ValueError("METADATA_URL is not set")
+
+async def concat_text(doc_id: str) -> str:
+    job = load_job(doc_id=doc_id, job_type="extraction")
+    if not job:
+        raise HTTPException(
+            status_code=404, detail="Document not found or not processed yet"
+        )
+    if job.get("status") == "processing":
+        raise HTTPException(
+            status_code=202,
+            detail="The document is still being processed. Please try again later.",
+        )
+    texts = job.get("data", {}).get("result", {}).get("texts", [])
+    text_list = [entry.get("text", "") or entry.get("orig", "") for entry in texts]
+    return "\n".join(text_list)
 
 
 @router.get("/{doc_id}", response_model=WordcloudResponse)
-async def get_pdf_wordcloud(
+async def get_wordcloud(
     doc_id: str,
-    _validated: bool = Depends(validate_session_doc_pair),
 ):
-    """Get wordcloud data for a processed PDF."""
-    # Check if document is processed
-    job = load_job(doc_id=doc_id, job_type="extraction")
-    handle_job_status(job, "document")
-    
-    # Make request to metadata service wordcloud endpoint
-    async with httpx.AsyncClient() as client:
-        try:
-            wordcloud_url = f"{METADATA_URL}/wordcloud/{doc_id}"
-            response = await client.get(wordcloud_url)
-            
-            if response.status_code != 200:
-                handle_status_error(response, wordcloud_url)
-                
-        except httpx.RequestError as e:
-            logger.error(f"Request error retrieving wordcloud from {wordcloud_url}: {e}")
-            raise HTTPException(
-                status_code=500, detail=f"Could not connect to metadata service: {e}"
-            ) from e
-        except HTTPException:
-            # Re-raise HTTPExceptions from handle_status_error
-            raise
-        except Exception as e:
-            logger.error(f"Unexpected error in wordcloud request: {e}", exc_info=True)
-            raise HTTPException(status_code=500, detail="Internal server error") from e
-    
-    # Parse and return the response
-    wordcloud_data = response.json()
-    return WordcloudResponse(
-        doc_id=wordcloud_data["doc_id"],
-        top_words=wordcloud_data["top_words"]
-    )
+    doc_text = await concat_text(doc_id)
+    wordcloud = WordCloud(max_words=MAX_WORDS)
+    words = wordcloud.process_text(doc_text)
+    top_words = list(dict(sorted(words.items(), key=lambda item: item[1], reverse=True)[0:MAX_WORDS]).keys())
 
+    wordcloud.generate_from_frequencies(words)
+    img_filepath = f"{doc_id}/wordcloud.png"
 
-@router.get("/{doc_id}/wordcloud.png", response_class=StreamingResponse)
-async def get_pdf_wordcloud_image(
-    doc_id: str,
-    _validated: bool = Depends(validate_session_doc_pair),
-):
-    """Get the wordcloud image for a processed PDF."""
-    file_key = f"{doc_id}/wordcloud.png"
-    
-    # Check if wordcloud image exists in S3
-    try:
-        file_stream = get_object_stream(file_key)
-    except ClientError as e:
-        if e.response["Error"]["Code"] == "NoSuchKey":
-            # If image doesn't exist, trigger wordcloud generation first
-            try:
-                await get_pdf_wordcloud(doc_id, _validated=True)
-                # Try to get the file again after generation
-                file_stream = get_object_stream(file_key)
-            except ClientError:
-                raise HTTPException(status_code=404, detail="Wordcloud image not found")
-        else:
-            raise HTTPException(status_code=500, detail="Failed to retrieve wordcloud image")
-    
-    # Extend expiry time for the wordcloud files
-    _ = document_files[doc_id]
-    
-    return StreamingResponse(file_stream, media_type="image/png")
+    with BytesIO() as img_file:
+        img = wordcloud.to_image()
+        img.save(img_file, format="PNG")
+        img_file.seek(0)
+        if not upload_fileobj(img_file, img_filepath):
+            raise HTTPException(status_code=500, detail="failed to upload file")
+    document_files.add(doc_id, img_filepath)
+
+    return WordcloudResponse(doc_id=doc_id, top_words=top_words)

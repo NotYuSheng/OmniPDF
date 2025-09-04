@@ -15,8 +15,8 @@ from metadata_service.models.llm_config import (
 router = APIRouter(prefix="/metadata", tags=["metadata"])
 
 logger = logging.getLogger(__name__)
-document_list = RedisDocumentFileList()
 
+document_list = RedisDocumentFileList()
 model_config = ModelConfig()
 prompt_templates = PromptTemplates()
 response_optimizer = ModelResponseOptimizer()
