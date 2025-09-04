@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-PROJECT_ROOT="/home/ubuntu/Desktop/OmniPDF"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 cd "$PROJECT_ROOT"
 
 echo -e "${BLUE}🧪 OmniPDF Unit Test Runner${NC}"
@@ -62,7 +62,7 @@ run_service_tests() {
     echo "----------------------------------------"
     
     # Install pytest and run tests in the service container
-    if docker compose exec -T "$service" sh -c "pip install pytest > /dev/null 2>&1 && python -m pytest ${service}/tests/ -v --tb=short"; then
+    if docker compose exec -T "$service" sh -c "python -m pytest ${service}/tests/ -v --tb=short"; then
         echo -e "${GREEN}✅ $service tests PASSED${NC}"
         test_results[$service]="PASS"
         ((passed_services++))
