@@ -9,6 +9,7 @@ from fastapi import Depends, Request, Response, HTTPException
 from shared_utils.redis import RedisDocumentFileList, RedisSetWithFlagExpiry, RedisPrefix, EXPIRY_DAY
 
 SESSION_COOKIE_NAME: str = "OmniPDFSession"
+  
 
 class SessionStorage(RedisSetWithFlagExpiry):
     def __init__(self, redis_client=None, prefix=RedisPrefix.SESSION_DOC_LIST, flag_prefix=RedisPrefix.SESSION_FLAG, default_expiry=EXPIRY_DAY):
@@ -81,12 +82,13 @@ def get_doc_list_append_function(
         session_id = create_new_session(response, session_storage=session_storage)
     document_files = RedisDocumentFileList()
 
+    document_files = RedisDocumentFileList()
+
     def append_doc(doc_id: str, file_key: str, filename: str):
         session_storage.add(session_id, doc_id)
         document_files.init_doc_id(doc_id)
         document_files.add(doc_id, file_key)
         document_files.set_document_name(doc_id, filename)
-
 
     return append_doc
 
