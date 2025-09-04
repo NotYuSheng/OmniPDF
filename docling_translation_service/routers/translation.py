@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from models.translate import TranslateResponse
 from shared_utils.s3_utils import upload_fileobj
 from shared_utils.job_status import save_job, load_job, JobType
+from shared_utils.redis import RedisDocumentFileList
 
 import os
 import logging
