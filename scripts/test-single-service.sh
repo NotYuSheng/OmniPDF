@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-PROJECT_ROOT="/home/ubuntu/Desktop/OmniPDF"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 cd "$PROJECT_ROOT"
 
 echo -e "${BLUE}🧪 OmniPDF Unit Test Runner${NC}"
