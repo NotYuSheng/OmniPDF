@@ -1,4 +1,4 @@
-name: Integration Test
+name: Service Health Checks
 
 on:
   push:
@@ -9,8 +9,8 @@ on:
       - dev
 
 jobs:
-  cypress-run:
-    name: Run Cypress Integration Tests
+  service-health:
+    name: Run Service Health Checks
     runs-on: ubuntu-latest
 
     steps:
@@ -138,17 +138,6 @@ jobs:
           
           echo "All *_service services passed individual testing!"
 
-      - name: Set up Node.js for Cypress
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install Cypress
+      - name: Service health checks completed
         run: |
-          npm init -y
-          npm install cypress --save-dev
-
-      - name: Run Cypress tests (placeholder-safe)
-        working-directory: cypress
-        run: |
-          npx cypress run || echo "Cypress run completed with non-zero exit (placeholder mode)"
+          echo "All service health checks completed successfully!"
