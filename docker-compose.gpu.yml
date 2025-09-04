@@ -61,11 +61,7 @@ services:
     env_file:
       - ./nginx/.env
     depends_on:
-      - pdf_extraction_service
       - pdf_processor_service
-      - chat_service
-      - docling_translation_service
-      - embedder_service
 
   redis:
     container_name: redis

@@ -1,4 +1,5 @@
 import logging
+import os
 from io import BytesIO
 
 from fastapi import APIRouter, HTTPException
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/wordcloud", tags=["wordcloud"])
 
 logger = logging.getLogger(__name__)
 document_files = RedisDocumentFileList()
-MAX_WORDS = 50
+MAX_WORDS = int(os.getenv("WORDCLOUD_MAX_WORDS", "50"))
 
 
 async def concat_text(doc_id: str) -> str:
@@ -39,8 +40,7 @@ async def get_wordcloud(
     doc_text = await concat_text(doc_id)
     wordcloud = WordCloud(max_words=MAX_WORDS)
     words = wordcloud.process_text(doc_text)
-    top_words_items = sorted(words.items(), key=lambda item: item[1], reverse=True)[:MAX_WORDS]
-    top_words = [item[0] for item in top_words_items]
+    top_words = list(dict(sorted(words.items(), key=lambda item: item[1], reverse=True)[0:MAX_WORDS]).keys())
 
     wordcloud.generate_from_frequencies(words)
     img_filepath = f"{doc_id}/wordcloud.png"
@@ -48,6 +48,7 @@ async def get_wordcloud(
         img = wordcloud.to_image()
         img.save(img_file, format="PNG")
         img_file.seek(0)
+        if not upload_fileobj(img_file, img_filepath):
         if not upload_fileobj(img_file, img_filepath):
             raise HTTPException(status_code=500, detail="failed to upload file")
     document_files.add(doc_id, img_filepath)
