@@ -20,7 +20,7 @@ async def wait_for_extraction(doc_id: str):
                 if e.status_code == 450:
                     logger.error(f"Failed to process {doc_id} for {JobType.EXTRACTION}. Please refer to file or service logs for more info.")
                 else:
-                    logger.error(f"An unknown error has occur for {doc_id}")
+                    logger.error(f"An unknown error has occurred for {doc_id}: {e}")
                 break
         await asyncio.sleep(POLLING_DELAY)
 
@@ -36,7 +36,7 @@ async def wait_for_semantic_embedder(doc_id: str, session_id: str):
                 if e.status_code == 450:
                     logger.error(f"Failed to process {doc_id} for {JobType.SEMANTICEMBEDDER}. Please refer to file or service logs for more info.")
                 else:
-                    logger.error(f"An unknown error has occur for {doc_id}")
+                    logger.error(f"An unknown error has occurred for {doc_id}: {e}")
                 break
         await asyncio.sleep(POLLING_DELAY)
 
@@ -52,7 +52,7 @@ async def wait_for_sentence_embedder(doc_id: str, session_id: str):
                 if e.status_code == 450:
                     logger.error(f"Failed to process {doc_id} for {JobType.SENTENCEEMBEDDER}. Please refer to file or service logs for more info.")
                 else:
-                    logger.error(f"An unknown error has occur for {doc_id}")
+                    logger.error(f"An unknown error has occurred for {doc_id}: {e}")
                 break
         await asyncio.sleep(POLLING_DELAY)
 
@@ -67,7 +67,7 @@ async def wait_for_metadata(doc_id: str, session_id: str):
                 if e.status_code == 450:
                     logger.error(f"Failed to process {doc_id} for {JobType.METADATA}. Please refer to file or service logs for more info.")
                 else:
-                    logger.error(f"An unknown error has occur for {doc_id}")
+                    logger.error(f"An unknown error has occurred for {doc_id}: {e}")
                 break
         await asyncio.sleep(POLLING_DELAY)
 
