@@ -9,9 +9,10 @@ from shared_utils.s3_utils import load_job, generate_presigned_url
 
 logger = logging.getLogger(__name__)
 
-EXTERNAL_ENDPOINT = os.getenv("EXTERNAL_ENDPOINT")
-EXTRACTION_URL = os.getenv("EXTRACTION_URL")
-METADATA_URL = os.getenv("METADATA_URL")
+EXTERNAL_ENDPOINT = os.environ["EXTERNAL_ENDPOINT"]
+METADATA_URL = os.environ["METADATA_URL"]
+EXTRACTION_URL = os.environ["EXTRACTION_URL"]
+
 if not EXTRACTION_URL:
     raise ValueError("EXTRACTION_URL is not set")
 
