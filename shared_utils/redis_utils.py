@@ -185,12 +185,14 @@ class RedisDocumentFileList(RedisSetWithFlagExpiry):
         default_expiry=EXPIRY_HOUR,
     ):
         super().__init__(redis_client, prefix, flag_prefix, default_expiry)
-        self.document_names = RedisStringStorage(self.client, RedisPrefix.FILENAME, None)
+        self.document_names = RedisStringStorage(
+            self.client, RedisPrefix.FILENAME, None
+        )
 
     def __delitem__(self, key):
         del self.document_names[key]
         return super().__delitem__(key)
-    
+
     def init_doc_id(self, doc_id) -> str:
         if not self.client.set(
             self.flag_prefixed(doc_id), 1, ex=self.flag_expiry, nx=True

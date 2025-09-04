@@ -49,3 +49,7 @@ trivy_scan_results/
 # Temporary testing files
 test_results/
 coverage/
+
+# Code assist tools
+.claude/
+CLAUDE.md

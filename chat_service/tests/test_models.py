@@ -7,10 +7,9 @@ class TestChatRequest:
     def test_valid_chat_request(self):
         """Test creation of valid ChatRequest"""
         request = ChatRequest(
-            message="What is this document about?",
-            collection_name="test_collection"
+            message="What is this document about?", collection_name="test_collection"
         )
-        
+
         assert request.message == "What is this document about?"
         assert request.collection_name == "test_collection"
         assert request.doc_id is None
@@ -20,9 +19,9 @@ class TestChatRequest:
         request = ChatRequest(
             message="What is this document about?",
             collection_name="test_collection",
-            doc_id="doc123"
+            doc_id="doc123",
         )
-        
+
         assert request.doc_id == "doc123"
 
     def test_chat_request_default_collection(self):
@@ -48,9 +47,9 @@ class TestChatResponse:
         """Test creation of valid ChatResponse"""
         response = ChatResponse(
             response="This is the AI response",
-            metadata={"model": "gpt-4", "tokens": 100}
+            metadata={"model": "gpt-4", "tokens": 100},
         )
-        
+
         assert response.response == "This is the AI response"
         assert response.metadata == {"model": "gpt-4", "tokens": 100}
         assert response.relevant_chunks == []
@@ -59,15 +58,13 @@ class TestChatResponse:
         """Test ChatResponse with relevant chunks"""
         chunks = [
             {"content": "chunk1", "similarity": 0.9},
-            {"content": "chunk2", "similarity": 0.8}
+            {"content": "chunk2", "similarity": 0.8},
         ]
-        
+
         response = ChatResponse(
-            response="AI response",
-            relevant_chunks=chunks,
-            metadata={"model": "gpt-4"}
+            response="AI response", relevant_chunks=chunks, metadata={"model": "gpt-4"}
         )
-        
+
         assert len(response.relevant_chunks) == 2
         assert response.relevant_chunks[0]["content"] == "chunk1"
 

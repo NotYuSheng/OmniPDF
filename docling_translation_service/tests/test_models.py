@@ -17,9 +17,9 @@ class TestDoclingTranslationResponse:
             tables=[{"table_data": []}],
             key_value_items=[{"key": "value"}],
             form_items=[{"field": "input"}],
-            pages={"total": 1}
+            pages={"total": 1},
         )
-        
+
         assert response.schema_name == "test_schema"
         assert response.version == "1.0"
         assert response.name == "test_document"
@@ -40,9 +40,9 @@ class TestDoclingTranslationResponse:
             tables=[],
             key_value_items=[],
             form_items=[],
-            pages={}
+            pages={},
         )
-        
+
         assert response.texts == []
         assert response.pictures == []
         assert response.tables == []
@@ -54,7 +54,7 @@ class TestDoclingTranslationResponse:
         with pytest.raises(ValidationError):
             DoclingTranslationResponse(
                 schema_name="test_schema",
-                version="1.0"
+                version="1.0",
                 # Missing required fields
             )
 
@@ -73,16 +73,16 @@ class TestTranslateResponse:
             tables=[],
             key_value_items=[],
             form_items=[],
-            pages={}
+            pages={},
         )
-        
+
         response = TranslateResponse(
             doc_id="doc123",
             docling=docling_data,
             source_lang="Spanish",
-            target_lang="English"
+            target_lang="English",
         )
-        
+
         assert response.doc_id == "doc123"
         assert response.source_lang == "Spanish"
         assert response.target_lang == "English"
@@ -91,11 +91,9 @@ class TestTranslateResponse:
     def test_translate_response_without_docling(self):
         """Test TranslateResponse without docling data"""
         response = TranslateResponse(
-            doc_id="doc123",
-            source_lang="Spanish",
-            target_lang="English"
+            doc_id="doc123", source_lang="Spanish", target_lang="English"
         )
-        
+
         assert response.doc_id == "doc123"
         assert response.docling is None
         assert response.source_lang == "Spanish"
@@ -104,32 +102,19 @@ class TestTranslateResponse:
     def test_invalid_translate_response_missing_doc_id(self):
         """Test TranslateResponse validation without doc_id"""
         with pytest.raises(ValidationError):
-            TranslateResponse(
-                source_lang="Spanish",
-                target_lang="English"
-            )
+            TranslateResponse(source_lang="Spanish", target_lang="English")
 
     def test_invalid_translate_response_missing_source_lang(self):
         """Test TranslateResponse validation without source_lang"""
         with pytest.raises(ValidationError):
-            TranslateResponse(
-                doc_id="doc123",
-                target_lang="English"
-            )
+            TranslateResponse(doc_id="doc123", target_lang="English")
 
     def test_invalid_translate_response_missing_target_lang(self):
         """Test TranslateResponse validation without target_lang"""
         with pytest.raises(ValidationError):
-            TranslateResponse(
-                doc_id="doc123",
-                source_lang="Spanish"
-            )
+            TranslateResponse(doc_id="doc123", source_lang="Spanish")
 
     def test_translate_response_empty_strings(self):
         """Test TranslateResponse with empty string values"""
         with pytest.raises(ValidationError):
-            TranslateResponse(
-                doc_id="",
-                source_lang="Spanish",
-                target_lang="English"
-            )
+            TranslateResponse(doc_id="", source_lang="Spanish", target_lang="English")

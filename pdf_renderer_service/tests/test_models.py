@@ -1,6 +1,10 @@
 import pytest
 from pydantic import ValidationError
-from models.render import DocumentRendererResponse, DoclingTranslationResponse, AnnotationResponse
+from models.render import (
+    DocumentRendererResponse,
+    DoclingTranslationResponse,
+    AnnotationResponse,
+)
 from models.bypass import BypassResponse
 
 
@@ -10,9 +14,9 @@ class TestDocumentRendererResponse:
         response = DocumentRendererResponse(
             doc_id="doc123",
             filename="doc123/rendered.pdf",
-            download_url="https://example.com/download/doc123"
+            download_url="https://example.com/download/doc123",
         )
-        
+
         assert response.doc_id == "doc123"
         assert response.filename == "doc123/rendered.pdf"
         assert str(response.download_url) == "https://example.com/download/doc123"
@@ -20,10 +24,9 @@ class TestDocumentRendererResponse:
     def test_document_renderer_response_without_url(self):
         """Test DocumentRendererResponse without download_url"""
         response = DocumentRendererResponse(
-            doc_id="doc123",
-            filename="doc123/rendered.pdf"
+            doc_id="doc123", filename="doc123/rendered.pdf"
         )
-        
+
         assert response.doc_id == "doc123"
         assert response.filename == "doc123/rendered.pdf"
         assert response.download_url is None
@@ -31,16 +34,12 @@ class TestDocumentRendererResponse:
     def test_invalid_document_renderer_response_missing_doc_id(self):
         """Test DocumentRendererResponse validation without doc_id"""
         with pytest.raises(ValidationError):
-            DocumentRendererResponse(
-                filename="doc123/rendered.pdf"
-            )
+            DocumentRendererResponse(filename="doc123/rendered.pdf")
 
     def test_invalid_document_renderer_response_missing_filename(self):
         """Test DocumentRendererResponse validation without filename"""
         with pytest.raises(ValidationError):
-            DocumentRendererResponse(
-                doc_id="doc123"
-            )
+            DocumentRendererResponse(doc_id="doc123")
 
     def test_invalid_document_renderer_response_invalid_url(self):
         """Test DocumentRendererResponse with invalid URL"""
@@ -48,7 +47,7 @@ class TestDocumentRendererResponse:
             DocumentRendererResponse(
                 doc_id="doc123",
                 filename="doc123/rendered.pdf",
-                download_url="not-a-valid-url"
+                download_url="not-a-valid-url",
             )
 
 
@@ -66,9 +65,9 @@ class TestDoclingTranslationResponse:
             tables=[{"table_data": []}],
             key_value_items=[{"key": "value"}],
             form_items=[{"field": "input"}],
-            pages={"total": 1}
+            pages={"total": 1},
         )
-        
+
         assert response.schema_name == "test_schema"
         assert response.version == "1.0"
         assert response.name == "test_document"
@@ -89,9 +88,9 @@ class TestDoclingTranslationResponse:
             tables=[],
             key_value_items=[],
             form_items=[],
-            pages={}
+            pages={},
         )
-        
+
         assert response.texts == []
         assert response.pictures == []
         assert response.tables == []
@@ -104,7 +103,7 @@ class TestDoclingTranslationResponse:
         with pytest.raises(ValidationError):
             DoclingTranslationResponse(
                 schema_name="test_schema",
-                version="1.0"
+                version="1.0",
                 # Missing required fields
             )
 
@@ -123,16 +122,16 @@ class TestAnnotationResponse:
             tables=[],
             key_value_items=[],
             form_items=[],
-            pages={}
+            pages={},
         )
-        
+
         response = AnnotationResponse(
             doc_id="doc123",
             docling=docling_data,
             source_lang="Spanish",
-            target_lang="English"
+            target_lang="English",
         )
-        
+
         assert response.doc_id == "doc123"
         assert response.source_lang == "Spanish"
         assert response.target_lang == "English"
@@ -141,11 +140,9 @@ class TestAnnotationResponse:
     def test_annotation_response_without_docling(self):
         """Test AnnotationResponse without docling data"""
         response = AnnotationResponse(
-            doc_id="doc123",
-            source_lang="Spanish",
-            target_lang="English"
+            doc_id="doc123", source_lang="Spanish", target_lang="English"
         )
-        
+
         assert response.doc_id == "doc123"
         assert response.docling is None
         assert response.source_lang == "Spanish"
@@ -156,7 +153,7 @@ class TestAnnotationResponse:
         with pytest.raises(ValidationError):
             AnnotationResponse(
                 doc_id="doc123",
-                source_lang="Spanish"
+                source_lang="Spanish",
                 # Missing target_lang
             )
 
@@ -167,20 +164,17 @@ class TestBypassResponse:
         response = BypassResponse(
             doc_id="doc123",
             filename="doc123/original.json",
-            download_url="https://example.com/download/doc123"
+            download_url="https://example.com/download/doc123",
         )
-        
+
         assert response.doc_id == "doc123"
         assert response.filename == "doc123/original.json"
         assert str(response.download_url) == "https://example.com/download/doc123"
 
     def test_bypass_response_without_url(self):
         """Test BypassResponse without download_url"""
-        response = BypassResponse(
-            doc_id="doc123",
-            filename="doc123/original.json"
-        )
-        
+        response = BypassResponse(doc_id="doc123", filename="doc123/original.json")
+
         assert response.doc_id == "doc123"
         assert response.filename == "doc123/original.json"
         assert response.download_url is None
@@ -188,16 +182,12 @@ class TestBypassResponse:
     def test_invalid_bypass_response_missing_doc_id(self):
         """Test BypassResponse validation without doc_id"""
         with pytest.raises(ValidationError):
-            BypassResponse(
-                filename="doc123/original.json"
-            )
+            BypassResponse(filename="doc123/original.json")
 
     def test_invalid_bypass_response_missing_filename(self):
         """Test BypassResponse validation without filename"""
         with pytest.raises(ValidationError):
-            BypassResponse(
-                doc_id="doc123"
-            )
+            BypassResponse(doc_id="doc123")
 
     def test_invalid_bypass_response_invalid_url(self):
         """Test BypassResponse with invalid URL"""
@@ -205,5 +195,5 @@ class TestBypassResponse:
             BypassResponse(
                 doc_id="doc123",
                 filename="doc123/original.json",
-                download_url="invalid-url"
+                download_url="invalid-url",
             )

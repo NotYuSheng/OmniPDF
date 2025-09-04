@@ -17,9 +17,9 @@ class TestPDFDataResponse:
             tables=[],
             key_value_items=[],
             form_items=[],
-            pages={"0": {"image": {"uri": "page"}}}
+            pages={"0": {"image": {"uri": "page"}}},
         )
-        
+
         assert data.schema_name == "docling"
         assert data.version == "1.0"
         assert data.name == "test.pdf"
@@ -30,7 +30,7 @@ class TestPDFDataResponse:
         """Test PDFDataResponse with empty lists"""
         data = PDFDataResponse(
             schema_name="docling",
-            version="1.0", 
+            version="1.0",
             name="test.pdf",
             origin={},
             furniture={},
@@ -39,9 +39,9 @@ class TestPDFDataResponse:
             tables=[],
             key_value_items=[],
             form_items=[],
-            pages={}
+            pages={},
         )
-        
+
         assert data.texts == []
         assert data.pictures == []
         assert data.tables == []
@@ -57,7 +57,7 @@ class TestPDFDataResponse:
             PDFDataResponse(
                 schema_name="docling",
                 version="1.0",
-                name="test.pdf", 
+                name="test.pdf",
                 origin={},
                 furniture={},
                 texts="not a list",  # Should be list
@@ -65,18 +65,15 @@ class TestPDFDataResponse:
                 tables=[],
                 key_value_items=[],
                 form_items=[],
-                pages={}
+                pages={},
             )
 
 
 class TestExtractResponse:
     def test_valid_extract_response_processing(self):
         """Test creation of valid ExtractResponse in processing state"""
-        response = ExtractResponse(
-            doc_id="test123",
-            status="processing"
-        )
-        
+        response = ExtractResponse(doc_id="test123", status="processing")
+
         assert response.doc_id == "test123"
         assert response.status == "processing"
         assert response.result is None
@@ -94,15 +91,13 @@ class TestExtractResponse:
             tables=[],
             key_value_items=[],
             form_items=[],
-            pages={}
+            pages={},
         )
-        
+
         response = ExtractResponse(
-            doc_id="test123",
-            status="completed",
-            result=pdf_data
+            doc_id="test123", status="completed", result=pdf_data
         )
-        
+
         assert response.doc_id == "test123"
         assert response.status == "completed"
         assert response.result is not None
@@ -110,11 +105,8 @@ class TestExtractResponse:
 
     def test_extract_response_failed_status(self):
         """Test ExtractResponse with failed status"""
-        response = ExtractResponse(
-            doc_id="test123",
-            status="failed"
-        )
-        
+        response = ExtractResponse(doc_id="test123", status="failed")
+
         assert response.doc_id == "test123"
         assert response.status == "failed"
         assert response.result is None

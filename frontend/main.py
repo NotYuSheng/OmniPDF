@@ -13,7 +13,7 @@ st.set_page_config(
     page_title="OmniPDF",
     page_icon="🦸",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 if "processed_data" not in st.session_state:
     st.session_state.processed_data = None
@@ -24,10 +24,11 @@ if "httpx_cookies" not in st.session_state:
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL")
 CHAT_URL = os.getenv("CHAT_URL")
 
-    
+
 if __name__ == "__main__":
     # Custom CSS for better styling
-    st.markdown("""
+    st.markdown(
+        """
     <style>
         .main-header {
             font-size: 2.5rem;
@@ -62,35 +63,22 @@ if __name__ == "__main__":
             gap: 2rem;
         }
     </style>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
     upload_UI = st.Page(
         page="pages/1_upload_UI.py",
         title="Upload PDF",
         icon="📂",
-        default=True # to set this as the FIRST page upon establishing connection
+        default=True,  # to set this as the FIRST page upon establishing connection
     )
 
+    images_UI = st.Page(page="pages/2_images_UI.py", title="Extract Images", icon="🖼️")
 
-    images_UI = st.Page(
-        page="pages/2_images_UI.py",
-        title="Extract Images",
-        icon="🖼️"
-    )
+    tables_UI = st.Page(page="pages/3_tables_UI.py", title="Extract Tables", icon="📋")
 
-
-    tables_UI = st.Page(
-        page="pages/3_tables_UI.py",
-        title="Extract Tables",
-        icon="📋"
-    )
-
-
-    wordcloud_UI = st.Page(
-        page="pages/4_wordcloud_UI.py",
-        title="Word Cloud",
-        icon="☁️"
-    )
+    wordcloud_UI = st.Page(page="pages/4_wordcloud_UI.py", title="Word Cloud", icon="☁️")
 
     chat_UI = st.Page(
         page="pages/5_chat_UI.py",
@@ -104,20 +92,18 @@ if __name__ == "__main__":
         icon="📄",
     )
 
-    settings_UI = st.Page(
-        page="pages/10_settings_UI.py",
-        title="Settings",
-        icon="⚙️"
-    )
-
-
+    settings_UI = st.Page(page="pages/10_settings_UI.py", title="Settings", icon="⚙️")
 
     # To go between the different pages
-    pg = st.navigation(pages=[upload_UI,
-                              chat_UI, 
-                              images_UI, 
-                              tables_UI, 
-                              wordcloud_UI,
-                              translate_UI,
-                              settings_UI])
+    pg = st.navigation(
+        pages=[
+            upload_UI,
+            chat_UI,
+            images_UI,
+            tables_UI,
+            wordcloud_UI,
+            translate_UI,
+            settings_UI,
+        ]
+    )
     pg.run()

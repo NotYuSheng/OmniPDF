@@ -27,7 +27,9 @@ async def get_image(image_url: str) -> tuple[bytes, str]:
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 403:
             logger.error(f"Invalid or expired S3 signed URL: {e.response.status_code}")
-            raise HTTPException(status_code=400, detail="Invalid or expired S3 signed URL")
+            raise HTTPException(
+                status_code=400, detail="Invalid or expired S3 signed URL"
+            )
         else:
             logger.error(f"Error fetching image: {e.response.status_code}")
             raise HTTPException(status_code=500, detail="Failed to fetch image")
@@ -54,11 +56,10 @@ async def get_image(image_url: str) -> tuple[bytes, str]:
 
 @router.post("/", response_model=ImageCaptioningResponse, status_code=200)
 async def generate_image_caption(
-    request: ImageCaptioningRequest, 
-    client: AsyncOpenAI = Depends(get_openai_client)
+    request: ImageCaptioningRequest, client: AsyncOpenAI = Depends(get_openai_client)
 ):
     """Use Vision-Language Model (VLM) to create a caption for the retrieved image from the processed PDF"""
-    
+
     logger.info(f"Generating caption with given prompt: '{request.prompt}'")
 
     image_url = request.image_url
@@ -68,7 +69,7 @@ async def generate_image_caption(
 
     try:
         image_bytes, image_format = await get_image(image_url)
-        
+
         # Base64 encode the image
         encoded_image = base64.b64encode(image_bytes).decode("utf-8")
         logger.info("Image successfully encoded to base64.")
@@ -76,35 +77,38 @@ async def generate_image_caption(
         # Prepare messages containing system prompt and encoded image for VLM
         system_prompt = PromptTemplates.get_system_prompt()
         messages = [
-            {
-                "role": "system",
-                "content": system_prompt
-            },
+            {"role": "system", "content": system_prompt},
             {
                 "role": "user",
                 "content": [
                     {"type": "text", "text": request.prompt},
                     {
-                        "type": "image_url", 
-                        "image_url": {"url": f"data:image/{image_format};base64,{encoded_image}"}
-                    }
-                ]
-            }
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/{image_format};base64,{encoded_image}"
+                        },
+                    },
+                ],
+            },
         ]
 
         logger.info(f"Sending request to {VLM_MODEL} with {len(messages)} messages")
         response = await client.chat.completions.create(
-            model=VLM_MODEL,
-            messages=messages,
-            **vlm_config.generation_params
+            model=VLM_MODEL, messages=messages, **vlm_config.generation_params
         )
-        
+
     except APIError as e:
         logger.error(f"HTTP error calling vLLM service: {e}")
         raise HTTPException(status_code=500, detail="HTTP error calling vLLM service")
     except Exception as e:
-        logger.error(f"An unexpected error occurred during caption generation: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="An unexpected error occurred during caption generation.")
+        logger.error(
+            f"An unexpected error occurred during caption generation: {e}",
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred during caption generation.",
+        )
 
     if not response.choices:
         logger.error("No choices found in OpenAI response: %s", response)
@@ -120,13 +124,15 @@ async def generate_image_caption(
             status_code=500,
             detail="Malformed choice in OpenAI response",
         )
-    
+
     # Post-process the response
     if vlm_config.enable_response_post_processing:
-        processed_caption = CaptionOptimizer.post_process_llm_response(first_choice.message.content)
+        processed_caption = CaptionOptimizer.post_process_llm_response(
+            first_choice.message.content
+        )
     else:
         processed_caption = first_choice.message.content
-    
+
     logger.info(f"Received caption from LLM: '{processed_caption}'")
 
     response_data = ImageCaptioningResponse(caption=processed_caption)
