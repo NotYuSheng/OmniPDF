@@ -80,21 +80,42 @@ class QueryClassificationExamples:
         """Returns comprehensive examples for each query type"""
         return [
             # Factual queries - seeking specific information, data, or facts
-            {"query": "What is the capital of France?", "type": "factual"},
+            {
+                "query": "What is the capital of France?",
+                "type": "factual"
+            },
             {
                 "query": "When was the Declaration of Independence signed?",
                 "type": "factual",
             },
-            {"query": "How many employees work at the company?", "type": "factual"},
-            {"query": "List all the ingredients in the recipe.", "type": "factual"},
+            {
+                "query": "How many employees work at the company?",
+                "type": "factual"
+            },
+            {
+                "query": "List all the ingredients in the recipe.",
+                "type": "factual"
+            },
             {
                 "query": "What are the system requirements for the software?",
                 "type": "factual",
             },
-            {"query": "Who is the CEO of the organization?", "type": "factual"},
-            {"query": "Define machine learning.", "type": "factual"},
-            {"query": "What is my shopping list?", "type": "factual"},
-            {"query": "Show me the sales figures for last quarter.", "type": "factual"},
+            {
+                "query": "Who is the CEO of the organization?",
+                "type": "factual"
+            },
+            {
+                "query": "Define machine learning.",
+                "type": "factual"
+            },
+            {
+                "query": "What is my shopping list?",
+                "type": "factual"
+            },
+            {
+                "query": "Show me the sales figures for last quarter.",
+                "type": "factual"
+            },
             # Analytical queries - requiring analysis, comparison, evaluation
             {
                 "query": "Why did the stock price decline last month?",
@@ -141,7 +162,10 @@ class QueryClassificationExamples:
                 "query": "Give me an overview of the quarterly results.",
                 "type": "summarization",
             },
-            {"query": "Summarize my shopping list.", "type": "summarization"},
+            {
+                "query": "Summarize my shopping list.",
+                "type": "summarization"
+            },
             {
                 "query": "Provide a summary of the meeting minutes.",
                 "type": "summarization",
@@ -167,17 +191,38 @@ class QueryClassificationExamples:
                 "type": "summarization",
             },
             # General queries - conversational, complex, or multi-faceted
-            {"query": "How can I improve my productivity?", "type": "general"},
-            {"query": "Tell me about artificial intelligence.", "type": "general"},
-            {"query": "What should I consider when buying a car?", "type": "general"},
-            {"query": "Help me understand this concept better.", "type": "general"},
-            {"query": "Can you explain how this process works?", "type": "general"},
+            {
+                "query": "How can I improve my productivity?",
+                "type": "general"
+            },
+            {
+                "query": "Tell me about artificial intelligence.",
+                "type": "general"
+            },
+            {
+                "query": "What should I consider when buying a car?",
+                "type": "general"
+            },
+            {
+                "query": "Help me understand this concept better.",
+                "type": "general"
+            },
+            {
+                "query": "Can you explain how this process works?",
+                "type": "general"
+            },
             {
                 "query": "What are some best practices for project management?",
                 "type": "general",
             },
-            {"query": "I need advice on career development.", "type": "general"},
-            {"query": "How do I troubleshoot this technical issue?", "type": "general"},
+            {
+                "query": "I need advice on career development.",
+                "type": "general"
+            },
+            {
+                "query": "How do I troubleshoot this technical issue?",
+                "type": "general"
+            },
             {
                 "query": "What would you recommend for this situation?",
                 "type": "general",
