@@ -1,0 +1,82 @@
+name: End-to-End Tests (Cypress)
+
+# DISABLED: Frontend is not ready for testing yet
+# To enable: rename this file from .yml.disabled to .yml
+
+on:
+  # Disabled - uncomment when frontend is ready
+  # push:
+  #   branches: [dev]
+  # pull_request:
+  #   branches: [dev]
+  workflow_dispatch:
+    inputs:
+      force_run:
+        description: 'Force run E2E tests (frontend must be ready)'
+        required: false
+        default: 'false'
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.force_run == 'true'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: cypress/package-lock.json
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Copy example.env to .env
+        run: |
+          find . -name "example.env" | while read f; do
+            cp "$f" "$(dirname "$f")/.env"
+            echo "✓ Created $(dirname "$f")/.env"
+          done
+
+      - name: Start OmniPDF services
+        run: |
+          docker compose up --build -d
+          echo "Waiting for services to be ready..."
+          sleep 30
+          
+          # Wait for frontend to be accessible
+          timeout 300 bash -c 'while ! curl -f http://localhost:8501 >/dev/null 2>&1; do sleep 5; done'
+
+      - name: Install Cypress dependencies
+        working-directory: cypress
+        run: |
+          npm ci
+
+      - name: Run Cypress tests
+        working-directory: cypress
+        run: |
+          npx cypress run --browser chrome --headless
+
+      - name: Upload Cypress screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-videos  
+          path: cypress/videos
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker compose down
+          docker system prune -f
