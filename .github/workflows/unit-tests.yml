@@ -53,11 +53,106 @@ jobs:
           chmod +x scripts/test-all-services.sh
           chmod +x scripts/test-single-service.sh
 
-      - name: Run unit tests for all services
+      - name: Test each service individually (health check + unit tests)
         run: |
           echo "🧪 Running OmniPDF Unit Test Suite"
           echo "=================================="
-          ./scripts/test-all-services.sh
+          
+          # Services with unit tests
+          SERVICES=(
+            "chat_service"
+            "pdf_extraction_service" 
+            "docling_translation_service"
+            "pdf_renderer_service"
+            "embedder_service"
+            "pdf_processor_service"
+            "image_captioner_service"
+          )
+          
+          FAILED_SERVICES=""
+          SUCCESSFUL_SERVICES=""
+          
+          # Test each service individually
+          for SERVICE in "${SERVICES[@]}"; do
+            echo ""
+            echo "=========================================="
+            echo "Testing $SERVICE (Health + Unit Tests)"
+            echo "=========================================="
+            
+            # Build the service and its dependencies
+            echo "Building $SERVICE..."
+            docker compose build $SERVICE
+            
+            # Start dependencies first (redis, chromadb, minio)
+            echo "Starting dependencies..."
+            docker compose up -d redis chromadb minio
+            
+            # Start the service
+            echo "Starting $SERVICE..."
+            docker compose up -d $SERVICE
+            
+            # Wait for service to be ready
+            sleep 10
+            
+            # Health check first
+            echo "Checking health of $SERVICE..."
+            HEALTHY=false
+            for i in {1..20}; do
+              STATUS=$(docker exec "$SERVICE" python3 -c 'import urllib.request; response = urllib.request.urlopen("http://localhost:8000/health", timeout=5); print(response.getcode())' 2>/dev/null || echo "000")
+              if [ "$STATUS" == "200" ]; then
+                echo "✅ $SERVICE is healthy"
+                HEALTHY=true
+                break
+              fi
+              echo "Waiting for $SERVICE health check (attempt $i/20, HTTP $STATUS)..."
+              sleep 3
+            done
+            
+            if [ "$HEALTHY" = false ]; then
+              echo "❌ $SERVICE failed health check"
+              docker logs "$SERVICE" --tail 30
+              FAILED_SERVICES="$FAILED_SERVICES $SERVICE"
+            else
+              # Run unit tests inside the service container
+              echo "Running unit tests for $SERVICE..."
+              if docker compose exec -T "$SERVICE" sh -c "python -m pytest ${SERVICE}/tests/ -v --tb=short" 2>&1 | tee "/tmp/${SERVICE}_test.log"; then
+                echo "✅ $SERVICE tests PASSED"
+                SUCCESSFUL_SERVICES="$SUCCESSFUL_SERVICES $SERVICE"
+              else
+                echo "❌ $SERVICE tests FAILED"
+                FAILED_SERVICES="$FAILED_SERVICES $SERVICE"
+              fi
+            fi
+            
+            # Stop and remove containers
+            echo "Stopping $SERVICE..."
+            docker compose stop $SERVICE
+            docker compose rm -f $SERVICE
+            
+            # Clean up build artifacts to save space
+            docker builder prune --force
+            docker system prune --force
+            
+            echo "=== Disk space after testing $SERVICE ==="
+            df -h | grep -E "(/$)"
+          done
+          
+          # Stop dependencies
+          docker compose down
+          
+          echo ""
+          echo "=========================================="
+          echo "UNIT TEST RESULTS SUMMARY"
+          echo "=========================================="
+          if [ ! -z "$SUCCESSFUL_SERVICES" ]; then
+            echo "✅ SUCCESSFUL SERVICES:$SUCCESSFUL_SERVICES"
+          fi
+          if [ ! -z "$FAILED_SERVICES" ]; then
+            echo "❌ FAILED SERVICES:$FAILED_SERVICES"
+            exit 1
+          fi
+          
+          echo "🎉 All unit tests passed!"
 
       - name: Upload test logs
         uses: actions/upload-artifact@v4
