@@ -41,7 +41,7 @@ run_service_tests() {
     echo "----------------------------------------"
     
     # Run the test via the unit test script with timeout
-    if timeout 300 ./scripts/run_unit_tests.sh "$service" > "/tmp/${service}_test.log" 2>&1; then
+    if timeout 300 ./scripts/test-single-service.sh "$service" > "/tmp/${service}_test.log" 2>&1; then
         echo -e "${GREEN}✅ $service tests PASSED${NC}"
         test_results[$service]="PASS"
         # Get test count from log
