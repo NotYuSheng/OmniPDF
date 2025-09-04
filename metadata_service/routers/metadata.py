@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chunks
@@ -6,6 +6,7 @@ from shared_utils.redis import RedisDocumentFileList
 from shared_utils.job_status import save_job, load_job, JobType
 import logging
 import os
+from models.metadata import MetadataResponse
 from metadata_service.models.llm_config import (
     ModelConfig,
     PromptTemplates, 
