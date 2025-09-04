@@ -107,13 +107,13 @@ services:
 
   redis:
     container_name: redis
-    image: redis:7.4.4-alpine
+    image: redis:8.2.1-alpine
     expose:
       - "6379"
   
   chromadb:
     container_name: chromadb
-    image: chromadb/chroma:1.0.13
+    image: chromadb/chroma:1.0.20
     volumes:
       - chromadb-data:/data
     environment:

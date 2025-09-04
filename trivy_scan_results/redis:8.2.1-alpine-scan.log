@@ -1,0 +1,10 @@
+2025-09-05 00:50:17 - Starting scan for redis:8.2.1-alpine (redis:8.2.1-alpine)
+2025-09-05 00:50:17 - Running comprehensive image scan...
+2025-09-05T00:50:17+08:00	INFO	[vuln] Vulnerability scanning is enabled
+2025-09-05T00:50:17+08:00	INFO	[secret] Secret scanning is enabled
+2025-09-05T00:50:17+08:00	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2025-09-05T00:50:17+08:00	INFO	[secret] Please see https://trivy.dev/v0.66/docs/scanner/secret#recommendation for faster secret detection
+2025-09-05T00:50:17+08:00	INFO	Detected OS	family="alpine" version="3.22.1"
+2025-09-05T00:50:17+08:00	INFO	[alpine] Detecting vulnerabilities...	os_version="3.22" repository="3.22" pkg_num=22
+2025-09-05T00:50:17+08:00	INFO	Number of language-specific files	num=0
+2025-09-05 00:50:17 - Scan completed successfully: No vulnerabilities found
