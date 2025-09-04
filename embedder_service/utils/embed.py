@@ -41,7 +41,7 @@ async def vectorize_chromadb(chunk_data: List[Dict[str, Any]], config: Processin
             documents=documents,
             metadatas=metadatas
         )
-        #refresh document expiry
+        # Refresh document expiry
         doc_id_list = {metadata["doc_id"] for metadata in metadatas}
         document_list.refresh_document_expiries(doc_id_list)
         logger.info(f"Added {len(ids)} chunks to collection '{collection_name}'")
