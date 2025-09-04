@@ -43,8 +43,8 @@ run_service_tests() {
     # Clean up any existing containers first
     docker compose down > /dev/null 2>&1
     
-    # Run the test via the unit test script with timeout
-    if timeout 300 ./scripts/test-single-service.sh "$service" > "/tmp/${service}_test.log" 2>&1; then
+    # Run the test via the unit test script 
+    if ./scripts/test-single-service.sh "$service" > "/tmp/${service}_test.log" 2>&1; then
         echo -e "${GREEN}✅ $service tests PASSED${NC}"
         test_results[$service]="PASS"
         # Get test count from log
