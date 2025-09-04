@@ -110,7 +110,7 @@ async def load_or_create_extraction_job(doc_id: str) -> dict | Response:
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
             raise HTTPException(status_code=500, details=f"{job_type} has returned an unexpected response.")
 
-    handle_job_status(job, "document")
+    handle_job_status(job, job_type)
     return job
 
 
