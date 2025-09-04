@@ -80,7 +80,6 @@ def get_doc_list_append_function(
 ) -> Callable[[str], None]:
     if not validate_session_id(session_id, session_storage):
         session_id = create_new_session(response, session_storage=session_storage)
-    document_files = RedisDocumentFileList()
 
     document_files = RedisDocumentFileList()
 
