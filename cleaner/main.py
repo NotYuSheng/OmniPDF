@@ -5,10 +5,10 @@ from utils.cleaner import setup_redis_watcher_thread
 
 # Set up logger
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 def main():
     # load the redis watcher
@@ -18,6 +18,7 @@ def main():
     # Setup Graceful shutdown
     def exit_gracefully(signum, frame):
         watcher_thread.stop()
+
     signal.signal(signal.SIGINT, exit_gracefully)
     signal.signal(signal.SIGTERM, exit_gracefully)
 

@@ -17,6 +17,13 @@ COPY shared_utils ./shared_utils
 # Copy frontend folder from root context into /app/frontend
 COPY frontend ./frontend
 
+# Remove unnecessary system packages
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get remove --purge -y linux-libc-dev && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 EXPOSE 8501
 
 ENV STREAMLIT_CLIENT_TOOLBAR_MODE=minimal

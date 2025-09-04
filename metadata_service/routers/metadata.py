@@ -2,14 +2,14 @@ from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chunks
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 from shared_utils.s3_utils import save_job, load_job
 import logging
 import os
 from metadata_service.models.llm_config import (
     ModelConfig,
-    PromptTemplates, 
-    ModelResponseOptimizer
+    PromptTemplates,
+    ModelResponseOptimizer,
 )
 
 router = APIRouter(prefix="/metadata", tags=["metadata"])
@@ -28,11 +28,7 @@ BATCH_SIZE = int(os.getenv("BATCH_SIZE", "8"))
 PROMPT_PURPOSE = ["default", "summary", "title", "keywords", "authors"]
 
 
-async def get_model_response(
-    system_prompt: str,
-    user_prompt: str,
-    client: AsyncOpenAI
-):
+async def get_model_response(system_prompt: str, user_prompt: str, client: AsyncOpenAI):
     # Prepare messages for model
     messages = [
         {"role": "system", "content": system_prompt},
@@ -66,25 +62,24 @@ async def get_model_response(
             status_code=500,
             detail="Malformed choice in OpenAI response",
         )
-    
+
     # Post-process the response
     if model_config.enable_response_post_processing:
-        processed_response = response_optimizer.post_process_llm_response(first_choice.message.content)
+        processed_response = response_optimizer.post_process_llm_response(
+            first_choice.message.content
+        )
     else:
         processed_response = first_choice.message.content
 
     return processed_response
 
 
-async def get_summary(
-    chunks: list[str],
-    client: AsyncOpenAI
-):
+async def get_summary(chunks: list[str], client: AsyncOpenAI):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
     user_prompt = prompt_templates.get_user_prompt(
-        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.", 
+        f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
         PROMPT_PURPOSE[1],
-        r"{context}"
+        r"{context}",
     )
     summaries = []
     for chunk in chunks:
@@ -96,49 +91,44 @@ async def get_summary(
     return await cascade_query(summaries, user_prompt, system_prompt, client)
 
 
-async def get_short_description(
-    summary: str,
-    client: AsyncOpenAI
-):
+async def get_short_description(summary: str, client: AsyncOpenAI):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
     user_prompt = prompt_templates.get_user_prompt(
         f"Return a short description of the document, up to {SHORT_DSECRIPTION_LENGTH} words. Return only the short description.",
         PROMPT_PURPOSE[1],
-        summary
+        summary,
     )
 
     return await get_model_response(system_prompt, user_prompt, client)
 
 
 async def cascade_query(
-    chunks: list[str],
-    user_prompt: str,
-    system_prompt: str,
-    client: AsyncOpenAI
+    chunks: list[str], user_prompt: str, system_prompt: str, client: AsyncOpenAI
 ):
     if not chunks:
         return ""
     # Not ideal, will consume a lot of memory as prev chunks will not be gc till final set is gotten
     if len(chunks) == 1:
         return chunks[0]
-    
+
     current_chunks = chunks
     while len(current_chunks) > 1:
         new_chunks = []
         for i in range(0, len(current_chunks), BATCH_SIZE):
             new_chunk_context = "\n".join(current_chunks[i : i + BATCH_SIZE])
             user_prompt_with_context = user_prompt.format(context=new_chunk_context)
-            new_chunks.append(await get_model_response(system_prompt, user_prompt_with_context, client))
+            new_chunks.append(
+                await get_model_response(
+                    system_prompt, user_prompt_with_context, client
+                )
+            )
         current_chunks = new_chunks
         logger.info(f"Reduced to {len(current_chunks)} chunks.")
 
     return current_chunks[0]
 
 
-async def get_authors(
-    chunks: list[str],
-    client: AsyncOpenAI
-):
+async def get_authors(chunks: list[str], client: AsyncOpenAI):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
     user_prompt = prompt_templates.get_user_prompt(
         "Identify the Authors in the given document", PROMPT_PURPOSE[4], r"{context}"
@@ -163,15 +153,12 @@ async def get_authors(
     return list(set(authors))
 
 
-async def get_title(
-    chunks: list[str],
-    client: AsyncOpenAI
-):
+async def get_title(chunks: list[str], client: AsyncOpenAI):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
     user_prompt = prompt_templates.get_user_prompt(
         "Identify the title in the given document", PROMPT_PURPOSE[2], r"{context}"
     )
-    
+
     title_chunks = []
     for chunk in chunks:
         title_chunks.append(
@@ -186,15 +173,12 @@ async def get_title(
     return title_split[-1]
 
 
-async def get_keywords(
-    chunks: list[str],
-    client: AsyncOpenAI
-):
+async def get_keywords(chunks: list[str], client: AsyncOpenAI):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
     user_prompt = prompt_templates.get_user_prompt(
         "Identify the Keywords in the given document", PROMPT_PURPOSE[3], r"{context}"
     )
- 
+
     keyword_chunks = []
     for chunk in chunks:
         keyword_chunks.append(
@@ -220,10 +204,7 @@ async def get_filename(doc_id: str):
     return filename
 
 
-async def generate_metadata(
-    doc_id: str,
-    client: AsyncOpenAI
-):
+async def generate_metadata(doc_id: str, client: AsyncOpenAI):
     chunks = await get_chunks(doc_id)
     try:
         summary = await get_summary(chunks, client)
@@ -231,9 +212,7 @@ async def generate_metadata(
         metadata = {
             "filename": await get_filename(doc_id),
             "summary": summary,
-            "executive_summary": await get_short_description(
-                summary, client
-            ),
+            "executive_summary": await get_short_description(summary, client),
             "keywords": await get_keywords(chunks, client),
             "authors": await get_authors(chunks, client),
             "title": await get_title(chunks, client),
@@ -258,8 +237,11 @@ async def generate_metadata(
 
 
 @router.post("/{doc_id}", status_code=202)
-async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks, client: AsyncOpenAI = Depends(get_openai_client)):
-
+async def submit_pdf(
+    doc_id: str,
+    background_tasks: BackgroundTasks,
+    client: AsyncOpenAI = Depends(get_openai_client),
+):
     save_job(
         doc_id=doc_id,
         job_data={},
