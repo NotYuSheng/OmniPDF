@@ -1,13 +1,12 @@
 import os
 import logging
 import boto3
+import json
+import itertools
+from io import BytesIO
 from botocore.exceptions import BotoCoreError, ClientError
 from typing import Optional, Union
 from pydantic import BaseModel
-import itertools
-
-import json
-from io import BytesIO
 
 from shared_utils.redis import RedisDocumentFileList
 

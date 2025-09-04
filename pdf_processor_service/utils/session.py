@@ -3,7 +3,6 @@
 
 from typing import Callable, Generator
 from uuid import uuid4
-
 from fastapi import Depends, Request, Response, HTTPException
 
 from shared_utils.redis import RedisDocumentFileList, RedisSetWithFlagExpiry, RedisPrefix, EXPIRY_DAY
