@@ -33,7 +33,7 @@ async def get_pdf_metadata(
 ):
     """Get metadata for a processed PDF."""
     # Extract metadata from job data
-    job_data = job.get("data", {}).get("result", None)
+    job_data = job.get("data", {})
     
     # Convert the job data to our response model
     metadata_response = MetadataResponse(

@@ -237,16 +237,9 @@ async def generate_metadata(doc_id: str):
             "title": await get_title(chunks, client),
         }
         
-        # Save successful job
-        job_data = {
-            "doc_id": doc_id,
-            "status": "completed",
-            "result": metadata_result
-        }
-        
         save_job(
             doc_id=doc_id,
-            job_data=job_data,
+            job_data=metadata_result,
             status="completed",
             job_type=JobType.METADATA,
         )
@@ -290,10 +283,9 @@ async def get_status(doc_id: str):
         raise HTTPException(status_code=500, detail=error_message)
 
     job_data = job.get("data", {})
-    result = job_data.get("result", None)
 
     return MetadataResponse(
         doc_id=doc_id,
         status=job.get("status", "unknown"),
-        result=result
+        result=job_data
     )
