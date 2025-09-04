@@ -1,0 +1,13 @@
+2025-09-05 00:49:49 - Starting scan for docling_translation_service (omnipdf-docling_translation_service:latest)
+2025-09-05 00:49:49 - Running comprehensive scan (image + filesystem)...
+  → Scanning Docker image...
+2025-09-05T00:49:54+08:00	FATAL	Fatal error	run error: init error: DB error: error in vulnerability DB initialize: vulnerability database may be in use by another process: timeout
+  → Scanning filesystem...
+2025-09-05T00:49:59+08:00	INFO	[vuln] Vulnerability scanning is enabled
+2025-09-05T00:49:59+08:00	INFO	[secret] Secret scanning is enabled
+2025-09-05T00:49:59+08:00	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2025-09-05T00:49:59+08:00	INFO	[secret] Please see https://trivy.dev/v0.66/docs/scanner/secret#recommendation for faster secret detection
+2025-09-05T00:49:59+08:00	WARN	[pip] Unable to find python `site-packages` directory. License detection is skipped.	err="site-packages directory not found"
+2025-09-05T00:49:59+08:00	INFO	Number of language-specific files	num=1
+2025-09-05T00:49:59+08:00	INFO	[pip] Detecting vulnerabilities...
+2025-09-05 00:49:59 - Scan completed successfully: No vulnerabilities found

@@ -2,7 +2,7 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-ENV PYTHONPATH=/app/pdf_processor_service:/app/shared_utils
+ENV PYTHONPATH=/app/chat_service:/app/shared_utils
 
 RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
 
@@ -17,6 +17,14 @@ COPY shared_utils ./shared_utils
 # Copy chat_service folder from root context into /app/chat_service
 COPY chat_service ./chat_service
 
+# Remove unnecessary system packages
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get remove --purge -y linux-libc-dev && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Expose the FastAPI port    
 EXPOSE 8000
 
 CMD ["sh", "-c", "PYTHONPATH=/app/chat_service uvicorn chat_service.main:app --host 0.0.0.0 --port 8000"]

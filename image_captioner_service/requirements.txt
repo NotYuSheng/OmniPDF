@@ -1,0 +1,13 @@
+fastapi==0.115.12
+uvicorn==0.34.3
+boto3==1.38.34
+PyMuPDF==1.26.1
+pypdf==5.6.0
+PyPDF2==3.0.1
+pillow==11.3.0
+httpx==0.28.1
+python-multipart==0.0.20
+requests==2.32.4
+spire-pdf==11.7.0
+openai==1.86.0
+pytest-asyncio==0.25.0

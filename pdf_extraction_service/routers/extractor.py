@@ -1,13 +1,12 @@
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 import logging
 import time
-from datetime import timedelta
 import io
 import json
 
 from models.extractor import ExtractResponse
 from shared_utils.s3_utils import (
-    save_job, 
+    save_job,
     load_job,
     upload_fileobj,
 )
@@ -17,11 +16,12 @@ from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling.datamodel.accelerator_options import AcceleratorDevice, AcceleratorOptions
-from shared_utils.redis import RedisSetWithFlagExpiry
+from shared_utils.redis_utils import RedisDocumentFileList
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 logger = logging.getLogger(__name__)
-redis_image_sets = RedisSetWithFlagExpiry(prefix="ImageFiles", flag_prefix="S3Key", default_expiry=timedelta(hours=1))
+document_files = RedisDocumentFileList()
+
 
 def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
     start_time = time.time()
@@ -35,16 +35,15 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
     opts.accelerator_options = AcceleratorOptions(
         num_threads=4, device=AcceleratorDevice.AUTO
     )
-    
+
     try:
         converter = DocumentConverter(
             format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=opts)}
         )
         result = converter.convert(presign_url)
         data = result.document.export_to_dict()
-        img_files = set()
 
-        for ref in ['body', 'groups']:
+        for ref in ["body", "groups"]:
             data.pop(ref, None)
 
         pic_cnt = -1
@@ -58,76 +57,71 @@ def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
                 buffer.seek(0)
 
                 success = upload_fileobj(buffer, key, content_type="image/png")
-                img_files.add(key)
+                document_files.add(doc_id, key)
                 if not success:
                     logger.warning(detail=f"Failed to upload picture {pic_cnt} to S3")
 
                 data["pictures"][pic_cnt]["key"] = f"img_{pic_cnt}.png"
                 data["pictures"][pic_cnt].get("image", {}).pop("uri", None)
-                
+
             else:
                 continue
-            
+
         pages = data.get("pages", {})
         for page in pages.values():
             page.get("image", {}).pop("uri", None)
-        
 
         job_data = {
             "doc_id": doc_id,
             "status": "complete",
             "result": {
-                "schema_name": data.get('schema_name', ""),
-                "version": data.get('version', ""),
-                "name": data.get('name', ""),
-                "origin": data.get('origin', {}),
-                "furniture": data.get('furniture', {}),
-                "texts": data.get('texts', []),
-                "pictures": data.get('pictures', []),
-                "tables": data.get('tables', []),
-                "key_value_items": data.get('key_value_items', []),
-                "form_items": data.get('form_items', []),
-                "pages": data.get('pages', {})
-            }
+                "schema_name": data.get("schema_name", ""),
+                "version": data.get("version", ""),
+                "name": data.get("name", ""),
+                "origin": data.get("origin", {}),
+                "furniture": data.get("furniture", {}),
+                "texts": data.get("texts", []),
+                "pictures": data.get("pictures", []),
+                "tables": data.get("tables", []),
+                "key_value_items": data.get("key_value_items", []),
+                "form_items": data.get("form_items", []),
+                "pages": data.get("pages", {}),
+            },
         }
 
-        redis_image_sets[doc_id] = img_files
-        json_bytes = io.BytesIO(json.dumps(job_data).encode('utf-8'))
+        json_bytes = io.BytesIO(json.dumps(job_data).encode("utf-8"))
         json_key = f"{doc_id}/original.json"
         if not upload_fileobj(json_bytes, json_key, "application/json"):
             raise IOError(f"Failed to upload original JSON to S3 for doc_id={doc_id}")
+        document_files.add(doc_id, json_key)
 
-        save_job(doc_id = doc_id, 
-                 job_data = job_data, 
-                 status = "completed", 
-                 job_type = "extraction"
-                 )
-        
+        save_job(
+            doc_id=doc_id, job_data=job_data, status="completed", job_type="extraction"
+        )
+
         logger.info(f"Time to process PDF: {time.time() - start_time}")
 
     except Exception as e:
-        logger.exception(f"Docling failed to convert the document for doc_id: {doc_id} - {e}")
+        logger.exception(
+            f"Docling failed to convert the document for doc_id: {doc_id} - {e}"
+        )
         error_job = {
             "doc_id": doc_id,
             "status": "error",
-            "message": "Failed to download or parse document"
+            "message": "Failed to download or parse document",
         }
-        save_job(doc_id = doc_id, 
-                 job_data = error_job, 
-                 status = "failed", 
-                 job_type = "extraction"
-                 )
+        save_job(
+            doc_id=doc_id, job_data=error_job, status="failed", job_type="extraction"
+        )
+
 
 @router.post("/extract", response_model=ExtractResponse, status_code=202)
 async def submit_pdf(doc_id: str, download_url: str, background_tasks: BackgroundTasks):
-    save_job(doc_id = doc_id, 
-             job_data = {}, 
-             status = "processing", 
-             job_type = "extraction"
-             )
+    save_job(doc_id=doc_id, job_data={}, status="processing", job_type="extraction")
 
     background_tasks.add_task(process_pdf, doc_id, download_url)
     return ExtractResponse(doc_id=doc_id, status="processing")
+
 
 @router.get("/{doc_id}", response_model=ExtractResponse)
 async def get_status(doc_id: str):
@@ -138,12 +132,10 @@ async def get_status(doc_id: str):
     if job.get("status") == "failed":
         error_message = job.get("data", {}).get("message", "Processing failed")
         raise HTTPException(status_code=500, detail=error_message)
-    
+
     job_data = job.get("data", {})
     result = job_data.get("result", None)
 
     return ExtractResponse(
-        doc_id=doc_id,
-        status=job.get("status", "unknown"),
-        result=result
+        doc_id=doc_id, status=job.get("status", "unknown"), result=result
     )

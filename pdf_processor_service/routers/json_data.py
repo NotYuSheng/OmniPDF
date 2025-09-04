@@ -1,10 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 import logging
-from shared_utils.s3_utils import (
-    generate_external_presigned_url,
-    s3_client,
-    S3_BUCKET,
-)
+from shared_utils.s3_utils import get_object_stream
 from utils.session import validate_session_doc_pair
 
 from botocore.exceptions import ClientError
@@ -12,21 +9,19 @@ from botocore.exceptions import ClientError
 router = APIRouter(prefix="/json_data", tags=["json_data"])
 logger = logging.getLogger(__name__)
 
-@router.get("/{doc_id}", status_code=200)
-async def get_json(doc_id: str,
-                  json_name: str,
-                  _validated: bool = Depends(validate_session_doc_pair)
-                  ):
 
+@router.get("/{doc_id}", response_class=StreamingResponse, status_code=200)
+async def get_json(
+    doc_id: str, json_name: str, _validated: bool = Depends(validate_session_doc_pair)
+):
     key = f"{doc_id}/{json_name}.json"
 
-        # Check if object exists
+    # Check if object exists
     try:
-        s3_client.head_object(Bucket=S3_BUCKET, Key=key)
+        file_stream = get_object_stream(key)
     except ClientError as e:
-        if e.response["Error"]["Code"] == "404":
-            raise HTTPException(status_code=404, detail="Document not found")
-        raise HTTPException(status_code=500, detail="Failed to check document")
+        if e.response["Error"]["Code"] == "NoSuchKey":
+            raise HTTPException(status_code=404, detail="JSON file not found")
+        raise HTTPException(status_code=500, detail="Failed to check JSON file")
 
-    presigned_url = generate_external_presigned_url(key)
-    return {"key": key, "url": presigned_url}
+    return StreamingResponse(file_stream, media_type="application/json")

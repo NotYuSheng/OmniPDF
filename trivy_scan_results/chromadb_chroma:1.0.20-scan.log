@@ -1,0 +1,11 @@
+2025-09-05 00:50:17 - Starting scan for chromadb/chroma:1.0.20 (chromadb/chroma:1.0.20)
+2025-09-05 00:50:17 - Running comprehensive image scan...
+2025-09-05T00:50:17+08:00	INFO	[vuln] Vulnerability scanning is enabled
+2025-09-05T00:50:17+08:00	INFO	[secret] Secret scanning is enabled
+2025-09-05T00:50:17+08:00	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2025-09-05T00:50:17+08:00	INFO	[secret] Please see https://trivy.dev/v0.66/docs/scanner/secret#recommendation for faster secret detection
+2025-09-05T00:50:17+08:00	INFO	Detected OS	family="debian" version="13.0"
+2025-09-05T00:50:17+08:00	INFO	[debian] Detecting vulnerabilities...	os_version="13" pkg_num=82
+2025-09-05T00:50:17+08:00	INFO	Number of language-specific files	num=0
+2025-09-05T00:50:17+08:00	WARN	Using severities from other vendors for some vulnerabilities. Read https://trivy.dev/v0.66/docs/scanner/vulnerability#severity-selection for details.
+2025-09-05 00:50:17 - Scan completed successfully: No vulnerabilities found
