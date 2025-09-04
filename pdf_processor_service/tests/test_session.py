@@ -13,31 +13,33 @@ client = TestClient(app)
 class TestSessionRouter:
     @patch('routers.session.create_new_session')
     @patch('routers.session.delete_session')
-    @patch('routers.session.validate_session_id')
-    @patch('routers.session.get_session_id')
-    @patch('routers.session.get_session_storage')
-    def test_set_session_with_valid_existing_session(
-        self, mock_get_storage, mock_get_id, mock_validate, mock_delete, mock_create
-    ):
+    def test_set_session_with_valid_existing_session(self, mock_delete, mock_create):
         """Test setting session with valid existing session"""
+        from utils.session import get_session_id, validate_session_id, get_session_storage
+        
         # Mock dependencies
         mock_storage = MagicMock()
-        mock_get_storage.return_value = mock_storage
-        mock_get_id.return_value = "old_session_123"
-        mock_validate.return_value = True
         mock_create.return_value = "new_session_456"
         
-        response = client.post("/session/")
+        # Override dependencies for this test
+        app.dependency_overrides[get_session_storage] = lambda: mock_storage
+        app.dependency_overrides[get_session_id] = lambda: "old_session_123"
+        app.dependency_overrides[validate_session_id] = lambda: True
         
-        assert response.status_code == 200
-        response_data = response.json()
-        assert response_data["session_id"] == "new_session_456"
-        assert response_data["valid_session"] is True
-        
-        # Verify old session was deleted
-        mock_delete.assert_called_once()
-        # Verify new session was created
-        mock_create.assert_called_once()
+        try:
+            response = client.post("/session/")
+            
+            assert response.status_code == 200
+            response_data = response.json()
+            assert response_data["session_id"] == "new_session_456"
+            assert response_data["valid_session"] is True
+            
+            # Verify old session was deleted
+            mock_delete.assert_called_once()
+            # Verify new session was created
+            mock_create.assert_called_once()
+        finally:
+            app.dependency_overrides.clear()
 
     @patch('routers.session.create_new_session')
     @patch('routers.session.delete_session')
@@ -67,33 +69,41 @@ class TestSessionRouter:
         # Verify new session was created
         mock_create.assert_called_once()
 
-    @patch('routers.session.validate_session_id')
-    @patch('routers.session.get_session_id')
-    def test_get_session_status_valid(self, mock_get_id, mock_validate):
+    def test_get_session_status_valid(self):
         """Test getting status of valid session"""
-        mock_get_id.return_value = "session_123"
-        mock_validate.return_value = True
+        from utils.session import get_session_id, validate_session_id
         
-        response = client.get("/session/")
+        # Override dependencies for this test
+        app.dependency_overrides[get_session_id] = lambda: "session_123"
+        app.dependency_overrides[validate_session_id] = lambda: True
         
-        assert response.status_code == 200
-        response_data = response.json()
-        assert response_data["session_id"] == "session_123"
-        assert response_data["valid_session"] is True
+        try:
+            response = client.get("/session/")
+            
+            assert response.status_code == 200
+            response_data = response.json()
+            assert response_data["session_id"] == "session_123"
+            assert response_data["valid_session"] is True
+        finally:
+            app.dependency_overrides.clear()
 
-    @patch('routers.session.validate_session_id')
-    @patch('routers.session.get_session_id')
-    def test_get_session_status_invalid(self, mock_get_id, mock_validate):
+    def test_get_session_status_invalid(self):
         """Test getting status of invalid session"""
-        mock_get_id.return_value = "invalid_session"
-        mock_validate.return_value = False
+        from utils.session import get_session_id, validate_session_id
         
-        response = client.get("/session/")
+        # Override dependencies for this test
+        app.dependency_overrides[get_session_id] = lambda: "invalid_session"
+        app.dependency_overrides[validate_session_id] = lambda: False
         
-        assert response.status_code == 200
-        response_data = response.json()
-        assert response_data["session_id"] == "invalid_session"
-        assert response_data["valid_session"] is False
+        try:
+            response = client.get("/session/")
+            
+            assert response.status_code == 200
+            response_data = response.json()
+            assert response_data["session_id"] == "invalid_session"
+            assert response_data["valid_session"] is False
+        finally:
+            app.dependency_overrides.clear()
 
     @patch('routers.session.delete_session')
     @patch('routers.session.get_session_id')

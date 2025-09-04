@@ -8,7 +8,7 @@ from pydantic import BaseModel
 import json
 from io import BytesIO
 
-from shared_utils.redis import RedisSimpleFileFlag
+from shared_utils.redis_utils import RedisSimpleFileFlag
 
 logger = logging.getLogger(__name__)
 

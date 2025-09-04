@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List, Any
 
 class DoclingTranslationResponse(BaseModel):
@@ -15,7 +15,7 @@ class DoclingTranslationResponse(BaseModel):
     pages: Any
 
 class TranslateResponse(BaseModel):
-    doc_id: str
+    doc_id: str = Field(min_length=1, description="Document ID")
     docling: Optional[DoclingTranslationResponse] = None
-    source_lang: str
-    target_lang: str
+    source_lang: str = Field(min_length=1, description="Source language")
+    target_lang: str = Field(min_length=1, description="Target language")

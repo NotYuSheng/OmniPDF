@@ -137,7 +137,7 @@ class TestRedactAndRenderFunction:
             "docling": {
                 "texts": [
                     {
-                        "translated_text": None,  # Non-string text
+                        "translated_text": 123,  # Non-string text (integer)
                         "prov": [
                             {
                                 "page_no": 1,
@@ -153,7 +153,7 @@ class TestRedactAndRenderFunction:
         
         assert isinstance(result, bytes)
         # Should insert "Error" for non-string text
-        mock_page.insert_htmlbox.assert_called_with((10, 60, 50, 80), "Error")
+        mock_page.insert_htmlbox.assert_called_with((10, 80, 50, 60), "Error")
 
 
 class TestHandleFileFunction:

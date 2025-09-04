@@ -1,7 +1,6 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
 import uuid
 
 from main import app
@@ -63,8 +62,8 @@ class TestDataChunking:
             assert isinstance(result, list)
             assert len(result) == 1
             assert result[0]['content'] == "This is a sample chunk"
-            assert result[0]['doc_id'] == "test_doc_123"
-            assert result[0]['session_id'] == "session_456"
+            assert result[0]['metadata']['doc_id'] == "test_doc_123"
+            assert result[0]['metadata']['session_id'] == "session_456"
             assert 'chunk_id' in result[0]
             assert result[0]['chunk_index'] == 0
 
@@ -102,26 +101,28 @@ class TestDataChunking:
             for i, chunk in enumerate(result):
                 assert chunk['content'] == f"Chunk content {i+1}"
                 assert chunk['chunk_index'] == i
-                assert chunk['doc_id'] == "test_doc_123"
+                assert chunk['metadata']['doc_id'] == "test_doc_123"
 
-    @pytest.mark.asyncio
-    async def test_chunking_failure(self, sample_data_request):
-        """Test chunking failure handling"""
+    def test_chunking_failure(self, sample_data_request):
+        """Test chunking failure handling"""  
+        import asyncio
         from fastapi import HTTPException
         
-        with patch('routers.semantic.get_chunking_model') as mock_get_chunker:
-            mock_get_chunker.side_effect = Exception("Chunking model error")
-            
-            with pytest.raises(HTTPException) as exc_info:
-                await data_chunking(sample_data_request)
-            
-            assert exc_info.value.status_code == 500
-            assert "Chunking failed" in str(exc_info.value.detail)
+        async def run_test():
+            with patch('routers.semantic.get_chunking_model') as mock_get_chunker:
+                mock_get_chunker.side_effect = Exception("Chunking model error")
+                
+                with pytest.raises(HTTPException) as exc_info:
+                    await data_chunking(sample_data_request)
+                
+                assert exc_info.value.status_code == 500
+                assert "Chunking failed" in str(exc_info.value.detail)
+        
+        asyncio.run(run_test())
 
 
 class TestSemanticRoutes:
-    @pytest.mark.asyncio
-    async def test_semantic_embedding_success(self, sample_data_request):
+    def test_semantic_embedding_success(self, client, sample_data_request):
         """Test successful semantic embedding endpoint"""
         mock_chunks = [
             {
@@ -144,11 +145,10 @@ class TestSemanticRoutes:
             mock_chunk.return_value = mock_chunks
             mock_vectorize.return_value = mock_embed_results
             
-            async with AsyncClient(app=app, base_url="http://test") as ac:
-                response = await ac.post(
-                    "/semantic/",
-                    json=sample_data_request.dict()
-                )
+            response = client.post(
+                "/semantic/",
+                json=sample_data_request.model_dump()
+            )
             
             assert response.status_code == 200
             data = response.json()
@@ -157,36 +157,31 @@ class TestSemanticRoutes:
             assert data['chunks_created'] == 1
             assert len(data['chunk_details']) == 1
 
-    @pytest.mark.asyncio
-    async def test_semantic_embedding_no_chunks(self, sample_data_request):
+    def test_semantic_embedding_no_chunks(self, client, sample_data_request):
         """Test semantic embedding with no chunks created"""
         with patch('routers.semantic.data_chunking') as mock_chunk:
             mock_chunk.return_value = []
             
-            async with AsyncClient(app=app, base_url="http://test") as ac:
-                response = await ac.post(
-                    "/semantic/",
-                    json=sample_data_request.dict()
-                )
+            response = client.post(
+                "/semantic/",
+                json=sample_data_request.model_dump()
+            )
             
             assert response.status_code == 400
 
-    @pytest.mark.asyncio
-    async def test_semantic_embedding_failure(self, sample_data_request):
+    def test_semantic_embedding_failure(self, client, sample_data_request):
         """Test semantic embedding endpoint failure"""
         with patch('routers.semantic.data_chunking') as mock_chunk:
             mock_chunk.side_effect = Exception("Embedding failed")
             
-            async with AsyncClient(app=app, base_url="http://test") as ac:
-                response = await ac.post(
-                    "/semantic/",
-                    json=sample_data_request.dict()
-                )
+            response = client.post(
+                "/semantic/",
+                json=sample_data_request.model_dump()
+            )
             
             assert response.status_code == 500
 
-    @pytest.mark.asyncio
-    async def test_verify_document_embedding_found(self):
+    def test_verify_document_embedding_found(self, client):
         """Test document embedding verification when document exists"""
         mock_results = {
             'ids': ['chunk1', 'chunk2'],
@@ -199,8 +194,7 @@ class TestSemanticRoutes:
             mock_collection.get.return_value = mock_results
             mock_chroma.return_value.get_collection.return_value = mock_collection
             
-            async with AsyncClient(app=app, base_url="http://test") as ac:
-                response = await ac.get("/semantic/status/test_doc")
+            response = client.get("/semantic/status/test_doc")
             
             assert response.status_code == 200
             data = response.json()
@@ -209,8 +203,7 @@ class TestSemanticRoutes:
             assert data['chunks_found'] == 2
             assert data['chunks_have_embeddings'] is True
 
-    @pytest.mark.asyncio
-    async def test_verify_document_embedding_not_found(self):
+    def test_verify_document_embedding_not_found(self, client):
         """Test document embedding verification when document not found"""
         mock_results = {'ids': []}
         
@@ -219,8 +212,7 @@ class TestSemanticRoutes:
             mock_collection.get.return_value = mock_results
             mock_chroma.return_value.get_collection.return_value = mock_collection
             
-            async with AsyncClient(app=app, base_url="http://test") as ac:
-                response = await ac.get("/semantic/status/nonexistent_doc")
+            response = client.get("/semantic/status/nonexistent_doc")
             
             assert response.status_code == 200
             data = response.json()
@@ -228,13 +220,11 @@ class TestSemanticRoutes:
             assert data['status'] == 'not_found'
             assert data['chunks_found'] == 0
 
-    @pytest.mark.asyncio
-    async def test_verify_document_embedding_error(self):
+    def test_verify_document_embedding_error(self, client):
         """Test document embedding verification error handling"""
         with patch('routers.semantic.get_chroma_client') as mock_chroma:
             mock_chroma.side_effect = Exception("Database error")
             
-            async with AsyncClient(app=app, base_url="http://test") as ac:
-                response = await ac.get("/semantic/status/test_doc")
+            response = client.get("/semantic/status/test_doc")
             
             assert response.status_code == 500

@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import patch
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from routers.bypass import router, s3_upload
 import io

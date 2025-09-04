@@ -7,14 +7,14 @@ from uuid import uuid4
 
 from fastapi import Depends, Request, Response, HTTPException
 
-import shared_utils.redis
+import shared_utils.redis_utils
 
 
 SESSION_COOKIE_NAME: str = "OmniPDFSession"
 SESSION_REDIS_PREFIX = "Session_Files"
 SESSION_FLAG_PREFIX = "SessionHeader"
 
-class SessionStorage(shared_utils.redis.RedisSetWithFlagExpiry):
+class SessionStorage(shared_utils.redis_utils.RedisSetWithFlagExpiry):
     def __init__(self, redis_client=None, prefix=SESSION_REDIS_PREFIX, flag_prefix=SESSION_FLAG_PREFIX, default_expiry=timedelta(days=1)):
         super().__init__(redis_client, prefix, flag_prefix, default_expiry)
 

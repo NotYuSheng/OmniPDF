@@ -4,7 +4,7 @@ from typing import Optional, List, Dict
 class DocumentRendererResponse(BaseModel):
     doc_id: str
     filename: str
-    download_url: Optional[HttpUrl]
+    download_url: Optional[HttpUrl] = None
 
 class DoclingTranslationResponse(BaseModel):
     schema_name: str

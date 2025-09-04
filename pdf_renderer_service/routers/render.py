@@ -106,9 +106,16 @@ async def pdf_render(
                 ):
 
     start_time = time.time()
-    async with httpx.AsyncClient() as client:
-        pdf_response = await client.get(doc_url)
-        pdf_response.raise_for_status()
+    try:
+        async with httpx.AsyncClient() as client:
+            pdf_response = await client.get(doc_url)
+            pdf_response.raise_for_status()
+    except httpx.HTTPStatusError as e:
+        logger.error(f"HTTP error fetching PDF: {e.response.status_code}")
+        raise HTTPException(422, f"Failed to fetch PDF from {doc_url}: HTTP {e.response.status_code}")
+    except httpx.RequestError as e:
+        logger.error(f"Request error fetching PDF: {e}")
+        raise HTTPException(422, f"Failed to fetch PDF from {doc_url}: {str(e)}")
 
     content_length = pdf_response.headers.get("Content-Length")
     if content_length:

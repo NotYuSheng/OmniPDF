@@ -9,7 +9,7 @@ from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
 from utils.proxy import load_or_create_job, generate_external_image_url
 from shared_utils.s3_utils import get_object_stream, list_folder
-from shared_utils.redis import RedisSetWithFlagExpiry
+from shared_utils.redis_utils import RedisSetWithFlagExpiry
 
 
 router = APIRouter(prefix="/images", tags=["images"])

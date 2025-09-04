@@ -1,6 +1,6 @@
 import logging
 
-from shared_utils.redis import RedisBase, RedisSetStorage, SEPERATOR
+from shared_utils.redis_utils import RedisBase, RedisSetStorage, SEPERATOR
 from shared_utils.s3_utils import delete_file, delete_folder, get_job_s3_key
 
 logger = logging.getLogger(__name__)

@@ -7,8 +7,7 @@ __pycache__/
 
 # Virtual environment
 .venv/
-.venv_tests/
-.venv_integration/
+.venv_test/
 env/
 venv/
 

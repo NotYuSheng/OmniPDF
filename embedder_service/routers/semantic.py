@@ -23,9 +23,9 @@ async def data_chunking(request:DataRequest) -> List[Dict[str, Any]]:
     and reject by returning empty list if PDF document has no textual content"""
 
     logger.info("Starting chunking process...")
-    chunker = get_chunking_model(request.config)
-
+    
     try:
+        chunker = get_chunking_model(request.config)
         if not request.text.strip():
             raise HTTPException(status_code=400, detail="No textual content found in PDF")
 
@@ -94,6 +94,9 @@ async def data_chunking(request:DataRequest) -> List[Dict[str, Any]]:
 
         logger.info(chunk_data)
         return chunk_data
+    except HTTPException:
+        # Re-raise HTTPExceptions (like 400 Bad Request) as-is
+        raise
     except Exception as e:
         logger.error(f"Chunking failed: {e}")
         raise HTTPException(status_code=500, detail="Chunking failed.")
@@ -130,6 +133,9 @@ async def pdf_embedder_service(request: DataRequest):
                     for chunk in chunk_data
                 ]
             }
+    except HTTPException:
+        # Re-raise HTTPExceptions (like 400 Bad Request) as-is
+        raise
     except Exception as e:
         logger.error(f"PDF embedder service failed: {e}")
         raise HTTPException(status_code=500, detail="PDF embedder service failed")

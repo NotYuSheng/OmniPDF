@@ -1,11 +1,11 @@
 import pytest
+import asyncio
 import httpx
 from unittest.mock import AsyncMock, patch, MagicMock
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
 from routers.caption import router, get_image
 from models.caption import ImageCaptioningRequest
-from openai import APIError
 from PIL import Image
 import io
 
@@ -14,6 +14,13 @@ import io
 app = FastAPI()
 app.include_router(router)
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def cleanup_dependencies():
+    """Ensure dependency overrides are cleared between tests"""
+    yield
+    app.dependency_overrides.clear()
 
 
 class TestGetImageFunction:
@@ -123,65 +130,81 @@ class TestGetImageFunction:
 
 class TestCaptionRouter:
     @patch('routers.caption.get_image')
-    @patch('routers.caption.get_openai_client')
-    def test_generate_image_caption_success(self, mock_get_client, mock_get_image):
+    def test_generate_image_caption_success(self, mock_get_image):
         """Test successful image caption generation"""
-        # Mock image retrieval
-        mock_get_image.return_value = (b"mock_image_bytes", "png")
+        from shared_utils.openai_client import get_openai_client
         
-        # Mock OpenAI client response
+        # Mock image retrieval as async
+        async def mock_get_image_func(*args, **kwargs):
+            return (b"mock_image_bytes", "png")
+        mock_get_image.side_effect = mock_get_image_func
+        
+        # Mock OpenAI client response using dependency override
         mock_client = AsyncMock()
         mock_choice = MagicMock()
         mock_choice.message.content = "A beautiful landscape with mountains and trees"
         mock_response = MagicMock()
         mock_response.choices = [mock_choice]
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
-        mock_get_client.return_value = mock_client
         
-        request_data = ImageCaptioningRequest(
-            doc_id="doc123",
-            image_id="img456",
-            image_url="https://example.com/image.png",
-            prompt="Describe this landscape"
-        )
+        # Override the dependency
+        app.dependency_overrides[get_openai_client] = lambda: mock_client
         
-        response = client.post("/caption/", json=request_data.model_dump())
-        
-        assert response.status_code == 200
-        response_data = response.json()
-        assert "caption" in response_data
-        assert "A beautiful landscape with mountains and trees." in response_data["caption"]
-
-    @patch('routers.caption.get_image')
-    @patch('routers.caption.get_openai_client')
-    def test_generate_image_caption_with_post_processing_disabled(self, mock_get_client, mock_get_image):
-        """Test image caption generation with post-processing disabled"""
-        # Mock image retrieval
-        mock_get_image.return_value = (b"mock_image_bytes", "png")
-        
-        # Mock OpenAI client response
-        mock_client = AsyncMock()
-        mock_choice = MagicMock()
-        mock_choice.message.content = "A beautiful landscape"
-        mock_response = MagicMock()
-        mock_response.choices = [mock_choice]
-        mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
-        mock_get_client.return_value = mock_client
-        
-        # Mock VLM config to disable post-processing
-        with patch('routers.caption.vlm_config.enable_response_post_processing', False):
+        try:
             request_data = ImageCaptioningRequest(
                 doc_id="doc123",
                 image_id="img456",
-                image_url="https://example.com/image.png"
+                image_url="https://example.com/image.png",
+                prompt="Describe this landscape"
             )
             
             response = client.post("/caption/", json=request_data.model_dump())
             
             assert response.status_code == 200
             response_data = response.json()
-            # Without post-processing, no period should be added
-            assert response_data["caption"] == "A beautiful landscape"
+            assert "caption" in response_data
+            assert "A beautiful landscape with mountains and trees." in response_data["caption"]
+        finally:
+            app.dependency_overrides.clear()
+
+    @patch('routers.caption.get_image')
+    def test_generate_image_caption_with_post_processing_disabled(self, mock_get_image):
+        """Test image caption generation with post-processing disabled"""
+        from shared_utils.openai_client import get_openai_client
+        
+        # Mock image retrieval as async
+        async def mock_get_image_func(*args, **kwargs):
+            return (b"mock_image_bytes", "png")
+        mock_get_image.side_effect = mock_get_image_func
+        
+        # Mock OpenAI client response using dependency override
+        mock_client = AsyncMock()
+        mock_choice = MagicMock()
+        mock_choice.message.content = "A beautiful landscape"
+        mock_response = MagicMock()
+        mock_response.choices = [mock_choice]
+        mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
+        
+        # Override the dependency
+        app.dependency_overrides[get_openai_client] = lambda: mock_client
+        
+        try:
+            # Mock VLM config to disable post-processing
+            with patch('routers.caption.vlm_config.enable_response_post_processing', False):
+                request_data = ImageCaptioningRequest(
+                    doc_id="doc123",
+                    image_id="img456",
+                    image_url="https://example.com/image.png"
+                )
+                
+                response = client.post("/caption/", json=request_data.model_dump())
+                
+                assert response.status_code == 200
+                response_data = response.json()
+                # Without post-processing, no period should be added
+                assert response_data["caption"] == "A beautiful landscape"
+        finally:
+            app.dependency_overrides.clear()
 
     def test_generate_image_caption_missing_image_url(self):
         """Test caption generation with missing image URL"""
@@ -194,14 +217,17 @@ class TestCaptionRouter:
         
         response = client.post("/caption/", json=request_data)
         
-        assert response.status_code == 400
+        assert response.status_code == 422  # Pydantic validation error for empty string
         response_data = response.json()
-        assert "Image URL is required" in response_data["detail"]
+        assert "Field cannot be empty" in str(response_data)
 
     @patch('routers.caption.get_image')
     def test_generate_image_caption_image_retrieval_error(self, mock_get_image):
         """Test caption generation when image retrieval fails"""
-        mock_get_image.side_effect = Exception("Failed to fetch image")
+        # Mock async function with exception
+        async def mock_get_image_error(*args, **kwargs):
+            raise Exception("Failed to fetch image")
+        mock_get_image.side_effect = mock_get_image_error
         
         request_data = ImageCaptioningRequest(
             doc_id="doc123",
@@ -209,112 +235,151 @@ class TestCaptionRouter:
             image_url="https://example.com/image.png"
         )
         
-        response = client.post("/caption/", json=request_data)
+        response = client.post("/caption/", json=request_data.model_dump())
         
         # The exception from get_image should propagate
         assert response.status_code == 500
 
     @patch('routers.caption.get_image')
-    @patch('routers.caption.get_openai_client')
-    def test_generate_image_caption_openai_api_error(self, mock_get_client, mock_get_image):
+    def test_generate_image_caption_openai_api_error(self, mock_get_image):
         """Test caption generation with OpenAI API error"""
-        mock_get_image.return_value = (b"mock_image_bytes", "png")
+        from shared_utils.openai_client import get_openai_client
         
-        # Mock OpenAI client to raise APIError
+        # Mock image retrieval as async
+        async def mock_get_image_func(*args, **kwargs):
+            return (b"mock_image_bytes", "png")
+        mock_get_image.side_effect = mock_get_image_func
+        
+        # Mock OpenAI client to raise APIError using dependency override
+        from openai import APIError
         mock_client = AsyncMock()
-        mock_client.chat.completions.create = AsyncMock(side_effect=APIError("API Error"))
-        mock_get_client.return_value = mock_client
+        # Create a proper APIError - it needs a message and response/request parameters
+        api_error = Exception("API Error")  # Use Exception to trigger the except block in the router
+        mock_client.chat.completions.create = AsyncMock(side_effect=api_error)
         
-        request_data = ImageCaptioningRequest(
-            doc_id="doc123",
-            image_id="img456",
-            image_url="https://example.com/image.png"
-        )
+        # Override the dependency
+        app.dependency_overrides[get_openai_client] = lambda: mock_client
         
-        response = client.post("/caption/", json=request_data)
-        
-        assert response.status_code == 500
-        response_data = response.json()
-        assert "HTTP error calling vLLM service" in response_data["detail"]
+        try:
+            request_data = ImageCaptioningRequest(
+                doc_id="doc123",
+                image_id="img456",
+                image_url="https://example.com/image.png"
+            )
+            
+            response = client.post("/caption/", json=request_data.model_dump())
+            
+            assert response.status_code == 500
+            response_data = response.json()
+            assert "HTTP error calling vLLM service" in response_data["detail"]
+        finally:
+            app.dependency_overrides.clear()
 
     @patch('routers.caption.get_image')
-    @patch('routers.caption.get_openai_client')
-    def test_generate_image_caption_no_choices(self, mock_get_client, mock_get_image):
+    def test_generate_image_caption_no_choices(self, mock_get_image):
         """Test caption generation when OpenAI returns no choices"""
-        mock_get_image.return_value = (b"mock_image_bytes", "png")
+        from shared_utils.openai_client import get_openai_client
         
-        # Mock OpenAI client response with no choices
+        # Mock image retrieval as async
+        async def mock_get_image_func(*args, **kwargs):
+            return (b"mock_image_bytes", "png")
+        mock_get_image.side_effect = mock_get_image_func
+        
+        # Mock OpenAI client response with no choices using dependency override
         mock_client = AsyncMock()
         mock_response = MagicMock()
         mock_response.choices = []
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
-        mock_get_client.return_value = mock_client
         
-        request_data = ImageCaptioningRequest(
-            doc_id="doc123",
-            image_id="img456",
-            image_url="https://example.com/image.png"
-        )
+        # Override the dependency
+        app.dependency_overrides[get_openai_client] = lambda: mock_client
         
-        response = client.post("/caption/", json=request_data)
-        
-        assert response.status_code == 500
-        response_data = response.json()
-        assert "No choices found in OpenAI response" in response_data["detail"]
+        try:
+            request_data = ImageCaptioningRequest(
+                doc_id="doc123",
+                image_id="img456",
+                image_url="https://example.com/image.png"
+            )
+            
+            response = client.post("/caption/", json=request_data.model_dump())
+            
+            assert response.status_code == 500
+            response_data = response.json()
+            assert "No choices found in OpenAI response" in response_data["detail"]
+        finally:
+            app.dependency_overrides.clear()
 
     @patch('routers.caption.get_image')
-    @patch('routers.caption.get_openai_client')
-    def test_generate_image_caption_malformed_choice(self, mock_get_client, mock_get_image):
+    def test_generate_image_caption_malformed_choice(self, mock_get_image):
         """Test caption generation when OpenAI returns malformed choice"""
-        mock_get_image.return_value = (b"mock_image_bytes", "png")
+        from shared_utils.openai_client import get_openai_client
         
-        # Mock OpenAI client response with malformed choice
+        # Mock image retrieval as async
+        async def mock_get_image_func(*args, **kwargs):
+            return (b"mock_image_bytes", "png")
+        mock_get_image.side_effect = mock_get_image_func
+        
+        # Mock OpenAI client response with malformed choice using dependency override
         mock_client = AsyncMock()
         mock_choice = MagicMock()
         mock_choice.message = None
         mock_response = MagicMock()
         mock_response.choices = [mock_choice]
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
-        mock_get_client.return_value = mock_client
         
-        request_data = ImageCaptioningRequest(
-            doc_id="doc123",
-            image_id="img456",
-            image_url="https://example.com/image.png"
-        )
+        # Override the dependency
+        app.dependency_overrides[get_openai_client] = lambda: mock_client
         
-        response = client.post("/caption/", json=request_data)
-        
-        assert response.status_code == 500
-        response_data = response.json()
-        assert "Malformed choice in OpenAI response" in response_data["detail"]
+        try:
+            request_data = ImageCaptioningRequest(
+                doc_id="doc123",
+                image_id="img456",
+                image_url="https://example.com/image.png"
+            )
+            
+            response = client.post("/caption/", json=request_data.model_dump())
+            
+            assert response.status_code == 500
+            response_data = response.json()
+            assert "Malformed choice in OpenAI response" in response_data["detail"]
+        finally:
+            app.dependency_overrides.clear()
 
     @patch('routers.caption.get_image')
-    @patch('routers.caption.get_openai_client')
-    def test_generate_image_caption_none_content(self, mock_get_client, mock_get_image):
+    def test_generate_image_caption_none_content(self, mock_get_image):
         """Test caption generation when OpenAI returns None content"""
-        mock_get_image.return_value = (b"mock_image_bytes", "png")
+        from shared_utils.openai_client import get_openai_client
         
-        # Mock OpenAI client response with None content
+        # Mock image retrieval as async
+        async def mock_get_image_func(*args, **kwargs):
+            return (b"mock_image_bytes", "png")
+        mock_get_image.side_effect = mock_get_image_func
+        
+        # Mock OpenAI client response with None content using dependency override
         mock_client = AsyncMock()
         mock_choice = MagicMock()
         mock_choice.message.content = None
         mock_response = MagicMock()
         mock_response.choices = [mock_choice]
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
-        mock_get_client.return_value = mock_client
         
-        request_data = ImageCaptioningRequest(
-            doc_id="doc123",
-            image_id="img456",
-            image_url="https://example.com/image.png"
-        )
+        # Override the dependency
+        app.dependency_overrides[get_openai_client] = lambda: mock_client
         
-        response = client.post("/caption/", json=request_data)
-        
-        assert response.status_code == 500
-        response_data = response.json()
-        assert "Malformed choice in OpenAI response" in response_data["detail"]
+        try:
+            request_data = ImageCaptioningRequest(
+                doc_id="doc123",
+                image_id="img456",
+                image_url="https://example.com/image.png"
+            )
+            
+            response = client.post("/caption/", json=request_data.model_dump())
+            
+            assert response.status_code == 500
+            response_data = response.json()
+            assert "Malformed choice in OpenAI response" in response_data["detail"]
+        finally:
+            app.dependency_overrides.clear()
 
     def test_generate_image_caption_invalid_request(self):
         """Test caption generation with invalid request data"""
@@ -328,28 +393,38 @@ class TestCaptionRouter:
         assert response.status_code == 422  # Validation error
 
     @patch('routers.caption.get_image')
-    @patch('routers.caption.get_openai_client')
-    def test_generate_image_caption_with_default_prompt(self, mock_get_client, mock_get_image):
+    def test_generate_image_caption_with_default_prompt(self, mock_get_image):
         """Test caption generation using default prompt"""
-        mock_get_image.return_value = (b"mock_image_bytes", "png")
+        from shared_utils.openai_client import get_openai_client
         
+        # Mock image retrieval as async
+        async def mock_get_image_func(*args, **kwargs):
+            return (b"mock_image_bytes", "png")
+        mock_get_image.side_effect = mock_get_image_func
+        
+        # Mock OpenAI client response using dependency override
         mock_client = AsyncMock()
         mock_choice = MagicMock()
         mock_choice.message.content = "Default caption"
         mock_response = MagicMock()
         mock_response.choices = [mock_choice]
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
-        mock_get_client.return_value = mock_client
         
-        request_data = {
-            "doc_id": "doc123",
-            "image_id": "img456",
-            "image_url": "https://example.com/image.png"
-            # No prompt specified, should use default
-        }
+        # Override the dependency
+        app.dependency_overrides[get_openai_client] = lambda: mock_client
         
-        response = client.post("/caption/", json=request_data)
-        
-        assert response.status_code == 200
-        response_data = response.json()
-        assert "caption" in response_data
+        try:
+            request_data = ImageCaptioningRequest(
+                doc_id="doc123",
+                image_id="img456",
+                image_url="https://example.com/image.png"
+                # No prompt specified, should use default
+            )
+            
+            response = client.post("/caption/", json=request_data.model_dump())
+            
+            assert response.status_code == 200
+            response_data = response.json()
+            assert "caption" in response_data
+        finally:
+            app.dependency_overrides.clear()
