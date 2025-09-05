@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 import logging
 import time
@@ -71,10 +72,15 @@ async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
                 continue
         
         #captioning
-        for idx, pic in enumerate(data.get("pictures", [])):
-            image_url = generate_presigned_url(get_image_s3_key(doc_id, pic["key"]))
-            caption = await get_caption(doc_id, pic["key"], image_url)
-            data["pictures"][idx]["caption"] = caption
+        pictures = data.get("pictures", [])
+        if pictures:
+            tasks = [
+                get_caption(doc_id, pic["key"], generate_presigned_url(get_image_s3_key(doc_id, pic["key"])))
+                for pic in pictures
+            ]
+            captions = await asyncio.gather(*tasks)
+            for idx, caption in enumerate(captions):
+                data["pictures"][idx]["caption"] = caption
 
         pages = data.get("pages", {})
         for page in pages.values():
