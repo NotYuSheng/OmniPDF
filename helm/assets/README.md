@@ -15,7 +15,7 @@ Reference the logo in your Chart.yaml files:
 
 ```yaml
 # Chart.yaml
-icon: file://logo.svg
+icon: file://../assets/logo.svg
 ```
 
 ## Logo Guidelines
