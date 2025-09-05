@@ -7,7 +7,7 @@ from wordcloud import WordCloud
 
 from shared_utils.s3_utils import upload_fileobj
 from shared_utils.job_status import load_job, JobType
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 from models.wordcloud import WordcloudResponse
 
 router = APIRouter(prefix="/wordcloud", tags=["wordcloud"])
@@ -40,7 +40,11 @@ async def get_wordcloud(
     doc_text = await concat_text(doc_id)
     wordcloud = WordCloud(max_words=MAX_WORDS)
     words = wordcloud.process_text(doc_text)
-    top_words = list(dict(sorted(words.items(), key=lambda item: item[1], reverse=True)[0:MAX_WORDS]).keys())
+    top_words = list(
+        dict(
+            sorted(words.items(), key=lambda item: item[1], reverse=True)[0:MAX_WORDS]
+        ).keys()
+    )
 
     wordcloud.generate_from_frequencies(words)
     img_filepath = f"{doc_id}/wordcloud.png"

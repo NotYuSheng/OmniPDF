@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from shared_utils.redis import (
+from shared_utils.redis_utils import (
     RedisBase,
     RedisDocumentFileList,
     RedisSetStorage,
@@ -42,7 +42,10 @@ async def empty_function(_):
 
 async def handle_session_doc_list(prefixed_session_id: str):
     logger.info(f"deleting session_id: {prefixed_session_id}")
-    prefixed_keys = [document_files.flag_prefixed(doc_id) for doc_id in redis_set_store[prefixed_session_id]]
+    prefixed_keys = [
+        document_files.flag_prefixed(doc_id)
+        for doc_id in redis_set_store[prefixed_session_id]
+    ]
     redis_store.delete_set(prefixed_keys)
     del redis_set_store[prefixed_session_id]
 
@@ -57,17 +60,21 @@ async def handle_doc_file_list(prefixed_doc_id: str):
 
 async def clean_chromadb(doc_id):
     chroma_client = await get_chroma_client()
-    
+
     async def delete_from_collection(collection_name):
         collection = await chroma_client.get_or_create_collection(name=collection_name)
         await collection.delete(where={"doc_id": doc_id})
-        logger.info(f"Deleted documents with doc_id '{doc_id}' from collection '{collection_name}'")
-    
+        logger.info(
+            f"Deleted documents with doc_id '{doc_id}' from collection '{collection_name}'"
+        )
+
     # Process all collections concurrently using asyncio.gather
-    await asyncio.gather(*[
-        delete_from_collection(collection_name) 
-        for collection_name in EMBEDDING_COLLECTIONS
-    ])
+    await asyncio.gather(
+        *[
+            delete_from_collection(collection_name)
+            for collection_name in EMBEDDING_COLLECTIONS
+        ]
+    )
 
 
 DELETION_PREFIX_CALLBACK_DICT = {

@@ -9,13 +9,18 @@ class ChatRequest(BaseModel):
 
     message: str
     doc_id: Optional[str] = None
-    collection_name: str = Field(default="default_collection", description="ChromaDB collection name")
+    collection_name: str = Field(
+        default="default_collection", description="ChromaDB collection name"
+    )
 
 
 class ChatResponse(BaseModel):
     """
     Response model for chat API
     """
+
     response: str
-    relevant_chunks: List[Dict[str, Any]] = Field(default_factory=list, description="Additional metadata about the RAG process")
+    relevant_chunks: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Additional metadata about the RAG process"
+    )
     metadata: Dict[str, Any]

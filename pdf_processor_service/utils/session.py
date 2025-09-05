@@ -6,23 +6,36 @@ from uuid import uuid4
 
 from fastapi import Depends, Request, Response, HTTPException
 
-from shared_utils.redis import RedisDocumentFileList, RedisSetWithFlagExpiry, RedisPrefix, EXPIRY_DAY
+from shared_utils.redis_utils import (
+    RedisDocumentFileList,
+    RedisSetWithFlagExpiry,
+    RedisPrefix,
+    EXPIRY_DAY,
+)
 
 SESSION_COOKIE_NAME: str = "OmniPDFSession"
-  
+
 
 class SessionStorage(RedisSetWithFlagExpiry):
-    def __init__(self, redis_client=None, prefix=RedisPrefix.SESSION_DOC_LIST, flag_prefix=RedisPrefix.SESSION_FLAG, default_expiry=EXPIRY_DAY):
+    def __init__(
+        self,
+        redis_client=None,
+        prefix=RedisPrefix.SESSION_DOC_LIST,
+        flag_prefix=RedisPrefix.SESSION_FLAG,
+        default_expiry=EXPIRY_DAY,
+    ):
         super().__init__(redis_client, prefix, flag_prefix, default_expiry)
 
     def generate_session(self) -> str:
         session_id = uuid4().hex
-        while not self.client.set(self.flag_prefixed(session_id), 1, ex=self.flag_expiry, nx=True):
+        while not self.client.set(
+            self.flag_prefixed(session_id), 1, ex=self.flag_expiry, nx=True
+        ):
             session_id = uuid4().hex
         return session_id
 
 
-def get_session_storage() -> Generator[SessionStorage]:
+def get_session_storage() -> Generator[SessionStorage, None, None]:
     storage = SessionStorage()
     yield storage
 
@@ -66,7 +79,7 @@ def validate_session_doc_pair(
     if valid_session:
         if session_storage.contains(session_id, doc_id):
             return True
-    
+
     raise HTTPException(
         status_code=403,
         detail="User not authorized to access this document or invalid document ID",
@@ -96,6 +109,7 @@ def get_doc_list_remove_function(
     session_storage: SessionStorage = Depends(get_session_storage),
 ) -> Callable[[str], None]:
     document_files = RedisDocumentFileList()
+
     def remove_doc(doc_id: str):
         session_storage.remove(session_id, doc_id)
         del document_files[doc_id]

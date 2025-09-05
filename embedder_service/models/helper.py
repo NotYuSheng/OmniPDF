@@ -5,9 +5,13 @@ from functools import lru_cache
 # Langchain components
 from langchain_core.embeddings import Embeddings
 from langchain_experimental.text_splitter import SemanticChunker
+
 # Sentence transformers
 from sentence_transformers import SentenceTransformer
-from chromadb.utils.embedding_functions.sentence_transformer_embedding_function import SentenceTransformerEmbeddingFunction
+from chromadb.utils.embedding_functions.sentence_transformer_embedding_function import (
+    SentenceTransformerEmbeddingFunction,
+)
+
 
 # Custom Embeddings class for Sentence Transformers
 class SentenceTransformerEmbeddings(Embeddings):
@@ -38,8 +42,8 @@ def get_chunking_model(config: ProcessingConfig):
     # emb_model = get_embedding_model(config.embedding_model)
     sem_chunker = SemanticChunker(
         SentenceTransformerEmbeddings(config.embedding_model),
-        breakpoint_threshold_type=config.breakpoint_threshold_type, 
-        breakpoint_threshold_amount=config.breakpoint_threshold_amount
+        breakpoint_threshold_type=config.breakpoint_threshold_type,
+        breakpoint_threshold_amount=config.breakpoint_threshold_amount,
     )
 
     return sem_chunker
