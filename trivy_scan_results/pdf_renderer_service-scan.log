@@ -1,0 +1,15 @@
+2025-09-05 00:49:59 - Starting scan for pdf_renderer_service (omnipdf-pdf_renderer_service:latest)
+2025-09-05 00:49:59 - Running comprehensive scan (image + filesystem)...
+  → Scanning Docker image...
+2025-09-05T00:49:59+08:00	INFO	[vuln] Vulnerability scanning is enabled
+2025-09-05T00:49:59+08:00	INFO	[secret] Secret scanning is enabled
+2025-09-05T00:49:59+08:00	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2025-09-05T00:49:59+08:00	INFO	[secret] Please see https://trivy.dev/v0.66/docs/scanner/secret#recommendation for faster secret detection
+2025-09-05T00:49:59+08:00	INFO	Detected OS	family="debian" version="13.0"
+2025-09-05T00:49:59+08:00	INFO	[debian] Detecting vulnerabilities...	os_version="13" pkg_num=88
+2025-09-05T00:49:59+08:00	INFO	Number of language-specific files	num=1
+2025-09-05T00:49:59+08:00	INFO	[python-pkg] Detecting vulnerabilities...
+2025-09-05T00:49:59+08:00	WARN	Using severities from other vendors for some vulnerabilities. Read https://trivy.dev/v0.66/docs/scanner/vulnerability#severity-selection for details.
+  → Scanning filesystem...
+2025-09-05T00:50:04+08:00	FATAL	Fatal error	run error: init error: DB error: error in vulnerability DB initialize: vulnerability database may be in use by another process: timeout
+2025-09-05 00:50:04 - Scan completed successfully: No vulnerabilities found

@@ -1,4 +1,14 @@
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: frontend
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "8501:8501"
+
   pdf_processor_service:
     build:
       context: .
@@ -6,17 +16,9 @@ services:
     container_name: pdf_processor_service
     env_file:
       - ./pdf_processor_service/.env
+    ports:
+      - "8000:8000"
 
-  cleaner:
-      build:
-        context: .
-        dockerfile: ./cleaner/Dockerfile
-      container_name: cleaner
-      env_file:
-        - ./cleaner/.env
-      depends_on:
-        - redis
-        
   chat_service:
     build:
       context: .
@@ -63,6 +65,16 @@ services:
     depends_on:
       - chromadb
 
+  metadata_service:
+    build:
+      context: .
+      dockerfile: ./metadata_service/Dockerfile
+    container_name: metadata_service
+    env_file:
+      - ./metadata_service/.env
+    depends_on:
+      - chromadb
+
   image_captioner_service:
     build:
       context: .
@@ -70,6 +82,16 @@ services:
     container_name: image_captioner_service
     env_file:
       - ./image_captioner_service/.env
+
+  cleaner:
+      build:
+        context: .
+        dockerfile: ./cleaner/Dockerfile
+      container_name: cleaner
+      env_file:
+        - ./cleaner/.env
+      depends_on:
+        - redis
 
   nginx:
     container_name: nginx
@@ -81,23 +103,17 @@ services:
     env_file:
       - ./nginx/.env
     depends_on:
-      - pdf_extraction_service
       - pdf_processor_service
-      - chat_service
-      - docling_translation_service
-      - pdf_renderer_service
-      - embedder_service
-      - minio
 
   redis:
     container_name: redis
-    image: redis:7.4.4-alpine
+    image: redis:8.2.1-alpine
     expose:
       - "6379"
   
   chromadb:
     container_name: chromadb
-    image: chromadb/chroma:1.0.13
+    image: chromadb/chroma:1.0.20
     volumes:
       - chromadb-data:/data
     environment:
@@ -112,8 +128,8 @@ services:
       - "8000"
     
   minio:
-    image: minio/minio
     container_name: minio
+    image: minio/minio:RELEASE.2025-07-23T15-54-02Z
     ports:
       - "9000:9000"   # S3 API
       - "9001:9001"   # Admin UI
@@ -130,8 +146,8 @@ services:
       retries: 5
 
   createbucket:
-    image: minio/mc
     container_name: createbucket
+    image: minio/mc:RELEASE.2025-07-21T05-28-08Z
     depends_on:
       - minio
     entrypoint: >
@@ -145,15 +161,6 @@ services:
         mc policy set none local/omnifiles
         exit 0;
       "
-  frontend:
-    build:
-      context: .
-      dockerfile: ./frontend/Dockerfile
-    container_name: frontend
-    env_file:
-      - ./frontend/.env
-    ports:
-      - "8501:8501"
 
 volumes:
   minio-data:

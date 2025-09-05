@@ -7,6 +7,7 @@ __pycache__/
 
 # Virtual environment
 .venv/
+.venv_test/
 env/
 venv/
 
@@ -39,3 +40,19 @@ data/
 
 llm_models/
 .llm_models
+
+# Integration testing (allow scan reports but ignore temp files)
+trivy_scan_results/archive/
+!trivy_scan_results/.gitkeep
+!trivy_scan_results/*.txt
+!trivy_scan_results/*.log
+*.scan
+*.sarif
+
+# Temporary testing files
+test_results/
+coverage/
+
+# Code assist tools
+.claude/
+CLAUDE.md

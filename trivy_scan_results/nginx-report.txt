@@ -1,0 +1,39 @@
+TRIVY SECURITY SCAN REPORT
+==========================
+Service: nginx
+Image: omnipdf-nginx:latest
+Scan Date: 2025-09-05 00:50:17
+Severity Levels: HIGH,CRITICAL
+
+DOCKER IMAGE SCAN RESULTS
+=========================
+
+Report Summary
+
+┌──────────────────────────────────────┬────────┬─────────────────┬─────────┐
+│                Target                │  Type  │ Vulnerabilities │ Secrets │
+├──────────────────────────────────────┼────────┼─────────────────┼─────────┤
+│ omnipdf-nginx:latest (alpine 3.22.1) │ alpine │        0        │    -    │
+└──────────────────────────────────────┴────────┴─────────────────┴─────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+FILESYSTEM SCAN RESULTS
+=======================
+
+Report Summary
+
+┌────────┬──────┬─────────────────┬─────────┐
+│ Target │ Type │ Vulnerabilities │ Secrets │
+├────────┼──────┼─────────────────┼─────────┤
+│   -    │  -   │        -        │    -    │
+└────────┴──────┴─────────────────┴─────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+End of Report
+=============
