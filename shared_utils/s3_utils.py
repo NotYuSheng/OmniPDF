@@ -150,7 +150,8 @@ def get_job_s3_key(doc_id: str, job_type: str):
 
 
 def get_image_s3_key(doc_id: str, image_name: str):
-    return f"{doc_id}/images/{image_name}.png"
+    base_name = image_name.removesuffix(".png")
+    return f"{doc_id}/images/{base_name}.png"
 
 
 def save_job(
