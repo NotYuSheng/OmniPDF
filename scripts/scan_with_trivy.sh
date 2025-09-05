@@ -35,8 +35,8 @@ CUSTOM_SERVICES=(
 
 # External Docker images (pre-built)
 EXTERNAL_IMAGES=(
-    "redis:7.4.4-alpine"
-    "chromadb/chroma:1.0.13"
+    "redis:8.2.1-alpine"
+    "chromadb/chroma:1.0.20"
     "minio/minio:RELEASE.2025-07-23T15-54-02Z"
     "minio/mc:RELEASE.2025-07-21T05-28-08Z"
 )
@@ -89,9 +89,13 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Check if Trivy is installed
+# Check if Trivy is installed (prefer local version if available)
 check_trivy() {
-    if ! command -v trivy &> /dev/null; then
+    if [ -f "$HOME/.local/bin/trivy" ]; then
+        TRIVY_CMD="$HOME/.local/bin/trivy"
+    elif command -v trivy &> /dev/null; then
+        TRIVY_CMD="trivy"
+    else
         echo -e "${RED}❌ Trivy is not installed${NC}"
         echo ""
         echo "Install Trivy:"
@@ -106,7 +110,7 @@ check_trivy() {
         exit 1
     fi
     
-    echo -e "${GREEN}✅ Trivy $(trivy --version | head -n1 | cut -d' ' -f2) found${NC}"
+    echo -e "${GREEN}✅ Trivy $($TRIVY_CMD --version | head -n1 | cut -d' ' -f2) found${NC}"
 }
 
 # Check if specific service requested
@@ -179,7 +183,7 @@ scan_service() {
         "image")
             echo "$(date '+%Y-%m-%d %H:%M:%S') - Running image scan..." | tee -a "$log_file"
             set +e  # Temporarily disable exit on error
-            trivy image \
+            $TRIVY_CMD image \
                 --severity "$SEVERITY" \
                 --format "$OUTPUT_FORMAT" \
                 --output "$report_file" \
@@ -196,7 +200,7 @@ scan_service() {
             fi
             echo "$(date '+%Y-%m-%d %H:%M:%S') - Running filesystem scan..." | tee -a "$log_file"
             set +e  # Temporarily disable exit on error
-            trivy fs \
+            $TRIVY_CMD fs \
                 --severity "$SEVERITY" \
                 --format "$OUTPUT_FORMAT" \
                 --output "$report_file" \
@@ -209,7 +213,7 @@ scan_service() {
             if [ "$is_external_image" = true ]; then
                 echo "$(date '+%Y-%m-%d %H:%M:%S') - Running comprehensive image scan..." | tee -a "$log_file"
                 set +e  # Temporarily disable exit on error
-                trivy image \
+                $TRIVY_CMD image \
                     --severity "$SEVERITY" \
                     --format "$OUTPUT_FORMAT" \
                     --output "$report_file" \
@@ -227,7 +231,7 @@ scan_service() {
                 # Run image scan
                 echo "  → Scanning Docker image..." | tee -a "$log_file"
                 set +e  # Temporarily disable exit on error
-                trivy image \
+                $TRIVY_CMD image \
                     --severity "$SEVERITY" \
                     --format "$OUTPUT_FORMAT" \
                     --output "$temp_image_report" \
@@ -239,7 +243,7 @@ scan_service() {
                 if [ -d "$service_path" ]; then
                     echo "  → Scanning filesystem..." | tee -a "$log_file"
                     set +e  # Temporarily disable exit on error
-                    trivy fs \
+                    $TRIVY_CMD fs \
                         --severity "$SEVERITY" \
                         --format "$OUTPUT_FORMAT" \
                         --output "$temp_fs_report" \
@@ -344,7 +348,7 @@ echo "Scan type: $SCAN_TYPE"
 # Update Trivy vulnerability database
 echo ""
 echo -e "${YELLOW}📡 Updating Trivy vulnerability database...${NC}"
-trivy image --download-db-only
+$TRIVY_CMD image --download-db-only
 
 # Scan each service
 echo ""
