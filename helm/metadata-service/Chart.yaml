@@ -1,0 +1,18 @@
+apiVersion: v2
+name: metadata-service
+description: OmniPDF Metadata Service - Document metadata generation and word cloud service
+
+type: application
+version: 0.1.0
+appVersion: "dev-v0.0.0-6653136"
+
+# Chart icon for Helm repositories and UIs
+icon: file://../assets/logo.svg
+
+# Keywords for chart search
+keywords:
+  - metadata
+  - wordcloud
+  - summary
+  - document
+  - omnipdf
