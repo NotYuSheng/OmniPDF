@@ -9,6 +9,8 @@ pdf_processor_service
 pdf_extraction_service
 pdf_renderer_service
 docling_translation_service
+image_captioner_service
+metadata_service
 
 # Additional services
 cleaner
