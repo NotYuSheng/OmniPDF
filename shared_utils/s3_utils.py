@@ -8,7 +8,7 @@ from botocore.exceptions import BotoCoreError, ClientError
 from typing import Optional, Union
 from pydantic import BaseModel
 
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 
 logger = logging.getLogger(__name__)
 

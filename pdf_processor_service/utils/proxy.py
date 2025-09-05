@@ -153,8 +153,8 @@ async def concat_text(doc_id: str) -> str:
     texts = job.get("data", {}).get("result", {}).get("texts", [])
     text_list = [entry.get("text", "") or entry.get("orig", "") for entry in texts]
     return "\n".join(text_list)
-  
-  
+
+
 def generate_external_image_url(doc_id: str, image_name: str):
     return f"{EXTERNAL_ENDPOINT}/images/{doc_id}/{image_name}"
 

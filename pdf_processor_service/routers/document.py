@@ -51,9 +51,7 @@ async def upload_document(
         raise HTTPException(status_code=500, detail="Internal server error")
 
     append_doc(doc_id, key, file.filename)
-    return DocumentUploadResponse(
-        doc_id=doc_id, filename=key, download_url=url
-    )
+    return DocumentUploadResponse(doc_id=doc_id, filename=key, download_url=url)
 
 
 @router.get("/{doc_id}", response_class=StreamingResponse)

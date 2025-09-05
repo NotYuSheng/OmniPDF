@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 MAX_STRING_LENGTH = 3072
 TEXTUAL_EMBEDDING_COLLECTION = "SentenceEmbeds"
 
-def split_in_segments_by_sentences(text:str, max_length:int):
+
+def split_in_segments_by_sentences(text: str, max_length: int):
     word_count = 0
     current_segment_sentences = []
     segments = []
@@ -39,7 +40,9 @@ def split_in_segments_by_sentences(text:str, max_length:int):
             sentence_start = text.index(sentence, last_match_end)
         except ValueError as e:
             # if sentences can't be located raise an error, as the tokenizer should not modify the text.
-            logger.error(f"Failed to locate sentence {{{sentence}}} in orignal text.\n{e}")
+            logger.error(
+                f"Failed to locate sentence {{{sentence}}} in orignal text.\n{e}"
+            )
             raise HTTPException(status_code=500, detail="Embedder failure.")
 
         if word_count > 0 and word_count + new_word_count > max_length:
@@ -76,12 +79,16 @@ async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
                 status_code=400, detail="No textual content found in PDF"
             )
 
-        chunks, chunk_start_idx, chunk_end_idx = split_in_segments_by_sentences(request.text, MAX_STRING_LENGTH)
+        chunks, chunk_start_idx, chunk_end_idx = split_in_segments_by_sentences(
+            request.text, MAX_STRING_LENGTH
+        )
         logger.info(f"Number of chunks: {len(chunks)}")
 
         chunk_data = []
 
-        for chunk, chunk_start, chunk_end in zip(chunks, chunk_start_idx, chunk_end_idx):
+        for chunk, chunk_start, chunk_end in zip(
+            chunks, chunk_start_idx, chunk_end_idx
+        ):
             # First iteration: Extract first chunk of doc.page_content
             chunk_content = chunk
             logger.info(f"Length of chunk: {len(chunk_content.strip())}")
@@ -124,7 +131,9 @@ async def sentence_embedder_service(request: DataRequest):
             )
 
         # Once chunking is done, embed into ChromaDB with the specified embedding model
-        embed_results = await vectorize_chromadb(chunk_data, request.config, TEXTUAL_EMBEDDING_COLLECTION)
+        embed_results = await vectorize_chromadb(
+            chunk_data, request.config, TEXTUAL_EMBEDDING_COLLECTION
+        )
 
         return {
             "status": "success",

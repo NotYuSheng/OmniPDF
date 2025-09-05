@@ -1,4 +1,4 @@
-name: Integration Test
+name: Service Health Checks
 
 on:
   push:
@@ -9,8 +9,8 @@ on:
       - dev
 
 jobs:
-  cypress-run:
-    name: Run Cypress Integration Tests
+  service-health:
+    name: Run Service Health Checks
     runs-on: ubuntu-latest
 
     steps:
@@ -138,17 +138,11 @@ jobs:
           
           echo "All *_service services passed individual testing!"
 
-      - name: Set up Node.js for Cypress
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install Cypress
+      - name: Service health checks completed
         run: |
-          npm init -y
-          npm install cypress --save-dev
-
-      - name: Run Cypress tests (placeholder-safe)
-        working-directory: cypress
-        run: |
-          npx cypress run || echo "Cypress run completed with non-zero exit (placeholder mode)"
+          echo "✅ All service health checks completed successfully!"
+          echo ""
+          echo "Note: E2E tests are disabled and located in e2e-tests.yml.disabled"
+          echo "To enable E2E tests when frontend is ready:"
+          echo "  1. Rename e2e-tests.yml.disabled to e2e-tests.yml"
+          echo "  2. Uncomment the push/pull_request triggers in that file"
