@@ -8,7 +8,7 @@ image:
   repository: minio/minio
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "RELEASE.2025-07-23T15-54-02Z"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -203,6 +203,28 @@ podDisruptionBudget:
 # Deployment strategy
 deploymentStrategy:
   type: Recreate  # MinIO typically uses Recreate for single-node
+
+# Bucket initialization configuration using minio/mc
+bucketInit:
+  enabled: true
+  image:
+    repository: minio/mc
+    tag: "RELEASE.2025-07-21T05-28-08Z"
+    pullPolicy: Always
+  # List of buckets to create
+  buckets:
+    - omnifiles
+  # Optional bucket policies
+  policies: []
+    # - bucket: omnifiles
+    #   policy: download  # none, download, upload, public
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
 
 # Resource quota (optional)
 serviceMonitor:

@@ -6,8 +6,16 @@ replicaCount: 1
 # Use official MinIO image
 image:
   repository: minio/minio
-  tag: "RELEASE.2024-01-16T16-07-38Z"
+  tag: "RELEASE.2025-07-23T15-54-02Z"
   pullPolicy: Always
+
+# Staging bucket initialization
+bucketInit:
+  enabled: true
+  image:
+    repository: minio/mc
+    tag: "RELEASE.2025-07-21T05-28-08Z"
+    pullPolicy: Always
 
 # Staging resources
 resources:
