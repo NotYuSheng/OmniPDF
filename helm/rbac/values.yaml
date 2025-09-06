@@ -1,0 +1,61 @@
+# RBAC Configuration for OmniPDF Services
+# Based on service communication matrix requirements
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Global namespace configuration
+namespace: omnipdf
+
+# Service account names (should match Helm release names)
+serviceAccounts:
+  pdfProcessor: "pdf-processor-service"
+  pdfExtraction: "pdf-extraction-service"
+  doclingTranslate: "docling-translation-service"
+  pdfRenderer: "pdf-renderer-service"
+  embedder: "embedder-service"
+  chatService: "chat-service"
+  imageCaptioner: "image-captioner-service"
+  metadataService: "metadata-service"
+  cleaner: "cleaner"
+  frontend: "frontend"
+  nginx: "nginx"
+  minio: "minio"
+  chromadb: "chromadb"
+  redis: "redis"
+
+# Enable/disable specific RBAC rules
+rbac:
+  # Core orchestration permissions
+  pdfProcessor:
+    enabled: true
+    # Can call all processing services
+    canCallProcessingServices: true
+    # Can access all data stores
+    canAccessDataStores: true
+    
+  # Processing service permissions
+  processingServices:
+    enabled: true
+    # Can call AI/ML services
+    canCallAI: true
+    # Limited data store access
+    canAccessDataStores: true
+    
+  # AI/ML service permissions
+  aiServices:
+    enabled: true
+    # No outbound service calls (end of chain)
+    canCallServices: false
+    
+  # Data services permissions
+  dataServices:
+    enabled: true
+    # No outbound calls needed
+    canCallServices: false
+    
+  # Cleanup service permissions
+  cleaner:
+    enabled: true
+    # Can access all data stores for cleanup
+    canAccessAllDataStores: true

@@ -1,0 +1,213 @@
+{{- if .Values.rbac.processingServices.enabled }}
+---
+# Individual roles for each processing service (per-service secret isolation)
+
+# PDF Extraction Service Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: pdf-extraction-service-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: processing
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "pdf-extraction-service-secrets"  # Contains vLLM, MinIO credentials for this service
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: ["image-captioner-service", "minio"]
+  verbs: ["get", "list"]
+
+---
+# RoleBinding for PDF Extraction Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pdf-extraction-service-binding
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.pdfExtraction }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: pdf-extraction-service-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Docling Translation Service Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: docling-translation-service-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: processing
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "docling-translation-service-secrets"  # Contains vLLM credentials for this service
+  verbs: ["get"]
+
+---
+# RoleBinding for Docling Translation Service  
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: docling-translation-service-binding
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.doclingTranslate }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: docling-translation-service-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Embedder Service Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: embedder-service-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: processing
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "embedder-service-secrets"  # Contains ChromaDB credentials for this service
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: ["chromadb"]
+  verbs: ["get", "list"]
+
+---
+# RoleBinding for Embedder Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: embedder-service-binding
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.embedder }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: embedder-service-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Chat Service Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: chat-service-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: processing
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "chat-service-secrets"  # Contains vLLM and ChromaDB credentials for this service
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: ["chromadb"]  # Chat service calls ChromaDB for vector retrieval
+  verbs: ["get", "list"]
+
+---
+# RoleBinding for Chat Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: chat-service-binding
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.chatService }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: chat-service-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Image Captioner Service Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: image-captioner-service-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: processing
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "image-captioner-service-secrets"  # Contains vLLM VLM credentials for this service
+  verbs: ["get"]
+
+---
+# RoleBinding for Image Captioner Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: image-captioner-service-binding
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.imageCaptioner }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: image-captioner-service-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Metadata Service Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: metadata-service-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: processing
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "metadata-service-secrets"  # Contains vLLM credentials for this service
+  verbs: ["get"]
+
+---
+# RoleBinding for Metadata Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metadata-service-binding
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.metadataService }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: metadata-service-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

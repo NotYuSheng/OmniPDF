@@ -1,0 +1,2 @@
+# NOTE: This file has been replaced by individual-service-roles.yaml
+# Each processing service now has its own role for per-service secret isolation

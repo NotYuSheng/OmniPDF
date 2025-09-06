@@ -1,0 +1,57 @@
+{{- if .Values.rbac.pdfProcessor.enabled }}
+---
+# Role for PDF Processor Service - Main Orchestrator
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: pdf-processor-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: orchestrator
+rules:
+# Service Discovery - can list services and endpoints
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+  
+# Secret access for inter-service authentication (per-service isolation)
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "pdf-extraction-service-secrets"
+    - "docling-translation-service-secrets" 
+    - "pdf-renderer-service-secrets"
+    - "embedder-service-secrets"
+    - "chat-service-secrets"
+    - "metadata-service-secrets"
+    - "image-captioner-service-secrets"
+    - "minio-secrets"
+  verbs: ["get"]
+
+# ConfigMap access for service configuration
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames:
+    - "pdf-processor-config"
+  verbs: ["get", "watch"]
+
+---
+# RoleBinding for PDF Processor Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pdf-processor-binding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: orchestrator
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.pdfProcessor }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: pdf-processor-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

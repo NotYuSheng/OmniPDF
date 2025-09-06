@@ -1,0 +1,55 @@
+{{- if .Values.rbac.cleaner.enabled }}
+---
+# Role for Cleaner Service - Background cleanup operations
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: cleaner-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: cleaner
+rules:
+# Service Discovery - can access all data stores
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: 
+    - "minio"
+    - "chromadb"
+    - "redis"
+  verbs: ["get", "list"]
+
+# Secret access for all data stores (needs admin access for cleanup)
+# NOTE: Per-service secret isolation - cleaner has its own secret with all data store credentials
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames:
+    - "cleaner-secrets"  # Contains MinIO, ChromaDB, Redis credentials for cleanup operations
+  verbs: ["get"]
+
+# ConfigMap access for cleanup configuration
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames:
+    - "cleaner-config"
+  verbs: ["get", "watch"]
+
+---
+# RoleBinding for Cleaner Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cleaner-binding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: cleaner
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.cleaner }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: cleaner-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

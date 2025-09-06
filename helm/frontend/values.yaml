@@ -21,7 +21,7 @@ fullnameOverride: ""
 #This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
   # Specifies whether a service account should be created
-  create: false
+  create: true
   # Automatically mount a ServiceAccount's API credentials?
   automount: true
   # Annotations to add to the service account
@@ -156,7 +156,7 @@ env: []
 # Secret configuration for sensitive values
 secrets:
   # Set to true to create secret from values, false to use existing secret
-  create: false
+  create: true
   # Name of the secret to reference (must exist if create=false)
   name: frontend-secrets
   # Data for secret creation (only used when create=true)

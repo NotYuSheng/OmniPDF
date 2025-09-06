@@ -1,0 +1,53 @@
+{{- if .Values.rbac.processingServices.enabled }}
+---
+# Role for Frontend Service - Limited to PDF Processor communication
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: frontend-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: frontend
+rules:
+# Service Discovery - only PDF Processor
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: 
+    - "pdf-processor-service"
+  verbs: ["get", "list"]
+
+# Secret access for PDF Processor communication
+# NOTE: Per-service secret isolation - frontend has its own secret with PDF Processor credentials
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames:
+    - "frontend-secrets"  # Contains PDF Processor service credentials
+  verbs: ["get"]
+
+# ConfigMap access for frontend configuration  
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames:
+    - "frontend-config"
+  verbs: ["get", "watch"]
+
+---
+# RoleBinding for Frontend Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: frontend-binding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: frontend
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.frontend }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: frontend-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

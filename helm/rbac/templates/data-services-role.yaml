@@ -1,0 +1,98 @@
+{{- if .Values.rbac.dataServices.enabled }}
+---
+# Role for Data Services (MinIO, ChromaDB, Redis) - Minimal permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: data-services-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: data
+rules:
+# Self-service discovery (for health checks, etc.)
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: 
+    - "minio"
+    - "chromadb" 
+    - "redis"
+  verbs: ["get"]
+
+# Access to own configuration
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames:
+    - "minio-config"
+    - "chromadb-config"
+    - "redis-config"
+  verbs: ["get", "watch"]
+
+# Access to own secrets (per-service secret isolation)
+# Each data service manages its own configuration secrets
+- apiGroups: [""]
+  resources: ["secrets"] 
+  resourceNames:
+    - "minio-secrets"
+    - "nginx-secrets"  # Added nginx secrets
+  verbs: ["get"]
+
+# NOTE: ChromaDB and Redis don't have individual secret access since they're typically externally managed
+
+---
+# RoleBinding for MinIO Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: minio-binding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: data
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.minio }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: data-services-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# RoleBinding for ChromaDB Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: chromadb-binding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: data
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.chromadb }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: data-services-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# RoleBinding for Redis Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: redis-binding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: data
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.redis }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: data-services-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
