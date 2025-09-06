@@ -16,11 +16,12 @@ SERVICE_VALUES_FILE ?= $(CHART_DIR)/values.yaml
 SERVICE_ENV_VALUES_FILE ?= $(CHART_DIR)/values-$(ENV).yaml
 
 # Build values file list (in order of precedence - later files override earlier ones)
-VALUES_FILES = -f $(SERVICE_VALUES_FILE)
-VALUES_FILES += -f $(SHARED_BASE_VALUES)
+# Order: shared-base → shared-env → service-base → service-env (general to specific)
+VALUES_FILES = -f $(SHARED_BASE_VALUES)
 ifneq ($(wildcard $(SHARED_ENV_VALUES)),)
     VALUES_FILES += -f $(SHARED_ENV_VALUES)
 endif
+VALUES_FILES += -f $(SERVICE_VALUES_FILE)
 ifneq ($(wildcard $(SERVICE_ENV_VALUES_FILE)),)
     VALUES_FILES += -f $(SERVICE_ENV_VALUES_FILE)
 endif
