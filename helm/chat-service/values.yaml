@@ -146,39 +146,41 @@ secrets:
   # Name of the secret to reference (must exist)
   name: chat-service-secrets
 
-# Network policy configuration for network segmentation
+# Network policy configuration for zero-trust network segmentation
 networkPolicy:
   enabled: false  # Disabled by default for dev/testing
   ingress:
     enabled: true
-    # Allow ingress controller to reach this service
-    fromIngressController: true
-    ingressControllerNamespaceLabels:
-      name: ingress-nginx
-    # Allow services in same namespace to communicate
-    fromSameNamespace: true
-    # Custom ingress rules (empty by default)
+    # ZERO-TRUST: Only pdf-processor-service can call chat-service
+    fromSpecificServices: true
+    allowedCallers:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+    # Legacy broad access (DEPRECATED - use allowedCallers instead)
+    fromIngressController: false
+    fromSameNamespace: false
+    # Custom ingress rules for special cases
     customRules: []
   egress:
     enabled: true
-    # Allow DNS resolution (required for hostname lookups)
+    # Essential egress for all services
     allowDNS: true
-    # Allow HTTPS for external APIs
-    allowHTTPS: true
-    # Allow HTTP for internal services  
-    allowHTTP: false
-    # Allow communication to LLM service
-    allowLLMService: true
-    llmServiceSelectors:
+    allowHTTPS: true  # For external vLLM in prestaging
+    # ZERO-TRUST: chat-service can only call specific services
+    allowSpecificServices: true
+    allowedTargets:
+      # ChromaDB for vector retrieval
       - podSelector:
           matchLabels:
-            app.kubernetes.io/name: llm-service
-    llmServicePorts:
-      - 8080
-      - 8000
-    # Allow traffic to same namespace
-    toSameNamespace: true
-    # Custom egress rules (empty by default)
+            app.kubernetes.io/name: chromadb
+        ports:
+          - 8000
+    # Legacy broad access (DEPRECATED - use allowedTargets instead)
+    allowHTTP: false
+    allowLLMService: false
+    toSameNamespace: false
+    # Custom egress rules for special cases (external vLLM, etc.)
     customRules: []
 
 # Pod Disruption Budget for high availability during maintenance

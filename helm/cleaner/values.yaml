@@ -95,20 +95,41 @@ secrets:
   # Data for secret creation (only used when create=true)
   data: {}
 
-# Network policy configuration
+# Network policy configuration for zero-trust network segmentation
 networkPolicy:
   enabled: false  # Disabled by default for dev/testing
   ingress:
-    enabled: false  # Cleaner doesn't accept inbound connections
+    enabled: false  # Cleaner doesn't accept inbound connections - it's a background service
     customRules: []
   egress:
     enabled: true
-    # Allow DNS resolution
+    # Essential egress for all services
     allowDNS: true
-    # Allow HTTP for Redis connection
-    allowHTTP: true
-    # Allow traffic to same namespace (Redis)
-    toSameNamespace: true
+    allowHTTPS: false  # Cleaner doesn't call external APIs
+    # ZERO-TRUST: cleaner can only call storage/session services for cleanup
+    allowSpecificServices: true
+    allowedTargets:
+      # MinIO for deleting expired files
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports:
+          - 9000
+      # ChromaDB for deleting expired vectors
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chromadb
+        ports:
+          - 8000
+      # Redis for cleaning expired sessions
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports:
+          - 6379
+    # Legacy broad access (DEPRECATED)
+    allowHTTP: false
+    toSameNamespace: false
     customRules: []
 
 # Pod Disruption Budget not needed for single replica background service

@@ -140,3 +140,104 @@ secrets:
   create: false
   # Name of the secret to reference (must exist)
   name: pdf-processor-service-secrets
+
+# Network policy configuration for zero-trust network segmentation
+networkPolicy:
+  enabled: false  # Disabled by default for dev/testing
+  ingress:
+    enabled: true
+    # ZERO-TRUST: Only nginx and frontend can call pdf-processor-service
+    fromSpecificServices: true
+    allowedCallers:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: nginx
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: frontend
+    # Legacy broad access (DEPRECATED)
+    fromIngressController: false
+    fromSameNamespace: false
+    # Custom ingress rules for special cases
+    customRules: []
+  egress:
+    enabled: true
+    # Essential egress for all services
+    allowDNS: true
+    allowHTTPS: false  # pdf-processor doesn't call external APIs
+    # ZERO-TRUST: pdf-processor can call multiple downstream services
+    allowSpecificServices: true
+    allowedTargets:
+      # Chat service for RAG queries
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
+        ports:
+          - 8000
+      # PDF extraction service
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-extraction-service
+        ports:
+          - 8002
+      # Embedder service for vectorization
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: embedder-service
+        ports:
+          - 8005
+      # Translation service
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: docling-translation-service
+        ports:
+          - 8003
+      # PDF renderer service
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-renderer-service
+        ports:
+          - 8004
+      # Image captioner service
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: image-captioner-service
+        ports:
+          - 8006
+      # Metadata service
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
+        ports:
+          - 8007
+      # MinIO for file storage
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports:
+          - 9000
+      # Redis for session management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports:
+          - 6379
+    # Legacy broad access (DEPRECATED)
+    allowHTTP: false
+    toSameNamespace: false
+    # Custom egress rules for special cases
+    customRules: []
+
+# Pod Disruption Budget for high availability during maintenance
+podDisruptionBudget:
+  enabled: false  # Disabled by default for dev
+  # Use either minAvailable OR maxUnavailable (not both)
+  minAvailable: null
+  maxUnavailable: null
+
+# Deployment strategy for updates (defaults to Kubernetes standard)
+deploymentStrategy: {}
+
+# Service monitoring for Prometheus (optional)
+serviceMonitor:
+  enabled: false  # Disabled by default - enable in environments with Prometheus

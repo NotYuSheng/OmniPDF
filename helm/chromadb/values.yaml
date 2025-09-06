@@ -175,33 +175,43 @@ deploymentStrategy: {}
   # OR for faster dev updates:
   # type: Recreate
 
-# Network policy configuration for network segmentation
+# Network policy configuration for zero-trust network segmentation
 networkPolicy:
   enabled: false  # Disabled by default for dev/testing
   ingress:
     enabled: true
-    # Allow ingress controller to reach this service
-    fromIngressController: true
-    ingressControllerNamespaceLabels:
-      name: ingress-nginx
-    # Allow services in same namespace to communicate
-    fromSameNamespace: true
+    # ZERO-TRUST: ChromaDB accepts calls from specific services only
+    fromSpecificServices: true
+    allowedCallers:
+      # Chat service for vector queries
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
+      # Embedder service for storing vectors
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: embedder-service
+      # Cleaner for expired vector cleanup
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: cleaner
+    # Legacy broad access (DEPRECATED)
+    fromIngressController: false
+    fromSameNamespace: false
     # Custom ingress rules (empty by default)
     customRules: []
   egress:
     enabled: true
-    # Allow DNS resolution (required for hostname lookups)
+    # Essential egress for all services
     allowDNS: true
-    # Allow HTTPS for external APIs
-    allowHTTPS: true
-    # Allow HTTP for internal services  
-    allowHTTP: true
-    # Allow communication to LLM service (not applicable for ChromaDB)
+    allowHTTPS: false  # ChromaDB is a storage service, doesn't call external APIs
+    # ZERO-TRUST: ChromaDB doesn't need to call any other services
+    allowSpecificServices: false
+    allowedTargets: []
+    # Legacy broad access (DEPRECATED)
+    allowHTTP: false
     allowLLMService: false
-    llmServiceSelectors: []
-    llmServicePorts: []
-    # Allow traffic to same namespace
-    toSameNamespace: true
+    toSameNamespace: false
     # Custom egress rules (empty by default)
     customRules: []
 

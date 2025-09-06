@@ -18,7 +18,17 @@ spec:
     {{- end }}
   {{- if .Values.networkPolicy.ingress.enabled }}
   ingress:
-    # Allow traffic from ingress controller
+    # ZERO-TRUST: Allow traffic from specific services only
+    {{- if .Values.networkPolicy.ingress.fromSpecificServices }}
+    {{- range .Values.networkPolicy.ingress.allowedCallers }}
+    - from:
+        - {{ . | toYaml | nindent 10 }}
+      ports:
+        - protocol: TCP
+          port: {{ $.Values.service.port }}
+    {{- end }}
+    {{- end }}
+    # LEGACY: Allow traffic from ingress controller (DEPRECATED)
     {{- if .Values.networkPolicy.ingress.fromIngressController }}
     - from:
         - namespaceSelector:
@@ -28,7 +38,7 @@ spec:
         - protocol: TCP
           port: {{ .Values.service.port }}
     {{- end }}
-    # Allow traffic from same namespace
+    # LEGACY: Allow traffic from same namespace (DEPRECATED)
     {{- if .Values.networkPolicy.ingress.fromSameNamespace }}
     - from:
         - namespaceSelector:
@@ -45,7 +55,7 @@ spec:
   {{- end }}
   {{- if .Values.networkPolicy.egress.enabled }}
   egress:
-    # Allow DNS resolution
+    # Essential egress for all services
     {{- if .Values.networkPolicy.egress.allowDNS }}
     - to: []
       ports:
@@ -54,21 +64,32 @@ spec:
         - protocol: TCP
           port: 53
     {{- end }}
-    # Allow HTTPS for external APIs
     {{- if .Values.networkPolicy.egress.allowHTTPS }}
     - to: []
       ports:
         - protocol: TCP
           port: 443
     {{- end }}
-    # Allow HTTP for internal services
+    # ZERO-TRUST: Allow communication to specific services only
+    {{- if .Values.networkPolicy.egress.allowSpecificServices }}
+    {{- range .Values.networkPolicy.egress.allowedTargets }}
+    - to:
+        - {{ .podSelector | toYaml | nindent 10 }}
+      ports:
+        {{- range .ports }}
+        - protocol: TCP
+          port: {{ . }}
+        {{- end }}
+    {{- end }}
+    {{- end }}
+    # LEGACY: Allow HTTP for internal services (DEPRECATED)
     {{- if .Values.networkPolicy.egress.allowHTTP }}
     - to: []
       ports:
         - protocol: TCP
           port: 80
     {{- end }}
-    # Allow communication to LLM service
+    # LEGACY: Allow communication to LLM service (DEPRECATED)
     {{- if .Values.networkPolicy.egress.allowLLMService }}
     {{- range .Values.networkPolicy.egress.llmServiceSelectors }}
     - to:
@@ -80,7 +101,7 @@ spec:
         {{- end }}
     {{- end }}
     {{- end }}
-    # Allow traffic to same namespace
+    # LEGACY: Allow traffic to same namespace (DEPRECATED)
     {{- if .Values.networkPolicy.egress.toSameNamespace }}
     - to:
         - namespaceSelector:

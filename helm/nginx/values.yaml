@@ -156,38 +156,51 @@ secrets:
   # Name of the secret to reference (must exist)
   name: nginx-secrets
 
-# Network policy configuration for network segmentation
+# Network policy configuration for zero-trust network segmentation
 networkPolicy:
   enabled: false  # Disabled by default for dev/testing
   ingress:
     enabled: true
-    # Allow ingress controller to reach this service
-    fromIngressController: true
-    ingressControllerNamespaceLabels:
-      name: ingress-nginx
-    # Allow services in same namespace to communicate
-    fromSameNamespace: true
+    # ZERO-TRUST: Nginx accepts calls from ingress controller and frontend only
+    fromSpecificServices: true
+    allowedCallers:
+      # Allow Istio/ingress controller access (from different namespace)
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      # Allow frontend to call nginx
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: frontend
+    # Legacy broad access (DEPRECATED)
+    fromIngressController: false
+    fromSameNamespace: false
     # Custom ingress rules (empty by default)
     customRules: []
   egress:
     enabled: true
-    # Allow DNS resolution (required for hostname lookups)
+    # Essential egress for all services
     allowDNS: true
-    # Allow HTTPS for external APIs
-    allowHTTPS: true
-    # Allow HTTP for internal services  
-    allowHTTP: false
-    # Allow communication to LLM service
-    allowLLMService: true
-    llmServiceSelectors:
+    allowHTTPS: false  # nginx routes internally, doesn't call external APIs
+    # ZERO-TRUST: nginx can only route to pdf-processor-service (API gateway pattern)
+    allowSpecificServices: true
+    allowedTargets:
+      # Primary API endpoint
       - podSelector:
           matchLabels:
-            app.kubernetes.io/name: llm-service
-    llmServicePorts:
-      - 8080
-      - 8000
-    # Allow traffic to same namespace
-    toSameNamespace: true
+            app.kubernetes.io/name: pdf-processor-service
+        ports:
+          - 8000
+      # MinIO for direct file uploads/downloads
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports:
+          - 9000
+    # Legacy broad access (DEPRECATED)
+    allowHTTP: false
+    allowLLMService: false
+    toSameNamespace: false
     # Custom egress rules (empty by default)
     customRules: []
 
