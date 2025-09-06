@@ -174,37 +174,37 @@ networkPolicy:
           matchLabels:
             app.kubernetes.io/name: pdf-extraction-service
         ports:
-          - 8002
+          - 8000
       # Embedder service for vectorization
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: embedder-service
         ports:
-          - 8005
+          - 8000
       # Translation service
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: docling-translation-service
         ports:
-          - 8003
+          - 8000
       # PDF renderer service
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: pdf-renderer-service
         ports:
-          - 8004
+          - 8000
       # Image captioner service
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: image-captioner-service
         ports:
-          - 8006
+          - 8000
       # Metadata service
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: metadata-service
         ports:
-          - 8007
+          - 8000
       # MinIO for file storage
       - podSelector:
           matchLabels:

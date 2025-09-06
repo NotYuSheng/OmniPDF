@@ -4,20 +4,20 @@ OmniPDF is a PDF analyzer capable of translation, summarization, captioning and 
 
 ## Port Assignments
 
-The following port mappings are used across the OmniPDF microservices **for development and testing purposes only**. Ports for some core services are defined in the `docker-compose.yml` file, while other services listed are common components in the development setup (potentially run separately or via other configurations). This table aims to ensure clarity and avoid conflicts during local deployment.
+The following port mappings are used across the OmniPDF microservices in both development and production deployments. The architecture uses **nginx as an API gateway** that routes external traffic to backend services, with **standardized port 8000** for all core microservices to simplify service discovery and NetworkPolicy configuration.
 
-> **Note:** These port numbers are **not** intended for production. Actual port exposure should be handled by production-grade routing layers such as **Kubernetes Ingress**, **Istio Service Mesh**, **OpenShift Routes**, or a **reverse proxy** in secured environments.
+> **Note:** In production Kubernetes deployments, services communicate internally via ClusterIP services and are secured with **zero-trust NetworkPolicy** configurations. External access is controlled through **Kubernetes Ingress**, **Istio Service Mesh**, or **OpenShift Routes** that route to the nginx gateway on port 8080.
 
 | Service                   | Description                                               | Port   |
 |---------------------------|-----------------------------------------------------------|--------|
 | Streamlit Frontend        | Web UI for user interaction                               | 8501   |
 | Nginx API Gateway         | Proxies file uploads to PDF Processor                     | 8080   |
 | PDF Processor Service     | Main coordinator for processing and routing               | 8000   |
-| Chat Service              | Retrieves context chunks and queries LLM                  | 8001   |
-| PDF Extraction Service    | Extracts tables and images from PDFs                      | 8002   |
-| Docling Translate Service | Translates text fields in docling-style JSON              | 8003   |
-| PDF Renderer Service      | Overlays translated tables and text onto the original PDF | 8004   |
-| Embedder Service          | Chunks + embeds PDF text and stores in ChromaDB           | 8005   |
+| Chat Service              | Retrieves context chunks and queries LLM                  | 8000   |
+| PDF Extraction Service    | Extracts tables and images from PDFs                      | 8000   |
+| Docling Translate Service | Translates text fields in docling-style JSON              | 8000   |
+| PDF Renderer Service      | Overlays translated tables and text onto the original PDF | 8000   |
+| Embedder Service          | Chunks + embeds PDF text and stores in ChromaDB           | 8000   |
 | vLLM LLM Server           | LLM backend for chat, translation, captions, summaries    | 1234   |
 | Redis                     | In-memory session store                                   | 6379   |
 | ChromaDB                  | Temporary in-memory vector store                          | 5100   |
