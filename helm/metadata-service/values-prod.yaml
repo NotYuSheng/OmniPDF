@@ -26,7 +26,7 @@ autoscaling:
 # Production secrets (externally managed)
 secrets:
   create: false
-  name: chat-service-prod-secrets
+  name: metadata-service-prod-secrets
 
 # Production image handling
 image:
@@ -41,14 +41,14 @@ ingress:
     nginx.ingress.kubernetes.io/rate-limit: "100"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts:
-    - host: chat.company.com
+    - host: metadata.company.com
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: chat-prod-tls
+    - secretName: metadata-prod-tls
       hosts:
-        - chat.company.com
+        - metadata.company.com
 
 # Production pod security context
 podSecurityContext:
@@ -67,7 +67,7 @@ affinity:
           - key: app.kubernetes.io/name
             operator: In
             values:
-            - chat-service
+            - metadata-service
         topologyKey: kubernetes.io/hostname
 
 # Environment variables
