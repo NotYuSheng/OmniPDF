@@ -3,10 +3,10 @@
 # Single replica (can be scaled to distributed mode)
 replicaCount: 1
 
-# Use official MinIO image with specific stable version
+# Use official Redis image with specific stable version
 image:
-  repository: minio/minio
-  tag: "RELEASE.2024-01-16T16-07-38Z"
+  repository: redis
+  tag: "7-alpine"
   pullPolicy: Always
 
 # Production resources
