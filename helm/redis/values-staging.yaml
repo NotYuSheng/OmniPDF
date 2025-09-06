@@ -6,7 +6,7 @@ replicaCount: 1
 # Use official Redis image
 image:
   repository: redis
-  tag: "7-alpine"
+  tag: "8.2.1-alpine"
   pullPolicy: Always
 
 # Staging resources

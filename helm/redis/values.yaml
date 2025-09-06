@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: docker.io/library/redis
+  repository: redis
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "7-alpine"
+  tag: "8.2.1-alpine"
 
 imagePullSecrets: []
 nameOverride: ""

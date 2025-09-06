@@ -6,7 +6,7 @@ replicaCount: 1
 # Use official Redis image with specific stable version
 image:
   repository: redis
-  tag: "7-alpine"
+  tag: "8.2.1-alpine"
   pullPolicy: Always
 
 # Production resources
