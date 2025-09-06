@@ -93,7 +93,6 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
             # Secret environment variables
-                  name: {{ include "metadata-service.secretName" . }}
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
