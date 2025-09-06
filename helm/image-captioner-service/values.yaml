@@ -146,3 +146,48 @@ secrets:
   create: true
   # Name of the secret to reference (must exist)
   name: image-captioner-service-secrets
+
+serviceMonitor:
+  enabled: false  # Disabled by default - enable in environments with Prometheus
+  # Metrics endpoint configuration
+  port: "http"              # Service port name to scrape (default: http)
+  path: "/metrics"          # Metrics endpoint path
+  interval: "30s"           # How often to scrape metrics
+  scrapeTimeout: "10s"      # Timeout for each scrape
+  honorLabels: false        # Whether to honor labels from target
+  # Additional labels for ServiceMonitor resource
+  labels: {}
+  # Additional annotations for ServiceMonitor resource  
+  annotations: {}
+  # Metric relabeling (advanced)
+  metricRelabelings: []
+  relabelings: []
+
+# Network policy configuration for zero-trust network segmentation
+networkPolicy:
+  enabled: false  # Disabled by default for dev/testing
+  ingress:
+    enabled: true
+    # ZERO-TRUST: Only pdf-extraction-service can call image-captioner-service
+    allowedCallers:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-extraction-service
+    # Custom ingress rules for special cases
+    customRules: []
+  egress:
+    enabled: true
+    # Essential egress for all services
+    allowDNS: true
+    allowHTTPS: true  # For external vLLM in prestaging
+    # ZERO-TRUST: image-captioner-service can only call specific services
+    allowedTargets: []  # Configured via customRules for external vLLM VLM
+    # Custom egress rules for special cases (external vLLM VLM, etc.)
+    customRules: []
+
+# Pod Disruption Budget for high availability during maintenance
+podDisruptionBudget:
+  enabled: false  # Disabled by default for dev
+  # Use either minAvailable OR maxUnavailable (not both)
+  minAvailable: null
+  maxUnavailable: null
