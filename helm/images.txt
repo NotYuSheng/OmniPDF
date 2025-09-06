@@ -3,6 +3,7 @@
 # Comments (lines starting with #) and empty lines are ignored
 
 # Core Application Services
+ghcr.io/notyusheng/frontend:dev-v0.0.3-5d69f89
 ghcr.io/notyusheng/chat_service:dev-v0.0.3-5d69f89
 ghcr.io/notyusheng/embedder_service:dev-v0.0.3-5d69f89
 ghcr.io/notyusheng/pdf_processor_service:dev-v0.0.3-5d69f89

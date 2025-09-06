@@ -3,6 +3,7 @@
 # Comments (lines starting with #) and empty lines are ignored
 
 # Core Application Services
+frontend
 chat_service
 embedder_service
 pdf_processor_service
