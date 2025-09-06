@@ -1,0 +1,118 @@
+# Staging environment configuration for frontend
+# This file overrides default values.yaml for staging deployment
+
+# Multiple replicas for staging availability
+replicaCount: 2
+
+# Use staging image configuration
+image:
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/frontend
+  tag: "dev-v0.0.3-5d69f89"
+  pullPolicy: Always
+
+# Staging resource allocation - production-like for web UI
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+# Enable autoscaling for staging testing
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Enable ingress for staging testing
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "staging-issuer"
+  hosts:
+    - host: frontend-staging.company.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: frontend-staging-tls
+      hosts:
+        - frontend-staging.company.com
+
+# Staging secrets
+secrets:
+  create: false
+  name: frontend-staging-secrets
+
+# Environment variables for staging
+env:
+  - name: LOG_LEVEL
+    value: "WARN"
+  - name: ENVIRONMENT
+    value: "staging"
+  - name: STREAMLIT_CLIENT_TOOLBAR_MODE
+    value: "minimal"
+  - name: STREAMLIT_CLIENT_SHOW_ERROR_DETAILS
+    value: "false"
+
+# Health probes optimized for staging
+startupProbe:
+  enabled: true
+  httpGet:
+    path: /_stcore/health
+    port: http
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 10
+  successThreshold: 1
+
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /_stcore/health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /_stcore/health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 2
+  successThreshold: 1
+
+# Enable monitoring for staging
+serviceMonitor:
+  enabled: true
+  interval: "15s"
+  scrapeTimeout: "8s"
+  labels:
+    environment: staging
+
+# Enable network policy for staging security testing
+networkPolicy:
+  enabled: true
+
+# Pod disruption budget for staging availability (2 replicas, allow 1 down)
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+# Conservative deployment strategy for staging (production-like)
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
