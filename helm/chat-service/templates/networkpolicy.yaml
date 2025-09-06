@@ -19,34 +19,12 @@ spec:
   {{- if .Values.networkPolicy.ingress.enabled }}
   ingress:
     # ZERO-TRUST: Allow traffic from specific services only
-    {{- if .Values.networkPolicy.ingress.fromSpecificServices }}
     {{- range .Values.networkPolicy.ingress.allowedCallers }}
     - from:
         - {{ . | toYaml | nindent 10 }}
       ports:
         - protocol: TCP
           port: {{ $.Values.service.port }}
-    {{- end }}
-    {{- end }}
-    # LEGACY: Allow traffic from ingress controller (DEPRECATED)
-    {{- if .Values.networkPolicy.ingress.fromIngressController }}
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              {{- toYaml .Values.networkPolicy.ingress.ingressControllerNamespaceLabels | nindent 14 }}
-      ports:
-        - protocol: TCP
-          port: {{ .Values.service.port }}
-    {{- end }}
-    # LEGACY: Allow traffic from same namespace (DEPRECATED)
-    {{- if .Values.networkPolicy.ingress.fromSameNamespace }}
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Release.Namespace }}
-      ports:
-        - protocol: TCP
-          port: {{ .Values.service.port }}
     {{- end }}
     # Custom ingress rules
     {{- with .Values.networkPolicy.ingress.customRules }}
@@ -71,7 +49,6 @@ spec:
           port: 443
     {{- end }}
     # ZERO-TRUST: Allow communication to specific services only
-    {{- if .Values.networkPolicy.egress.allowSpecificServices }}
     {{- range .Values.networkPolicy.egress.allowedTargets }}
     - to:
         - {{ .podSelector | toYaml | nindent 10 }}
@@ -80,33 +57,6 @@ spec:
         - protocol: TCP
           port: {{ . }}
         {{- end }}
-    {{- end }}
-    {{- end }}
-    # LEGACY: Allow HTTP for internal services (DEPRECATED)
-    {{- if .Values.networkPolicy.egress.allowHTTP }}
-    - to: []
-      ports:
-        - protocol: TCP
-          port: 80
-    {{- end }}
-    # LEGACY: Allow communication to LLM service (DEPRECATED)
-    {{- if .Values.networkPolicy.egress.allowLLMService }}
-    {{- range .Values.networkPolicy.egress.llmServiceSelectors }}
-    - to:
-        - {{ . | toYaml | nindent 10 }}
-      ports:
-        {{- range $.Values.networkPolicy.egress.llmServicePorts }}
-        - protocol: TCP
-          port: {{ . }}
-        {{- end }}
-    {{- end }}
-    {{- end }}
-    # LEGACY: Allow traffic to same namespace (DEPRECATED)
-    {{- if .Values.networkPolicy.egress.toSameNamespace }}
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Release.Namespace }}
     {{- end }}
     # Custom egress rules
     {{- with .Values.networkPolicy.egress.customRules }}

@@ -152,14 +152,10 @@ networkPolicy:
   ingress:
     enabled: true
     # ZERO-TRUST: Only pdf-processor-service can call chat-service
-    fromSpecificServices: true
     allowedCallers:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: pdf-processor-service
-    # Legacy broad access (DEPRECATED - use allowedCallers instead)
-    fromIngressController: false
-    fromSameNamespace: false
     # Custom ingress rules for special cases
     customRules: []
   egress:
@@ -168,7 +164,6 @@ networkPolicy:
     allowDNS: true
     allowHTTPS: true  # For external vLLM in prestaging
     # ZERO-TRUST: chat-service can only call specific services
-    allowSpecificServices: true
     allowedTargets:
       # ChromaDB for vector retrieval
       - podSelector:
@@ -176,10 +171,6 @@ networkPolicy:
             app.kubernetes.io/name: chromadb
         ports:
           - 8000
-    # Legacy broad access (DEPRECATED - use allowedTargets instead)
-    allowHTTP: false
-    allowLLMService: false
-    toSameNamespace: false
     # Custom egress rules for special cases (external vLLM, etc.)
     customRules: []
 

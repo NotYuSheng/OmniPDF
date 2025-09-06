@@ -181,7 +181,6 @@ networkPolicy:
   ingress:
     enabled: true
     # ZERO-TRUST: ChromaDB accepts calls from specific services only
-    fromSpecificServices: true
     allowedCallers:
       # Chat service for vector queries
       - podSelector:
@@ -195,9 +194,6 @@ networkPolicy:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: cleaner
-    # Legacy broad access (DEPRECATED)
-    fromIngressController: false
-    fromSameNamespace: false
     # Custom ingress rules (empty by default)
     customRules: []
   egress:
@@ -206,12 +202,7 @@ networkPolicy:
     allowDNS: true
     allowHTTPS: false  # ChromaDB is a storage service, doesn't call external APIs
     # ZERO-TRUST: ChromaDB doesn't need to call any other services
-    allowSpecificServices: false
     allowedTargets: []
-    # Legacy broad access (DEPRECATED)
-    allowHTTP: false
-    allowLLMService: false
-    toSameNamespace: false
     # Custom egress rules (empty by default)
     customRules: []
 

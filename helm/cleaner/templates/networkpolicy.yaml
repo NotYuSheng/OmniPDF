@@ -61,7 +61,6 @@ spec:
           port: 443
     {{- end }}
     # ZERO-TRUST: Allow communication to specific services only
-    {{- if .Values.networkPolicy.egress.allowSpecificServices }}
     {{- range .Values.networkPolicy.egress.allowedTargets }}
     - to:
         - {{ .podSelector | toYaml | nindent 10 }}
@@ -70,33 +69,6 @@ spec:
         - protocol: TCP
           port: {{ . }}
         {{- end }}
-    {{- end }}
-    {{- end }}
-    # LEGACY: Allow HTTP for internal services (DEPRECATED)
-    {{- if .Values.networkPolicy.egress.allowHTTP }}
-    - to: []
-      ports:
-        - protocol: TCP
-          port: 80
-    {{- end }}
-    # LEGACY: Allow communication to LLM service (DEPRECATED)
-    {{- if .Values.networkPolicy.egress.allowLLMService }}
-    {{- range .Values.networkPolicy.egress.llmServiceSelectors }}
-    - to:
-        - {{ . | toYaml | nindent 10 }}
-      ports:
-        {{- range $.Values.networkPolicy.egress.llmServicePorts }}
-        - protocol: TCP
-          port: {{ . }}
-        {{- end }}
-    {{- end }}
-    {{- end }}
-    # LEGACY: Allow traffic to same namespace (DEPRECATED)
-    {{- if .Values.networkPolicy.egress.toSameNamespace }}
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Release.Namespace }}
     {{- end }}
     # Custom egress rules
     {{- with .Values.networkPolicy.egress.customRules }}

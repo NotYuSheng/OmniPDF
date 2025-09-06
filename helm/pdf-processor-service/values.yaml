@@ -147,7 +147,6 @@ networkPolicy:
   ingress:
     enabled: true
     # ZERO-TRUST: Only nginx and frontend can call pdf-processor-service
-    fromSpecificServices: true
     allowedCallers:
       - podSelector:
           matchLabels:
@@ -155,9 +154,6 @@ networkPolicy:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: frontend
-    # Legacy broad access (DEPRECATED)
-    fromIngressController: false
-    fromSameNamespace: false
     # Custom ingress rules for special cases
     customRules: []
   egress:
@@ -166,7 +162,6 @@ networkPolicy:
     allowDNS: true
     allowHTTPS: false  # pdf-processor doesn't call external APIs
     # ZERO-TRUST: pdf-processor can call multiple downstream services
-    allowSpecificServices: true
     allowedTargets:
       # Chat service for RAG queries
       - podSelector:
@@ -222,9 +217,6 @@ networkPolicy:
             app.kubernetes.io/name: redis
         ports:
           - 6379
-    # Legacy broad access (DEPRECATED)
-    allowHTTP: false
-    toSameNamespace: false
     # Custom egress rules for special cases
     customRules: []
 

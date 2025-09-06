@@ -183,14 +183,10 @@ networkPolicy:
   ingress:
     enabled: true
     # ZERO-TRUST: Only pdf-processor-service can call embedder-service
-    fromSpecificServices: true
     allowedCallers:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: pdf-processor-service
-    # Legacy broad access (DEPRECATED)
-    fromIngressController: false
-    fromSameNamespace: false
     # Custom ingress rules (empty by default)
     customRules: []
   egress:
@@ -199,7 +195,6 @@ networkPolicy:
     allowDNS: true
     allowHTTPS: true  # May need to download models/transformers
     # ZERO-TRUST: embedder-service can only call ChromaDB
-    allowSpecificServices: true
     allowedTargets:
       # ChromaDB for storing embeddings
       - podSelector:
@@ -207,10 +202,6 @@ networkPolicy:
             app.kubernetes.io/name: chromadb
         ports:
           - 8000
-    # Legacy broad access (DEPRECATED)
-    allowHTTP: false
-    allowChromaDBService: false
-    toSameNamespace: false
     # Custom egress rules (empty by default)
     customRules: []
 

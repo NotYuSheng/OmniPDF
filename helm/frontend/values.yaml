@@ -169,15 +169,11 @@ networkPolicy:
   ingress:
     enabled: true
     # ZERO-TRUST: Frontend accessible from ingress controller only
-    fromSpecificServices: true
     allowedCallers:
       # Allow Istio/ingress controller access (from different namespace)
       - namespaceSelector:
           matchLabels:
             name: ingress-nginx
-    # Legacy broad access (DEPRECATED)
-    fromIngressController: false
-    fromSameNamespace: false
     # Custom ingress rules (empty by default)
     customRules: []
   egress:
@@ -186,7 +182,6 @@ networkPolicy:
     allowDNS: true
     allowHTTPS: false  # Frontend doesn't call external APIs directly
     # ZERO-TRUST: frontend can only call nginx gateway
-    allowSpecificServices: true
     allowedTargets:
       # Nginx API gateway for all backend communication
       - podSelector:
@@ -194,10 +189,6 @@ networkPolicy:
             app.kubernetes.io/name: nginx
         ports:
           - 8080
-    # Legacy broad access (DEPRECATED)
-    allowHTTP: false
-    allowBackendServices: false
-    toSameNamespace: false
     # Custom egress rules (empty by default)
     customRules: []
 

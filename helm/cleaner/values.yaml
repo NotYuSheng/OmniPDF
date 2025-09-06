@@ -107,7 +107,6 @@ networkPolicy:
     allowDNS: true
     allowHTTPS: false  # Cleaner doesn't call external APIs
     # ZERO-TRUST: cleaner can only call storage/session services for cleanup
-    allowSpecificServices: true
     allowedTargets:
       # MinIO for deleting expired files
       - podSelector:
@@ -127,9 +126,6 @@ networkPolicy:
             app.kubernetes.io/name: redis
         ports:
           - 6379
-    # Legacy broad access (DEPRECATED)
-    allowHTTP: false
-    toSameNamespace: false
     customRules: []
 
 # Pod Disruption Budget not needed for single replica background service

@@ -162,7 +162,6 @@ networkPolicy:
   ingress:
     enabled: true
     # ZERO-TRUST: Nginx accepts calls from ingress controller and frontend only
-    fromSpecificServices: true
     allowedCallers:
       # Allow Istio/ingress controller access (from different namespace)
       - namespaceSelector:
@@ -172,9 +171,6 @@ networkPolicy:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: frontend
-    # Legacy broad access (DEPRECATED)
-    fromIngressController: false
-    fromSameNamespace: false
     # Custom ingress rules (empty by default)
     customRules: []
   egress:
@@ -183,7 +179,6 @@ networkPolicy:
     allowDNS: true
     allowHTTPS: false  # nginx routes internally, doesn't call external APIs
     # ZERO-TRUST: nginx can only route to pdf-processor-service (API gateway pattern)
-    allowSpecificServices: true
     allowedTargets:
       # Primary API endpoint
       - podSelector:
@@ -197,10 +192,6 @@ networkPolicy:
             app.kubernetes.io/name: minio
         ports:
           - 9000
-    # Legacy broad access (DEPRECATED)
-    allowHTTP: false
-    allowLLMService: false
-    toSameNamespace: false
     # Custom egress rules (empty by default)
     customRules: []
 
