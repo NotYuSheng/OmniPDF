@@ -27,17 +27,17 @@
 3. View Logs:
   kubectl --namespace {{ .Release.Namespace }} logs -f deployment/{{ include "minio.fullname" . }}
 
-4. Test the Chat Service:
+4. Test the MinIO Service:
 {{- if .Values.ingress.enabled }}
-  curl -X POST {{ (index .Values.ingress.hosts 0).host }}/chat \
-    -H "Content-Type: application/json" \
-    -d '{"message": "Hello, OmniPDF!"}'
+  curl {{ (index .Values.ingress.hosts 0).host }}/minio/health/live
 {{- else }}
   # Port forward first, then:
-  curl -X POST http://localhost:8080/chat \
-    -H "Content-Type: application/json" \
-    -d '{"message": "Hello, OmniPDF!"}'
+  curl http://localhost:9000/minio/health/live
 {{- end }}
+
+  # Additional MinIO API tests:
+  # curl http://localhost:9000/minio/health/ready
+  # Access MinIO Console at: http://localhost:9001
 
 {{- if .Values.serviceMonitor.enabled }}
 

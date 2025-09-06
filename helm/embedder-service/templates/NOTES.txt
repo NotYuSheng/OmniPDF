@@ -27,17 +27,17 @@
 3. View Logs:
   kubectl --namespace {{ .Release.Namespace }} logs -f deployment/{{ include "embedder-service.fullname" . }}
 
-4. Test the Chat Service:
+4. Test the Embedder Service:
 {{- if .Values.ingress.enabled }}
-  curl -X POST {{ (index .Values.ingress.hosts 0).host }}/chat \
-    -H "Content-Type: application/json" \
-    -d '{"message": "Hello, OmniPDF!"}'
+  curl {{ (index .Values.ingress.hosts 0).host }}/embedder/health
 {{- else }}
   # Port forward first, then:
-  curl -X POST http://localhost:8080/chat \
-    -H "Content-Type: application/json" \
-    -d '{"message": "Hello, OmniPDF!"}'
+  curl http://localhost:8080/health
 {{- end }}
+
+  # Test embedding endpoints:
+  # curl -X POST http://localhost:8080/semantic/ -H "Content-Type: application/json" -d '{"doc_id": "test"}'
+  # curl -X POST http://localhost:8080/sentence/ -H "Content-Type: application/json" -d '{"doc_id": "test"}'
 
 {{- if .Values.serviceMonitor.enabled }}
 

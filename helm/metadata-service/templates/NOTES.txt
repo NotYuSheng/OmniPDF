@@ -21,6 +21,24 @@
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
 {{- end }}
 
+2. Health Check:
+  kubectl --namespace {{ .Release.Namespace }} get pods -l "app.kubernetes.io/name={{ include "metadata-service.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"
+
+3. View Logs:
+  kubectl --namespace {{ .Release.Namespace }} logs -f deployment/{{ include "metadata-service.fullname" . }}
+
+4. Test the Metadata Service:
+{{- if .Values.ingress.enabled }}
+  curl {{ (index .Values.ingress.hosts 0).host }}/health
+{{- else }}
+  # Port forward first, then:
+  curl http://localhost:8080/health
+{{- end }}
+
+  # Test metadata endpoints:
+  # curl -X POST http://localhost:8080/metadata/test-doc-id
+  # curl http://localhost:8080/wordcloud/test-doc-id
+
 Metadata Service Configuration:
 - LLM Model: {{ .Values.llm.model }}
 - LLM Base URL: {{ .Values.llm.baseUrl }}

@@ -43,13 +43,13 @@ networkPolicy:
 # Pod disruption budget for pre-staging (2 replicas, allow 1 down)
 podDisruptionBudget:
   enabled: true
-  maxUnavailable: 1
+  minAvailable: 1
 
 # Moderate deployment strategy for pre-staging (balanced speed/safety)
 deploymentStrategy:
   type: RollingUpdate
   rollingUpdate:
-    maxUnavailable: 1
+    minAvailable: 1
     maxSurge: 1
 
 # Moderate resource quota for pre-staging testing

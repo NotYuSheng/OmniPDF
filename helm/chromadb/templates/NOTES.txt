@@ -27,17 +27,17 @@
 3. View Logs:
   kubectl --namespace {{ .Release.Namespace }} logs -f deployment/{{ include "chromadb.fullname" . }}
 
-4. Test the Chat Service:
+4. Test the ChromaDB Service:
 {{- if .Values.ingress.enabled }}
-  curl -X POST {{ (index .Values.ingress.hosts 0).host }}/chat \
-    -H "Content-Type: application/json" \
-    -d '{"message": "Hello, OmniPDF!"}'
+  curl {{ (index .Values.ingress.hosts 0).host }}/api/v1/heartbeat
 {{- else }}
   # Port forward first, then:
-  curl -X POST http://localhost:8080/chat \
-    -H "Content-Type: application/json" \
-    -d '{"message": "Hello, OmniPDF!"}'
+  curl http://localhost:8080/api/v1/heartbeat
 {{- end }}
+
+  # Additional ChromaDB API tests:
+  # curl http://localhost:8080/api/v1/version
+  # curl http://localhost:8080/api/v1/collections
 
 {{- if .Values.serviceMonitor.enabled }}
 
