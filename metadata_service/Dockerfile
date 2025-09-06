@@ -17,9 +17,9 @@ COPY shared_utils ./shared_utils
 # Copy metadata_service folder from root context into /app/metadata_service
 COPY metadata_service ./metadata_service
 
-# Create non-root user for security
-RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /bin/bash appuser
-RUN chown -R appuser:appuser /app
+# Create non-root user for security and set permissions
+RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /bin/bash appuser && \
+    chown -R appuser:appuser /app
 
 USER appuser
 

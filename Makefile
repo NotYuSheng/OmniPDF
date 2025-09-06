@@ -130,14 +130,14 @@ define deploy-all-charts
 		CHART=$$(basename $$dir); \
 		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
 			echo "$(1) chart: $$CHART"; \
-			CHART_VALUES="-f $(SHARED_BASE_VALUES)"; \
+			CHART_VALUES="-f helm/$$CHART/values.yaml"; \
+			CHART_VALUES="$$CHART_VALUES -f $(SHARED_BASE_VALUES)"; \
 			if [ -f "$(SHARED_VALUES_DIR)/common-$(ENV).yaml" ]; then \
 				CHART_VALUES="$$CHART_VALUES -f $(SHARED_VALUES_DIR)/common-$(ENV).yaml"; \
 			fi; \
 			if [ -f "helm/$$CHART/values-$(ENV).yaml" ]; then \
 				CHART_VALUES="$$CHART_VALUES -f helm/$$CHART/values-$(ENV).yaml"; \
 			fi; \
-			CHART_VALUES="$$CHART_VALUES -f helm/$$CHART/values.yaml"; \
 			helm upgrade --install $$CHART helm/$$CHART \
 				--namespace $(NAMESPACE) \
 				--create-namespace \
