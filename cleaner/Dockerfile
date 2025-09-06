@@ -24,4 +24,10 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /bin/bash appuser
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
 CMD ["python3", "cleaner/main.py"]
