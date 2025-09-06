@@ -27,7 +27,7 @@ secrets:
 
 # Production image handling
 image:
-  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/nginx
+  repository: ghcr.io/notyusheng/nginx
   pullPolicy: Always  # Stable tags in production
 
 # Production ingress with proper SSL

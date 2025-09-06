@@ -24,6 +24,17 @@ The following port mappings are used across the OmniPDF microservices **for deve
 | S3-Compatible Store       | Object storage (e.g., MinIO S3 API)                       | 9000   |
 | MinIO Console             | MinIO web-based Admin UI                                  | 9001   |
 
+## Deployment Environments
+
+OmniPDF supports multiple deployment environments with different orchestration methods:
+
+- **Development**: Docker Compose for local development
+- **Pre-staging**: CodeReady Containers (CRC) with local OpenShift registry
+- **Staging**: Offline OpenShift Container Platform (OCP) with internal registries
+- **Production**: Offline OpenShift Container Platform (OCP) with internal registries
+
+**Note**: Staging and production environments are offline/disconnected and cannot access external registries. All container images must be pre-mirrored to internal registries.
+
 ## CRC (OpenShift Local) Setup
 
 OmniPDF uses Red Hat CodeReady Containers (CRC) for local OpenShift development. Due to the resource-intensive nature of running 8+ microservices, CRC requires significant CPU and memory allocation.

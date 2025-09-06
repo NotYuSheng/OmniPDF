@@ -30,7 +30,7 @@ secrets:
 
 # Production image handling
 image:
-  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/chat_service
+  repository: ghcr.io/notyusheng/chat_service
   pullPolicy: Always  # Stable tags in production
 
 # Production ingress with proper SSL

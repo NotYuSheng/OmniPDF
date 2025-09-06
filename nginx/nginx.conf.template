@@ -16,6 +16,21 @@ server {
         add_header Content-Type text/plain;
     }
 
+    # Route frontend UI requests
+    location / {
+        proxy_pass ${FRONTEND_URL}/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400;
+    }
+
+    # Route API requests to PDF processor service
+    location /api/ {
+        proxy_pass ${PDF_PROCESSOR_URL}/;
+    }
+
+    # Legacy route for direct PDF processor access
     location /pdf_processor/ {
         proxy_pass ${PDF_PROCESSOR_URL}/;
     }
