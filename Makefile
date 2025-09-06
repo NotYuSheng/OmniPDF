@@ -15,15 +15,15 @@ SHARED_ENV_VALUES ?= $(SHARED_VALUES_DIR)/common-$(ENV).yaml
 SERVICE_VALUES_FILE ?= $(CHART_DIR)/values.yaml
 SERVICE_ENV_VALUES_FILE ?= $(CHART_DIR)/values-$(ENV).yaml
 
-# Build values file list (in order of precedence)
-VALUES_FILES = -f $(SHARED_BASE_VALUES)
+# Build values file list (in order of precedence - later files override earlier ones)
+VALUES_FILES = -f $(SERVICE_VALUES_FILE)
+VALUES_FILES += -f $(SHARED_BASE_VALUES)
 ifneq ($(wildcard $(SHARED_ENV_VALUES)),)
     VALUES_FILES += -f $(SHARED_ENV_VALUES)
 endif
 ifneq ($(wildcard $(SERVICE_ENV_VALUES_FILE)),)
     VALUES_FILES += -f $(SERVICE_ENV_VALUES_FILE)
 endif
-VALUES_FILES += -f $(SERVICE_VALUES_FILE)
 
 # Default port for port-forwarding (override as needed)
 LOCAL_PORT ?= 8000
@@ -58,10 +58,10 @@ help:
 	@echo ""
 	@echo "Shared Values System:"
 	@echo "  Values are applied in order (later values override earlier ones):"
-	@echo "  1. helm/shared-values/common-base.yaml       - Base configuration for all services"
-	@echo "  2. helm/shared-values/common-{ENV}.yaml      - Environment-specific shared config"
-	@echo "  3. helm/{SERVICE}/values-{ENV}.yaml          - Service-specific environment config"
-	@echo "  4. helm/{SERVICE}/values.yaml                - Service-specific base config"
+	@echo "  1. helm/{SERVICE}/values.yaml                - Service-specific base config"
+	@echo "  2. helm/shared-values/common-base.yaml       - Base configuration for all services"
+	@echo "  3. helm/shared-values/common-{ENV}.yaml      - Environment-specific shared config"
+	@echo "  4. helm/{SERVICE}/values-{ENV}.yaml          - Service-specific environment config (highest priority)"
 	@echo ""
 	@echo "Environment Variables:"
 	@echo "  ENV                         Environment (staging, prestaging, prod) - defaults to 'staging'"

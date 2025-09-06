@@ -62,6 +62,17 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Create the name of the persistent volume claim
+*/}}
+{{- define "redis.pvcName" -}}
+{{- if .Values.persistence.existingClaim }}
+{{- .Values.persistence.existingClaim }}
+{{- else }}
+{{- include "redis.fullname" . }}-data
+{{- end }}
+{{- end }}
+
+{{/*
 MinIO access and secret keys from secret
 */}}
 {{- define "redis.secretName" -}}

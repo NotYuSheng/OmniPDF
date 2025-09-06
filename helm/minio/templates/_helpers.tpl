@@ -62,6 +62,17 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Create the name of the persistent volume claim
+*/}}
+{{- define "minio.pvcName" -}}
+{{- if .Values.persistence.existingClaim }}
+{{- .Values.persistence.existingClaim }}
+{{- else }}
+{{- include "minio.fullname" . }}-data
+{{- end }}
+{{- end }}
+
+{{/*
 MinIO access and secret keys from secret
 */}}
 {{- define "minio.secretName" -}}
