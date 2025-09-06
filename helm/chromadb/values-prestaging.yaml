@@ -23,19 +23,32 @@ persistence:
   accessModes:
     - ReadWriteOnce
 
-# Health probes disabled for prestaging due to ChromaDB API compatibility
+# Health probes enabled for prestaging to mirror production behavior
 startupProbe:
-  enabled: false
+  enabled: true
+  path: /api/v1/heartbeat
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 12
+  successThreshold: 1
 
 livenessProbe:
-  enabled: false
+  enabled: true
+  path: /api/v1/heartbeat
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+  successThreshold: 1
 
 readinessProbe:
-  enabled: false
-  initialDelaySeconds: 10
+  enabled: true
+  path: /api/v1/heartbeat
+  initialDelaySeconds: 15
   periodSeconds: 10
-  timeoutSeconds: 3
-  failureThreshold: 2
+  timeoutSeconds: 5
+  failureThreshold: 3
   successThreshold: 1
 
 # ChromaDB configuration for prestaging
