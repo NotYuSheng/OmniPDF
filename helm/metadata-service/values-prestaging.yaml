@@ -22,11 +22,11 @@ autoscaling:
 # Pre-staging secrets
 secrets:
   create: false
-  name: chat-service-prestaging-secrets
+  name: metadata-service-secrets
 
 # Pre-staging specific configurations - using local CRC registry
 image:
-  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/chat_service
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/metadata_service
   tag: "dev-v0.0.0-6653136"
   pullPolicy: Always  # Use local registry image
 
