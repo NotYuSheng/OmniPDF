@@ -29,6 +29,17 @@ secrets:
 networkPolicy:
   enabled: true
 
-# Simple recreate strategy for background service
+# Simple recreate strategy for background service (override shared prestaging values)
 deploymentStrategy:
   type: Recreate
+  # Explicitly clear rollingUpdate to avoid conflicts
+  rollingUpdate: null
+
+# Cleaner doesn't need multiple replicas or autoscaling
+replicaCount: 1
+autoscaling:
+  enabled: false
+
+# Disable PDB for single replica service  
+podDisruptionBudget:
+  enabled: false

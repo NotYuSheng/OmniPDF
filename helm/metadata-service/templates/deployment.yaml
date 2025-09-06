@@ -93,11 +93,7 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
             # Secret environment variables
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
                   name: {{ include "metadata-service.secretName" . }}
-                  key: OPENAI_API_KEY
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:

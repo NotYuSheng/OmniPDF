@@ -4,17 +4,17 @@
 # Use local CRC registry image
 image:
   repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/embedder_service
-  tag: "latest"
+  tag: "dev-v0.0.3-5d69f89"
   pullPolicy: Always
 
-# Prestaging resource allocation - conservative for CRC
+# Prestaging resource allocation - increased memory for ML models
 resources:
   limits:
-    cpu: 300m
-    memory: 256Mi
+    cpu: 500m
+    memory: 1Gi
   requests:
-    cpu: 50m
-    memory: 64Mi
+    cpu: 100m
+    memory: 512Mi
 
 # Single replica for prestaging
 replicaCount: 1

@@ -14,9 +14,16 @@ crc stop 2>/dev/null || true
 echo "Configuring CRC resources..."
 crc config set memory 262144    # 256GB RAM
 crc config set cpus 32          # 32 CPU cores  
-crc config set disk-size 80     # 80GB disk
+crc config set disk-size 120    # 120GB disk (increased for ML workloads)
 crc config set enable-cluster-monitoring true
 crc config set consent-telemetry no
+
+# Check if CRC VM exists and needs recreation for disk size changes
+echo ""
+echo "⚠️  Note: CRC disk-size changes require VM recreation if CRC was already created"
+echo "If you have an existing CRC VM and need more disk space, run:"
+echo "  crc delete"
+echo "  crc start"
 
 echo "CRC configuration completed!"
 echo ""
@@ -29,3 +36,12 @@ echo ""
 echo "After CRC starts, set up oc environment:"
 echo "  eval \$(crc oc-env)"
 echo "  crc console --credentials  # Get login credentials"
+echo ""
+echo "💡 For OmniPDF ML workloads, consider:"
+echo "  - Regular docker system prune to clean up unused images"
+echo "  - Monitor disk usage with: crc status"
+echo "  - If disk fills up, delete and recreate CRC with larger disk-size"
+echo ""
+echo "🧹 To clean up Docker space:"
+echo "  docker system prune -f"
+echo "  docker image prune -a -f"

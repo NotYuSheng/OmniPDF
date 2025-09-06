@@ -4,7 +4,7 @@ description: OmniPDF Embedder Service - Text chunking and embedding with ChromaD
 
 type: application
 version: 0.1.0
-appVersion: "dev-v0.0.0-6653136"
+appVersion: "dev-v0.0.3-5d69f89"
 
 # Chart icon for Helm repositories and UIs
 icon: file://../assets/logo.svg

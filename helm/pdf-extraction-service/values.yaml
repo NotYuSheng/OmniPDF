@@ -7,7 +7,7 @@ replicaCount: 2
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: ghcr.io/notyusheng/pdf-extraction-service
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/pdf_extraction_service
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -114,17 +114,16 @@ autoscaling:
   targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+volumes:
+  # Writable volume for temporary files (required with read-only filesystem)
+  - name: tmp
+    emptyDir: {}
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+  # Mount writable temporary directory
+  - name: tmp
+    mountPath: "/tmp"
 
 nodeSelector: {}
 

@@ -60,12 +60,11 @@ spec:
             - name: {{ .name }}
               value: {{ .value | quote }}
             {{- end }}
-            # Secret environment variables
-            - name: API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.name }}
-                  key: API_KEY
+          {{- if .Values.secrets.name }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secrets.name }}
+          {{- end }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}

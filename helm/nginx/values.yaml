@@ -54,7 +54,8 @@ service:
   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-  port: 80
+  port: 8080
+  targetPort: 8080
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
@@ -114,17 +115,31 @@ autoscaling:
   targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+volumes:
+  # Writable volume for nginx cache (required for read-only filesystem)
+  - name: nginx-cache
+    emptyDir: {}
+  # Writable volume for nginx pid and temp files
+  - name: nginx-run
+    emptyDir: {}
+  # Writable volume for nginx logs
+  - name: nginx-log
+    emptyDir: {}
+  # Writable volume for nginx conf.d (for template processing)
+  - name: nginx-conf
+    emptyDir: {}
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+  # Mount writable cache directories for nginx
+  - name: nginx-cache
+    mountPath: "/var/cache/nginx"
+  - name: nginx-run
+    mountPath: "/var/run"
+  - name: nginx-log
+    mountPath: "/var/log/nginx"
+  - name: nginx-conf
+    mountPath: "/etc/nginx/conf.d"
 
 nodeSelector: {}
 

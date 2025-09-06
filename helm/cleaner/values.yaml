@@ -118,6 +118,8 @@ podDisruptionBudget:
 # Simple recreate strategy for background service
 deploymentStrategy:
   type: Recreate
+  # Explicitly disable rollingUpdate for Recreate strategy
+  rollingUpdate: null
 
 # Service monitoring for Prometheus (if the cleaner exposes metrics)
 serviceMonitor:

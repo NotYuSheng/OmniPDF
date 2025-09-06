@@ -1,0 +1,5 @@
+# Core OmniPDF Services (Essential for basic functionality)
+ghcr.io/notyusheng/chat_service:dev-v0.0.1-860e67e
+ghcr.io/notyusheng/embedder_service:dev-v0.0.1-860e67e
+ghcr.io/notyusheng/pdf_processor_service:dev-v0.0.1-860e67e
+ghcr.io/notyusheng/pdf_extraction_service:dev-v0.0.1-860e67e

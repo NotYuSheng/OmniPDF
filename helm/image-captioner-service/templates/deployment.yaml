@@ -80,11 +80,7 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
             # Secret environment variables
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
                   name: {{ include "image-captioner-service.secretName" . }}
-                  key: OPENAI_API_KEY
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}

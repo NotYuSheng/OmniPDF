@@ -92,16 +92,11 @@ spec:
             - name: {{ .name }}
               value: {{ .value | quote }}
             {{- end }}
-            # Secret environment variables
-            {{- if .Values.secrets.create }}
-            {{- range $key, $value := .Values.secrets.data }}
-            - name: {{ $key }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "embedder-service.secretName" . }}
-                  key: {{ $key }}
-            {{- end }}
-            {{- end }}
+          {{- if .Values.secrets.name }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secrets.name }}
+          {{- end }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}

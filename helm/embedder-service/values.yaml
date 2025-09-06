@@ -10,7 +10,7 @@ image:
   repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/embedder_service
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "dev-v0.0.1-860e67e"
+  tag: "dev-v0.0.3-5d69f89"
 
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -55,7 +55,7 @@ service:
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 8005
-  targetPort: 8005
+  targetPort: 8000
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
@@ -136,17 +136,22 @@ ingress:
   #      - chart-example.local
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+volumes:
+  # Writable volume for temporary files (required for PyTorch with read-only filesystem)
+  - name: tmp
+    emptyDir: {}
+  # Writable volume for NLTK data (required for NLTK downloads with read-only filesystem)
+  - name: nltk-data
+    emptyDir: {}
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+  # Mount writable temporary directory
+  - name: tmp
+    mountPath: "/tmp"
+  # Mount writable NLTK data directory at the default path
+  - name: nltk-data
+    mountPath: "/nltk_data"
 
 nodeSelector: {}
 
