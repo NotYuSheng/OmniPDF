@@ -21,7 +21,7 @@ fullnameOverride: ""
 #This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Automatically mount a ServiceAccount's API credentials?
   automount: true
   # Annotations to add to the service account
@@ -172,15 +172,10 @@ env: []
 
 # Secret configuration for sensitive values
 secrets:
-  # Set to true to create secret from values, false to use existing secret
+  # Must reference existing secret - secret templates removed for security
   create: false
-  # Name of the secret to reference (must exist if create=false)
+  # Name of the secret to reference (must exist)
   name: embedder-service-secrets
-  # Data for secret creation (only used when create=true)
-  # Values will be base64 encoded automatically
-  data: {}
-    # EMBEDDING_API_KEY: "your-api-key-here"
-    # DATABASE_PASSWORD: "your-db-password"
 
 # Network policy configuration for network segmentation
 networkPolicy:

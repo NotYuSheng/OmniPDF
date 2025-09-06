@@ -16,7 +16,7 @@ fullnameOverride: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Automatically mount a ServiceAccount's API credentials?
   automount: true
   # Annotations to add to the service account
@@ -167,85 +167,7 @@ env:
 
 # Secret configuration for sensitive values
 secrets:
-  # Set to true to create secret from values, false to use existing secret
+  # Must reference existing secret - secret templates removed for security
   create: false
-  # Name of the secret to reference (must exist if create=false)
+  # Name of the secret to reference (must exist)
   name: metadata-service-secrets
-  # Data for secret creation (only used when create=true)
-  # Values will be base64 encoded automatically
-  data: {}
-    # OPENAI_API_KEY: "your-api-key-here"
-    # MINIO_ACCESS_KEY: "your-minio-access-key"
-    # MINIO_SECRET_KEY: "your-minio-secret-key"
-
-# Network policy configuration for network segmentation
-networkPolicy:
-  enabled: false  # Disabled by default for dev/testing
-  ingress:
-    enabled: true
-    # Allow ingress controller to reach this service
-    fromIngressController: true
-    ingressControllerNamespaceLabels:
-      name: ingress-nginx
-    # Allow services in same namespace to communicate
-    fromSameNamespace: true
-    # Custom ingress rules (empty by default)
-    customRules: []
-  egress:
-    enabled: true
-    # Allow DNS resolution (required for hostname lookups)
-    allowDNS: true
-    # Allow HTTPS for external APIs
-    allowHTTPS: true
-    # Allow HTTP for internal services  
-    allowHTTP: true
-    # Allow communication to LLM service
-    allowLLMService: true
-    llmServiceSelectors:
-      - podSelector:
-          matchLabels:
-            app.kubernetes.io/name: llm-service
-    llmServicePorts:
-      - 8080
-      - 8000
-    # Allow traffic to same namespace (Redis, MinIO, ChromaDB)
-    toSameNamespace: true
-    # Custom egress rules (empty by default)
-    customRules: []
-
-# Pod Disruption Budget for high availability during maintenance
-podDisruptionBudget:
-  enabled: false  # Disabled by default for dev
-  # Use either minAvailable OR maxUnavailable (not both)
-  minAvailable: null
-  maxUnavailable: null
-
-# Deployment strategy for updates (defaults to Kubernetes standard)
-deploymentStrategy: {}
-  # Example configurations:
-  # type: RollingUpdate
-  # rollingUpdate:
-  #   maxUnavailable: 25%
-  #   maxSurge: 25%
-  # 
-  # OR for faster dev updates:
-  # type: Recreate
-
-serviceMonitor:
-  enabled: false  # Disabled by default - enable in environments with Prometheus
-  # Metrics endpoint configuration
-  port: "http"              # Service port name to scrape (default: http)
-  path: "/metrics"          # Metrics endpoint path
-  interval: "30s"           # How often to scrape metrics
-  scrapeTimeout: "10s"      # Timeout for each scrape
-  honorLabels: false        # Whether to honor labels from target
-  # Additional labels for ServiceMonitor resource
-  labels: {}
-  # Additional annotations for ServiceMonitor resource  
-  annotations: {}
-  # Metric relabeling (advanced)
-  metricRelabelings: []
-  relabelings: []
-
-#istio:
-#  enabled: true
