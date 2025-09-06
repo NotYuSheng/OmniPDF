@@ -2,6 +2,7 @@
 
 # Production-like image handling
 image:
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/cleaner
   pullPolicy: Always
 
 # Staging resources
