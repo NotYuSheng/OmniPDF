@@ -8,8 +8,8 @@ metadata:
     "helm.sh/hook": test
 spec:
   containers:
-    - name: wget
-      image: busybox
-      command: ['wget']
-      args: ['--spider', '--timeout=10', '{{ include "redis.fullname" . }}:{{ .Values.service.port }}/redis/health/live']
+    - name: redis-test
+      image: redis:7-alpine
+      command: ['redis-cli']
+      args: ['-h', '{{ include "redis.fullname" . }}', '-p', '{{ .Values.service.port }}', 'ping']
   restartPolicy: Never

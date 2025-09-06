@@ -53,13 +53,14 @@ env:
 # OpenShift security context adjustments for CRC
 securityContext:
   allowPrivilegeEscalation: false
-  runAsNonRoot: false  # ChromaDB needs to run as root or specific user
+  runAsNonRoot: true
   readOnlyRootFilesystem: false
   capabilities:
     drop:
       - ALL
 
-podSecurityContext: {}
+podSecurityContext:
+  runAsNonRoot: true
 
 # No node selection needed for CRC
 nodeSelector: {}

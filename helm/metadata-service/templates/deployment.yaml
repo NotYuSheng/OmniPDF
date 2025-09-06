@@ -73,7 +73,7 @@ spec:
             # Metadata Configuration
             - name: SUMMARY_LENGTH
               value: {{ .Values.metadata.summaryLength | quote }}
-            - name: SHORT_DSECRIPTION_LENGTH
+            - name: SHORT_DESCRIPTION_LENGTH
               value: {{ .Values.metadata.shortDescriptionLength | quote }}
             - name: BATCH_SIZE
               value: {{ .Values.metadata.batchSize | quote }}

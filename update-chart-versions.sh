@@ -20,11 +20,14 @@ for chart_file in helm/*/Chart.yaml; do
         
         echo "Updating $chart_file..."
         
-        # Update appVersion line
-        sed -i "s/appVersion: \"$OLD_PATTERN\"/appVersion: \"$NEW_VERSION\"/g" "$chart_file"
+        # Update appVersion line (portable across Linux/macOS)
+        sed -i.bak "s/appVersion: \"$OLD_PATTERN\"/appVersion: \"$NEW_VERSION\"/g" "$chart_file"
         
         # Also check for other old version patterns and update
-        sed -i "s/appVersion: \"dev-v0.0.1-860e67e\"/appVersion: \"$NEW_VERSION\"/g" "$chart_file"
+        sed -i.bak "s/appVersion: \"dev-v0.0.1-860e67e\"/appVersion: \"$NEW_VERSION\"/g" "$chart_file"
+        
+        # Clean up backup files
+        rm -f "$chart_file.bak"
         
         echo "✅ Updated appVersion for $service_name"
     fi

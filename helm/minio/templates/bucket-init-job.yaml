@@ -47,8 +47,10 @@ spec:
             - -c
             - |
               set -e
+              echo "Setting up MinIO alias..."
+              mc alias set minio-local http://{{ include "minio.fullname" . }}:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
               echo "Waiting for MinIO to be ready..."
-              until mc alias set minio-local http://{{ include "minio.fullname" . }}:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD; do
+              until mc ready minio-local; do
                 echo "MinIO not ready yet, waiting..."
                 sleep 2
               done
