@@ -9,7 +9,7 @@ from models.metadata import WordcloudResponse
 from utils.session import validate_session_doc_pair
 from utils.proxy import handle_status_error, handle_job_status
 from shared_utils.s3_utils import get_object_stream, load_job
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 import httpx
 
 router = APIRouter(prefix="/wordcloud", tags=["wordcloud"])
