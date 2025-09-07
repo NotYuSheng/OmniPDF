@@ -24,6 +24,7 @@ async def get_wordcloud(doc_id: str, status_bar, max_retries=600, delay=1):
             try:
                 data = response.json()
             except json.JSONDecodeError as e:
+                data = {}
                 logger.error(
                     f"Failed to decode JSON from response: {response.text}: {e}"
                 )
@@ -35,15 +36,11 @@ async def get_wordcloud(doc_id: str, status_bar, max_retries=600, delay=1):
                 # Still processing, continue polling
                 if attempt < max_retries - 1:
                     if status_bar:
+                        reason = data.get("detail", "in progress") if data else "in progress"
                         status_bar.info(
                             f"Document still processing... ({(attempt + 1) * delay}s)"
+                            f"\nReason: {reason}"
                         )
-                    data = response.json()
-                    # if "detail" in data:
-                    #     server_status.info(data["detail"])
-                    # else:
-                    #     if len(data) > 100:
-                    #         server_status.info(str(data)[:50] + "...")
                     await asyncio.sleep(delay)
                     continue
                 else:

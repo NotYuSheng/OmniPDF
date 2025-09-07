@@ -24,6 +24,7 @@ async def get_metadata(doc_id: str, status_bar, max_retries=600, delay=1):
             try:
                 data = response.json()
             except json.JSONDecodeError as e:
+                data = {}
                 logger.error(
                     f"Failed to decode JSON from response: {response.text}: {e}"
                 )
@@ -35,11 +36,11 @@ async def get_metadata(doc_id: str, status_bar, max_retries=600, delay=1):
                 # Still processing, continue polling
                 if attempt < max_retries - 1:
                     if status_bar:
+                        reason = data.get("detail", "in progress") if data else "in progress"
                         status_bar.info(
-                            f"Document still processing... ({(attempt + 1) * delay}s)" +
-                            f"\nReason: {data['detail']}"
+                            f"Document still processing... ({(attempt + 1) * delay}s)"
+                            f"\nReason: {reason}"
                         )
-                    data = response.json()
                     await asyncio.sleep(delay)
                     continue
                 else:
