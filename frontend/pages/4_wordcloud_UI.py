@@ -82,18 +82,14 @@ async def display_wordcloud(expander: DocumentExpander):
 
 
 async def display_all(expanders: list[DocumentExpander]):
-    a = [display_wordcloud(expander) for expander in expanders]
-    await asyncio.gather(*a, return_exceptions= True)
+    displays = [display_wordcloud(expander) for expander in expanders]
+    await asyncio.gather(*displays, return_exceptions= True)
 
 
 if "processed_data" in st.session_state and st.session_state.processed_data:
     # Initialize session state for expander states if not exists
     if "expander_states" not in st.session_state:
         st.session_state.expander_states = {}
-
-    doc_ids = st.session_state.processed_data.keys()
-    response_lst = list(st.session_state.processed_data.items())
-    doc_names = [data["uploaded_filename"] for _, data in response_lst]
 
     expanders = document_multiselect_with_expander()
     runner.run(display_all(expanders))
