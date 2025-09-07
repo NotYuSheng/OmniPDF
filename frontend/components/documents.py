@@ -1,0 +1,75 @@
+import streamlit as st
+
+
+def get_document_names():
+    response_lst = list(st.session_state.processed_data.items())
+    return [data["uploaded_filename"] for _, data in response_lst]
+
+
+def get_document_ids():
+    return st.session_state.processed_data.keys()
+
+
+def document_multiselect_with_expander():
+    document_multiselect = DocumentMultiSelect()
+    doc_names = get_document_names()
+    doc_ids = get_document_ids()
+    expander_list = []
+    for doc_name, doc_id in zip(doc_names, doc_ids):
+        expander_list.append(DocumentExpander(doc_id, doc_name, document_multiselect))
+    return expander_list
+
+class DocumentMultiSelect():
+    def __init__(self):
+        # Update multiselect based on expander states
+        self.doc_names = get_document_names()
+        self.multiselect = st.multiselect(
+            label="Expand documents:",
+            options=self.doc_names,
+            default=[
+                doc for doc in self.doc_names if st.session_state.expander_states.get(doc, True)
+            ],
+            help="Choose which documents should be expanded",
+            key="expander_multiselect",
+        )
+        
+        # Update session state based on multiselect
+        for doc_name in self.doc_names:
+            st.session_state.expander_states[doc_name] = doc_name in self.multiselect
+
+    def __contains__(self, item):
+        return item in self.multiselect
+    
+    def remove(self, item):
+        return self.multiselect.remove(item)
+
+class DocumentExpander():
+    def __init__(self, doc_id: str, doc_name: str, doc_multiselect: DocumentMultiSelect):
+        self.doc_id = doc_id
+        self.doc_name = doc_name
+        self.expander = st.expander(
+                        label=f"**{doc_name}**",
+                        expanded=st.session_state.expander_states.get(
+                            doc_name, True
+                        ),
+                    )
+        self.status = None
+        
+        # Update expander state and multiselect when expander is toggled
+        if not self.expander:  # expander is closed
+            st.session_state.expander_states[doc_name] = (
+                False
+            )
+            if doc_name in doc_multiselect:
+                doc_multiselect.remove(doc_name)
+        else:  # expander is open
+            st.session_state.expander_states[doc_name] = (
+                True
+            )
+        
+    def __enter__(self):
+        self.expander.__enter__()
+        self.status = st.empty()
+
+    def __exit__(self, *exc_details):
+        self.expander.__exit__(*exc_details)
