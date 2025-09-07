@@ -2,7 +2,7 @@ import asyncio
 import os
 import streamlit as st
 import logging
-import json 
+import json
 import httpx
 from components.documents import document_multiselect_with_expander, DocumentExpander
 
@@ -36,7 +36,9 @@ async def get_metadata(doc_id: str, status_bar, max_retries=600, delay=1):
                 # Still processing, continue polling
                 if attempt < max_retries - 1:
                     if status_bar:
-                        reason = data.get("detail", "in progress") if data else "in progress"
+                        reason = (
+                            data.get("detail", "in progress") if data else "in progress"
+                        )
                         status_bar.info(
                             f"Document still processing... ({(attempt + 1) * delay}s)"
                             f"\nReason: {reason}"
@@ -53,7 +55,9 @@ async def get_metadata(doc_id: str, status_bar, max_retries=600, delay=1):
             logger.error(f"Request error on attempt: {e}")
         except TimeoutError:
             logger.error(f"Document ID: {doc_id} took too long to process.")
-            status_bar.error("Retry limit reached. Please retry by clicking on page on left.")
+            status_bar.error(
+                "Retry limit reached. Please retry by clicking on page on left."
+            )
 
 
 async def display_metadata(expander: DocumentExpander):
@@ -65,7 +69,7 @@ async def display_metadata(expander: DocumentExpander):
 
 async def display_all(expanders: list[DocumentExpander]):
     displays = [display_metadata(expander) for expander in expanders]
-    await asyncio.gather(*displays, return_exceptions= True)
+    await asyncio.gather(*displays, return_exceptions=True)
 
 
 if "processed_data" in st.session_state and st.session_state.processed_data:
