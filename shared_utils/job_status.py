@@ -8,7 +8,7 @@ from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import HTTPException
 
 from shared_utils.s3_utils import upload_fileobj, get_object_stream
-from shared_utils.redis import RedisDocumentFileList
+from shared_utils.redis_utils import RedisDocumentFileList
 
 logger = logging.getLogger(__name__)
 
