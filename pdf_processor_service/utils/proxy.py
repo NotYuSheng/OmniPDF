@@ -15,6 +15,7 @@ EXTERNAL_ENDPOINT = os.environ["EXTERNAL_ENDPOINT"]
 METADATA_URL = os.environ["METADATA_URL"]
 EXTRACTION_URL = os.environ["EXTRACTION_URL"]
 EMBED_URL = os.environ["EMBED_URL"]
+TRANSLATION_URL = os.environ["TRANSLATION_URL"]
 
 
 def handle_status_error(response: httpx.Response, url: str) -> None:
@@ -194,6 +195,40 @@ async def load_or_create_sentence_embedder_job(
         }
 
         response = await proxy_post(f"{EMBED_URL}/sentence/", body=embedder_request)
+        if response.status_code == 202:
+            raise_processing_error(job_type)
+        else:
+            logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
+            raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
+
+    handle_job_status(job, job_type)
+    return job
+
+
+async def load_or_create_translation_job(
+    doc_id: str, 
+    source_lang: str = "", 
+    target_lang: str = ""
+) -> dict | Response:
+    """Load existing translation job or create a new one if it doesn't exist"""
+    job_type = JobType.TRANSLATION
+    job = load_job(doc_id=doc_id, job_type=job_type)
+    if not job:
+        # Ensure extraction is complete first
+        extraction_job = await load_or_create_extraction_job(doc_id)
+        
+        # Get the extraction result to send to translation service
+        extraction_result = extraction_job.get("data", {}).get("result", {})
+        
+        # Prepare request body for translation service
+        translation_request = {
+            "doc_id": doc_id,
+            "docling": extraction_result,
+            "source_lang": source_lang,
+            "target_lang": target_lang,
+        }
+
+        response = await proxy_post(f"{TRANSLATION_URL}/translation/", body=translation_request)
         if response.status_code == 202:
             raise_processing_error(job_type)
         else:
