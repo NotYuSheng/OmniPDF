@@ -105,7 +105,7 @@ if __name__ == "__main__":
     )
 
     metadata_UI = st.Page(
-        page="pages/7_metadata_UI.py.py",
+        page="pages/7_metadata_UI.py",
         title="Metadata",
         icon="📄",
     )
