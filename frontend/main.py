@@ -104,6 +104,12 @@ if __name__ == "__main__":
         icon="📄",
     )
 
+    metadata_UI = st.Page(
+        page="pages/7_metadata_UI.py.py",
+        title="Metadata",
+        icon="📄",
+    )
+
     settings_UI = st.Page(
         page="pages/10_settings_UI.py",
         title="Settings",
@@ -119,6 +125,7 @@ if __name__ == "__main__":
             tables_UI,
             wordcloud_UI,
             translate_UI,
+            metadata_UI,
             settings_UI,
         ]
     )
