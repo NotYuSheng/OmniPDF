@@ -38,9 +38,7 @@ class DocumentMultiSelect():
 
     def __contains__(self, item):
         return item in self.multiselect
-    
-    def remove(self, item):
-        return self.multiselect.remove(item)
+
 
 class DocumentExpander():
     def __init__(self, doc_id: str, doc_name: str, doc_multiselect: DocumentMultiSelect):
@@ -59,8 +57,6 @@ class DocumentExpander():
             st.session_state.expander_states[doc_name] = (
                 False
             )
-            if doc_name in doc_multiselect:
-                doc_multiselect.remove(doc_name)
         else:  # expander is open
             st.session_state.expander_states[doc_name] = (
                 True
