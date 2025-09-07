@@ -2,8 +2,7 @@ import streamlit as st
 
 
 def get_document_names():
-    response_lst = list(st.session_state.processed_data.items())
-    return [data["uploaded_filename"] for _, data in response_lst]
+    return [data["uploaded_filename"] for data in st.session_state.processed_data.values()]
 
 
 def get_document_ids():
