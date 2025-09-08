@@ -24,7 +24,7 @@ async def submit_pdf_for_extraction(
     """Submit a PDF for extraction processing."""
     presign_url = generate_presigned_url(f"{doc_id}/original.pdf")
     params = {"doc_id": doc_id, "download_url": presign_url}
-    return await proxy_post(f"{EXTRACTION_URL}/documents/extract?{urlencode(params)}", body={})
+    return await proxy_post(f"{EXTRACTION_URL}?{urlencode(params)}", body={})
 
 
 @router.get("/{doc_id}", response_model=ExtractorResponse)
