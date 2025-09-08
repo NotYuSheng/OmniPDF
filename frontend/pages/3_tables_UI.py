@@ -38,15 +38,21 @@ server_status = st.empty()
 runner = asyncio.Runner()
 
 async def get_tables(doc_id, max_retries=600, delay=1) -> dict:
+    """
+    Poll the backend for table extraction results.
+    """
     for attempt in range(max_retries):
         try:
             response = await table_client.get(f"{PDF_PROCESSOR_URL}/tables/{doc_id}")
             logger.info(f"Table extraction response status: {response.status_code}")
             try:
                 data = response.json()
+                logger.info(f"Table extraction response JSON: {data}")
             except json.JSONDecodeError:
                 logger.error(f"Failed to decode JSON from response: {response.text}")
                 server_status.error("Received an invalid response from the server.")
+                raise Exception("Invalid JSON response from server")
+
 
             if response.status_code == 200 or response.status_code == 201:
                 server_status.info("Successfully retrieved tables")
@@ -54,7 +60,7 @@ async def get_tables(doc_id, max_retries=600, delay=1) -> dict:
                 return response.json()  # Success - return the actual data
             elif response.status_code == 202:
                 if "detail" in data:
-                    server_status.info(data["detail"])
+                    server_status.info(data['detail'])
                     logger.info(f"Info details: {data['detail']}")
            
                 # Still processing, continue polling
@@ -80,6 +86,10 @@ async def get_tables(doc_id, max_retries=600, delay=1) -> dict:
             if attempt == max_retries - 1:
                 raise
             await asyncio.sleep(delay)
+        except Exception as e:
+            logger.error(f"Unexpected error on attempt {attempt + 1}: {e}", exc_info=True)
+            server_status.error("Unexpected error occurred getting tables")
+            raise Exception("Unexpected error occurred getting tables")
 
     raise TimeoutError("Max retries exceeded")
 
@@ -116,11 +126,9 @@ def display_tables(table_response, doc_id=None):
     """
     Display tables extracted from the processed PDF document.
     """
-    # for doc_id, _data in response_lst:
-    #     init_table_request(doc_id=doc_id)
 
-     # Check if we have tables in the response
-    if "tables" in table_response and table_response["tables"]:
+    # Check if we have tables in the response
+    if table_response:
         table_status.success(f"Found {len(table_response)} tables in the document")
         for i, table_data in enumerate(table_response):
             with st.container():
