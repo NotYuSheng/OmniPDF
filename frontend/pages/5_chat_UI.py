@@ -36,17 +36,18 @@ with chat_container:
     
 client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
 
-async def chat_with_rag(prompt: str, doc_id: str = None, max_retries: int = 600, delay: int = 1):
+async def chat_with_rag(prompt: str, doc_ids: list[str] = None, collection_name: str = "SemanticEmbeds", max_retries: int = 600, delay: int = 1):
     """
     Send chat request to RAG backend and handle the response.
     """
+    logger.info(f"Sending chat request with doc_ids: {doc_ids}")
     for attempt in range(max_retries):
         try:
-            response = await client.post(url=f"{CHAT_URL}/chat/chat/",
+            response = await client.post(url=f"{PDF_PROCESSOR_URL}/chat/",
                                         json={"message": prompt,
-                                              "doc_id": doc_id,
-                                              "collection_name": "default_collection"
-                                              })
+                                            "doc_ids": doc_ids,
+                                            "collection_name": "SemanticEmbeds"
+                                        })
             
             logger.info(f"Chat response status: {response.status_code}")
             logger.info(f"Chat response text: {response.text}")
@@ -81,6 +82,10 @@ async def chat_with_rag(prompt: str, doc_id: str = None, max_retries: int = 600,
                     continue
                 else:
                     raise TimeoutError("Response generation timed out after maximum retries")
+            elif response.status_code == 404:
+                server_status.error("Documents not found or not embedded yet")
+                st.error(f"{response.json()}")
+                return "Sorry, the documents you selected haven't been embedded yet. Please go to the Images page and wait for embedding to complete, then try again."
             else:
                 # Handle other HTTP errors
                 logger.error(f"HTTP error {response.status_code}: {response.text}")
@@ -105,42 +110,39 @@ def simulate_rag_response(prompt, _document_content):
     # Placeholder response - replace with your actual RAG implementation
     return f"This is a simulated response for: {prompt}"
 
-# Get document ID from session state
-if "processed_data" in st.session_state:
-    if st.session_state.processed_data is not None:
-        first_key = next(iter(st.session_state.processed_data))
-        first_nested_dictionary = st.session_state.processed_data[first_key]
-        if "doc_id" in first_nested_dictionary:
-            doc_id = first_nested_dictionary.get("doc_id")
-            logger.info(f"Using document ID: {doc_id} for chat")
-        else:
-            logger.warning("No document ID found. Please upload and process a document first.")
-            st.warning("No document ID found. Please upload and process a document first.")
-    else:
-        logger.warning("No document processed. Please upload and process a document first.")
-        st.warning("No document processed. Please upload and process a document first.")
+# Check if documents are available
+if "processed_data" not in st.session_state or not st.session_state.processed_data:
+    st.info("No documents available. Please upload and process documents first.")
 
 with st.container():
     col1, col2 = st.columns(2)
     with col1:
-        if st.session_state.processed_data:
+        file_options = {}
+        if "processed_data" in st.session_state and st.session_state.processed_data:
+            logger.info(f"Processed data structure: {st.session_state.processed_data}")
             # Create a mapping of filenames to doc_ids
-            file_options = {}
-            for doc_id, doc_data in st.session_state.processed_data.items():
-                filename = doc_data.get('uploaded_filename', doc_id)
-                file_options[filename] = doc_id
-            
-            selected_file = st.selectbox(
-                "Select file:",
-                options=list(file_options.keys()),
-                key="file_selector"
-            )
+            for temp_doc_id, doc_data in st.session_state.processed_data.items():
+                filename = doc_data.get('uploaded_filename', temp_doc_id)
+                # Use the actual doc_id from the response, not the temp_doc_id
+                actual_doc_id = doc_data.get('doc_id', temp_doc_id)
+                file_options[filename] = actual_doc_id
+                logger.info(f"Mapping {filename} -> {actual_doc_id} (temp_id: {temp_doc_id})")
 
-            logger.info(f"Selected file: {selected_file}")
+        selected_files = st.multiselect(
+            "Select files:",
+            options=list(file_options.keys()) if file_options else [],
+            default=list(file_options.keys()) if file_options else [],
+            key="file_selector"
+        )
 
-            # Update doc_id based on selected filename
-            if selected_file:
-                doc_id = file_options[selected_file]
+        logger.info(f"Selected files: {selected_files}")
+
+        # Update doc_ids based on selected filenames
+        doc_ids = []
+        if selected_files and file_options:
+            doc_ids = [file_options[filename] for filename in selected_files]
+            logger.info(f"Mapped doc_ids: {doc_ids}")
+            logger.info(f"File options mapping: {file_options}")
 
     with col2:
         # Create sub-columns for side-by-side buttons
@@ -148,42 +150,52 @@ with st.container():
 
         with btn_col1:
             if st.button("Summarize", key="summary_btn"):
-                prompt = "Summarize the document"
-                response = runner.run(chat_with_rag(prompt, doc_id))
-                st.session_state.messages.append({"role": "user", "content": prompt})
-                st.session_state.messages.append({"role": "assistant", "content": response})
-                st.rerun()
+                if not doc_ids:
+                    st.error("Please select at least one document to summarize.")
+                else:
+                    prompt = "Summarize the document"
+                    response = runner.run(chat_with_rag(prompt, doc_ids))
+                    st.session_state.messages.append({"role": "user", "content": prompt})
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                    st.rerun()
         
         with btn_col2:    
             if st.button("Main Topic", key="topic_btn"):
-                prompt = "What is the main topic?"
-                response = runner.run(chat_with_rag(prompt))
-                st.session_state.messages.append({"role": "user", "content": prompt})
-                st.session_state.messages.append({"role": "assistant", "content": response})
-                st.rerun()
+                if not doc_ids:
+                    st.error("Please select at least one document to analyze.")
+                else:
+                    prompt = "What is the main topic?"
+                    response = runner.run(chat_with_rag(prompt, doc_ids))
+                    st.session_state.messages.append({"role": "user", "content": prompt})
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                    st.rerun()
         
         with btn_col3:
             if st.button("Key Findings", key="findings_btn"):
-                prompt = "What are the key findings?"
-                response = runner.run(chat_with_rag(prompt, doc_id))
-                st.session_state.messages.append({"role": "user", "content": prompt})
-                st.session_state.messages.append({"role": "assistant", "content": response})
-                st.rerun()
-
+                if not doc_ids:
+                    st.error("Please select at least one document to analyze.")
+                else:
+                    prompt = "What are the key findings?"
+                    response = runner.run(chat_with_rag(prompt, doc_ids))
+                    st.session_state.messages.append({"role": "user", "content": prompt})
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                    st.rerun()
 
 # Chat input
 if prompt := st.chat_input("Ask about the document"):
-    # Add user message to chat history
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    # Check if any documents are selected
+    if not doc_ids:
+        st.error("Please select at least one document to chat with.")
+    else:
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # Generate and display assistant response
-    response = asyncio.run(chat_with_rag(prompt, doc_id))
+        # Generate and display assistant response
+        response = asyncio.run(chat_with_rag(prompt, doc_ids))
 
-    response = response.json()
-    
-    # Add assistant response to chat history
-    st.session_state.messages.append({"role": "assistant", "content": response})
+        # Add assistant response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": response})
 
-    # Rerun to update the interface
-    st.rerun()
+        # Rerun to update the interface
+        st.rerun()
 
