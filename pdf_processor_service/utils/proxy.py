@@ -3,8 +3,6 @@ import logging
 
 from fastapi import HTTPException, Response, Depends
 import httpx
-import os
-import logging
 
 from urllib.parse import urlencode
 from utils.session import get_session_id
@@ -74,98 +72,6 @@ def handle_status_error(response: httpx.Response, url: str) -> None:
         logger.error(f"HTTP error {status_code} from {url}: {response.text}")
         raise HTTPException(
             status_code=status_code, detail=f"Processor error: {response.text}"
-        )
-
-
-def handle_status_error(response: httpx.Response, url: str) -> None:
-    """
-    Handle HTTP status errors for requests that don't return status code 200.
-    
-    Args:
-        response: The HTTP response object
-        url: The URL that was requested
-        
-    Raises:
-        HTTPException: With appropriate status code and error message
-    """
-    status_code = response.status_code
-    
-    # Handle specific status codes with meaningful messages
-    if 200 <= status_code < 300:
-        # No error, successful response
-        return
-    elif status_code == 400:
-        logger.error(f"Bad request to {url}: {response.text}")
-        raise HTTPException(
-            status_code=400,
-            detail=f"Bad request: {response.text}"
-        )
-    elif status_code == 401:
-        logger.error(f"Unauthorized request to {url}")
-        raise HTTPException(
-            status_code=401,
-            detail="Unauthorized access to processor service"
-        )
-    elif status_code == 403:
-        logger.error(f"Forbidden request to {url}")
-        raise HTTPException(
-            status_code=403,
-            detail="Access forbidden to processor service"
-        )
-    elif status_code == 404:
-        logger.error(f"Resource not found at {url}")
-        raise HTTPException(
-            status_code=404,
-            detail="Resource not found in processor service"
-        )
-    elif status_code == 422:
-        logger.error(f"Unprocessable entity at {url}: {response.text}")
-        raise HTTPException(
-            status_code=422,
-            detail=f"Validation error: {response.text}"
-        )
-    elif status_code == 429:
-        logger.error(f"Rate limit exceeded for {url}")
-        raise HTTPException(
-            status_code=429,
-            detail="Rate limit exceeded for processor service"
-        )
-    elif 500 <= status_code < 600:
-        logger.error(f"Server error from {url}: {status_code} - {response.text}")
-        raise HTTPException(
-            status_code=502,
-            detail=f"Processor service error: {response.text}"
-        )
-    else:
-        # Generic error for any other non-200 status codes
-        logger.error(f"HTTP error {status_code} from {url}: {response.text}")
-        raise HTTPException(
-            status_code=status_code,
-            detail=f"Processor error: {response.text}"
-        )
-
-
-def handle_job_status(job: dict, job_type: str = "document") -> None:
-    """
-    Handle job status validation and raise appropriate HTTPExceptions.
-    
-    Args:
-        job: The job dictionary containing status information
-        job_type: Type of job for error messaging (default: "document")
-        
-    Raises:
-        HTTPException: With appropriate status code and error message
-    """
-    if not job:
-        raise HTTPException(
-            status_code=404, 
-            detail=f"{job_type.capitalize()} not found or not processed yet"
-        )
-    
-    if job.get("status") == "processing":
-        raise HTTPException(
-            status_code=202,
-            detail=f"The {job_type} is still being processed. Please try again later.",
         )
 
 
