@@ -68,6 +68,9 @@ redis:
     # Logging
     loglevel notice
     
+    # Authentication (will be set via environment variable if secret exists)
+    # requirepass will be set dynamically by init script if REDIS_PASSWORD is available
+    
   # Redis password (optional, will be generated if not provided)
   # Leave empty to disable authentication
   password: ""
@@ -126,7 +129,12 @@ startupProbe:
     command:
       - sh
       - -c
-      - "redis-cli ping"
+      - |
+        if [ -n "$REDIS_PASSWORD" ]; then
+          redis-cli -a "$REDIS_PASSWORD" ping
+        else
+          redis-cli ping
+        fi
   initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 3

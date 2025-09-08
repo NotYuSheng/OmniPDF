@@ -44,13 +44,38 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.redis.config }}
           command:
-            - redis-server
-            - /etc/redis/redis.conf
+            - sh
+            - -c
+            - |
+              # Create Redis config with optional authentication
+              cp /etc/redis/redis.conf /tmp/redis.conf
+              if [ -n "$REDIS_PASSWORD" ]; then
+                echo "requirepass $REDIS_PASSWORD" >> /tmp/redis.conf
+              fi
+              redis-server /tmp/redis.conf
+          {{- else }}
+          command:
+            - sh
+            - -c
+            - |
+              if [ -n "$REDIS_PASSWORD" ]; then
+                redis-server --requirepass "$REDIS_PASSWORD"
+              else
+                redis-server
+              fi
           {{- end }}
           ports:
             - name: redis
               containerPort: 6379
               protocol: TCP
+          env:
+            {{- if (lookup "v1" "Secret" .Release.Namespace "redis-secrets") }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secrets
+                  key: REDIS_PASSWORD
+            {{- end }}
           {{- if .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
