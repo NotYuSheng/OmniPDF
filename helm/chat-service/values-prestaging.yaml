@@ -67,4 +67,8 @@ serviceMonitor:
 tolerations:
   - key: "node.kubernetes.io/disk-pressure"
     operator: "Exists"
-    effect: "NoSchedule"
+    effect: "NoSchedule"# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  sidecar.istio.io/proxyCPU: "15m"
+  sidecar.istio.io/proxyMemory: "128Mi"

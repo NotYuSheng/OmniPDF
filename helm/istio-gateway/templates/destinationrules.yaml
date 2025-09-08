@@ -1,0 +1,15 @@
+{{- if .Values.destinationRules.enabled }}
+{{- range .Values.destinationRules.services }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .name }}-dr
+  labels:
+    {{- include "istio-gateway.labels" $ | nindent 4 }}
+spec:
+  host: {{ .name }}
+  trafficPolicy:
+    {{- toYaml .trafficPolicy | nindent 4 }}
+{{- end }}
+{{- end }}

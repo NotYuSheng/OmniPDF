@@ -68,3 +68,10 @@ tolerations:
   - key: "node.kubernetes.io/disk-pressure"
     operator: "Exists"
     effect: "NoSchedule"
+
+# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  # PDF processor needs more sidecar resources due to file uploads
+  sidecar.istio.io/proxyCPU: "20m"
+  sidecar.istio.io/proxyMemory: "256Mi"

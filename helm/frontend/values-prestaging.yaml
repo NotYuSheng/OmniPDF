@@ -83,9 +83,14 @@ networkPolicy:
 podDisruptionBudget:
   enabled: false
 
-# Resource quota for prestaging namespace
+# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  # Streamlit-specific sidecar configuration
+  sidecar.istio.io/proxyCPU: "10m"
+  sidecar.istio.io/proxyMemory: "128Mi"
 
-# Add toleration for disk pressure to allow scheduling
+# Add toleration for disk pressure to allow scheduling  
 tolerations:
   - key: "node.kubernetes.io/disk-pressure"
     operator: "Exists"

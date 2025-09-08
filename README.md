@@ -40,15 +40,16 @@ OmniPDF follows a **microservices architecture** with **centralized orchestratio
 - **Processing services**: Specialized services for extraction, translation, rendering, embedding, and chat
 - **Data layer**: Redis (sessions), ChromaDB (vectors), MinIO (files)
 - **AI/ML layer**: vLLM text and vision-language models
+- **Service mesh layer**: Istio for mTLS, traffic management, and observability (prestaging/staging/production)
 
 ## Deployment Environments
 
 OmniPDF supports multiple deployment environments with **Kubernetes + Helm**:
 
 - **Development**: Docker Compose for local development
-- **Pre-staging**: CodeReady Containers (CRC) with Helm charts and local OpenShift registry
-- **Staging**: Offline OpenShift Container Platform (OCP) with Helm deployment
-- **Production**: Offline OpenShift Container Platform (OCP) with Helm deployment
+- **Pre-staging**: CodeReady Containers (CRC) with **Istio Service Mesh** + Helm charts
+- **Staging**: Offline OpenShift Container Platform (OCP) with **organization's Istio** + Helm
+- **Production**: Offline OpenShift Container Platform (OCP) with **organization's Istio** + Helm
 
 **Container Registry Patterns**:
 - **Development**: Local Docker images
@@ -80,6 +81,39 @@ done
 # Deploy RBAC (service accounts and permissions)
 helm install omnipdf-rbac ./helm/rbac --namespace omnipdf
 ```
+
+### Prestaging with Istio Service Mesh
+
+For prestaging environment in CRC with full service mesh capabilities:
+
+```bash
+# 1. Install Istio control plane  
+./istio-1.27.1/bin/istioctl install --set values.defaultRevision=default -y
+
+# 2. Create namespace with sidecar injection
+oc create namespace omnipdf-prestaging
+oc label namespace omnipdf-prestaging istio-injection=enabled
+
+# 3. Deploy Istio Gateway and routing
+helm install istio-gateway ./helm/istio-gateway \
+  --namespace omnipdf-prestaging \
+  --values ./helm/istio-gateway/values-prestaging.yaml
+
+# 4. Deploy services with Istio sidecars
+for service in frontend pdf-processor-service chat-service embedder-service chromadb redis minio cleaner pdf-extraction-service docling-translation-service pdf-renderer-service image-captioner-service metadata-service; do
+  helm install $service ./helm/$service \
+    --namespace omnipdf-prestaging \
+    --values ./helm/$service/values-prestaging.yaml
+done
+```
+
+**Istio Features Enabled:**
+- **mTLS**: Automatic mutual TLS between all services
+- **Traffic Management**: Intelligent routing and load balancing
+- **Observability**: Distributed tracing and metrics
+- **Security Policies**: Fine-grained access control
+
+See [`helm/istio-gateway/INSTALL.md`](helm/istio-gateway/INSTALL.md) for detailed setup instructions.
 
 ## Security Features
 
@@ -113,19 +147,22 @@ OmniPDF implements comprehensive zero-trust network policies with explicit servi
 
 #### Network Policy Configuration
 
-| Environment | Status | Description |
-|-------------|--------|-------------|
-| **Development** | Disabled | Network policies disabled for easier local development and testing |
-| **Staging** | Enabled | Zero-trust policies enforce service communication matrix |
-| **Production** | Enabled | Strict network segmentation with minimal required permissions |
+| Environment | NetworkPolicy | Service Mesh | Description |
+|-------------|---------------|--------------|-------------|
+| **Development** | Disabled | None | Docker Compose - no network restrictions for local dev |
+| **Prestaging** | Enabled | **Own Istio** | Zero-trust + mTLS within service mesh |
+| **Staging** | Enabled | **Org Istio** | Zero-trust policies + organization's service mesh |
+| **Production** | Enabled | **Org Istio** | Strict segmentation + organization's service mesh |
 
 #### Key Architecture Patterns
 
-- **API Gateway**: nginx serves as central ingress point with controlled downstream access
+- **Service Mesh Gateway**: Istio Gateway handles external traffic in prestaging/staging/production
+- **API Gateway**: nginx provides application-level routing (development) or internal routing (with Istio)
 - **Orchestration Hub**: pdf-processor-service coordinates workflows across processing services  
 - **Data Layer Security**: Restricted access to chromadb (vectors), redis (sessions), and minio (files)
+- **mTLS Communication**: Automatic mutual TLS between all services in service mesh environments
 - **Background Services**: cleaner operates with minimal network permissions for cleanup tasks
-- **External Connectivity**: HTTPS egress enabled for services requiring external LLM/AI APIs
+- **External Connectivity**: Managed external vLLM/AI API access through ServiceEntry (Istio) or HTTPS egress
 
 ### HPA (Horizontal Pod Autoscaler)
 - **9 services** with auto-scaling enabled across 3 tiers:

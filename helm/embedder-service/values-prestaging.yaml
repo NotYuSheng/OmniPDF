@@ -75,3 +75,8 @@ podDisruptionBudget:
   enabled: false
 
 # Resource quota for prestaging namespace
+# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  sidecar.istio.io/proxyCPU: "15m"
+  sidecar.istio.io/proxyMemory: "128Mi"
