@@ -3,6 +3,9 @@
 
 set -e
 
+# Change to project root directory (one level up from scripts/)
+cd "$(dirname "$0")/.."
+
 NEW_VERSION="dev-v0.0.3-5d69f89"
 OLD_PATTERN="dev-v0.0.0-6653136"
 

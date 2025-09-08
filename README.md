@@ -14,23 +14,23 @@ The following port mappings are used across the OmniPDF microservices in both de
 | Streamlit Frontend        | Web UI for user interaction                               | 8501   |
 | Nginx API Gateway         | Proxies requests and handles file uploads                 | 8080   |
 | **Core Processing Services** |                                                        |        |
-| PDF Processor Service     | Main orchestrator - coordinates all processing workflows | 8000   |
-| PDF Extraction Service    | Extracts tables and images from PDFs using docling       | 8000   |
+| PDF Processor Service     | Main orchestrator - coordinates all processing workflows  | 8000   |
+| PDF Extraction Service    | Extracts tables and images from PDFs using docling        | 8000   |
 | Docling Translation Service | Translates text fields in docling-format JSON           | 8000   |
-| PDF Renderer Service      | Renders translated content onto original PDFs            | 8000   |
-| Embedder Service          | Chunks text and creates embeddings for vector storage    | 8000   |
-| Chat Service              | RAG chat interface using retrieved context chunks        | 8000   |
-| Image Captioner Service   | AI image captioning for extracted images using VLM       | 8000   |
-| Metadata Service          | Document metadata and word cloud generation              | 8000   |
-| Cleaner                   | Background cleanup of expired sessions and files         | N/A    |
+| PDF Renderer Service      | Renders translated content onto original PDFs             | 8000   |
+| Embedder Service          | Chunks text and creates embeddings for vector storage     | 8000   |
+| Chat Service              | RAG chat interface using retrieved context chunks         | 8000   |
+| Image Captioner Service   | AI image captioning for extracted images using VLM        | 8000   |
+| Metadata Service          | Document metadata and word cloud generation               | 8000   |
+| Cleaner                   | Event-driven cleanup of expired sessions and files via Redis notifications | N/A    |
 | **AI/ML Services**        |                                                           |        |
-| vLLM Text Model           | Text-only LLM (Llama 3.1, Qwen2.5) for chat/translation | 8000   |
-| vLLM Vision-Language Model | Multimodal VLM (Llava, Qwen2-VL) for image captioning  | 8000   |
+| vLLM Text Model           | Text-only LLM (Llama 3.1, Qwen2.5) for chat/translation   | 8000   |
+| vLLM Vision-Language Model | Multimodal VLM (Qwen2-VL) for image captioning           | 8000   |
 | **Data Services**         |                                                           |        |
-| Redis                     | Session storage and caching                              | 6379   |
-| ChromaDB                  | Vector database for embeddings                           | 8000   |
-| MinIO                     | S3-compatible object storage for files                   | 9000   |
-| MinIO Console             | MinIO web-based Admin UI                                 | 9001   |
+| Redis                     | Session storage and caching                               | 6379   |
+| ChromaDB                  | Vector database for embeddings                            | 8000   |
+| MinIO                     | S3-compatible object storage for files                    | 9000   |
+| MinIO Console             | MinIO web-based Admin UI                                  | 9001   |
 
 ## Architecture
 
