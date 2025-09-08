@@ -5,7 +5,6 @@ import httpx
 import json
 import os
 
-CHAT_URL = os.getenv("CHAT_URL")
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL")
 logger = logging.getLogger(__name__)
 
