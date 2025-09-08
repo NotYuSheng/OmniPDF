@@ -64,15 +64,15 @@ async def get_pdf_rendering(
     
     return render_response
 
-@router.get("/{doc_id}/render.pdf", response_model=RendererResponse)
+@router.get("/{doc_id}/rendered.pdf", response_model=RendererResponse)
 async def get_pdf_rendered_file(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
     job: str = Depends(load_or_create_render_job),
 ):
     """Get rendering results for a processed PDF."""
-    file_key = f"{doc_id}/render.pdf"
-    job.get("data", {}).get("filename", "")
+    # file_key = f"{doc_id}/rendered.pdf"
+    file_key = job.get("data", {}).get("filename", "")
     # Check if wordcloud image exists in S3
     try:
         file_stream = get_object_stream(file_key)
