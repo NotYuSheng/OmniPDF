@@ -1,13 +1,12 @@
 import os
 import logging
 import boto3
+import json
+import itertools
+from io import BytesIO
 from botocore.exceptions import BotoCoreError, ClientError
 from typing import Optional, Union
 from pydantic import BaseModel
-import itertools
-
-import json
-from io import BytesIO
 
 from shared_utils.redis_utils import RedisDocumentFileList
 
@@ -174,7 +173,7 @@ def save_job(
             key=job_key,
             content_type="application/json",
         )
-    except Exception as e:
+    except (BotoCoreError, ClientError) as e:
         logger.exception(f"Failed to save job for doc_id: {doc_id} - {e}")
         return False
 
