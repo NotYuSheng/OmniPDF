@@ -87,10 +87,10 @@ OmniPDF implements **defense-in-depth security** with multiple layers:
 
 ### Service Account & RBAC
 - **Individual service accounts** for each service with per-service secret isolation
-- **RBAC roles** with principle of least privilege:
-  - `orchestrator-role`: pdf-processor (full coordination access)
-  - `individual-service-roles`: Each service accesses only its own secrets
-  - `cleaner-role`: Full data store access for cleanup operations
+- **RBAC roles** with principle of least privilege (no hierarchy - different scopes):
+  - `individual-service-roles`: Each service accesses only its own secrets (standard pattern)
+  - `pdf-processor-role`: Coordination access to other services' secrets for orchestration
+  - `cleaner-role`: Data store access (MinIO, ChromaDB, Redis) for cleanup operations
 - **Complete audit trail** for inter-service communication
 
 ### NetworkPolicy (Zero-Trust)
@@ -100,10 +100,12 @@ OmniPDF implements **defense-in-depth security** with multiple layers:
 - **Pod selector-based** traffic rules
 
 ### HPA (Horizontal Pod Autoscaler)
-- **6 services** with auto-scaling enabled (nginx, chat-service, pdf-processor, etc.)
-- **CPU/Memory thresholds**: 70% CPU, 80% Memory
-- **High availability**: Minimum 2 replicas for critical services
-- **Resource optimization**: Scale from 2-10 replicas based on load
+- **9 services** with auto-scaling enabled across 3 tiers:
+  - **Tier 1 (Critical)**: nginx, pdf-processor-service, chat-service - aggressive scaling (60-70% thresholds)
+  - **Tier 2 (Processing)**: pdf-extraction, docling-translation, pdf-renderer - standard scaling (70% thresholds)  
+  - **Tier 3 (Burst)**: embedder-service, image-captioner-service, metadata-service - conservative scaling (70% thresholds)
+- **High availability**: Minimum 1-2 replicas with scaling up to 5-15 replicas based on service tier
+- **Resource optimization**: Proactive scaling for user-facing services, workload-responsive for processing services
 
 ## Security Configuration
 

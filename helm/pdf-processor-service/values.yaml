@@ -109,9 +109,9 @@ readinessProbe:
 autoscaling:
   enabled: true
   minReplicas: 2
-  maxReplicas: 8
-  targetCPUUtilizationPercentage: 70
-  targetMemoryUtilizationPercentage: 80
+  maxReplicas: 10  # Increased capacity for orchestrator
+  targetCPUUtilizationPercentage: 60  # More aggressive scaling
+  targetMemoryUtilizationPercentage: 70  # More aggressive scaling
 
 # Additional volumes on the output Deployment definition.
 volumes: []
