@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 EXTERNAL_ENDPOINT = os.environ["EXTERNAL_ENDPOINT"]
 METADATA_URL = os.environ["METADATA_URL"]
 EXTRACTION_URL = os.environ["EXTRACTION_URL"]
+EMBED_URL = os.environ["EMBED_URL"]
 
 
 def handle_status_error(response: httpx.Response, url: str) -> None:
