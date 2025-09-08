@@ -81,9 +81,6 @@ affinity:
     - weight: 100
       podAffinityTerm:
         labelSelector:
-          matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-            - "{{ .Chart.Name }}"
+          matchLabels:
+            app.kubernetes.io/name: CHART_NAME_PLACEHOLDER
         topologyKey: kubernetes.io/hostname
