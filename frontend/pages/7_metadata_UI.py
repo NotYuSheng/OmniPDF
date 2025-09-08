@@ -12,15 +12,15 @@ client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
 
 runner = asyncio.Runner()
 # WIP - this file is not fully functional yet
-st.header("☁️ Word Cloud")
+st.header("☁️ Metadata")
 
 
-async def get_wordcloud(doc_id: str, status_bar, max_retries=600, delay=1):
+async def get_metadata(doc_id: str, status_bar, max_retries=600, delay=1):
     for attempt in range(max_retries):
         try:
-            response = await client.get(f"{PDF_PROCESSOR_URL}/wordcloud/{doc_id}")
+            response = await client.get(f"{PDF_PROCESSOR_URL}/metadata/{doc_id}")
 
-            logger.info(f"Wordcloud response status: {response.status_code}")
+            logger.info(f"metadata response status: {response.status_code}")
             try:
                 data = response.json()
             except json.JSONDecodeError as e:
@@ -60,35 +60,15 @@ async def get_wordcloud(doc_id: str, status_bar, max_retries=600, delay=1):
             )
 
 
-async def get_wordcloud_image(doc_id: str | None):
-    if doc_id is None:
-        return None
-    try:
-        response = await client.get(
-            f"{PDF_PROCESSOR_URL}/wordcloud/{doc_id}/wordcloud.png"
-        )
-
-        logger.info(f"Wordcloud Image response status: {response.status_code}")
-        response.raise_for_status()
-        # return Image.open(BytesIO(response.content))
-        return response.content
-    except httpx.RequestError as e:
-        logger.error(f"Request error on attempt: {e}")
-        raise
-
-
-async def display_wordcloud(expander: DocumentExpander):
+async def display_metadata(expander: DocumentExpander):
     with expander:
-        res = await get_wordcloud(expander.doc_id, expander.status)
+        res = await get_metadata(expander.doc_id, expander.status)
         if res:
-            img = await get_wordcloud_image(expander.doc_id)
-            st.image(img)
-            markdown_list = [f"- {word}" for word in res["top_words"]]
-            st.markdown("\n".join(markdown_list))
+            st.dataframe(res["metadata"])
 
 
 async def display_all(expanders: list[DocumentExpander]):
-    displays = [display_wordcloud(expander) for expander in expanders]
+    displays = [display_metadata(expander) for expander in expanders]
     await asyncio.gather(*displays, return_exceptions=True)
 
 
