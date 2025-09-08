@@ -16,8 +16,8 @@ from metadata_service.models.llm_config import (
 router = APIRouter(prefix="/metadata", tags=["metadata"])
 
 logger = logging.getLogger(__name__)
-document_list = RedisDocumentFileList()
 
+document_list = RedisDocumentFileList()
 model_config = ModelConfig()
 prompt_templates = PromptTemplates()
 response_optimizer = ModelResponseOptimizer()
@@ -168,6 +168,7 @@ async def get_title(chunks: list[str], client: AsyncOpenAI):
             )
         )
     title_str = await cascade_query(title_chunks, user_prompt, system_prompt, client)
+
     title_split = title_str.split(":")
     if title_split[0].lower() != "title":
         return "UNKNOWN"
@@ -179,7 +180,6 @@ async def get_keywords(chunks: list[str], client: AsyncOpenAI):
     user_prompt = prompt_templates.get_user_prompt(
         "Identify the Keywords in the given document", PROMPT_PURPOSE[3], r"{context}"
     )
-
     keyword_chunks = []
     for chunk in chunks:
         keyword_chunks.append(
