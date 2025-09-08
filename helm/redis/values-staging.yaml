@@ -84,8 +84,26 @@ networkPolicy:
   enabled: true
   ingress:
     enabled: true
-    fromSameNamespace: true
-    fromIngressController: true
+    # ZERO-TRUST: Only specific services can connect to Redis
+    allowedCallers:
+      # PDF processor orchestrates workflows and manages sessions
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+      # PDF extraction manages document file lists
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-extraction-service
+      # Metadata service manages document file lists
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
+      # Cleaner accesses Redis for cleanup notifications
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: cleaner
+    # Custom ingress rules for special cases
+    customRules: []
   egress:
     enabled: true
     allowDNS: true

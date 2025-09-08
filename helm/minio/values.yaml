@@ -180,10 +180,25 @@ networkPolicy:
   enabled: false
   ingress:
     enabled: true
-    fromSameNamespace: true
-    fromIngressController: true
-    ingressControllerNamespaceLabels:
-      name: ingress-nginx
+    # ZERO-TRUST: Only specific services can access MinIO
+    allowedCallers:
+      # PDF processor stores/retrieves files and manages jobs
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+      # PDF extraction stores extracted images and JSON
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-extraction-service
+      # Metadata service stores/loads job results
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
+      # Cleaner removes expired files
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: cleaner
+    # Custom ingress rules for special cases
     customRules: []
   egress:
     enabled: true

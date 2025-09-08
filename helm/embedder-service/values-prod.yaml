@@ -80,8 +80,13 @@ networkPolicy:
   enabled: true
   ingress:
     enabled: true
-    fromSameNamespace: true
-    fromIngressController: true
+    # ZERO-TRUST: Only pdf-processor-service can call embedder-service
+    allowedCallers:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+    # Custom ingress rules for special cases
+    customRules: []
     # Restrict external access in production
     customRules: []
   egress:

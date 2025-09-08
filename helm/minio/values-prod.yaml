@@ -104,17 +104,26 @@ networkPolicy:
   enabled: true
   ingress:
     enabled: true
-    fromSameNamespace: true
-    fromIngressController: true
-    customRules:
-      # Allow specific services to access MinIO
-      - from:
-        - namespaceSelector:
-            matchLabels:
-              name: omnipdf
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/component: application
+    # ZERO-TRUST: Only specific services can access MinIO
+    allowedCallers:
+      # PDF processor stores/retrieves files and manages jobs
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+      # PDF extraction stores extracted images and JSON
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-extraction-service
+      # Metadata service stores/loads job results
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
+      # Cleaner removes expired files
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: cleaner
+    # Custom ingress rules for special cases
+    customRules: []
   egress:
     enabled: true
     allowDNS: true
