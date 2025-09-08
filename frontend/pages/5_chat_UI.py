@@ -250,7 +250,7 @@ if prompt := st.chat_input("Ask about the document"):
                 st.write(prompt)
         
         # Get response first
-        response = asyncio.run(chat_with_rag(prompt, doc_ids))
+        response = runner.run(chat_with_rag(prompt, doc_ids))
         
         # Stream the response as it comes in (if enabled)
         with chat_container:
