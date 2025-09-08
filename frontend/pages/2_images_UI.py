@@ -158,7 +158,7 @@ def display_images(image_response, doc_id=None) -> None:
         logger.info("No images found in the document")
         st.info("No images found in the document")
 
-async def embed_pdf(embed_type: str, doc_id: str) -> str:
+async def embed_pdf(embed_type: str, doc_id: str) -> dict | None:
     """
     Embedding PDF
     For rag
