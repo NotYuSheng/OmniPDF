@@ -241,8 +241,14 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
 
                         embed_response = runner.run(embed_pdf(embed_type="sentence", doc_id=doc_id))
                         logger.info(f"Embedding response: {embed_response}")
-        
-        
+                        if embed_response and "error" not in embed_response:
+                            st.toast("Document successfully embedded",
+                                     icon="✅")
+                        else:
+                            st.toast("Error during embedding",
+                                     icon="❌")
+
+
     except TimeoutError as e:
         logger.error(f"Timeout error: {e}")
     except httpx.RequestError as e:
