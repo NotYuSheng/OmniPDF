@@ -165,8 +165,20 @@ networkPolicy:
     allowHTTPS: true
     # Allow HTTP for internal services  
     allowHTTP: false
-    # ZERO-TRUST: pdf-extraction-service only needs external model access
-    allowedTargets: []  # No internal service dependencies
+    # ZERO-TRUST: pdf-extraction-service can only call specific services
+    allowedTargets:
+      # MinIO for storing extracted images, JSON, and job results
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports:
+          - 9000
+      # Redis for document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports:
+          - 6379
     # Custom egress rules (empty by default)
     customRules: []
 
