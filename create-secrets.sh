@@ -58,9 +58,15 @@ echo ""
 echo "🗂️  MinIO Storage Configuration:"
 read -p "Enter MinIO root username [minioadmin]: " minio_user
 minio_user=${minio_user:-minioadmin}
-read -s -p "Enter MinIO root password [minioadmin123]: " minio_password
-minio_password=${minio_password}
+read -s -p "Enter MinIO root password (required): " minio_password
 echo ""
+
+# Validate that password is not empty
+if [[ -z "$minio_password" ]]; then
+    echo "❌ Error: MinIO password cannot be empty for security reasons"
+    echo "Please run the script again and provide a secure password"
+    exit 1
+fi
 
 # Delete existing secret if it exists
 oc delete secret "minio-secrets" -n "$NAMESPACE" 2>/dev/null || true
