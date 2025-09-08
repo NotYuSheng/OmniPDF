@@ -18,25 +18,13 @@ spec:
     {{- end }}
   {{- if .Values.networkPolicy.ingress.enabled }}
   ingress:
-    # Allow traffic from ingress controller
-    {{- if .Values.networkPolicy.ingress.fromIngressController }}
+    # ZERO-TRUST: Allow traffic from specific services only
+    {{- range .Values.networkPolicy.ingress.allowedCallers }}
     - from:
-        - namespaceSelector:
-            matchLabels:
-              {{- toYaml .Values.networkPolicy.ingress.ingressControllerNamespaceLabels | nindent 14 }}
+        - {{ . | toYaml | nindent 10 }}
       ports:
         - protocol: TCP
-          port: {{ .Values.service.port }}
-    {{- end }}
-    # Allow traffic from same namespace
-    {{- if .Values.networkPolicy.ingress.fromSameNamespace }}
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Release.Namespace }}
-      ports:
-        - protocol: TCP
-          port: {{ .Values.service.port }}
+          port: {{ $.Values.service.port }}
     {{- end }}
     # Custom ingress rules
     {{- with .Values.networkPolicy.ingress.customRules }}
@@ -68,24 +56,15 @@ spec:
         - protocol: TCP
           port: 80
     {{- end }}
-    # Allow communication to LLM service
-    {{- if .Values.networkPolicy.egress.allowLLMService }}
-    {{- range .Values.networkPolicy.egress.llmServiceSelectors }}
+    # Allow communication to specific target services (zero-trust)
+    {{- range .Values.networkPolicy.egress.allowedTargets }}
     - to:
-        - {{ . | toYaml | nindent 10 }}
+        - {{ .podSelector | toYaml | nindent 10 }}
       ports:
-        {{- range $.Values.networkPolicy.egress.llmServicePorts }}
+        {{- range .ports }}
         - protocol: TCP
           port: {{ . }}
         {{- end }}
-    {{- end }}
-    {{- end }}
-    # Allow traffic to same namespace
-    {{- if .Values.networkPolicy.egress.toSameNamespace }}
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Release.Namespace }}
     {{- end }}
     # Custom egress rules
     {{- with .Values.networkPolicy.egress.customRules }}

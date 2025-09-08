@@ -89,8 +89,14 @@ networkPolicy:
     allowDNS: true
     allowHTTPS: true
     allowHTTP: false  # Restrict HTTP in production
-    allowChromaDBService: true
-    toSameNamespace: true
+    # ZERO-TRUST: embedder-service can only call ChromaDB
+    allowedTargets:
+      # ChromaDB for storing embeddings
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chromadb
+        ports:
+          - 8000
     # Additional security restrictions
     customRules: []
 

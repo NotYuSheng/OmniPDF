@@ -94,10 +94,38 @@ OmniPDF implements **defense-in-depth security** with multiple layers:
 - **Complete audit trail** for inter-service communication
 
 ### NetworkPolicy (Zero-Trust)
-- **Network segmentation** between services
-- **Ingress/egress controls** based on service communication matrix
-- **DNS and HTTPS egress** allowed for external services
-- **Pod selector-based** traffic rules
+
+OmniPDF implements comprehensive zero-trust network policies with explicit service-to-service communication rules:
+
+#### Service Communication Matrix
+
+| Service | **Ingress (Who can call this service)** | **Egress (What this service can call)** |
+|---------|----------------------------------------|----------------------------------------|
+| **nginx** | • Ingress controller (`ingress-nginx` namespace)<br>• frontend | • pdf-processor-service:8000<br>• minio:9000<br>• DNS resolution |
+| **frontend** | • Ingress controller (`ingress-nginx` namespace) | • nginx:8080<br>• DNS resolution |
+| **pdf-processor-service** | • nginx<br>• frontend | • chat-service:8000<br>• pdf-extraction-service:8000<br>• embedder-service:8000<br>• docling-translation-service:8000<br>• pdf-renderer-service:8000<br>• image-captioner-service:8000<br>• metadata-service:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution |
+| **chat-service** | • pdf-processor-service | • chromadb:8000<br>• DNS resolution<br>• HTTPS (external vLLM) |
+| **embedder-service** | • pdf-processor-service | • chromadb:8000<br>• DNS resolution<br>• HTTPS (model downloads) |
+| **cleaner** | *No ingress (background service)* | • minio:9000<br>• chromadb:8000<br>• redis:6379<br>• DNS resolution |
+| **chromadb** | • chat-service<br>• embedder-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
+| **redis** | • pdf-processor-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
+| **minio** | • nginx<br>• pdf-processor-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
+
+#### Network Policy Configuration
+
+| Environment | Status | Description |
+|-------------|--------|-------------|
+| **Development** | Disabled | Network policies disabled for easier local development and testing |
+| **Staging** | Enabled | Zero-trust policies enforce service communication matrix |
+| **Production** | Enabled | Strict network segmentation with minimal required permissions |
+
+#### Key Architecture Patterns
+
+- **API Gateway**: nginx serves as central ingress point with controlled downstream access
+- **Orchestration Hub**: pdf-processor-service coordinates workflows across processing services  
+- **Data Layer Security**: Restricted access to chromadb (vectors), redis (sessions), and minio (files)
+- **Background Services**: cleaner operates with minimal network permissions for cleanup tasks
+- **External Connectivity**: HTTPS egress enabled for services requiring external LLM/AI APIs
 
 ### HPA (Horizontal Pod Autoscaler)
 - **9 services** with auto-scaling enabled across 3 tiers:
@@ -183,15 +211,6 @@ crc config view
 ```
 
 ## Documentation
-
-### Architecture & Design
-- [Service Communication Matrix](service-communication-matrix.md): Complete ingress/egress patterns for all services
-- [Service Account Matrix](service-account-matrix.md): RBAC permissions and secret access patterns
-
-### Security & Operations
-- [Service Account Setup](SERVICE-ACCOUNT-SETUP.md): RBAC implementation and deployment guide
-- [Secret Management](SECRET-MANAGEMENT.md): Per-service secret isolation strategy
-- [HPA Configuration](HPA-CONFIGURATION.md): Auto-scaling configuration and monitoring
 
 ## Testing
 

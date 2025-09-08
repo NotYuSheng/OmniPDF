@@ -150,33 +150,23 @@ networkPolicy:
   enabled: false  # Disabled by default for dev/testing
   ingress:
     enabled: true
-    # Allow ingress controller to reach this service
-    fromIngressController: true
-    ingressControllerNamespaceLabels:
-      name: ingress-nginx
-    # Allow services in same namespace to communicate
-    fromSameNamespace: true
+    # ZERO-TRUST: Only pdf-processor-service can call pdf-extraction-service
+    allowedCallers:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
     # Custom ingress rules (empty by default)
     customRules: []
   egress:
     enabled: true
     # Allow DNS resolution (required for hostname lookups)
     allowDNS: true
-    # Allow HTTPS for external APIs
+    # Allow HTTPS for external APIs (for docling model downloads)
     allowHTTPS: true
     # Allow HTTP for internal services  
     allowHTTP: false
-    # Allow communication to LLM service
-    allowLLMService: true
-    llmServiceSelectors:
-      - podSelector:
-          matchLabels:
-            app.kubernetes.io/name: llm-service
-    llmServicePorts:
-      - 8080
-      - 8000
-    # Allow traffic to same namespace
-    toSameNamespace: true
+    # ZERO-TRUST: pdf-extraction-service only needs external model access
+    allowedTargets: []  # No internal service dependencies
     # Custom egress rules (empty by default)
     customRules: []
 

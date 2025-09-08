@@ -65,25 +65,21 @@ autoscaling:
   targetCPUUtilizationPercentage: 70
   targetMemoryUtilizationPercentage: 80
 
-# Common network policy configuration (production-ready)
+# Common network policy configuration (zero-trust production-ready)
 networkPolicy:
   enabled: false  # Disabled by default for dev/testing
   ingress:
     enabled: true
-    fromIngressController: true
-    ingressControllerNamespaceLabels:
-      name: ingress-nginx
-    fromSameNamespace: true
+    # ZERO-TRUST: Define specific allowedCallers per service
+    allowedCallers: []
     customRules: []
   egress:
     enabled: true
     allowDNS: true
     allowHTTPS: true
-    allowHTTP: true
-    allowLLMService: false
-    llmServiceSelectors: []
-    llmServicePorts: []
-    toSameNamespace: true
+    allowHTTP: false  # Restrict HTTP by default - services can override
+    # ZERO-TRUST: Define specific allowedTargets per service  
+    allowedTargets: []
     customRules: []
 
 # Common pod disruption budget (production-ready)

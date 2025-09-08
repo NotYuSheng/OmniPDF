@@ -68,24 +68,15 @@ spec:
         - protocol: TCP
           port: 80
     {{- end }}
-    # Allow communication to VLM service
-    {{- if .Values.networkPolicy.egress.allowVLMService }}
-    {{- range .Values.networkPolicy.egress.vlmServiceSelectors }}
+    # Allow communication to specific target services (zero-trust)
+    {{- range .Values.networkPolicy.egress.allowedTargets }}
     - to:
-        - {{ . | toYaml | nindent 10 }}
+        - {{ .podSelector | toYaml | nindent 10 }}
       ports:
-        {{- range $.Values.networkPolicy.egress.vlmServicePorts }}
+        {{- range .ports }}
         - protocol: TCP
           port: {{ . }}
         {{- end }}
-    {{- end }}
-    {{- end }}
-    # Allow traffic to same namespace
-    {{- if .Values.networkPolicy.egress.toSameNamespace }}
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Release.Namespace }}
     {{- end }}
     # Custom egress rules
     {{- with .Values.networkPolicy.egress.customRules }}

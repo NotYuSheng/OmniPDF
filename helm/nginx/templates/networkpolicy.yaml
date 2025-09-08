@@ -80,12 +80,15 @@ spec:
         {{- end }}
     {{- end }}
     {{- end }}
-    # Allow traffic to same namespace
-    {{- if .Values.networkPolicy.egress.toSameNamespace }}
+    # Allow communication to specific target services (zero-trust)
+    {{- range .Values.networkPolicy.egress.allowedTargets }}
     - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Release.Namespace }}
+        - {{ .podSelector | toYaml | nindent 10 }}
+      ports:
+        {{- range .ports }}
+        - protocol: TCP
+          port: {{ . }}
+        {{- end }}
     {{- end }}
     # Custom egress rules
     {{- with .Values.networkPolicy.egress.customRules }}
