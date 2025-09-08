@@ -1,9 +1,6 @@
 import os
 import logging
 import boto3
-import json
-import itertools
-from io import BytesIO
 from botocore.exceptions import BotoCoreError, ClientError
 from typing import Optional
 import itertools
@@ -145,3 +142,6 @@ def delete_folder(folder_prefix: str) -> bool:
         return False
 
 
+def get_image_s3_key(doc_id: str, image_name: str):
+    base_name = image_name.removesuffix(".png")
+    return f"{doc_id}/images/{base_name}.png"
