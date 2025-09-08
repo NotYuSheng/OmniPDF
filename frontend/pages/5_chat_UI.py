@@ -25,7 +25,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Chat interface
-chat_container = st.container(height=350)
+chat_container = st.container(height=400)
 
 # Chat interface
 with chat_container:
