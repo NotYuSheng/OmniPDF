@@ -13,33 +13,6 @@ st.header("Chat")
 st.markdown("💬 Ask questions about the document content")
 runner = asyncio.Runner()
 
-# CSS to style the suggested questions container
-st.markdown("""
-<style>
-.suggested-questions {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: var(--background-color);
-    border-top: 1px solid var(--border-color);
-    padding: 0.5rem;
-    z-index: 999;
-    margin-bottom: 70px; /* Space for chat input */
-}
-.stButton > button {
-    width: 100%;
-    margin: 0.1rem 0;
-}
-.suggested-questions .stContainer {
-    padding: 0;
-}
-.suggested-questions .stSelectbox {
-    margin-bottom: 0.25rem;
-}
-</style>
-""", unsafe_allow_html=True)
-
 # Status containers for user feedback
 chat_status = st.empty()
 server_status = st.empty()
@@ -147,8 +120,6 @@ if "processed_data" in st.session_state:
         logger.warning("No document processed. Please upload and process a document first.")
         st.warning("No document processed. Please upload and process a document first.")
 
-# Suggested questions - positioned at bottom using container
-st.markdown('<div class="suggested-questions">', unsafe_allow_html=True)
 with st.container():
     col1, col2 = st.columns(2)
     with col1:
@@ -199,7 +170,6 @@ with st.container():
                 st.session_state.messages.append({"role": "assistant", "content": response})
                 st.rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
 
 # Chat input
 if prompt := st.chat_input("Ask about the document"):
