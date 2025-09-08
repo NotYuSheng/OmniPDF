@@ -191,9 +191,6 @@ crc config view
 - [Secret Management](SECRET-MANAGEMENT.md): Per-service secret isolation strategy
 - [HPA Configuration](HPA-CONFIGURATION.md): Auto-scaling configuration and monitoring
 
-### Development
-- [CLAUDE.md](CLAUDE.md): Development commands, testing, and architecture details
-
 ## Testing
 
 ```bash
