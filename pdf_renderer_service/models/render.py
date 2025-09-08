@@ -25,5 +25,3 @@ class DoclingTranslationResponse(BaseModel):
 class AnnotationResponse(BaseModel):
     doc_id: str
     docling: Optional[DoclingTranslationResponse] = None
-    source_lang: str
-    target_lang: str
