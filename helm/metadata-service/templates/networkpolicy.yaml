@@ -28,15 +28,13 @@ spec:
         - protocol: TCP
           port: {{ .Values.service.port }}
     {{- end }}
-    # Allow traffic from same namespace
-    {{- if .Values.networkPolicy.ingress.fromSameNamespace }}
+    # Allow traffic from specific allowed callers (zero-trust)
+    {{- range .Values.networkPolicy.ingress.allowedCallers }}
     - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Release.Namespace }}
+        - {{ .podSelector | toYaml | nindent 10 }}
       ports:
         - protocol: TCP
-          port: {{ .Values.service.port }}
+          port: {{ $.Values.service.port }}
     {{- end }}
     # Custom ingress rules
     {{- with .Values.networkPolicy.ingress.customRules }}

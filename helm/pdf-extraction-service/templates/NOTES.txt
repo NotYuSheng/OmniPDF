@@ -48,7 +48,7 @@ OmniPDF pdf-extraction-service has been deployed!
 
 6. Network Security:
   - NetworkPolicy is enabled - only authorized traffic is allowed
-  - Ingress allowed from: ingress-controller{{- if .Values.networkPolicy.ingress.fromSameNamespace }}, same namespace{{- end }}
+  - Ingress allowed from: specific services via zero-trust allowedCallers configuration
   - Egress allowed to: {{- if .Values.networkPolicy.egress.allowDNS }}DNS, {{- end }}{{- if .Values.networkPolicy.egress.allowHTTPS }}HTTPS, {{- end }}{{- if .Values.networkPolicy.egress.allowHTTP }}HTTP{{- end }}
 {{- end }}
 
