@@ -51,6 +51,7 @@ async def get_tables(doc_id, max_retries=600, delay=1) -> dict:
             except json.JSONDecodeError:
                 logger.error(f"Failed to decode JSON from response: {response.text}")
                 server_status.error("Received an invalid response from the server.")
+                return {"error": "Invalid JSON response from server"}
                 raise Exception("Invalid JSON response from server")
 
 
