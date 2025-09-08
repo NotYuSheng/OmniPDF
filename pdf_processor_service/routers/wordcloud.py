@@ -7,8 +7,8 @@ from botocore.exceptions import ClientError
 
 from models.metadata import WordcloudResponse
 from utils.session import validate_session_doc_pair
-from utils.proxy import handle_status_error, handle_job_status
-from shared_utils.s3_utils import get_object_stream, load_job
+from utils.proxy import load_or_create_extraction_job, handle_status_error
+from shared_utils.s3_utils import get_object_stream
 from shared_utils.redis_utils import RedisDocumentFileList
 import httpx
 
@@ -27,25 +27,20 @@ if not METADATA_URL:
 async def get_pdf_wordcloud(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
+    job: dict = Depends(load_or_create_extraction_job)
 ):
     """Get wordcloud data for a processed PDF."""
-    # Check if document is processed
-    job = load_job(doc_id=doc_id, job_type="extraction")
-    handle_job_status(job, "document")
-
     # Make request to metadata service wordcloud endpoint
     async with httpx.AsyncClient() as client:
         try:
             wordcloud_url = f"{METADATA_URL}/wordcloud/{doc_id}"
             response = await client.get(wordcloud_url)
-
+            
             if response.status_code != 200:
                 handle_status_error(response, wordcloud_url)
-
+                
         except httpx.RequestError as e:
-            logger.error(
-                f"Request error retrieving wordcloud from {wordcloud_url}: {e}"
-            )
+            logger.error(f"Request error retrieving wordcloud from {wordcloud_url}: {e}")
             raise HTTPException(
                 status_code=500, detail=f"Could not connect to metadata service: {e}"
             ) from e
@@ -55,11 +50,12 @@ async def get_pdf_wordcloud(
         except Exception as e:
             logger.error(f"Unexpected error in wordcloud request: {e}", exc_info=True)
             raise HTTPException(status_code=500, detail="Internal server error") from e
-
+    
     # Parse and return the response
     wordcloud_data = response.json()
     return WordcloudResponse(
-        doc_id=wordcloud_data["doc_id"], top_words=wordcloud_data["top_words"]
+        doc_id=wordcloud_data["doc_id"],
+        top_words=wordcloud_data["top_words"]
     )
 
 
@@ -70,7 +66,7 @@ async def get_pdf_wordcloud_image(
 ):
     """Get the wordcloud image for a processed PDF."""
     file_key = f"{doc_id}/wordcloud.png"
-
+    
     # Check if wordcloud image exists in S3
     try:
         file_stream = get_object_stream(file_key)
@@ -84,11 +80,9 @@ async def get_pdf_wordcloud_image(
             except ClientError:
                 raise HTTPException(status_code=404, detail="Wordcloud image not found")
         else:
-            raise HTTPException(
-                status_code=500, detail="Failed to retrieve wordcloud image"
-            )
-
+            raise HTTPException(status_code=500, detail="Failed to retrieve wordcloud image")
+    
     # Extend expiry time for the wordcloud files
     _ = document_files[doc_id]
-
+    
     return StreamingResponse(file_stream, media_type="image/png")

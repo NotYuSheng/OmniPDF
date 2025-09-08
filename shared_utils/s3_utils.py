@@ -1,12 +1,10 @@
 import os
 import logging
 import boto3
-import json
-import itertools
-from io import BytesIO
 from botocore.exceptions import BotoCoreError, ClientError
-from typing import Optional, Union
-from pydantic import BaseModel
+from typing import Optional
+import itertools
+
 
 from shared_utils.redis_utils import RedisDocumentFileList
 
@@ -144,61 +142,6 @@ def delete_folder(folder_prefix: str) -> bool:
         return False
 
 
-def get_job_s3_key(doc_id: str, job_type: str):
-    return f"jobs/{job_type}/{doc_id}.json"
-
-
 def get_image_s3_key(doc_id: str, image_name: str):
     base_name = image_name.removesuffix(".png")
     return f"{doc_id}/images/{base_name}.png"
-
-
-def save_job(
-    doc_id: str, job_data: Union[dict, BaseModel], status: str, job_type: str
-) -> bool:
-    """
-    Saves job data with metadata to S3 under a key based on the doc_id.
-    """
-    try:
-        payload = (
-            job_data.model_dump() if isinstance(job_data, BaseModel) else job_data or {}
-        )
-        wrapped = {
-            "doc_id": doc_id,
-            "status": status,
-            "type": job_type,
-            "data": payload,
-        }
-        file_obj = BytesIO(json.dumps(wrapped).encode("utf-8"))
-
-        job_key = get_job_s3_key(doc_id, job_type)
-        document_files.add(doc_id, job_key)
-        return upload_fileobj(
-            file_obj,
-            key=job_key,
-            content_type="application/json",
-        )
-    except (BotoCoreError, ClientError) as e:
-        logger.exception(f"Failed to save job for doc_id: {doc_id} - {e}")
-        return False
-
-
-def load_job(doc_id: str, job_type: str) -> Optional[dict]:
-    """
-    Loads job metadata and data from S3 given a doc_id.
-    """
-    try:
-        job_key = get_job_s3_key(doc_id, job_type)
-        response = s3_client.get_object(Bucket=S3_BUCKET, Key=job_key)
-        job = json.loads(response["Body"].read().decode("utf-8"))
-        # Extend Expiry for document file list
-        document_files[doc_id]
-        return {
-            "doc_id": doc_id,
-            "status": job.get("status", "unknown"),
-            "type": job.get("type", "unknown"),
-            "data": job.get("data", None),
-        }
-    except (ClientError, BotoCoreError, json.JSONDecodeError) as e:
-        logger.exception(f"Failed to load job for doc_id: {doc_id} - {e}")
-        return None

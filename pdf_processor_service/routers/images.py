@@ -1,13 +1,12 @@
 import logging
 
-from fastapi import APIRouter, Depends, Response, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from botocore.exceptions import ClientError
 
 from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_job, generate_external_image_url
-
+from utils.proxy import load_or_create_extraction_job, generate_external_image_url
 from shared_utils.s3_utils import get_object_stream, get_image_s3_key
 from shared_utils.redis_utils import RedisDocumentFileList
 
@@ -21,11 +20,8 @@ document_files = RedisDocumentFileList()
 async def get_pdf_images(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job_or_response=Depends(load_or_create_job),
+    job=Depends(load_or_create_extraction_job),
 ):
-    if isinstance(job_or_response, Response):
-        return job_or_response
-    job: dict = job_or_response
     images = job.get("data", {}).get("result", {}).get("pictures", [])
 
     image_list = []
