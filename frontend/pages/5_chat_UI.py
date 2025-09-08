@@ -110,10 +110,6 @@ async def chat_with_rag(prompt: str, doc_ids: list[str] = None, collection_name:
     server_status.error("Max retries exceeded")
     return "Sorry, the request timed out. Please try again."
 
-def simulate_rag_response(prompt, _document_content):
-    # Placeholder response - replace with your actual RAG implementation
-    return f"This is a simulated response for: {prompt}"
-
 # Check if documents are available
 if "processed_data" not in st.session_state or not st.session_state.processed_data:
     st.info("No documents available. Please upload and process documents first.")
