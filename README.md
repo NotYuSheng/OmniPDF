@@ -24,8 +24,8 @@ The following port mappings are used across the OmniPDF microservices in both de
 | Metadata Service          | Document metadata and word cloud generation               | 8000   |
 | Cleaner                   | Event-driven cleanup of expired sessions and files via Redis notifications | N/A    |
 | **AI/ML Services**        |                                                           |        |
-| vLLM Text Model           | Text-only LLM (Llama 3.1, Qwen2.5) for chat/translation   | 8000   |
-| vLLM Vision-Language Model | Multimodal VLM (Qwen2-VL) for image captioning           | 8000   |
+| vLLM Text Model           | Text-only LLM (Eg. Qwen2.5) for chat/translation          | 8000   |
+| vLLM Vision-Language Model | Multimodal VLM (Eg. Qwen2-VL) for image captioning       | 8000   |
 | **Data Services**         |                                                           |        |
 | Redis                     | Session storage and caching                               | 6379   |
 | ChromaDB                  | Vector database for embeddings                            | 8000   |
