@@ -59,7 +59,7 @@ async def chat_with_rag(prompt: str, doc_ids: list[str] = None, collection_name:
             logger.info(f"Current session cookie: {st.session_state.httpx_cookies.get('OmniPDFSession')}")
             
             try:
-                logger.info(f"FDecode JSON from response: {response}")
+                logger.info(f"Decode JSON from response: {response}")
                 logger.info(f"Decode JSON from headers: {response.headers}")
                 data = response.json()
             except json.JSONDecodeError as e:
