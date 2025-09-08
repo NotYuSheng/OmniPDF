@@ -135,7 +135,7 @@ affinity: {}
 # LLM Configuration - override in environment-specific values files
 llm:
   baseUrl: "http://webworkdgx/vllm_qwen2.5/v1"  # Default for local dev
-  model: "qwen2.5-0.5b-instruct"
+  model: "Qwen2.5-14B-Coder-Instruct"
 
 env: []  # Will be populated from LLM config in deployment template
 
