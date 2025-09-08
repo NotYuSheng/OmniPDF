@@ -178,20 +178,20 @@ networkPolicy:
     # Essential egress for all services
     allowDNS: true
     allowHTTPS: false  # nginx routes internally, doesn't call external APIs
-    # ZERO-TRUST: nginx can only route to pdf-processor-service (API gateway pattern)
+    # ZERO-TRUST: nginx can only route to frontend and pdf-processor-service (API gateway pattern)
     allowedTargets:
+      # Frontend UI (Streamlit)
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: frontend
+        ports:
+          - 8501
       # Primary API endpoint
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: pdf-processor-service
         ports:
           - 8000
-      # MinIO for direct file uploads/downloads
-      - podSelector:
-          matchLabels:
-            app.kubernetes.io/name: minio
-        ports:
-          - 9000
     # Custom egress rules (empty by default)
     customRules: []
 
