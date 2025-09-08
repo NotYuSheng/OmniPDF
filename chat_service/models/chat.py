@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from typing import List, Dict, Any
 
 
 class ChatRequest(BaseModel):
@@ -8,10 +8,9 @@ class ChatRequest(BaseModel):
     """
 
     message: str
-    doc_id: Optional[str] = None
-    collection_name: str = Field(
-        default="default_collection", description="ChromaDB collection name"
-    )
+    session_id: str
+    doc_ids: List[str] = None
+    collection_name: str = Field(default="default_collection", description="ChromaDB collection name")
 
 
 class ChatResponse(BaseModel):

@@ -109,7 +109,7 @@ def handle_job_status(job: dict, job_type: str = "document") -> None:
 
 
 async def proxy_post(url: str, body: dict):
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=300) as client:
         try:
             req = await client.post(url, json=body)
             # Check if status code is not 200 and handle the error
