@@ -59,7 +59,7 @@ echo "🗂️  MinIO Storage Configuration:"
 read -p "Enter MinIO root username [minioadmin]: " minio_user
 minio_user=${minio_user:-minioadmin}
 read -s -p "Enter MinIO root password [minioadmin123]: " minio_password
-minio_password=${minio_password:-minioadmin123}
+minio_password=${minio_password}
 echo ""
 
 # Delete existing secret if it exists
