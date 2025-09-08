@@ -73,10 +73,8 @@ docker compose -f docker-compose.gpu.yml up --build
 helm install chat-service ./helm/chat-service --namespace omnipdf
 
 # Deploy all services
-for service in helm/*/; do
-  service_name=$(basename "$service")
-  helm install "$service_name" "$service" --namespace omnipdf
-done
+# Deploy all services using the Makefile for robustness
+make install-all ENV=prestaging
 
 # Deploy RBAC (service accounts and permissions)
 helm install omnipdf-rbac ./helm/rbac --namespace omnipdf
