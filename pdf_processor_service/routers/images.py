@@ -7,7 +7,8 @@ from botocore.exceptions import ClientError
 from models.images import ImageData, ImageResponse
 from utils.session import validate_session_doc_pair
 from utils.proxy import load_or_create_job, generate_external_image_url
-from shared_utils.s3_utils import get_object_stream, list_folder
+
+from shared_utils.s3_utils import get_object_stream, get_image_s3_key
 from shared_utils.redis_utils import RedisDocumentFileList
 
 
@@ -24,18 +25,17 @@ async def get_pdf_images(
 ):
     if isinstance(job_or_response, Response):
         return job_or_response
+    job: dict = job_or_response
+    images = job.get("data", {}).get("result", {}).get("pictures", [])
 
-    url_list = []
-
-    prefix = f"{doc_id}/images/"
-    keys = list_folder(prefix)
-
-    for key in keys:
-        image_name = key.rsplit("/", 1)[-1]
+    image_list = []
+    for img_data in images:
+        image_name = img_data["key"]
+        key = get_image_s3_key(doc_id, image_name)
         url = generate_external_image_url(doc_id, image_name)
-        url_list.append(ImageData(image_key=key, url=url))
+        image_list.append(ImageData(image_key=key, url=url, caption=img_data["caption"]))
 
-    return ImageResponse(doc_id=doc_id, filename=f"{doc_id}.pdf", images=url_list)
+    return ImageResponse(doc_id=doc_id, filename=f"{doc_id}.pdf", images=image_list)
 
 
 @router.get("/{doc_id}/{img_name}", response_class=StreamingResponse)
@@ -44,7 +44,7 @@ async def get_pdf_image(
     img_name: str,
     _validated: bool = Depends(validate_session_doc_pair),
 ):
-    file_key = f"{doc_id}/images/{img_name}"
+    file_key = get_image_s3_key(doc_id, img_name)
 
     # Check if object exists
     try:

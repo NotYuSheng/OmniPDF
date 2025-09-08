@@ -40,8 +40,12 @@ async def vectorize_chromadb(
             return
 
         # Embed into ChromaDB using specified embedding model
-        await collection.add(ids=ids, documents=documents, metadatas=metadatas)
-        # refresh document expiry
+        await collection.add(
+            ids=ids,
+            documents=documents,
+            metadatas=metadatas
+        )
+        # Refresh document expiry
         doc_id_list = {metadata["doc_id"] for metadata in metadatas}
         document_list.refresh_document_expiries(doc_id_list)
         logger.info(f"Added {len(ids)} chunks to collection '{collection_name}'")
