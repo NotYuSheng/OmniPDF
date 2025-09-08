@@ -16,6 +16,7 @@ METADATA_URL = os.environ["METADATA_URL"]
 EXTRACTION_URL = os.environ["EXTRACTION_URL"]
 EMBED_URL = os.environ["EMBED_URL"]
 TRANSLATION_URL = os.environ["TRANSLATION_URL"]
+RENDERER_URL = os.environ["RENDERER_URL"]
 
 
 def handle_status_error(response: httpx.Response, url: str) -> None:
@@ -229,6 +230,42 @@ async def load_or_create_translation_job(
         }
 
         response = await proxy_post(f"{TRANSLATION_URL}/translation/", body=translation_request)
+        if response.status_code == 202:
+            raise_processing_error(job_type)
+        else:
+            logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
+            raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
+
+    handle_job_status(job, job_type)
+    return job
+
+
+async def load_or_create_render_job(
+    doc_id: str
+) -> dict | Response:
+    """Load existing render job or create a new one if it doesn't exist"""
+    job_type = JobType.RENDERER
+    
+    # First check if we have a local job for this render request
+    job = load_job(doc_id=doc_id, job_type=job_type)
+    if not job:
+        # Ensure translation is complete first
+        translation_job = await load_or_create_translation_job(doc_id)
+        
+        # Get the translation result to send to renderer service
+        translation_result = translation_job.get("data", {})
+        
+        # Generate the document URL for the renderer
+        doc_url = generate_presigned_url(f"{doc_id}/original.pdf")
+        
+        # Prepare request body for renderer service
+        render_request = {
+            "doc_id": doc_id,
+            "docling": translation_result
+        }
+
+        # Make request with doc_url as query parameter
+        response = await proxy_post(f"{RENDERER_URL}/render/{doc_id}?doc_url={doc_url}", body=render_request)
         if response.status_code == 202:
             raise_processing_error(job_type)
         else:
