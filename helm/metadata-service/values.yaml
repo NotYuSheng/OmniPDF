@@ -206,7 +206,25 @@ networkPolicy:
     allowDNS: true
     allowHTTPS: true  # For external vLLM in prestaging
     # ZERO-TRUST: metadata-service can only call specific services
-    allowedTargets: []  # Configured via customRules for external vLLM
+    allowedTargets:
+      # ChromaDB for retrieving document chunks
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chromadb
+        ports:
+          - 8000
+      # MinIO for storing/loading job results
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports:
+          - 9000
+      # Redis for document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports:
+          - 6379
     # Custom egress rules for special cases (external vLLM, etc.)
     customRules: []
 
