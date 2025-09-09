@@ -17,6 +17,14 @@ COPY shared_utils ./shared_utils
 # Copy pdf_processor_service folder from root context into /app/pdf_processor_service
 COPY pdf_processor_service ./pdf_processor_service
 
+# Remove unnecessary system packages
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get remove --purge -y linux-libc-dev && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Expose the FastAPI port
 EXPOSE 8000
 
 CMD ["sh", "-c", "PYTHONPATH=/app/pdf_processor_service uvicorn pdf_processor_service.main:app --host 0.0.0.0 --port 8000"]

@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class ImageData(BaseModel):
     image_key: str
     url: str
+    caption: str
 
 
 class ImageResponse(BaseModel):

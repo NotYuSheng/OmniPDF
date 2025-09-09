@@ -1,6 +1,9 @@
 name: Trivy Scan
 
 on:
+  schedule:
+    # Run at midnight SGT (UTC+8) daily - 16:00 UTC
+    - cron: '0 16 * * *'
   push:
     branches: [dev]
   workflow_dispatch:

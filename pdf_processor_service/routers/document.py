@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, BackgroundTasks
 from fastapi.responses import StreamingResponse
 import uuid
 import logging
@@ -8,11 +8,13 @@ from shared_utils.s3_utils import (
     get_object_stream,
 )
 from utils.session import (
+    get_session_id,
     get_doc_list_append_function,
     get_doc_list_remove_function,
     validate_session_doc_pair,
 )
 from utils.proxy import generate_external_doc_url
+from utils.process import process_file_basic
 from models.document import DocumentUploadResponse
 from botocore.exceptions import ClientError
 
@@ -22,7 +24,10 @@ logger = logging.getLogger(__name__)
 
 @router.post("/", response_model=DocumentUploadResponse, status_code=201)
 async def upload_document(
-    file: UploadFile = File(...), append_doc=Depends(get_doc_list_append_function)
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...), 
+    session_id: str = Depends(get_session_id),
+    append_doc=Depends(get_doc_list_append_function),
 ):
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="File extension must be .pdf")
@@ -50,7 +55,8 @@ async def upload_document(
         logger.error(f"Unexpected error during upload: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
 
-    append_doc(doc_id)
+    append_doc(doc_id, key, file.filename)
+    background_tasks.add_task(process_file_basic, doc_id, session_id)
     return DocumentUploadResponse(
         doc_id=doc_id, filename=key, download_url=url
     )

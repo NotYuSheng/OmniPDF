@@ -14,6 +14,14 @@ COPY shared_utils ./shared_utils
 
 COPY pdf_extraction_service ./pdf_extraction_service
 
+# Remove unnecessary system packages
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get remove --purge -y linux-libc-dev && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Expose the FastAPI port
 EXPOSE 8000
 
 # Start the FastAPI server
