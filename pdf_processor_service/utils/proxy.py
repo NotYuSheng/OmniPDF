@@ -265,7 +265,7 @@ async def load_or_create_render_job(
         }
 
         # Make request with doc_url as query parameter
-        response = await proxy_post(f"{RENDERER_URL}/render/{doc_id}?doc_url={doc_url}", body=render_request)
+        response = await proxy_post(f"{RENDERER_URL}/render/{doc_id}?{urlencode({'doc_url': doc_url})}", body=render_request)
         if response.status_code == 202:
             raise_processing_error(job_type)
         else:
