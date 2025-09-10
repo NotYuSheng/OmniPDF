@@ -49,7 +49,7 @@ async def submit_pdf_for_rendering(
 async def get_pdf_rendering(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job: str = Depends(load_or_create_render_job),
+    job: dict = Depends(load_or_create_render_job),
 ):
     """Get rendering results for a processed PDF."""
     # Extract result from job data
@@ -68,7 +68,7 @@ async def get_pdf_rendering(
 async def get_pdf_rendered_file(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job: str = Depends(load_or_create_render_job),
+    job: dict = Depends(load_or_create_render_job),
 ):
     """Get rendering results for a processed PDF."""
     # file_key = f"{doc_id}/rendered.pdf"
