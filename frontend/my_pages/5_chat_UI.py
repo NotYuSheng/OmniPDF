@@ -110,6 +110,43 @@ async def chat_with_rag(prompt: str, doc_ids: list[str] = None, collection_name:
     server_status.error("Max retries exceeded")
     return "Sorry, the request timed out. Please try again."
 
+async def handle_preset_query(prompt: str, doc_ids: list[str], error_message: str):
+    """
+    Handle preset queries (Summarize, Main Topic, Key Findings) with consistent UI updates.
+    """
+    if not doc_ids:
+        st.error(error_message)
+        return
+    
+    # Add user message and show immediately
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with chat_container:
+        with st.chat_message("user"):
+            st.write(prompt)
+    
+    # Add placeholder for assistant message immediately to ensure it's saved
+    placeholder_index = len(st.session_state.messages)
+    st.session_state.messages.append({"role": "assistant", "content": "Thinking..."})
+    
+    # Get and stream response
+    response = await chat_with_rag(prompt, doc_ids)
+    
+    # Save the complete response immediately after receiving from endpoint
+    st.session_state.messages[placeholder_index] = {"role": "assistant", "content": response}
+    
+    with chat_container:
+        with st.chat_message("assistant"):
+            if st.session_state.streaming_enabled:
+                def response_generator():
+                    for word in response.split():
+                        yield word + " "
+                        time.sleep(0.05)
+                streamed_response = st.write_stream(response_generator)
+            else:
+                st.write(response)
+                streamed_response = response
+    st.rerun()
+
 # Check if documents are available
 if "processed_data" not in st.session_state or not st.session_state.processed_data:
     st.info("No documents available. Please upload and process documents first.")
@@ -150,90 +187,27 @@ with st.container():
 
         with btn_col1:
             if st.button("Summarize", key="summary_btn"):
-                if not doc_ids:
-                    st.error("Please select at least one document to summarize.")
-                else:
-                    prompt = "Summarize the document"
-                    # Add user message and show immediately
-                    st.session_state.messages.append({"role": "user", "content": prompt})
-                    with chat_container:
-                        with st.chat_message("user"):
-                            st.write(prompt)
-                    
-                    # Get and stream response
-                    response = runner.run(chat_with_rag(prompt, doc_ids))
-                    with chat_container:
-                        with st.chat_message("assistant"):
-                            if st.session_state.streaming_enabled:
-                                def response_generator():
-                                    for word in response.split():
-                                        yield word + " "
-                                        time.sleep(0.05)
-                                streamed_response = st.write_stream(response_generator)
-                            else:
-                                st.write(response)
-                                streamed_response = response
-                    
-                    st.session_state.messages.append({"role": "assistant", "content": streamed_response})
-                    st.rerun()
+                runner.run(handle_preset_query(
+                    "Summarize the document", 
+                    doc_ids, 
+                    "Please select at least one document to summarize."
+                ))
         
         with btn_col2:    
             if st.button("Main Topic", key="topic_btn"):
-                if not doc_ids:
-                    st.error("Please select at least one document to analyze.")
-                else:
-                    prompt = "What is the main topic?"
-                    # Add user message and show immediately
-                    st.session_state.messages.append({"role": "user", "content": prompt})
-                    with chat_container:
-                        with st.chat_message("user"):
-                            st.write(prompt)
-                    
-                    # Get and stream response
-                    response = runner.run(chat_with_rag(prompt, doc_ids))
-                    with chat_container:
-                        with st.chat_message("assistant"):
-                            if st.session_state.streaming_enabled:
-                                def response_generator():
-                                    for word in response.split():
-                                        yield word + " "
-                                        time.sleep(0.05)
-                                streamed_response = st.write_stream(response_generator)
-                            else:
-                                st.write(response)
-                                streamed_response = response
-                    
-                    st.session_state.messages.append({"role": "assistant", "content": streamed_response})
-                    st.rerun()
+                runner.run(handle_preset_query(
+                    "What is the main topic?", 
+                    doc_ids, 
+                    "Please select at least one document to analyze."
+                ))
         
         with btn_col3:
             if st.button("Key Findings", key="findings_btn"):
-                if not doc_ids:
-                    st.error("Please select at least one document to analyze.")
-                else:
-                    prompt = "What are the key findings?"
-                    # Add user message and show immediately
-                    st.session_state.messages.append({"role": "user", "content": prompt})
-                    with chat_container:
-                        with st.chat_message("user"):
-                            st.write(prompt)
-                    
-                    # Get and stream response
-                    response = runner.run(chat_with_rag(prompt, doc_ids))
-                    with chat_container:
-                        with st.chat_message("assistant"):
-                            if st.session_state.streaming_enabled:
-                                def response_generator():
-                                    for word in response.split():
-                                        yield word + " "
-                                        time.sleep(0.05)
-                                streamed_response = st.write_stream(response_generator)
-                            else:
-                                st.write(response)
-                                streamed_response = response
-                    
-                    st.session_state.messages.append({"role": "assistant", "content": streamed_response})
-                    st.rerun()
+                runner.run(handle_preset_query(
+                    "What are the key findings?", 
+                    doc_ids, 
+                    "Please select at least one document to analyze."
+                ))
 
 # Chat input
 if prompt := st.chat_input("Ask about the document"):
@@ -249,8 +223,15 @@ if prompt := st.chat_input("Ask about the document"):
             with st.chat_message("user"):
                 st.write(prompt)
         
+        # Add placeholder for assistant message immediately to ensure it's saved
+        placeholder_index = len(st.session_state.messages)
+        st.session_state.messages.append({"role": "assistant", "content": "Thinking..."})
+        
         # Get response first
         response = runner.run(chat_with_rag(prompt, doc_ids))
+
+        # Save the complete response immediately after receiving from endpoint
+        st.session_state.messages[placeholder_index] = {"role": "assistant", "content": response}
         
         # Stream the response as it comes in (if enabled)
         with chat_container:
@@ -265,9 +246,6 @@ if prompt := st.chat_input("Ask about the document"):
                 else:
                     st.write(response)
                     streamed_response = response
-        
-        # Add final response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": streamed_response})
         
         # Rerun to update the interface
         st.rerun()
