@@ -141,10 +141,9 @@ async def handle_preset_query(prompt: str, doc_ids: list[str], error_message: st
                     for word in response.split():
                         yield word + " "
                         time.sleep(0.05)
-                streamed_response = st.write_stream(response_generator)
+                st.write_stream(response_generator)
             else:
                 st.write(response)
-                streamed_response = response
     st.rerun()
 
 # Check if documents are available
@@ -242,10 +241,9 @@ if prompt := st.chat_input("Ask about the document"):
                             yield word + " "
                             time.sleep(0.05)  # Adjust streaming speed
                     
-                    streamed_response = st.write_stream(response_generator)
+                    st.write_stream(response_generator)
                 else:
                     st.write(response)
-                    streamed_response = response
         
         # Rerun to update the interface
         st.rerun()
