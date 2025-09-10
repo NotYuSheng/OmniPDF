@@ -148,11 +148,6 @@ async def process_render_job(doc_id: str, doc_url: str, json_data: dict):
         document_files.add(doc_id, key)
         
         # Prepare result
-        # result = DocumentRendererResponse(
-        #     doc_id=doc_id,
-        #     filename=key,
-        #     download_url=presigned_url,
-        # )
         result = {
             "doc_id": doc_id,
             "filename": key,
