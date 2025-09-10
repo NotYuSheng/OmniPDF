@@ -82,7 +82,7 @@ async def get_pdf_rendered_file(
         else:
             raise HTTPException(status_code=500, detail="Failed to retrieve Rendered PDF")
     
-    # Extend expiry time for the wordcloud files
+    # Extend expiry time for the rendered PDF files
     document_files[doc_id]
     
     return StreamingResponse(file_stream, media_type="application/pdf")
