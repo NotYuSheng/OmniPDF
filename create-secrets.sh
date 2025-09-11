@@ -36,18 +36,54 @@ create_secret_from_env() {
     echo "✅ Created secret: $secret_name"
 }
 
-# Create secrets for all services
-create_secret_from_env "chat-service" "chat_service/.env"
-create_secret_from_env "pdf-processor-service" "pdf_processor_service/.env" 
-create_secret_from_env "pdf-extraction-service" "pdf_extraction_service/.env"
-create_secret_from_env "docling-translation-service" "docling_translation_service/.env"
-create_secret_from_env "pdf-renderer-service" "pdf_renderer_service/.env"
-create_secret_from_env "embedder-service" "embedder_service/.env"
-create_secret_from_env "metadata-service" "metadata_service/.env"
-create_secret_from_env "image-captioner-service" "image_captioner_service/.env"
-create_secret_from_env "cleaner" "cleaner/.env"
-create_secret_from_env "nginx" "nginx/.env"
-create_secret_from_env "frontend" "frontend/.env"
+# Auto-discover services by checking helm charts and .env files
+echo "🔍 Auto-discovering services from helm charts and .env files..."
+
+# Create secrets for services with helm charts (excluding shared-values and assets)
+for helm_dir in helm/*/; do
+    chart_name=$(basename "$helm_dir")
+    if [ "$chart_name" != "shared-values" ] && [ "$chart_name" != "assets" ]; then
+        # Convert chart name to directory name pattern
+        if [ "$chart_name" = "chat-service" ]; then
+            env_dir="chat_service"
+        elif [ "$chart_name" = "pdf-processor-service" ]; then
+            env_dir="pdf_processor_service"
+        elif [ "$chart_name" = "pdf-extraction-service" ]; then
+            env_dir="pdf_extraction_service"
+        elif [ "$chart_name" = "docling-translation-service" ]; then
+            env_dir="docling_translation_service"
+        elif [ "$chart_name" = "pdf-renderer-service" ]; then
+            env_dir="pdf_renderer_service"
+        elif [ "$chart_name" = "embedder-service" ]; then
+            env_dir="embedder_service"
+        elif [ "$chart_name" = "metadata-service" ]; then
+            env_dir="metadata_service"
+        elif [ "$chart_name" = "image-captioner-service" ]; then
+            env_dir="image_captioner_service"
+        else
+            # For services like cleaner, nginx, frontend - use chart name as directory name
+            env_dir="$chart_name"
+        fi
+        
+        env_file="${env_dir}/.env"
+        echo "Checking for service: $chart_name (env file: $env_file)"
+        create_secret_from_env "$chart_name" "$env_file"
+    fi
+done
+
+# Also check for any additional .env files in root directories not covered by helm charts
+echo ""
+echo "🔍 Checking for additional .env files..."
+for service_dir in */; do
+    service_name=$(basename "$service_dir")
+    env_file="${service_dir}.env"
+    
+    # Skip if already processed via helm chart
+    if [ ! -d "helm/${service_name}" ] && [ -f "$env_file" ]; then
+        echo "Found additional service: $service_name"
+        create_secret_from_env "$service_name" "$env_file"
+    fi
+done
 
 # Interactive creation of infrastructure secrets
 echo ""

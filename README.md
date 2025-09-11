@@ -219,8 +219,8 @@ Alternatively, configure CRC manually:
 crc stop
 
 # Configure CRC resources (adjust based on your system)
-crc config set memory 262144    # 256GB RAM
-crc config set cpus 32          # 32 CPU cores
+crc config set memory 32768     # 32GB RAM (adjust based on your system)
+crc config set cpus 12          # 12 CPU cores (adjust based on your system)
 crc config set disk-size 80     # 80GB disk
 
 # Start CRC with new configuration
