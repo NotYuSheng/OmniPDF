@@ -202,7 +202,9 @@ networkPolicy:
     customRules: []
   egress:
     enabled: true
-    allowDNS: true
+    allowDNS: true  # MinIO needs DNS resolution per matrix
+    allowHTTPS: false  # No outbound calls per matrix  
+    allowedTargets: []  # No service-to-service calls per matrix
     customRules: []
 
 # Pod Disruption Budget (optional)

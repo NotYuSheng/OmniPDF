@@ -192,8 +192,10 @@ networkPolicy:
     # Custom ingress rules for special cases
     customRules: []
   egress:
-    enabled: false
-    allowDNS: true
+    enabled: true
+    allowDNS: true  # Redis needs DNS resolution per matrix
+    allowHTTPS: false  # No outbound calls per matrix
+    allowedTargets: []  # No service-to-service calls per matrix
     customRules: []
 
 # Pod Disruption Budget

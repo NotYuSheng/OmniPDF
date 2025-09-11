@@ -162,7 +162,7 @@ networkPolicy:
     # Allow DNS resolution (required for hostname lookups)
     allowDNS: true
     # Allow HTTPS for external APIs (for docling model downloads)
-    allowHTTPS: false  # Uses local docling, no external API calls needed
+    allowHTTPS: true  # For docling model downloads per Service Communication Matrix
     # Allow HTTP for internal services  
     allowHTTP: false
     # ZERO-TRUST: pdf-extraction-service can only call specific services

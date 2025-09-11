@@ -161,12 +161,12 @@ networkPolicy:
   enabled: false  # Disabled by default for dev/testing
   ingress:
     enabled: true
-    # ZERO-TRUST: Nginx accepts calls from ingress controller and frontend only
+    # Allow traffic from ingress controller (per Service Communication Matrix)
+    fromIngressController: true
+    ingressControllerNamespaceLabels:
+      name: ingress-nginx
+    # ZERO-TRUST: Nginx accepts calls from frontend only (per matrix)
     allowedCallers:
-      # Allow Istio/ingress controller access (from different namespace)
-      - namespaceSelector:
-          matchLabels:
-            name: ingress-nginx
       # Allow frontend to call nginx
       - podSelector:
           matchLabels:

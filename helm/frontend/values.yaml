@@ -231,23 +231,21 @@ networkPolicy:
   enabled: false  # Enable in production environments
   ingress:
     enabled: true
-    # Allow traffic from Istio gateway (based on C4 diagram)
-    fromIstioGateway: true
-    istioGatewayNamespaceLabels:
-      name: istio-system
-    istioGatewayPodLabels:
-      app: istio-proxy
-    # Zero-trust: specific allowed callers
+    # Allow traffic from ingress controller (per Service Communication Matrix)
+    fromIngressController: true
+    ingressControllerNamespaceLabels:
+      name: ingress-nginx
+    # Zero-trust: no other callers allowed per matrix
     allowedCallers: []
     customRules: []
   egress:
     enabled: true
     allowDNS: true
-    allowHTTPS: false  # Frontend should only talk to internal services
-    # Zero-trust: Frontend only talks to pdf-processor-service per C4 diagram
+    allowHTTPS: false  # Frontend only talks to nginx per matrix
+    # Zero-trust: Frontend only talks to nginx:8080 per matrix
     allowedTargets:
       - podSelector:
           matchLabels:
-            app.kubernetes.io/name: pdf-processor-service
-        ports: [8000]
+            app.kubernetes.io/name: nginx
+        ports: [8080]
     customRules: []

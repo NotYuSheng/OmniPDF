@@ -180,7 +180,7 @@ networkPolicy:
   enabled: false  # Disabled by default for dev/testing
   ingress:
     enabled: true
-    # ZERO-TRUST: ChromaDB accepts calls from specific services only
+    # ZERO-TRUST: ChromaDB accepts calls from specific services only (per matrix)
     allowedCallers:
       # Chat service for vector queries
       - podSelector:
@@ -190,6 +190,10 @@ networkPolicy:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: embedder-service
+      # Metadata service for vector operations
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
       # Cleaner for expired vector cleanup
       - podSelector:
           matchLabels:
