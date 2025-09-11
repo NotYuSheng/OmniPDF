@@ -39,10 +39,10 @@ create_secret_from_env() {
 # Auto-discover services by checking helm charts and .env files
 echo "🔍 Auto-discovering services from helm charts and .env files..."
 
-# Create secrets for services with helm charts (excluding shared-values and assets)
+# Create secrets for services with helm charts (excluding assets)
 for helm_dir in helm/*/; do
     chart_name=$(basename "$helm_dir")
-    if [ "$chart_name" != "shared-values" ] && [ "$chart_name" != "assets" ]; then
+    if [ "$chart_name" != "assets" ]; then
         # Convert chart name to directory name pattern
         if [ "$chart_name" = "chat-service" ]; then
             env_dir="chat_service"
