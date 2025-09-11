@@ -20,9 +20,9 @@ shared-values/
 ### Development (Local)
 ```bash
 # Use docker-compose for local development
-docker-compose up -d                    # Start all services
-docker-compose logs -f chat_service     # View logs
-docker-compose down                     # Stop all services
+docker compose up -d                    # Start all services
+docker compose logs -f chat_service     # View logs
+docker compose down                     # Stop all services
 ```
 
 ### Staging Deployment (Kubernetes)
