@@ -4,7 +4,7 @@ description: OmniPDF Redis - In-memory session store and caching
 
 type: application
 version: 0.1.0
-appVersion: "7.0.15-alpine"
+appVersion: "8.2.1-alpine"
 
 # Chart icon for Helm repositories and UIs
 icon: file://../assets/logo.svg
