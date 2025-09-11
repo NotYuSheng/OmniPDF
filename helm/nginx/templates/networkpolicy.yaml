@@ -66,18 +66,6 @@ spec:
         - protocol: TCP
           port: 80
     {{- end }}
-    # Allow communication to LLM service
-    {{- if .Values.networkPolicy.egress.allowLLMService }}
-    {{- range .Values.networkPolicy.egress.llmServiceSelectors }}
-    - to:
-        - {{ . | toYaml | nindent 10 }}
-      ports:
-        {{- range $.Values.networkPolicy.egress.llmServicePorts }}
-        - protocol: TCP
-          port: {{ . }}
-        {{- end }}
-    {{- end }}
-    {{- end }}
     # Allow communication to specific target services (zero-trust)
     {{- range .Values.networkPolicy.egress.allowedTargets }}
     - to:
