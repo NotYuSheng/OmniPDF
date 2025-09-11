@@ -26,7 +26,7 @@ serviceAccounts:
 
 # Enable/disable specific RBAC rules
 rbac:
-  # Core orchestration permissions
+  # Core orchestration permissions (pdf-processor-service)
   pdfProcessor:
     enabled: true
     # Can call all processing services
@@ -34,7 +34,7 @@ rbac:
     # Can access all data stores
     canAccessDataStores: true
     
-  # Processing service permissions
+  # Processing service permissions (pdf-extraction, docling-translation, embedder, chat)
   processingServices:
     enabled: true
     # Can call AI/ML services
@@ -42,20 +42,38 @@ rbac:
     # Limited data store access
     canAccessDataStores: true
     
-  # AI/ML service permissions
+  # AI/ML service permissions (image-captioner, metadata)
   aiServices:
     enabled: true
     # No outbound service calls (end of chain)
     canCallServices: false
     
-  # Data services permissions
+  # Data services permissions (minio, chromadb, redis)
   dataServices:
     enabled: true
     # No outbound calls needed
     canCallServices: false
+    
+  # Frontend service permissions
+  frontend:
+    enabled: true
+    # Can only call pdf-processor
+    canCallProcessor: true
+    
+  # Gateway service permissions (nginx)
+  gateway:
+    enabled: true
+    # Can call frontend and pdf-processor
+    canCallFrontendAndProcessor: true
     
   # Cleanup service permissions
   cleaner:
     enabled: true
     # Can access all data stores for cleanup
     canAccessAllDataStores: true
+    
+  # PDF renderer service permissions
+  pdfRenderer:
+    enabled: true
+    # Can access minio for file operations
+    canAccessStorage: true

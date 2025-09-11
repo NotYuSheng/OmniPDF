@@ -10,7 +10,8 @@ metadata:
     app.kubernetes.io/name: omnipdf-rbac
     app.kubernetes.io/component: cleaner
 rules:
-# Service Discovery - can access all data stores
+{{- if .Values.rbac.cleaner.canAccessAllDataStores }}
+# Service Discovery - can access all data stores based on values.yaml configuration
 - apiGroups: [""]
   resources: ["services"]
   resourceNames: 
@@ -18,8 +19,9 @@ rules:
     - "chromadb"
     - "redis"
   verbs: ["get", "list"]
+{{- end }}
 
-# Secret access for all data stores (needs admin access for cleanup)
+# Secret access for cleanup operations
 # NOTE: Per-service secret isolation - cleaner has its own secret with all data store credentials
 - apiGroups: [""]
   resources: ["secrets"]

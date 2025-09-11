@@ -1,0 +1,53 @@
+{{- if .Values.rbac.pdfRenderer.enabled }}
+---
+# Role for PDF Renderer Service - Overlays translated content onto PDFs
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: pdf-renderer-service-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: processing
+rules:
+# Own secrets access
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "pdf-renderer-service-secrets"  # Contains MinIO credentials for file operations
+  verbs: ["get"]
+
+{{- if .Values.rbac.pdfRenderer.canAccessStorage }}
+# Service discovery for storage based on values.yaml configuration
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: ["minio"]
+  verbs: ["get", "list"]
+{{- end }}
+
+# ConfigMap access for renderer configuration
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames:
+    - "pdf-renderer-config"
+  verbs: ["get", "watch"]
+
+---
+# RoleBinding for PDF Renderer Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pdf-renderer-service-binding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: processing
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.pdfRenderer }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: pdf-renderer-service-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

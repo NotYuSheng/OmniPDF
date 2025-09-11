@@ -1,6 +1,6 @@
 {{- if .Values.rbac.pdfProcessor.enabled }}
 ---
-# Role for PDF Processor Service - Main Orchestrator
+# Role for PDF Processor Service - Main Orchestrator (C4: Orchestrator Layer)
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -10,30 +10,61 @@ metadata:
     app.kubernetes.io/name: omnipdf-rbac
     app.kubernetes.io/component: orchestrator
 rules:
-# Service Discovery - can list services and endpoints
+# Service Discovery - always enabled for orchestrator
 - apiGroups: [""]
   resources: ["services", "endpoints"]
   verbs: ["get", "list", "watch"]
+
+{{- if .Values.rbac.pdfProcessor.canCallProcessingServices }}
+# Processing Services Discovery - based on C4 diagram workflows
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames:
+    - "pdf-extraction-service"      # Delegates table and image extraction
+    - "docling-translation-service" # Requests docling translation
+    - "pdf-renderer-service"        # Renders previews of extracted content
+    - "embedder-service"            # Sends chunking + embedding tasks
+    - "chat-service"                # RAG conversations
+    - "metadata-service"            # Requests metadata generation
+  verbs: ["get", "list"]
+{{- end }}
+
+{{- if .Values.rbac.pdfProcessor.canAccessDataStores }}
+# Data Store Services Discovery - based on C4 diagram data flows
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames:
+    - "minio"      # Stores PDFs, generates presigned URLs
+    - "chromadb"   # Vector database access
+    - "redis"      # Session validation
+  verbs: ["get", "list"]
+{{- end }}
   
-# Secret access for inter-service authentication (per-service isolation)
+# Secret access for inter-service authentication
 - apiGroups: [""]
   resources: ["secrets"]
   resourceNames: 
+    - "pdf-processor-service-secrets"  # Own secrets
+{{- if .Values.rbac.pdfProcessor.canCallProcessingServices }}
     - "pdf-extraction-service-secrets"
     - "docling-translation-service-secrets" 
     - "pdf-renderer-service-secrets"
     - "embedder-service-secrets"
     - "chat-service-secrets"
     - "metadata-service-secrets"
-    - "image-captioner-service-secrets"
+{{- end }}
+{{- if .Values.rbac.pdfProcessor.canAccessDataStores }}
     - "minio-secrets"
+    - "chromadb-secrets"
+    - "redis-secrets"
+{{- end }}
   verbs: ["get"]
 
 # ConfigMap access for service configuration
 - apiGroups: [""]
   resources: ["configmaps"]
   resourceNames:
-    - "pdf-processor-config"
+    - "pdf-processor-service-config"
   verbs: ["get", "watch"]
 
 ---

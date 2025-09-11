@@ -1,55 +1,55 @@
-{{- if .Values.rbac.frontend.enabled }}
+{{- if .Values.rbac.gateway.enabled }}
 ---
-# Role for Frontend Service - Limited to PDF Processor communication
+# Role for Nginx Gateway - Routes requests to frontend and services
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: {{ .Values.namespace }}
-  name: frontend-role
+  name: nginx-gateway-role
   labels:
     app.kubernetes.io/name: omnipdf-rbac
-    app.kubernetes.io/component: frontend
+    app.kubernetes.io/component: gateway
 rules:
-{{- if .Values.rbac.frontend.canCallProcessor }}
-# Service Discovery - only PDF Processor based on values.yaml configuration
+{{- if .Values.rbac.gateway.canCallFrontendAndProcessor }}
+# Service Discovery - can access frontend and pdf-processor based on values.yaml configuration
 - apiGroups: [""]
   resources: ["services"]
   resourceNames: 
+    - "frontend"
     - "pdf-processor-service"
   verbs: ["get", "list"]
 {{- end }}
 
 # Secret access for service communication
-# NOTE: Per-service secret isolation - frontend has its own secret with service credentials
 - apiGroups: [""]
   resources: ["secrets"]
   resourceNames:
-    - "frontend-secrets"  # Contains service credentials
+    - "nginx-secrets"  # Contains gateway configuration and service credentials
   verbs: ["get"]
 
-# ConfigMap access for frontend configuration  
+# ConfigMap access for nginx configuration  
 - apiGroups: [""]
   resources: ["configmaps"]
   resourceNames:
-    - "frontend-config"
+    - "nginx-config"
   verbs: ["get", "watch"]
 
 ---
-# RoleBinding for Frontend Service
+# RoleBinding for Nginx Gateway Service
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: frontend-binding
+  name: nginx-gateway-binding
   namespace: {{ .Values.namespace }}
   labels:
     app.kubernetes.io/name: omnipdf-rbac
-    app.kubernetes.io/component: frontend
+    app.kubernetes.io/component: gateway
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.serviceAccounts.frontend }}
+  name: {{ .Values.serviceAccounts.nginx }}
   namespace: {{ .Values.namespace }}
 roleRef:
   kind: Role
-  name: frontend-role
+  name: nginx-gateway-role
   apiGroup: rbac.authorization.k8s.io
 {{- end }}

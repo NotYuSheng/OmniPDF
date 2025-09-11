@@ -1,6 +1,7 @@
 {{- if .Values.rbac.processingServices.enabled }}
 ---
-# Individual roles for each processing service (per-service secret isolation)
+# Roles for Processing Services (C4: Processing Layer)
+# Services: PDF Extraction, Docling Translation, PDF Renderer, Embedder, Chat Service
 
 # PDF Extraction Service Role
 apiVersion: rbac.authorization.k8s.io/v1
@@ -12,15 +13,34 @@ metadata:
     app.kubernetes.io/name: omnipdf-rbac
     app.kubernetes.io/component: processing
 rules:
+# Own secrets access
 - apiGroups: [""]
   resources: ["secrets"]
   resourceNames: 
-    - "pdf-extraction-service-secrets"  # Contains vLLM, MinIO credentials for this service
+    - "pdf-extraction-service-secrets"
   verbs: ["get"]
+
+{{- if .Values.rbac.processingServices.canCallAI }}
+# AI Services Discovery - based on C4 diagram: "Requests image captioning"
 - apiGroups: [""]
   resources: ["services"]
-  resourceNames: ["image-captioner-service", "minio"]
+  resourceNames: ["image-captioner-service"]
   verbs: ["get", "list"]
+{{- end }}
+
+{{- if .Values.rbac.processingServices.canAccessDataStores }}
+# Data Store Access - based on C4 diagram: "Stores extracted images"
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: ["minio"]
+  verbs: ["get", "list"]
+{{- end }}
+
+# ConfigMap access
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["pdf-extraction-service-config"]
+  verbs: ["get", "watch"]
 
 ---
 # RoleBinding for PDF Extraction Service
@@ -49,11 +69,18 @@ metadata:
     app.kubernetes.io/name: omnipdf-rbac
     app.kubernetes.io/component: processing
 rules:
+# Own secrets access
 - apiGroups: [""]
   resources: ["secrets"]
   resourceNames: 
-    - "docling-translation-service-secrets"  # Contains vLLM credentials for this service
+    - "docling-translation-service-secrets"
   verbs: ["get"]
+
+# ConfigMap access
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["docling-translation-service-config"]
+  verbs: ["get", "watch"]
 
 ---
 # RoleBinding for Docling Translation Service  
@@ -72,6 +99,54 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 
 ---
+# PDF Renderer Service Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: pdf-renderer-service-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: processing
+rules:
+# Own secrets access
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "pdf-renderer-service-secrets"
+  verbs: ["get"]
+
+{{- if .Values.rbac.processingServices.canAccessDataStores }}
+# Data Store Access - based on C4 diagram: renders content from/to storage
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: ["minio"]
+  verbs: ["get", "list"]
+{{- end }}
+
+# ConfigMap access
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["pdf-renderer-service-config"]
+  verbs: ["get", "watch"]
+
+---
+# RoleBinding for PDF Renderer Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pdf-renderer-service-binding
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.pdfRenderer }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: pdf-renderer-service-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
 # Embedder Service Role
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -82,15 +157,26 @@ metadata:
     app.kubernetes.io/name: omnipdf-rbac
     app.kubernetes.io/component: processing
 rules:
+# Own secrets access
 - apiGroups: [""]
   resources: ["secrets"]
   resourceNames: 
-    - "embedder-service-secrets"  # Contains ChromaDB credentials for this service
+    - "embedder-service-secrets"
   verbs: ["get"]
+
+{{- if .Values.rbac.processingServices.canAccessDataStores }}
+# Data Store Access - based on C4 diagram: "Store embeddings"
 - apiGroups: [""]
   resources: ["services"]
   resourceNames: ["chromadb"]
   verbs: ["get", "list"]
+{{- end }}
+
+# ConfigMap access
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["embedder-service-config"]
+  verbs: ["get", "watch"]
 
 ---
 # RoleBinding for Embedder Service
@@ -119,15 +205,26 @@ metadata:
     app.kubernetes.io/name: omnipdf-rbac
     app.kubernetes.io/component: processing
 rules:
+# Own secrets access
 - apiGroups: [""]
   resources: ["secrets"]
   resourceNames: 
-    - "chat-service-secrets"  # Contains vLLM and ChromaDB credentials for this service
+    - "chat-service-secrets"
   verbs: ["get"]
+
+{{- if .Values.rbac.processingServices.canAccessDataStores }}
+# Data Store Access - based on C4 diagram: "Query vectors"
 - apiGroups: [""]
   resources: ["services"]
-  resourceNames: ["chromadb"]  # Chat service calls ChromaDB for vector retrieval
+  resourceNames: ["chromadb"]
   verbs: ["get", "list"]
+{{- end }}
+
+# ConfigMap access
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["chat-service-config"]
+  verbs: ["get", "watch"]
 
 ---
 # RoleBinding for Chat Service
@@ -145,69 +242,4 @@ roleRef:
   name: chat-service-role
   apiGroup: rbac.authorization.k8s.io
 
----
-# Image Captioner Service Role
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  namespace: {{ .Values.namespace }}
-  name: image-captioner-service-role
-  labels:
-    app.kubernetes.io/name: omnipdf-rbac
-    app.kubernetes.io/component: processing
-rules:
-- apiGroups: [""]
-  resources: ["secrets"]
-  resourceNames: 
-    - "image-captioner-service-secrets"  # Contains vLLM VLM credentials for this service
-  verbs: ["get"]
-
----
-# RoleBinding for Image Captioner Service
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: image-captioner-service-binding
-  namespace: {{ .Values.namespace }}
-subjects:
-- kind: ServiceAccount
-  name: {{ .Values.serviceAccounts.imageCaptioner }}
-  namespace: {{ .Values.namespace }}
-roleRef:
-  kind: Role
-  name: image-captioner-service-role
-  apiGroup: rbac.authorization.k8s.io
-
----
-# Metadata Service Role
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  namespace: {{ .Values.namespace }}
-  name: metadata-service-role
-  labels:
-    app.kubernetes.io/name: omnipdf-rbac
-    app.kubernetes.io/component: processing
-rules:
-- apiGroups: [""]
-  resources: ["secrets"]
-  resourceNames: 
-    - "metadata-service-secrets"  # Contains vLLM credentials for this service
-  verbs: ["get"]
-
----
-# RoleBinding for Metadata Service
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: metadata-service-binding
-  namespace: {{ .Values.namespace }}
-subjects:
-- kind: ServiceAccount
-  name: {{ .Values.serviceAccounts.metadataService }}
-  namespace: {{ .Values.namespace }}
-roleRef:
-  kind: Role
-  name: metadata-service-role
-  apiGroup: rbac.authorization.k8s.io
 {{- end }}
