@@ -158,7 +158,7 @@ networkPolicy:
     # Allow DNS resolution (required for hostname lookups)
     allowDNS: true
     # Allow HTTPS for external APIs
-    allowHTTPS: true
+    allowHTTPS: false  # Just renders content, no external API calls needed
     # Allow HTTP for internal services  
     allowHTTP: false
     # ZERO-TRUST: pdf-renderer-service can only call external LLM

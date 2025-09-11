@@ -113,6 +113,6 @@ networkPolicy:
   egress:
     enabled: true
     allowDNS: true
-    allowHTTPS: true
+    allowHTTPS: false  # Redis is cache/session store, doesn't call external APIs
 
 # Production resource quotas

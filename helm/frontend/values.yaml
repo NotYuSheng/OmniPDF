@@ -225,3 +225,29 @@ serviceMonitor:
   # Metric relabeling (advanced)
   metricRelabelings: []
   relabelings: []
+
+# Network policy configuration for zero-trust security
+networkPolicy:
+  enabled: false  # Enable in production environments
+  ingress:
+    enabled: true
+    # Allow traffic from Istio gateway (based on C4 diagram)
+    fromIstioGateway: true
+    istioGatewayNamespaceLabels:
+      name: istio-system
+    istioGatewayPodLabels:
+      app: istio-proxy
+    # Zero-trust: specific allowed callers
+    allowedCallers: []
+    customRules: []
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false  # Frontend should only talk to internal services
+    # Zero-trust: Frontend only talks to pdf-processor-service per C4 diagram
+    allowedTargets:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+        ports: [8000]
+    customRules: []

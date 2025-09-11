@@ -127,6 +127,6 @@ networkPolicy:
   egress:
     enabled: true
     allowDNS: true
-    allowHTTPS: true
+    allowHTTPS: false  # MinIO is object storage, doesn't call external APIs
 
 # Production resource quotas
