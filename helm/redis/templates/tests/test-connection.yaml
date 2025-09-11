@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
     - name: redis-test
-      image: redis:7-alpine
+      image: redis:8.2.1-alpine
       command: ['redis-cli']
       args: ['-h', '{{ include "redis.fullname" . }}', '-p', '{{ .Values.service.port }}', 'ping']
   restartPolicy: Never
