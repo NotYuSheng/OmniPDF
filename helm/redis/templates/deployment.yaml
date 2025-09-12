@@ -107,7 +107,7 @@ spec:
         {{- if .Values.persistence.enabled }}
         - name: redis-data
           persistentVolumeClaim:
-            claimName: {{ include "redis.fullname" . }}
+            claimName: {{ include "redis.pvcName" . }}
         {{- end }}
         {{- if .Values.redis.config }}
         - name: redis-config
