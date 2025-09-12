@@ -228,7 +228,7 @@ crc stop
 # Configure CRC resources (adjust based on your system)
 crc config set memory 32768     # 32GB RAM (adjust based on your system)
 crc config set cpus 12          # 12 CPU cores (adjust based on your system)
-crc config set disk-size 80     # 80GB disk
+crc config set disk-size 120    # 120GB disk (increased for ML workloads)
 
 # Start CRC with new configuration
 crc start
@@ -238,7 +238,7 @@ crc start
 
 - **Memory**: 256GB recommended for running all microservices without constraints
 - **CPU**: 32 cores provides abundant processing power for OpenShift + services
-- **Disk**: 80GB sufficient for container images and persistent data
+- **Disk**: 120GB recommended for container images, ML models, and persistent data
 - **Configuration saved**: Current settings stored in `config/crc/crc-config.txt`
 
 ### Verify Setup
