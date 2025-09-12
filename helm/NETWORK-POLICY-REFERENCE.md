@@ -10,7 +10,6 @@ Based on the C4 diagram external AI connections, only these services should have
 
 | Service | LLM Type | Purpose | Implementation |
 |---------|----------|---------|----------------|
-| `docling-translation-service` | vLLM Text | Translation requests | `allowLLMService` section |
 | `chat-service` | vLLM Text | RAG chat requests | Zero-trust `allowedTargets` |
 | `metadata-service` | vLLM Text | Metadata generation | `allowLLMService` section |
 | `image-captioner-service` | vLLM VLM | Image captioning | Zero-trust `allowedTargets` |
@@ -24,6 +23,7 @@ Based on the C4 diagram external AI connections, only these services should have
 | `chromadb` | Vector database only | No LLM sections |
 | `nginx` | Reverse proxy only | No LLM sections |
 | `pdf-extraction-service` | Uses local docling, not external LLM | No LLM sections |
+| `docling-translation-service` | Pure processing service, no external LLM calls | No LLM sections |
 | `pdf-renderer-service` | Renders content only, no AI generation | No LLM sections |
 | `embedder-service` | Uses local embedding models | Zero-trust `allowedTargets` |
 | `cleaner` | Background cleanup tasks | Zero-trust `allowedTargets` |
@@ -53,14 +53,13 @@ networkPolicy:
     llmServicePorts: [...]
 ```
 
-**Used by:** `docling-translation-service`, `metadata-service`
+**Used by:** `metadata-service`
 
 **Note:** This approach should be migrated to zero-trust `allowedTargets` for consistency.
 
 ## Service Communication Patterns (from C4 Diagram)
 
 ### External AI Communication
-- `docling-translation-service` → `vllm_text` (HTTP)
 - `chat-service` → `vllm_text` (HTTP)  
 - `metadata-service` → `vllm_text` (HTTP)
 - `image-captioner-service` → `vllm_vlm` (HTTP)
@@ -88,5 +87,6 @@ When adding new services:
 
 ## Recent Fixes
 
-- **2025-01-XX**: Removed inappropriate LLM access from infrastructure services
-- **2025-01-XX**: Fixed `pdf-renderer-service` LLM access (should not have LLM connection per C4 diagram)
+- **2025-01-12**: Fixed `docling-translation-service` - removed incorrect LLM access, configured as pure processing service
+- **2025-01-12**: Updated reference documentation to match current NetworkPolicy implementations
+- **2025-01-12**: Aligned all service configurations with C4 architecture diagram
