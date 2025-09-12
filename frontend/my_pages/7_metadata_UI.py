@@ -62,9 +62,40 @@ async def get_metadata(doc_id: str, status_bar, max_retries=600, delay=1):
 
 async def display_metadata(expander: DocumentExpander):
     with expander:
+        # Add refresh button for each document
+        col1, col2 = st.columns([3, 1])
+        with col2:
+            refresh_key = f"refresh_metadata_{expander.doc_id}"
+            retry_key = f"retry_metadata_{expander.doc_id}"
+            
+            # Initialize retry state if not exists
+            if retry_key not in st.session_state:
+                st.session_state[retry_key] = False
+            
+            if st.button("🔄 Refresh", key=refresh_key, help="Retry metadata extraction for this document"):
+                st.session_state[retry_key] = True
+        
+        with col1:
+            st.markdown(f"**Document ID:** {expander.doc_id}")
+        
+        # Check if this document should be retried
+        force_retry = st.session_state.get(retry_key, False)
+        if force_retry:
+            # Reset the retry flag
+            st.session_state[retry_key] = False
+            # Clear any cached status for this document
+            expander.status.empty()
+            expander.status.info("Retrying metadata extraction...")
+        
         res = await get_metadata(expander.doc_id, expander.status)
-        if res:
+        if res and res.get("metadata"):
             st.dataframe(res["metadata"])
+        else:
+            # Handle cases where no metadata is found or processing failed
+            if res is None:
+                st.warning("Failed to process document for metadata extraction")
+            else:
+                st.info("No metadata found in document")
 
 
 async def display_all(expanders: list[DocumentExpander]):
