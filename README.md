@@ -73,11 +73,11 @@ docker compose -f docker-compose.gpu.yml up --build
 helm install chat-service ./helm/chat-service --namespace omnipdf
 
 # Deploy all services
-# Deploy all services using the Makefile for robustness
-make install-all ENV=prestaging
+# Deploy all services using deployment script (includes RBAC as first service)
+./scripts/deploy-helm-charts.sh --all --env prestaging
 
-# Deploy RBAC (service accounts and permissions)
-helm install omnipdf-rbac ./helm/rbac --namespace omnipdf
+# Deploy RBAC only (14 individual service roles - should be deployed first)
+./scripts/deploy-helm-charts.sh --service rbac --env prestaging
 ```
 
 ### Prestaging with Istio Service Mesh
@@ -97,7 +97,11 @@ helm install istio-gateway ./helm/istio-gateway \
   --namespace omnipdf-prestaging \
   --values ./helm/istio-gateway/values-prestaging.yaml
 
-# 4. Deploy services with Istio sidecars
+# 4. Deploy RBAC first (individual service roles)
+helm install rbac ./helm/rbac \
+  --namespace omnipdf-prestaging
+
+# 5. Deploy services with Istio sidecars  
 for service in frontend pdf-processor-service chat-service embedder-service chromadb redis minio cleaner pdf-extraction-service docling-translation-service pdf-renderer-service image-captioner-service metadata-service; do
   helm install $service ./helm/$service \
     --namespace omnipdf-prestaging \
@@ -119,10 +123,13 @@ OmniPDF implements **defense-in-depth security** with multiple layers:
 
 ### Service Account & RBAC
 - **Individual service accounts** for each service with per-service secret isolation
-- **RBAC roles** with principle of least privilege (no hierarchy - different scopes):
-  - `individual-service-roles`: Each service accesses only its own secrets (standard pattern)
-  - `pdf-processor-role`: Coordination access to other services' secrets for orchestration
-  - `cleaner-role`: Data store access (MinIO, ChromaDB, Redis) for cleanup operations
+- **Individual RBAC roles** (14 total) aligned with C4 architecture communication patterns:
+  - **Orchestrator**: `pdf-processor-service-role` - Broad coordination access to all services
+  - **Processing Services** (5 roles): PDF extraction, translation, embedding, chat, PDF renderer
+  - **AI/ML Services** (2 roles): Image captioner, metadata service - pure endpoints
+  - **Data Services** (3 roles): MinIO, ChromaDB, Redis - pure endpoints  
+  - **Infrastructure** (4 roles): Frontend, gateway, cleaner, PDF renderer with specific access patterns
+- **Principle of least privilege** - each service accesses only required secrets and services per C4 diagram
 - **Complete audit trail** for inter-service communication
 
 ### NetworkPolicy (Zero-Trust)
