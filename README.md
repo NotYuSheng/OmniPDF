@@ -149,7 +149,7 @@ OmniPDF implements comprehensive zero-trust network policies with explicit servi
 | **docling-translation-service** | • pdf-processor-service | • DNS resolution<br>• HTTPS (external translation APIs) |
 | **pdf-renderer-service** | • pdf-processor-service | • minio:9000<br>• DNS resolution |
 | **image-captioner-service** | • pdf-extraction-service | • DNS resolution<br>• HTTPS (external vLLM VLM) |
-| **metadata-service** | • pdf-processor-service | • DNS resolution<br>• HTTPS (external vLLM) |
+| **metadata-service** | • pdf-processor-service | • chromadb:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTPS (external vLLM) |
 | **cleaner** | *No ingress (background service)* | • minio:9000<br>• chromadb:8000<br>• redis:6379<br>• DNS resolution |
 | **chromadb** | • chat-service<br>• embedder-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
 | **redis** | • pdf-processor-service<br>• pdf-extraction-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |

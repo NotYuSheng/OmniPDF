@@ -1,7 +1,7 @@
 {{- if .Values.rbac.aiServices.enabled }}
 ---
 # Metadata Service Role (C4: AI/ML Layer)
-# AI endpoint - called by PDF processor for metadata/word cloud generation, no outbound calls
+# AI endpoint - called by PDF processor, accesses data stores for metadata generation
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -18,14 +18,24 @@ rules:
     - "metadata-service-secrets"  # Contains vLLM credentials
   verbs: ["get"]
 
+{{- if .Values.rbac.aiServices.canAccessDataStores }}
+# Data Store Service Discovery - based on C4 diagram metadata generation operations
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  resourceNames: 
+    - "chromadb"   # Query vectors for metadata generation (mTLS)
+    - "minio"      # Store/load metadata results (mTLS)
+    - "redis"      # Session validation (mTLS)
+  verbs: ["get", "list"]
+{{- end }}
+
 # ConfigMap access
 - apiGroups: [""]
   resources: ["configmaps"]
   resourceNames: ["metadata-service-config"]
   verbs: ["get", "watch"]
 
-# Metadata service is a pure AI endpoint per C4 diagram - no internal service discovery needed
-# Only calls external vLLM for metadata generation, receives requests from PDF processor
+# Metadata service accesses data stores for metadata generation and calls external vLLM
 
 ---
 # RoleBinding for Metadata Service

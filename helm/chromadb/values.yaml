@@ -190,6 +190,10 @@ networkPolicy:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: embedder-service
+      # Metadata service for vector queries during metadata generation
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
       # Cleaner for expired vector cleanup (C4: "Remove expired vectors")
       - podSelector:
           matchLabels:

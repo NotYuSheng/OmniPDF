@@ -45,8 +45,10 @@ rbac:
   # AI/ML service permissions (image-captioner, metadata)
   aiServices:
     enabled: true
-    # No outbound service calls (end of chain)
+    # No outbound service calls to other processing services
     canCallServices: false
+    # Metadata service needs data store access for metadata generation
+    canAccessDataStores: true
     
   # Data services permissions (minio, chromadb, redis)
   dataServices:

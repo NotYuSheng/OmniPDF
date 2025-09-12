@@ -1,0 +1,88 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+Person(user, "User", "Authenticated user accessing OmniPDF via browser")
+
+System_Boundary(omnipdf, "OmniPDF System - Prestaging (CRC)") {
+
+  Container(nginx, "Ingress Gateway", "Nginx", "External traffic entry point. SSL termination, file size limits, static content serving")
+
+  System_Boundary(istio_mesh, "Istio Service Mesh") {
+    Container(istio_gateway, "Istio Ingress Gateway", "Istio Gateway + Envoy", "Handles ingress traffic into the mesh with advanced routing policies")
+    
+    Container(frontend, "Streamlit Frontend", "Python/Streamlit + Envoy Sidecar", "Web UI for document processing and chat interface")
+
+    Container(pdf_service, "PDF Processor Service", "FastAPI + Envoy Sidecar", "Main orchestrator - manages sessions, coordinates processing workflows")
+
+    Container(pdf_extraction, "PDF Extraction Service", "FastAPI + Envoy Sidecar", "Extracts tables and images using docling")
+    Container(docling_translate, "Docling Translate Service", "FastAPI + Envoy Sidecar", "Translates docling JSON structures")
+    Container(pdf_renderer, "PDF Renderer Service", "FastAPI + Envoy Sidecar", "Renders translated content onto PDFs")
+
+    Container(embedder, "Embedder Service", "FastAPI + Envoy Sidecar", "Document chunking and embedding generation")
+    Container(chat_service, "Chat Service", "FastAPI + Envoy Sidecar", "RAG chat interface using retrieved context")
+    Container(image_captioner, "Image Captioning Service", "FastAPI + Envoy Sidecar", "AI image captioning for extracted images")
+
+    Container(metadata_service, "Metadata Service", "FastAPI + Envoy Sidecar", "Document metadata and wordcloud generation")
+    Container(cleaner, "Cleaner", "Python Worker + Envoy Sidecar", "Background cleanup of expired sessions and files")
+    
+    ContainerDb(chroma, "ChromaDB", "Vector DB + Envoy Sidecar", "Vector storage with mTLS within mesh")
+    ContainerDb(minio, "MinIO", "Object Storage + Envoy Sidecar", "File storage with mTLS within mesh")
+    Container(redis, "Redis", "Session Store + Envoy Sidecar", "Session storage with mTLS within mesh")
+  }
+}
+
+System_Boundary(external_ai, "External AI Infrastructure") {
+  Container(vllm_text, "vLLM Text Model", "vLLM Server", "External text-only LLM for chat and translation")
+  Container(vllm_vlm, "vLLM Vision-Language Model", "vLLM Server", "External multimodal VLM for image understanding")
+}
+
+' External traffic flow
+Rel(user, nginx, "HTTPS requests")
+
+' Nginx routes to Istio Gateway  
+Rel(nginx, istio_gateway, "API/UI requests → Istio Gateway")
+
+' Istio Gateway routes ingress traffic
+Rel(istio_gateway, frontend, "Routes UI requests")
+Rel(istio_gateway, pdf_service, "Routes API requests")
+
+' Frontend communicates with backend
+Rel(frontend, pdf_service, "Requests document metadata + presigned URLs")
+
+' PDF Processor orchestrates workflows (mTLS within mesh)
+Rel(pdf_service, pdf_extraction, "Delegates table and image extraction")
+Rel(pdf_service, docling_translate, "Requests docling translation")
+Rel(pdf_service, pdf_renderer, "Renders previews of extracted content")
+Rel(pdf_service, embedder, "Sends chunking + embedding task")
+Rel(pdf_service, chat_service, "RAG conversations")
+Rel(pdf_service, metadata_service, "Requests metadata generation")
+
+' File storage operations (mTLS within mesh)
+Rel(pdf_service, minio, "Stores PDFs, generates presigned URLs (mTLS)")
+Rel(pdf_extraction, minio, "Stores extracted images (mTLS)")
+Rel(pdf_extraction, image_captioner, "Requests image captioning")
+
+' External AI/ML service communication (HTTP over VPN)
+Rel(docling_translate, vllm_text, "Translation requests (HTTP)")
+Rel(chat_service, vllm_text, "RAG chat requests (HTTP)")
+Rel(metadata_service, vllm_text, "Metadata generation (HTTP)")
+
+' External VLM communication (HTTP over VPN)
+Rel(image_captioner, vllm_vlm, "Image captioning requests (HTTP)")
+
+' Vector database operations (mTLS within mesh)
+Rel(embedder, chroma, "Store embeddings (mTLS)")
+Rel(chat_service, chroma, "Query vectors (mTLS)")
+Rel(metadata_service, chroma, "Query vectors for metadata generation (mTLS)")
+
+' Session management (mTLS within mesh)
+Rel(pdf_service, redis, "Session validation (mTLS)")
+
+' Cleanup operations (mTLS within mesh)
+Rel(cleaner, minio, "Delete expired files (mTLS)")
+Rel(cleaner, chroma, "Remove expired vectors (mTLS)")
+Rel(cleaner, redis, "Clean sessions (mTLS)")
+
+@enduml
