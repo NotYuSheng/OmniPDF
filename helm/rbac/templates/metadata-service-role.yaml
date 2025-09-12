@@ -1,0 +1,49 @@
+{{- if .Values.rbac.aiServices.enabled }}
+---
+# Metadata Service Role (C4: AI/ML Layer)
+# AI endpoint - called by PDF processor for metadata/word cloud generation, no outbound calls
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: metadata-service-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: ai-ml
+rules:
+# Own secrets access
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "metadata-service-secrets"  # Contains vLLM credentials
+  verbs: ["get"]
+
+# ConfigMap access
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["metadata-service-config"]
+  verbs: ["get", "watch"]
+
+{{- if .Values.rbac.aiServices.canCallServices }}
+# Service Discovery - based on values.yaml configuration (currently disabled for AI services)
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list"]
+{{- end }}
+
+---
+# RoleBinding for Metadata Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metadata-service-binding
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.metadataService }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: metadata-service-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

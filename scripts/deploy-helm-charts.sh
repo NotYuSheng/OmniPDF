@@ -65,7 +65,7 @@ EXAMPLES:
     $0 --service chat-service --action uninstall
 
 SUPPORTED SERVICES:
-    chat-service, pdf-processor-service, pdf-extraction-service,
+    rbac, chat-service, pdf-processor-service, pdf-extraction-service,
     docling-translation-service, pdf-renderer-service, embedder-service,
     image-captioner-service, metadata-service, cleaner, frontend,
     nginx, redis, chromadb, minio
@@ -195,6 +195,7 @@ deploy_all_services() {
     print_info "Deploying all services to $ENV environment..."
     
     local services=(
+        "rbac"
         "redis"
         "chromadb" 
         "minio"

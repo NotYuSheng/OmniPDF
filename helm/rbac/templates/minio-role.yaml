@@ -1,0 +1,48 @@
+{{- if .Values.rbac.dataServices.enabled }}
+---
+# MinIO Service Role (C4: Data Layer)
+# Object storage endpoint - stores PDFs and extracted content, serves presigned URLs
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: minio-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: data
+rules:
+# MinIO is a pure endpoint per C4 diagram - no outbound service calls needed
+
+# Access to own configuration
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames:
+    - "minio-config"
+  verbs: ["get", "watch"]
+
+# Access to own secrets
+- apiGroups: [""]
+  resources: ["secrets"] 
+  resourceNames:
+    - "minio-secrets"
+  verbs: ["get"]
+
+---
+# RoleBinding for MinIO Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: minio-binding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: data
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.minio }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: minio-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

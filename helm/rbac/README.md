@@ -22,18 +22,24 @@ The RBAC implementation follows the OmniPDF microservices architecture with 6 di
 
 ## RBAC Template Structure
 
-### Template Files (8 Total)
+### Template Files (14 Total - Individual Service Roles)
 
-| Template | Services Covered | Component | Description |
-|----------|------------------|-----------|-------------|
-| `orchestrator-role.yaml` | pdf-processor-service | Orchestrator | Main coordinator with broad permissions |
-| `processing-services-role.yaml` | pdf-extraction, docling-translation, embedder, chat-service | Processing | Core processing pipeline services |
-| `ai-services-role.yaml` | image-captioner, metadata-service | AI/ML | AI endpoints (no outbound calls) |
-| `data-services-role.yaml` | minio, chromadb, redis | Data | Data storage endpoints |
+| Template | Service | Component | Description |
+|----------|---------|-----------|-------------|
+| `pdf-processor-service-role.yaml` | pdf-processor-service | Orchestrator | Main coordinator with broad permissions |
+| `pdf-extraction-service-role.yaml` | pdf-extraction-service | Processing | PDF extraction with image captioning access |
+| `docling-translation-service-role.yaml` | docling-translation-service | Processing | Translation service with minimal permissions |
+| `embedder-service-role.yaml` | embedder-service | Processing | Embedding service with ChromaDB access |
+| `chat-service-role.yaml` | chat-service | Processing | Chat service with ChromaDB access |
+| `pdf-renderer-service-role.yaml` | pdf-renderer-service | Processing | PDF rendering with MinIO access |
+| `image-captioner-service-role.yaml` | image-captioner-service | AI/ML | AI endpoint (no outbound calls) |
+| `metadata-service-role.yaml` | metadata-service | AI/ML | AI endpoint (no outbound calls) |
+| `minio-role.yaml` | minio | Data | Object storage endpoint |
+| `chromadb-role.yaml` | chromadb | Data | Vector database endpoint |
+| `redis-role.yaml` | redis | Data | Cache/session storage endpoint |
 | `frontend-role.yaml` | frontend | Frontend | Streamlit UI service |
 | `gateway-role.yaml` | nginx | Gateway | Ingress gateway service |
 | `cleaner-role.yaml` | cleaner | Utility | Background cleanup service |
-| `pdf-renderer-role.yaml` | pdf-renderer-service | Processing | PDF rendering bridge service |
 
 ### Service Coverage (14/14 Complete)
 
@@ -197,11 +203,10 @@ kubectl auth can-i get secrets/minio-secrets \
      newService: "new-service-name"
    ```
 
-2. **Choose appropriate template** based on service layer:
-   - Processing service → add to `processing-services-role.yaml`
-   - AI service → add to `ai-services-role.yaml`  
-   - Data service → add to `data-services-role.yaml`
-   - Unique service → create new `new-service-role.yaml`
+2. **Create individual role template** based on service layer:
+   - Copy appropriate template (`pdf-extraction-service-role.yaml`, `minio-role.yaml`, etc.)
+   - Create new `new-service-role.yaml` with service-specific permissions
+   - Follow pattern: service only accesses its own secrets and required data stores
 
 3. **Update permission flags** if needed in `values.yaml`
 

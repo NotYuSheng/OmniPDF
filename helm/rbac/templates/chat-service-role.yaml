@@ -1,0 +1,50 @@
+{{- if .Values.rbac.processingServices.enabled }}
+---
+# Chat Service Role (C4: Processing Layer)
+# RAG service - handles chat queries by retrieving context from ChromaDB and calling LLM
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: chat-service-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: processing
+rules:
+# Own secrets access
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: 
+    - "chat-service-secrets"
+  verbs: ["get"]
+
+{{- if .Values.rbac.processingServices.canAccessDataStores }}
+# Data Store Access - based on C4 diagram: "Query vectors"
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: ["chromadb"]
+  verbs: ["get", "list"]
+{{- end }}
+
+# ConfigMap access
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["chat-service-config"]
+  verbs: ["get", "watch"]
+
+---
+# RoleBinding for Chat Service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: chat-service-binding
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccounts.chatService }}
+  namespace: {{ .Values.namespace }}
+roleRef:
+  kind: Role
+  name: chat-service-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
