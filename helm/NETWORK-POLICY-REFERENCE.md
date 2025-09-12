@@ -68,7 +68,7 @@ networkPolicy:
 ### Internal Service Communication (mTLS within Istio mesh)
 - All services → `redis` (session validation)
 - Multiple services → `minio` (file storage)
-- `embedder-service`, `chat-service` → `chromadb` (vector operations)
+- `embedder-service`, `chat-service`, `cleaner` → `chromadb` (vector operations and cleanup)
 - `cleaner` → All storage services (cleanup)
 
 ## Security Principles
