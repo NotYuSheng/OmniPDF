@@ -10,15 +10,10 @@ metadata:
     app.kubernetes.io/name: omnipdf-rbac
     app.kubernetes.io/component: orchestrator
 rules:
-# Service Discovery - always enabled for orchestrator
+{{- if .Values.rbac.pdfProcessor.canCallProcessingServices }}
+# Processing Services Discovery - based on C4 diagram workflows (restricted access only)
 - apiGroups: [""]
   resources: ["services", "endpoints"]
-  verbs: ["get", "list", "watch"]
-
-{{- if .Values.rbac.pdfProcessor.canCallProcessingServices }}
-# Processing Services Discovery - based on C4 diagram workflows
-- apiGroups: [""]
-  resources: ["services"]
   resourceNames:
     - "pdf-extraction-service"      # Delegates table and image extraction
     - "docling-translation-service" # Requests docling translation
@@ -32,7 +27,7 @@ rules:
 {{- if .Values.rbac.pdfProcessor.canAccessDataStores }}
 # Data Store Services Discovery - based on C4 diagram data flows
 - apiGroups: [""]
-  resources: ["services"]
+  resources: ["services", "endpoints"]
   resourceNames:
     - "minio"      # Stores PDFs, generates presigned URLs
     - "chromadb"   # Vector database access

@@ -11,12 +11,12 @@ metadata:
     app.kubernetes.io/component: gateway
 rules:
 {{- if .Values.rbac.gateway.canCallFrontendAndProcessor }}
-# Service Discovery - can access frontend and pdf-processor based on values.yaml configuration
+# Service Discovery - can access frontend and pdf-processor based on C4 diagram routing
 - apiGroups: [""]
-  resources: ["services"]
+  resources: ["services", "endpoints"]
   resourceNames: 
-    - "frontend"
-    - "pdf-processor-service"
+    - "frontend"                # Routes UI requests
+    - "pdf-processor-service"   # Routes API requests
   verbs: ["get", "list"]
 {{- end }}
 

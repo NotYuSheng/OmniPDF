@@ -11,9 +11,9 @@ metadata:
     app.kubernetes.io/component: frontend
 rules:
 {{- if .Values.rbac.frontend.canCallProcessor }}
-# Service Discovery - only PDF Processor based on values.yaml configuration
+# Service Discovery - only PDF Processor based on C4 diagram
 - apiGroups: [""]
-  resources: ["services"]
+  resources: ["services", "endpoints"]
   resourceNames: 
     - "pdf-processor-service"
   verbs: ["get", "list"]

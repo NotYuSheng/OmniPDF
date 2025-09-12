@@ -21,7 +21,7 @@ rules:
 {{- if .Values.rbac.processingServices.canCallAI }}
 # AI Services Discovery - based on C4 diagram: "Requests image captioning"
 - apiGroups: [""]
-  resources: ["services"]
+  resources: ["services", "endpoints"]
   resourceNames: ["image-captioner-service"]
   verbs: ["get", "list"]
 {{- end }}
@@ -29,7 +29,7 @@ rules:
 {{- if .Values.rbac.processingServices.canAccessDataStores }}
 # Data Store Access - based on C4 diagram: "Stores extracted images"
 - apiGroups: [""]
-  resources: ["services"]
+  resources: ["services", "endpoints"]
   resourceNames: ["minio"]
   verbs: ["get", "list"]
 {{- end }}

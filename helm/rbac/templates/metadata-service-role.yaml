@@ -24,12 +24,8 @@ rules:
   resourceNames: ["metadata-service-config"]
   verbs: ["get", "watch"]
 
-{{- if .Values.rbac.aiServices.canCallServices }}
-# Service Discovery - based on values.yaml configuration (currently disabled for AI services)
-- apiGroups: [""]
-  resources: ["services"]
-  verbs: ["get", "list"]
-{{- end }}
+# Metadata service is a pure AI endpoint per C4 diagram - no internal service discovery needed
+# Only calls external vLLM for metadata generation, receives requests from PDF processor
 
 ---
 # RoleBinding for Metadata Service

@@ -11,13 +11,13 @@ metadata:
     app.kubernetes.io/component: cleaner
 rules:
 {{- if .Values.rbac.cleaner.canAccessAllDataStores }}
-# Service Discovery - can access all data stores based on values.yaml configuration
+# Service Discovery - can access all data stores based on C4 diagram cleanup operations
 - apiGroups: [""]
-  resources: ["services"]
+  resources: ["services", "endpoints"]
   resourceNames: 
-    - "minio"
-    - "chromadb"
-    - "redis"
+    - "minio"      # Delete expired files (mTLS)
+    - "chromadb"   # Remove expired vectors (mTLS)
+    - "redis"      # Clean sessions (mTLS)
   verbs: ["get", "list"]
 {{- end }}
 

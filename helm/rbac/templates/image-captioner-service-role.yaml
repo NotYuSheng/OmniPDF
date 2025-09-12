@@ -24,12 +24,8 @@ rules:
   resourceNames: ["image-captioner-service-config"]
   verbs: ["get", "watch"]
 
-{{- if .Values.rbac.aiServices.canCallServices }}
-# Service Discovery - based on values.yaml configuration (currently disabled for AI services)
-- apiGroups: [""]
-  resources: ["services"]
-  verbs: ["get", "list"]
-{{- end }}
+# Image captioner is a pure AI endpoint per C4 diagram - no internal service discovery needed  
+# Only calls external vLLM VLM for image captioning, receives requests from PDF extraction service
 
 ---
 # RoleBinding for Image Captioner Service

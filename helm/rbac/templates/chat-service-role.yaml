@@ -21,7 +21,7 @@ rules:
 {{- if .Values.rbac.processingServices.canAccessDataStores }}
 # Data Store Access - based on C4 diagram: "Query vectors"
 - apiGroups: [""]
-  resources: ["services"]
+  resources: ["services", "endpoints"]
   resourceNames: ["chromadb"]
   verbs: ["get", "list"]
 {{- end }}

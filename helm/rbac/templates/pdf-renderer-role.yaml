@@ -18,9 +18,9 @@ rules:
   verbs: ["get"]
 
 {{- if .Values.rbac.pdfRenderer.canAccessStorage }}
-# Service discovery for storage based on values.yaml configuration
+# Service discovery for storage based on C4 diagram rendering operations
 - apiGroups: [""]
-  resources: ["services"]
+  resources: ["services", "endpoints"]
   resourceNames: ["minio"]
   verbs: ["get", "list"]
 {{- end }}
