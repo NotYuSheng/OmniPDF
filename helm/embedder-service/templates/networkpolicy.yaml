@@ -21,7 +21,7 @@ spec:
     # ZERO-TRUST: Allow traffic from specific services only
     {{- range .Values.networkPolicy.ingress.allowedCallers }}
     - from:
-        - {{ . | toYaml | nindent 10 }}
+        - {{ .podSelector | toYaml | nindent 10 }}
       ports:
         - protocol: TCP
           port: {{ $.Values.service.port }}
