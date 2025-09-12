@@ -28,8 +28,15 @@ if "uploaded_files" not in st.session_state:
 FIXED_IMAGE_HEIGHT = 200  # Set your desired fixed height in pixels
 
 client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
+a, b = st.columns([6, 1])
+with a:
+    st.header("🖼️ Image Extraction")
 
-st.header("🖼️ Image Extraction")
+with b: 
+    # Page-level refresh button
+    if st.button("🔄 Refresh All", help="Refresh all"):
+        st.rerun()
+
 image_status = st.empty()
 server_status = st.empty()
 runner = asyncio.Runner()
@@ -69,22 +76,29 @@ async def get_images(doc_id, status_bar, max_retries=600, delay=1) -> dict:
                             f"\nReason: {reason}"
                         )
                     await asyncio.sleep(delay)
+                    await asyncio.sleep(0)  # Yield to Streamlit
                     continue
                 else:
                     raise TimeoutError(
                         "Document processing timed out after maximum retries"
                     )
+            elif response.status_code == 450:
+                # Processing failed
+                error_msg = data.get("detail", "Processing failed") if data else "Processing failed"
+                status_bar.error(f"Document processing failed: {error_msg}")
+                logger.error(f"Document processing failed for {doc_id}: {error_msg}")
+                return None
             response.raise_for_status()
         except httpx.RequestError as e:
-            logger.error(f"Request error on attempt {attempt + 1}: {e}")
-            if attempt == max_retries - 1:
-                raise
-            await asyncio.sleep(delay)
-        except Exception as e:
-            logger.error(f"Unexpected error on attempt {attempt + 1}: {e}")
-            if attempt == max_retries - 1:
-                raise
-            await asyncio.sleep(delay)
+            status_bar.error("Error Processing your file. Please try re uploading.")
+            logger.error(f"Request error on attempt: {e}")
+            return None
+        except TimeoutError:
+            logger.error(f"Document ID: {doc_id} took too long to process.")
+            status_bar.error(
+                "Retry limit reached. Please retry by clicking on page on left."
+            )
+            return None
 
     raise TimeoutError("Max retries exceeded")
 
@@ -94,8 +108,33 @@ async def display_images(expander: DocumentExpander) -> None:
     Display images extracted from the processed PDF document.
     """
     with expander:
+        # Add refresh button for each document
+        col1, col2 = st.columns([3, 1])
+        with col2:
+            refresh_key = f"refresh_images_{expander.doc_id}"
+            retry_key = f"retry_images_{expander.doc_id}"
+            
+            # Initialize retry state if not exists
+            if retry_key not in st.session_state:
+                st.session_state[retry_key] = False
+            
+            if st.button("🔄 Refresh", key=refresh_key, help="Retry image extraction for this document"):
+                st.session_state[retry_key] = True
+        
+        with col1:
+            st.markdown(f"**Document ID:** {expander.doc_id}")
+        
+        # Check if this document should be retried
+        force_retry = st.session_state.get(retry_key, False)
+        if force_retry:
+            # Reset the retry flag
+            st.session_state[retry_key] = False
+            # Clear any cached status for this document
+            expander.status.empty()
+            expander.status.info("Retrying image extraction...")
+        
         res = await get_images(expander.doc_id, expander.status)
-        if res:
+        if res and res.get("images") and len(res["images"]) > 0:
             # st.dataframe(res["metadata"])
 
             # Display each image
@@ -150,6 +189,10 @@ async def display_images(expander: DocumentExpander) -> None:
                             )
                         else:
                             st.error("Image not available for download")
+        else:
+            # Handle cases where no images are found or processing failed
+            if "detail" in res:
+                st.warning("Failed to process document for image extraction")
 
 async def display_all(expanders: list[DocumentExpander]):
     displays = [display_images(expander) for expander in expanders]
@@ -174,8 +217,9 @@ async def embed_pdf(doc_id: str, embed_type: str = "semantic", max_retries=600, 
                 logger.error(
                     f"Failed to decode JSON from response: {response.text}: {e}"
                 )
+            notifications = st.empty()
             if response.status_code == 200:
-                st.toast("Document successfully embedded",
+                notifications.info("Document successfully embedded",
                     icon="✅")
                 return data  # Success - return the actual data
             else:
@@ -183,7 +227,7 @@ async def embed_pdf(doc_id: str, embed_type: str = "semantic", max_retries=600, 
                     reason = (
                         data.get("detail", "in progress") if data else "in progress"
                     )
-                    st.toast(
+                    notifications.info(
                         f"Document still processing... ({(attempt + 1) * delay}s)"
                         f"\nReason: {reason}"
                     )
