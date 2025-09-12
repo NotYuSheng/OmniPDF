@@ -1,7 +1,7 @@
 {{- if .Values.rbac.processingServices.enabled }}
 ---
-# Docling Translation Service Role (C4: Processing Layer)
-# Pure processing service - receives docling JSON for translation, no outbound calls
+# Docling Translation Service Role (C4: Processing Layer)  
+# Translation service - receives docling JSON, calls external vLLM for translation
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:

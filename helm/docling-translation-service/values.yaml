@@ -162,12 +162,12 @@ networkPolicy:
     enabled: true
     # Allow DNS resolution (required for hostname lookups)
     allowDNS: true
-    # Allow HTTPS for external APIs
+    # Allow HTTPS for external vLLM APIs (production)
     allowHTTPS: true
-    # Allow HTTP for internal services  
-    allowHTTP: false
-    # ZERO-TRUST: docling-translation-service is a pure processing service
-    # No internal service calls needed - only external translation APIs via HTTPS
+    # Allow HTTP for internal vLLM services (development)
+    allowHTTP: true
+    # ZERO-TRUST: docling-translation-service calls external vLLM for translation
+    # No internal service discovery needed - vLLM is external to cluster
     allowedTargets: []
     # Custom egress rules (empty by default)
     customRules: []
