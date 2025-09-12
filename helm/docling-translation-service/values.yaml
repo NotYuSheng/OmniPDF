@@ -166,15 +166,9 @@ networkPolicy:
     allowHTTPS: true
     # Allow HTTP for internal services  
     allowHTTP: false
-    # ZERO-TRUST: docling-translation-service can only call external LLM
-    allowedTargets:
-      # External LLM service for translation
-      - podSelector:
-          matchLabels:
-            app.kubernetes.io/name: llm-service
-        ports:
-          - 8080
-          - 8000
+    # ZERO-TRUST: docling-translation-service is a pure processing service
+    # No internal service calls needed - only external translation APIs via HTTPS
+    allowedTargets: []
     # Custom egress rules (empty by default)
     customRules: []
 

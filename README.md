@@ -145,8 +145,11 @@ OmniPDF implements comprehensive zero-trust network policies with explicit servi
 | **pdf-processor-service** | • nginx<br>• frontend | • chat-service:8000<br>• pdf-extraction-service:8000<br>• embedder-service:8000<br>• docling-translation-service:8000<br>• pdf-renderer-service:8000<br>• image-captioner-service:8000<br>• metadata-service:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution |
 | **chat-service** | • pdf-processor-service | • chromadb:8000<br>• DNS resolution<br>• HTTPS (external vLLM) |
 | **embedder-service** | • pdf-processor-service | • chromadb:8000<br>• DNS resolution<br>• HTTPS (model downloads) |
-| **pdf-extraction-service** | • pdf-processor-service | • minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTPS (docling model downloads) |
-| **metadata-service** | • pdf-processor-service | • chromadb:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTPS (external vLLM) |
+| **pdf-extraction-service** | • pdf-processor-service | • image-captioner-service:8000<br>• minio:9000<br>• DNS resolution<br>• HTTPS (docling model downloads) |
+| **docling-translation-service** | • pdf-processor-service | • DNS resolution<br>• HTTPS (external translation APIs) |
+| **pdf-renderer-service** | • pdf-processor-service | • minio:9000<br>• DNS resolution |
+| **image-captioner-service** | • pdf-extraction-service | • DNS resolution<br>• HTTPS (external vLLM VLM) |
+| **metadata-service** | • pdf-processor-service | • DNS resolution<br>• HTTPS (external vLLM) |
 | **cleaner** | *No ingress (background service)* | • minio:9000<br>• chromadb:8000<br>• redis:6379<br>• DNS resolution |
 | **chromadb** | • chat-service<br>• embedder-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
 | **redis** | • pdf-processor-service<br>• pdf-extraction-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
