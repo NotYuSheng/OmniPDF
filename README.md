@@ -123,13 +123,13 @@ OmniPDF implements **defense-in-depth security** with multiple layers:
 
 ### Service Account & RBAC
 - **Individual service accounts** for each service with per-service secret isolation
-- **Individual RBAC roles** (14 total) aligned with C4 architecture communication patterns:
-  - **Orchestrator**: `pdf-processor-service-role` - Broad coordination access to all services
-  - **Processing Services** (5 roles): PDF extraction, translation, embedding, chat, PDF renderer
-  - **AI/ML Services** (2 roles): Image captioner, metadata service - pure endpoints
-  - **Data Services** (3 roles): MinIO, ChromaDB, Redis - pure endpoints  
-  - **Infrastructure** (4 roles): Frontend, gateway, cleaner, PDF renderer with specific access patterns
-- **Principle of least privilege** - each service accesses only required secrets and services per C4 diagram
+- **14 individual RBAC roles** - one role per service aligned with C4 architecture:
+  - `pdf-processor-service-role`, `pdf-extraction-service-role`, `docling-translation-service-role`
+  - `embedder-service-role`, `chat-service-role`, `pdf-renderer-service-role`
+  - `image-captioner-service-role`, `metadata-service-role`
+  - `minio-role`, `chromadb-role`, `redis-role`
+  - `frontend-role`, `nginx-gateway-role`, `cleaner-role`
+- **Zero-trust security** - each service accesses only required services per C4 diagram
 - **Complete audit trail** for inter-service communication
 
 ### NetworkPolicy (Zero-Trust)
