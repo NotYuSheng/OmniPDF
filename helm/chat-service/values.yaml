@@ -172,7 +172,12 @@ networkPolicy:
         ports:
           - 8000
     # Custom egress rules for special cases (external vLLM, etc.)
-    customRules: []
+    customRules:
+      # External vLLM service for RAG chat requests (HTTP over VPN)
+      - to: []
+        ports:
+          - protocol: TCP
+            port: 80
 
 # Pod Disruption Budget for high availability during maintenance
 podDisruptionBudget:
