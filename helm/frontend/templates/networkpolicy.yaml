@@ -18,7 +18,7 @@ spec:
     {{- end }}
   {{- if .Values.networkPolicy.ingress.enabled }}
   ingress:
-    # Allow traffic from ingress controller (per Service Communication Matrix)
+    # Allow traffic from ingress controller (per C4 diagram: Istio Gateway → frontend)
     {{- if .Values.networkPolicy.ingress.fromIngressController }}
     - from:
         - namespaceSelector:
@@ -28,7 +28,7 @@ spec:
         - protocol: TCP
           port: {{ .Values.service.port }}
     {{- end }}
-    # Allow traffic from specific allowed callers (zero-trust)
+    # ZERO-TRUST: Allow traffic from specific allowed callers only
     {{- range .Values.networkPolicy.ingress.allowedCallers }}
     - from:
         - {{ .podSelector | toYaml | nindent 10 }}

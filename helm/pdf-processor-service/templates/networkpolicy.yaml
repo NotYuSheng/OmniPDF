@@ -18,10 +18,20 @@ spec:
     {{- end }}
   {{- if .Values.networkPolicy.ingress.enabled }}
   ingress:
-    # ZERO-TRUST: Allow traffic from specific services only
+    # Allow traffic from ingress controller (per C4 diagram: Istio Gateway → pdf_service)
+    {{- if .Values.networkPolicy.ingress.fromIngressController }}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              {{- toYaml .Values.networkPolicy.ingress.ingressControllerNamespaceLabels | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.service.port }}
+    {{- end }}
+    # ZERO-TRUST: Allow traffic from specific allowed callers only
     {{- range .Values.networkPolicy.ingress.allowedCallers }}
     - from:
-        - {{ . | toYaml | nindent 10 }}
+        - {{ .podSelector | toYaml | nindent 10 }}
       ports:
         - protocol: TCP
           port: {{ $.Values.service.port }}
