@@ -193,7 +193,7 @@ networkPolicy:
     enabled: true
     # Essential egress for all services
     allowDNS: true
-    allowHTTPS: false  # Uses local embedding models, no external API calls needed
+    allowHTTPS: false  # Models pre-installed in container - no external downloads
     # ZERO-TRUST: embedder-service can only call ChromaDB
     allowedTargets:
       # ChromaDB for storing embeddings
