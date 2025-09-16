@@ -34,7 +34,7 @@ rbac:
     enabled: true
     canCall:
       frontend: true                    # UI routing
-      pdf-processor-service: true       # API routing (/api/, /pdf_processor/)
+      pdf-processor-service: true       # API routing (/pdf_processor/)
     canAccess:
       configmaps: ["nginx-config"]      # Configuration access
       secrets: ["nginx-secrets"]        # TLS certificates, etc.
