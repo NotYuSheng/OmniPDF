@@ -109,11 +109,6 @@ def display_tables(table_response):
     """
     Display tables extracted from the processed PDF document.
     """
-    # Handle the case where table_response is None (processing failed)
-    if table_response is None:
-        st.warning("Failed to process document for table extraction")
-        return
-    
     # Check if we have tables in the response
     if table_response and isinstance(table_response, list) and len(table_response) > 0:
         st.success(f"Found {len(table_response)} tables in the document")
