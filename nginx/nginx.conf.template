@@ -26,11 +26,6 @@ server {
     }
 
     # Route API requests to PDF processor service
-    location /api/ {
-        proxy_pass ${PDF_PROCESSOR_URL}/;
-    }
-
-    # Legacy route for direct PDF processor access
     location /pdf_processor/ {
         proxy_pass ${PDF_PROCESSOR_URL}/;
     }
