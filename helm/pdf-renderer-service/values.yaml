@@ -148,8 +148,20 @@ networkPolicy:
     allowHTTPS: false  # Just renders content, no external API calls needed
     # Allow HTTP for internal services  
     allowHTTP: false
-    # ZERO-TRUST: pdf-renderer-service can only call external LLM
+    # ZERO-TRUST: pdf-renderer-service can only call specific services
     allowedTargets:
+      # MinIO for file storage operations
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports:
+          - 9000
+      # Redis for future session management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports:
+          - 6379
       # External LLM service for rendering assistance
       - podSelector:
           matchLabels:

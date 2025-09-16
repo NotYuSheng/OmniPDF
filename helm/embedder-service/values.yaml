@@ -165,7 +165,7 @@ networkPolicy:
     # Essential egress for all services
     allowDNS: true
     allowHTTPS: false  # Models pre-installed in container - no external downloads
-    # ZERO-TRUST: embedder-service can only call ChromaDB
+    # ZERO-TRUST: embedder-service can only call specific services
     allowedTargets:
       # ChromaDB for storing embeddings
       - podSelector:
@@ -173,6 +173,18 @@ networkPolicy:
             app.kubernetes.io/name: chromadb
         ports:
           - 8000
+      # Redis for session management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports:
+          - 6379
+      # MinIO for future job status storage
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports:
+          - 9000
     # Custom egress rules (empty by default)
     customRules: []
 

@@ -153,9 +153,20 @@ networkPolicy:
     allowHTTPS: true
     # Allow HTTP for internal vLLM services (development)
     allowHTTP: true
-    # ZERO-TRUST: docling-translation-service calls external vLLM for translation
-    # No internal service discovery needed - vLLM is external to cluster
-    allowedTargets: []
+    # ZERO-TRUST: docling-translation-service calls external vLLM and internal storage
+    allowedTargets:
+      # MinIO for storing translated JSON and job status
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports:
+          - 9000
+      # Redis for document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports:
+          - 6379
     # Custom egress rules (empty by default)
     customRules: []
 

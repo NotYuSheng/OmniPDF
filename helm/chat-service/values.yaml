@@ -158,6 +158,18 @@ networkPolicy:
             app.kubernetes.io/name: chromadb
         ports:
           - 8000
+      # Redis for future session management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports:
+          - 6379
+      # MinIO for future job status and file operations
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports:
+          - 9000
     # Custom egress rules for special cases (external vLLM, etc.)
     customRules:
       # External vLLM service for RAG chat requests (HTTP over VPN)
