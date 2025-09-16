@@ -7,8 +7,7 @@ OmniPDF is a PDF analyzer capable of translation, summarization, captioning and 
 
 ## Architecture
 
-<!-- TODO: Add rendered C4 diagram image here -->
-<!-- ![OmniPDF Architecture](assets/architecture-diagram.png) -->
+![OmniPDF Architecture](assets/architecture-diagram.png)
 
 OmniPDF follows a **microservices architecture** with **centralized orchestration**:
 
