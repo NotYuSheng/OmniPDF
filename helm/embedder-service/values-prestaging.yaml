@@ -68,7 +68,35 @@ serviceMonitor:
 
 # Network policy for prestaging security
 networkPolicy:
-  enabled: false  # Enable for stricter network controls
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # PDF Processor Service - sends chunking + embedding task
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets:
+      # ChromaDB - store embeddings
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chromadb
+        ports: [8000]
+      # MinIO - future job status storage
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports: [9000]
+      # Redis - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports: [6379]
 
 # Pod disruption budget not needed for single replica
 podDisruptionBudget:

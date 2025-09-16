@@ -50,7 +50,48 @@ serviceMonitor:
 
 # Network policy disabled for pre-staging flexibility
 networkPolicy:
-  enabled: false
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # PDF Processor Service - session validation
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+      # PDF Extraction Service - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-extraction-service
+      # Metadata Service - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
+      # Embedder Service - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: embedder-service
+      # Docling Translation Service - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: docling-translation-service
+      # Chat Service - future session management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
+      # PDF Renderer Service - future session management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-renderer-service
+      # Cleaner - clean sessions
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: cleaner
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets: []  # Redis doesn't need to call other services
 
 # Istio sidecar injection for service mesh
 podAnnotations:

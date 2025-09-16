@@ -80,9 +80,33 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 
-# Network policy disabled for pre-staging flexibility
+# Network policy enabled for zero-trust security
 networkPolicy:
-  enabled: false
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # Embedder service - stores embeddings
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: embedder-service
+      # Chat service - queries vectors for RAG
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
+      # Metadata service - queries vectors for metadata generation
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
+      # Cleaner - removes expired vectors
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: cleaner
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
 
 # Enable service monitoring for prestaging
 serviceMonitor:

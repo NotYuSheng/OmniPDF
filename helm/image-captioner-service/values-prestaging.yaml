@@ -41,7 +41,20 @@ env:
 
 # Network policy disabled for pre-staging flexibility
 networkPolicy:
-  enabled: false
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # PDF Extraction Service - requests image captioning
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-extraction-service
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: true  # External VLM API calls
+    allowHTTP: true   # External VLM API calls
+    allowedTargets: []  # Only external VLM calls, no internal services
 
 # Pod disruption budget for pre-staging (2 replicas, allow 1 down)
 podDisruptionBudget:

@@ -77,7 +77,25 @@ serviceMonitor:
 
 # Network policy for prestaging security
 networkPolicy:
-  enabled: false  # Enable for stricter network controls
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # Istio Gateway - routes UI requests
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: istio-gateway
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets:
+      # PDF Processor Service - requests document metadata + presigned URLs
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+        ports: [8000]
 
 # Pod disruption budget not needed for single replica
 podDisruptionBudget:

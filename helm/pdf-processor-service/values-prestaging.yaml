@@ -41,7 +41,64 @@ env:
 
 # Network policy disabled for pre-staging flexibility
 networkPolicy:
-  enabled: false
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # Istio Gateway - routes API requests
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: istio-gateway
+      # Frontend - requests document metadata + presigned URLs
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: frontend
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets:
+      # PDF Extraction Service - delegates table and image extraction
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-extraction-service
+        ports: [8000]
+      # Docling Translation Service - requests translation
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: docling-translation-service
+        ports: [8000]
+      # PDF Renderer Service - renders previews
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-renderer-service
+        ports: [8000]
+      # Embedder Service - sends chunking + embedding tasks
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: embedder-service
+        ports: [8000]
+      # Chat Service - RAG conversations
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
+        ports: [8000]
+      # Metadata Service - requests metadata generation
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
+        ports: [8000]
+      # MinIO - stores PDFs, generates presigned URLs
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports: [9000]
+      # Redis - session validation
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports: [6379]
 
 # Pod disruption budget for pre-staging (2 replicas, allow 1 down)
 podDisruptionBudget:

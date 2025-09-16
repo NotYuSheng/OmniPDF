@@ -175,6 +175,29 @@ resources:
     cpu: 200m
     memory: 256Mi
 
-# Network policy disabled for pre-staging flexibility  
+# Network policy enabled for ingress gateway
 networkPolicy:
-  enabled: false
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # Nginx - API/UI requests → Istio Gateway
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: nginx
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets:
+      # Frontend - routes UI requests
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: frontend
+        ports: [8501]
+      # PDF Processor Service - routes API requests
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+        ports: [8000]

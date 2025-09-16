@@ -36,9 +36,23 @@ env:
   - name: ENABLE_METRICS
     value: "true"
 
-# Network policy disabled for pre-staging flexibility
+# Network policy enabled for external traffic entry point
 networkPolicy:
-  enabled: false
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers: []  # External traffic entry point - no pod-to-pod ingress
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets:
+      # Istio Gateway - routes API/UI requests to Istio Gateway
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: istio-gateway
+        ports: [80, 443]
 
 # Pod disruption budget for pre-staging (2 replicas, allow 1 down)
 podDisruptionBudget:

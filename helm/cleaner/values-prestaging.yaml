@@ -28,6 +28,29 @@ secrets:
 # Enable network policy for pre-staging security validation
 networkPolicy:
   enabled: true
+  ingress:
+    enabled: false  # Cleaner is a background worker, no incoming calls
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets:
+      # MinIO - delete expired files
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports: [9000]
+      # ChromaDB - remove expired vectors
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chromadb
+        ports: [8000]
+      # Redis - clean sessions
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports: [6379]
 
 # Simple recreate strategy for background service (override shared prestaging values)
 deploymentStrategy:

@@ -41,7 +41,35 @@ env:
 
 # Network policy disabled for pre-staging flexibility
 networkPolicy:
-  enabled: false
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # PDF Processor Service - delegates table and image extraction
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets:
+      # MinIO - stores extracted images + job status
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports: [9000]
+      # Redis - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports: [6379]
+      # Image Captioner Service - requests image captioning
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: image-captioner-service
+        ports: [8000]
 
 # Pod disruption budget for pre-staging (2 replicas, allow 1 down)
 podDisruptionBudget:
