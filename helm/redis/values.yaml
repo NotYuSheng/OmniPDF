@@ -220,25 +220,5 @@ serviceMonitor:
   metricRelabelings: []
   relabelings: []
 
-# Redis metrics exporter configuration
-metrics:
-  enabled: false              # Enable redis-exporter sidecar
-  image:
-    repository: oliver006/redis_exporter
-    tag: "v1.45.0"
-    pullPolicy: IfNotPresent
-  resources:
-    limits:
-      cpu: 100m
-      memory: 64Mi
-    requests:
-      cpu: 10m
-      memory: 16Mi
-  securityContext:
-    allowPrivilegeEscalation: false
-    runAsNonRoot: true
-    runAsUser: 65534
-    readOnlyRootFilesystem: true
-    capabilities:
-      drop:
-        - ALL
+# Redis built-in metrics via INFO command
+# Prometheus can scrape Redis directly using redis_exporter or custom scraper

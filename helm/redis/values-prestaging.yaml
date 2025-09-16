@@ -38,35 +38,12 @@ autoscaling:
 deploymentStrategy:
   type: Recreate
 
-# Enable Redis metrics exporter for prestaging
-metrics:
-  enabled: true
-  image:
-    repository: oliver006/redis_exporter
-    tag: "v1.45.0"
-    pullPolicy: IfNotPresent
-  resources:
-    limits:
-      cpu: 50m
-      memory: 32Mi
-    requests:
-      cpu: 5m
-      memory: 8Mi
-  securityContext:
-    allowPrivilegeEscalation: false
-    runAsNonRoot: true
-    runAsUser: 65534
-    readOnlyRootFilesystem: true
-    capabilities:
-      drop:
-        - ALL
-
-# Enable service monitoring for prestaging
+# Enable service monitoring for prestaging (Redis built-in metrics)
 serviceMonitor:
   enabled: true
-  port: "metrics"          # Redis exporter port
-  path: "/metrics"         # Redis exporter endpoint
-  interval: "30s"          # Scrape frequency
+  port: "redis"            # Redis main port (6379)
+  path: "/info"            # Redis INFO endpoint (custom scraper needed)
+  interval: "30s"          # Scrape frequency  
   scrapeTimeout: "10s"
   labels:
     environment: prestaging

@@ -103,29 +103,6 @@ spec:
             {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-        {{- if .Values.metrics.enabled }}
-        - name: redis-exporter
-          image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
-          imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
-          ports:
-            - name: metrics
-              containerPort: 9121
-              protocol: TCP
-          env:
-            - name: REDIS_ADDR
-              value: "redis://localhost:6379"
-            {{- if .Values.redis.auth.enabled }}
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "redis.secretName" . }}
-                  key: {{ include "redis.secretPasswordKey" . }}
-            {{- end }}
-          resources:
-            {{- toYaml .Values.metrics.resources | nindent 12 }}
-          securityContext:
-            {{- toYaml .Values.metrics.securityContext | nindent 12 }}
-        {{- end }}
       volumes:
         {{- if .Values.persistence.enabled }}
         - name: redis-data

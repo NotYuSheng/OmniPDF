@@ -200,34 +200,15 @@ deploymentStrategy: {}
   # OR for faster dev updates:
   # type: Recreate
 
-# Nginx metrics exporter configuration
-metrics:
-  enabled: false              # Enable nginx-prometheus-exporter sidecar
-  image:
-    repository: nginx/nginx-prometheus-exporter
-    tag: "1.1.0"
-    pullPolicy: IfNotPresent
-  resources:
-    limits:
-      cpu: 50m
-      memory: 32Mi
-    requests:
-      cpu: 5m
-      memory: 8Mi
-  securityContext:
-    allowPrivilegeEscalation: false
-    runAsNonRoot: true
-    runAsUser: 65534
-    readOnlyRootFilesystem: true
-    capabilities:
-      drop:
-        - ALL
+# Nginx configuration for built-in metrics
+nginx:
+  enableMetrics: false  # Enable stub_status module for metrics
 
 serviceMonitor:
   enabled: false  # Disabled by default - enable in environments with Prometheus
   # Metrics endpoint configuration
-  port: "metrics"           # Nginx exporter port
-  path: "/metrics"          # Nginx exporter metrics endpoint
+  port: "http"              # Nginx main port
+  path: "/nginx_status"     # Nginx stub_status endpoint
   interval: "30s"           # How often to scrape metrics
   scrapeTimeout: "10s"      # Timeout for each scrape
   honorLabels: false        # Whether to honor labels from target
