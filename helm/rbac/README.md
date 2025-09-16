@@ -51,8 +51,6 @@ The RBAC implementation follows the OmniPDF microservices architecture with **ex
 | **Data** | redis | `redis` | ✅ |
 | **Utility** | cleaner | `cleaner` | ✅ |
 
-> **Note**: `istio-gateway` service account needs to be added to RBAC configuration.
-
 ## Permission Model
 
 ### Service Communication Matrix (Per C4 Diagram)
