@@ -111,7 +111,7 @@ async def display_images(expander: DocumentExpander) -> None:
         res = await get_images(expander.doc_id, expander.status)
         if res and res.get("images") and len(res["images"]) > 0:
             # st.dataframe(res["metadata"])
-
+            st.success(f"Found {len(res['images'])} images in the document")
             # Display each image
             for i, image_data in enumerate(res["images"]):
                 with st.container():
