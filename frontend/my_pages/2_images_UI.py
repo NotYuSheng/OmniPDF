@@ -90,9 +90,14 @@ async def get_images(doc_id, status_bar, max_retries=600, delay=1) -> dict:
                 return None
             response.raise_for_status()
         except httpx.RequestError as e:
-            status_bar.error("Error Processing your file. Please try re uploading.")
-            logger.error(f"Request error on attempt: {e}")
-            return None
+            logger.error(f"Request error on attempt {attempt + 1}: {e}")
+            if attempt < max_retries - 1:
+                status_bar.warning(f"Connection error (attempt {attempt + 1}). Retrying...")
+                await asyncio.sleep(delay)
+                continue
+            else:
+                status_bar.error("Error Processing your file. Please try re uploading.")
+                return None
         except TimeoutError:
             logger.error(f"Document ID: {doc_id} took too long to process.")
             status_bar.error(
@@ -173,58 +178,99 @@ async def display_all(expanders: list[DocumentExpander]):
     displays = [display_images(expander) for expander in expanders]
     await asyncio.gather(*displays, return_exceptions=True)
     with st.spinner("Embedding document for RAG..."):
-        embed_response = [embed_pdf(expander.doc_id, "semantic") for expander in expanders]
+        _embed_response = [embed_pdf(expander.doc_id, "semantic") for expander in expanders]
+        embed_response = [display_embedding(expander) for expander in expanders] 
         await asyncio.gather(*embed_response, return_exceptions=True)
+                
+    
 
-async def embed_pdf(doc_id: str, embed_type: str = "semantic", max_retries=600, delay=1) -> dict | None:
+async def embed_pdf(doc_id: str, embed_type: str = "semantic", delay=1) -> dict | None:
     """
     Embedding PDF
     For rag
     """
-    for attempt in range(max_retries):
+    try:
+        response = await client.post(f"{PDF_PROCESSOR_URL}/embed/{embed_type}/{doc_id}")
+        logger.info(f"Embedding response: {response.text}")
         try:
-            response = await client.post(f"{PDF_PROCESSOR_URL}/embed/{embed_type}/{doc_id}")
-            logger.info(f"Embedding response: {response.text}")
-            try:
-                data = response.json()
-            except json.JSONDecodeError as e:
-                data = {}
-                logger.error(
-                    f"Failed to decode JSON from response: {response.text}: {e}"
-                )
-            notifications = st.empty()
-            if response.status_code == 200:
-                notifications.info("Document successfully embedded",
-                    icon="✅")
-                return data  # Success - return the actual data
-            else:
-                if attempt < max_retries - 1:
-                    reason = (
-                        data.get("detail", "in progress") if data else "in progress"
-                    )
-                    notifications.info(
-                        f"Document still processing... ({(attempt + 1) * delay}s)"
-                        f"\nReason: {reason}"
-                    )
-                    await asyncio.sleep(delay)
-                    continue
-                else:
-                    raise TimeoutError(
-                        "Document processing timed out after maximum retries"
-                    )
-                response.raise_for_status()
-        except httpx.RequestError as e:
-            logger.error(f"Request error during embedding: {e}")
-            return None
-        except Exception as e:
-            logger.error(f"Error during embedding: {e}")
-            return None
+            data = response.json()
+        except json.JSONDecodeError as e:
+            data = {}
+            logger.error(
+                f"Failed to decode JSON from response: {response.text}: {e}"
+            )
+        notifications = st.empty()
+        if response.status_code == 200:
+            notifications.info("Document successfully embedded",
+                icon="✅")
+            return data  # Success - return the actual data
+        else:
+            reason = (
+                data.get("detail", "in progress") if data else "in progress"
+            )
+            notifications.info(
+                f"Document still processing...\n"
+                f"\nReason: {reason}"
+            )
+            await asyncio.sleep(delay)
+
+    except httpx.RequestError as e:
+        logger.error(f"Request error during embedding: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Error during embedding: {e}")
+        return None
     
 async def display_embedding(expander: DocumentExpander) -> None:
     with expander:
-        res = await embed_pdf(expander.doc_id, expander.status)
+
+        res = await check_embedding_status(expander.doc_id, expander.status)
+        logger.info(f"Embedding status for doc {expander.doc_id}: {res}")
         if res:
+            st.subheader("Embedding Status")
             st.dataframe(res)
+
+# Check if embedding is in progress
+async def check_embedding_status(doc_id: str = None, status: str = None, max_retries: int = 3, delay: float = 1.0) -> bool:
+    for attempt in range(max_retries):
+        try:
+            response = await client.get(f"{PDF_PROCESSOR_URL}/embed/semantic/{doc_id}")
+            
+            try:
+                data = response.json()
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to decode JSON from embedding status response: {response.text}: {e}")
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(delay)
+                    continue
+                return False
+
+            if response.status_code == 200:
+                return data
+            elif response.status_code == 202:
+                if status:
+                    reason = data.get("detail", "in progress") if data else "in progress"
+                    status.info(
+                        f"Embedding still processing... ({(attempt + 1) * delay}s)"
+                        f"\nReason: {reason}"
+                    )
+                await asyncio.sleep(delay)
+                continue
+            else:
+                logger.error(f"Failed to get embedding status: {response.status_code}")
+                if "detail" in data:
+                    logger.error(f"Error details: {data['detail']}")
+                    return data.get("detail", False)
+                return False
+        except httpx.RequestError as e:
+            logger.error(f"Request error while checking embedding status (attempt {attempt + 1}): {e}")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(delay)
+                continue
+            return False
+    
+    return False
+
 
 
 def describe_image(image_data):
@@ -243,6 +289,5 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
 
     expanders = document_multiselect_with_expander()
     runner.run(display_all(expanders))
-
 else:
     st.info("Please upload and process a PDF first to extract images")
