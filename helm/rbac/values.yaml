@@ -173,3 +173,11 @@ global:
     secretPrefix: ""                    # No prefix, use service name
     configMapPrefix: ""                 # No prefix, use service name  
     rolePrefix: "omnipdf-"              # Prefix for all RBAC roles
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []

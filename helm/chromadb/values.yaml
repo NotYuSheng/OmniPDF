@@ -1,0 +1,153 @@
+# Prestaging environment configuration for ChromaDB
+# Prestaging environment configuration for chromadb service in CRC
+
+# Single replica for prestaging
+replicaCount: 1
+autoscaling:
+  enabled: false
+
+# Prestaging resource allocation - conservative for CRC
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# Persistence configuration for prestaging
+persistence:
+  enabled: true
+  storageClass: ""  # Use default CRC storage class
+  size: 2Gi
+  accessModes:
+    - ReadWriteOnce
+
+# Health probes enabled for prestaging to mirror production behavior
+startupProbe:
+  enabled: true
+  path: /api/v1/heartbeat
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 12
+  successThreshold: 1
+
+livenessProbe:
+  enabled: true
+  path: /api/v1/heartbeat
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  path: /api/v1/heartbeat
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+# ChromaDB configuration for prestaging
+chromadb:
+  persistent: "true"
+  anonymizedTelemetry: "false"
+
+# Environment-specific environment variables
+env:
+  - name: "LOG_LEVEL"
+    value: "DEBUG"
+  - name: "ENVIRONMENT" 
+    value: "prestaging"
+
+# OpenShift security context adjustments for CRC
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+podSecurityContext:
+  runAsNonRoot: true
+
+# No node selection needed for CRC
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Network policy enabled for zero-trust security
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # Embedder service - stores embeddings
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: embedder-service
+      # Chat service - queries vectors for RAG
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
+      # Metadata service - queries vectors for metadata generation
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
+      # Cleaner - removes expired vectors
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: cleaner
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+
+# Enable service monitoring for prestaging
+serviceMonitor:
+  enabled: true               # Enable ChromaDB metrics
+  port: "http"               # ChromaDB service port
+  path: "/metrics"           # ChromaDB metrics endpoint
+  interval: "30s"            # Scrape frequency
+  scrapeTimeout: "10s"
+  labels:
+    environment: prestaging
+
+# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  sidecar.istio.io/proxyCPU: "10m"
+  sidecar.istio.io/proxyMemory: "128Mi"
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8000
+
+serviceAccount:
+  create: false
+  automount: false
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []
+
+# Pod disruption budget configuration
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+# Image configuration
+image:
+  repository: "chromadb/chroma"
+  tag: "1.0.20"
+  pullPolicy: "IfNotPresent"

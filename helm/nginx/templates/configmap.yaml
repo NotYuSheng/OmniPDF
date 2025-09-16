@@ -55,7 +55,7 @@ data:
 
             # Route frontend UI requests
             location / {
-                proxy_pass http://{{ include "frontend.fullname" . }}:8501/;
+                proxy_pass http://{{ .Values.frontend.serviceName }}:8501/;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection "upgrade";
@@ -64,7 +64,7 @@ data:
 
             # Route PDF processor requests
             location /pdf_processor/ {
-                proxy_pass http://{{ include "pdf-processor-service.fullname" . }}:8000/;
+                proxy_pass http://{{ .Values.pdfProcessor.serviceName }}:8000/;
             }
         }
     }
