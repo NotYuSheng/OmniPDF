@@ -28,11 +28,11 @@ if "uploaded_files" not in st.session_state:
 FIXED_IMAGE_HEIGHT = 200  # Set your desired fixed height in pixels
 
 client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
-image_col_a, image_col_b = st.columns([6, 1])
-with image_col_a:
+a, b = st.columns([6, 1])
+with a:
     st.header("🖼️ Image Extraction")
 
-with image_col_b:
+with b: 
     # Page-level refresh button
     if st.button("🔄 Refresh All", help="Refresh all"):
         st.rerun()
