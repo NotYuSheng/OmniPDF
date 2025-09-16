@@ -108,28 +108,6 @@ async def display_images(expander: DocumentExpander) -> None:
     Display images extracted from the processed PDF document.
     """
     with expander:
-        # Add refresh button for each document
-        col1, col2 = st.columns([3, 1])
-        with col2:
-            refresh_key = f"refresh_images_{expander.doc_id}"
-            retry_key = f"retry_images_{expander.doc_id}"
-            
-            # Initialize retry state if not exists
-            if retry_key not in st.session_state:
-                st.session_state[retry_key] = False
-            
-        with col1:
-            st.markdown(f"**Document ID:** {expander.doc_id}")
-        
-        # Check if this document should be retried
-        force_retry = st.session_state.get(retry_key, False)
-        if force_retry:
-            # Reset the retry flag
-            st.session_state[retry_key] = False
-            # Clear any cached status for this document
-            expander.status.empty()
-            expander.status.info("Retrying image extraction...")
-        
         res = await get_images(expander.doc_id, expander.status)
         if res and res.get("images") and len(res["images"]) > 0:
             # st.dataframe(res["metadata"])
