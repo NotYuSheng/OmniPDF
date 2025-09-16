@@ -36,7 +36,7 @@ The RBAC implementation follows the OmniPDF microservices architecture with **ex
 | Layer | Service | Service Account | Status |
 |-------|---------|----------------|--------|
 | **External** | nginx | `nginx` | ✅ |
-| **Gateway** | istio-gateway | `istio-gateway` | ⚠️ Missing |
+| **Gateway** | istio-gateway | `istio-gateway` | N/A |
 | **Frontend** | frontend | `frontend` | ✅ |
 | **Orchestrator** | pdf-processor-service | `pdf-processor-service` | ✅ |
 | **Processing** | pdf-extraction-service | `pdf-extraction-service` | ✅ |
