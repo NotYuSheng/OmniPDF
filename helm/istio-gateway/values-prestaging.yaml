@@ -16,7 +16,6 @@ gateway:
         protocol: HTTP
       hosts:
         - "omnipdf-prestaging.apps-crc.testing"
-        - "localhost:8080"  # For local CRC testing
       # No HTTPS redirect in prestaging for easier testing
     - port:
         number: 443
@@ -35,7 +34,6 @@ virtualService:
   name: omnipdf-prestaging-routes
   hosts:
     - "omnipdf-prestaging.apps-crc.testing"
-    - "localhost:8080"
   gateways:
     - omnipdf-gateway
   
