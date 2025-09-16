@@ -79,6 +79,11 @@ podSecurityContext:
 nodeSelector: {}
 tolerations: []
 affinity: {}
+
+# Network policy disabled for pre-staging flexibility
+networkPolicy:
+  enabled: false
+
 # Istio sidecar injection for service mesh
 podAnnotations:
   sidecar.istio.io/inject: "true"

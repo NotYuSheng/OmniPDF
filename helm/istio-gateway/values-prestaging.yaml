@@ -174,3 +174,7 @@ resources:
   limits:
     cpu: 200m
     memory: 256Mi
+
+# Network policy disabled for pre-staging flexibility  
+networkPolicy:
+  enabled: false

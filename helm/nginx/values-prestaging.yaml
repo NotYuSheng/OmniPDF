@@ -24,7 +24,7 @@ secrets:
 # Pre-staging specific configurations - using local CRC registry
 image:
   repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/nginx
-  tag: "dev-v0.0.3-5d69f89-health"
+  tag: "dev-v0.0.3-5d69f89"
   pullPolicy: Always  # Use local registry image
 
 # Environment variables
@@ -65,3 +65,9 @@ tolerations:
   - key: "node.kubernetes.io/disk-pressure"
     operator: "Exists"
     effect: "NoSchedule"
+
+# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  sidecar.istio.io/proxyCPU: "10m"
+  sidecar.istio.io/proxyMemory: "128Mi"
