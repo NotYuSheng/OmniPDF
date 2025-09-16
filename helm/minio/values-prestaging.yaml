@@ -56,10 +56,13 @@ autoscaling:
 deploymentStrategy:
   type: Recreate
 
-# Enable service monitoring if Prometheus is available
+# Enable service monitoring for prestaging
 serviceMonitor:
-  enabled: false  # Enable when monitoring stack is deployed
-  interval: "60s"
+  enabled: true               # Enable MinIO built-in metrics
+  port: "minio-api"          # Use MinIO API port  
+  path: "/minio/v2/metrics/cluster"  # MinIO metrics endpoint
+  interval: "30s"             # Scrape every 30 seconds
+  scrapeTimeout: "10s"
   labels:
     environment: prestaging
 

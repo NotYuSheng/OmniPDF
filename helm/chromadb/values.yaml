@@ -209,7 +209,7 @@ serviceMonitor:
   enabled: false  # Disabled by default - enable in environments with Prometheus
   # Metrics endpoint configuration
   port: "http"              # Service port name to scrape (default: http)
-  path: "/api/v1/heartbeat" # ChromaDB heartbeat endpoint
+  path: "/metrics"          # ChromaDB Prometheus metrics endpoint
   interval: "30s"           # How often to scrape metrics
   scrapeTimeout: "10s"      # Timeout for each scrape
   honorLabels: false        # Whether to honor labels from target

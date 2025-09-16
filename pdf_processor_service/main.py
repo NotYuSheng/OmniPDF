@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from routers import health
 from routers import document, images, session, tables, text_chunks, json_data, embed
+from prometheus_fastapi_instrumentator import Instrumentator
 import logging
 
 # Set up logger
@@ -9,6 +10,10 @@ logging.basicConfig(
 )
 
 app = FastAPI(root_path="/pdf_processor")
+
+# Initialize Prometheus metrics
+instrumentator = Instrumentator()
+instrumentator.instrument(app).expose(app)
 
 app.include_router(health.router)
 app.include_router(document.router)

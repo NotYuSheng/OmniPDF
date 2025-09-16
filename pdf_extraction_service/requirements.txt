@@ -8,3 +8,4 @@ pymupdf==1.26.1
 pypdf==5.6.0
 httpx==0.28.1
 pytest-asyncio==1.1.0
+prometheus-fastapi-instrumentator==7.1.0

@@ -5,3 +5,4 @@ PyMuPDF==1.26.1
 python-multipart==0.0.20
 httpx==0.28.1
 redis==6.3.0
+prometheus-fastapi-instrumentator==7.1.0

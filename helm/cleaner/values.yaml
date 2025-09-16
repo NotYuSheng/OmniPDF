@@ -43,9 +43,11 @@ securityContext:
     drop:
       - ALL
 
-# Cleaner is a background service, no service needed
+# Service for metrics endpoint
 service:
-  enabled: false
+  enabled: false  # Enable when metrics are needed
+  type: ClusterIP
+  port: 8080
 
 # Cleaner doesn't need ingress - it's a background service
 ingress:
@@ -138,6 +140,19 @@ deploymentStrategy:
   # Explicitly disable rollingUpdate for Recreate strategy
   rollingUpdate: null
 
-# Service monitoring for Prometheus (if the cleaner exposes metrics)
+# Service monitoring for Prometheus (cleaner custom metrics)
 serviceMonitor:
-  enabled: false
+  enabled: false  # Disabled by default - enable when metrics are needed
+  # Metrics endpoint configuration
+  port: "metrics"           # Service port name to scrape
+  path: "/metrics"          # Cleaner metrics endpoint
+  interval: "30s"           # How often to scrape metrics
+  scrapeTimeout: "10s"      # Timeout for each scrape
+  honorLabels: false        # Whether to honor labels from target
+  # Additional labels for ServiceMonitor resource
+  labels: {}
+  # Additional annotations for ServiceMonitor resource  
+  annotations: {}
+  # Metric relabeling (advanced)
+  metricRelabelings: []
+  relabelings: []

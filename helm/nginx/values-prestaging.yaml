@@ -52,9 +52,26 @@ deploymentStrategy:
     minAvailable: 1
     maxSurge: 1
 
+# Enable nginx metrics exporter for prestaging
+metrics:
+  enabled: true
+  image:
+    repository: nginx/nginx-prometheus-exporter
+    tag: "1.1.0"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 25m
+      memory: 16Mi
+    requests:
+      cpu: 2m
+      memory: 4Mi
+
 # Moderate resource quota for pre-staging testing
 serviceMonitor:
   enabled: true
+  port: "metrics"           # Nginx exporter port
+  path: "/metrics"          # Nginx exporter metrics endpoint
   interval: "20s"           # Between staging and prod intervals
   scrapeTimeout: "8s"       # Slightly shorter timeout for testing
   labels:

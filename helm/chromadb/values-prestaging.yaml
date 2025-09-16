@@ -84,6 +84,16 @@ affinity: {}
 networkPolicy:
   enabled: false
 
+# Enable service monitoring for prestaging
+serviceMonitor:
+  enabled: true               # Enable ChromaDB metrics
+  port: "http"               # ChromaDB service port
+  path: "/metrics"           # ChromaDB metrics endpoint
+  interval: "30s"            # Scrape frequency
+  scrapeTimeout: "10s"
+  labels:
+    environment: prestaging
+
 # Istio sidecar injection for service mesh
 podAnnotations:
   sidecar.istio.io/inject: "true"

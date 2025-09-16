@@ -1,4 +1,4 @@
-# MinIO prestaging environment configuration
+# Redis prestaging environment configuration
 
 # Single replica for prestaging
 replicaCount: 1
@@ -12,11 +12,11 @@ image:
 # Reduced resources for prestaging
 resources:
   limits:
-    cpu: 300m
-    memory: 256Mi
-  requests:
     cpu: 100m
     memory: 128Mi
+  requests:
+    cpu: 25m
+    memory: 32Mi
 
 # Storage configuration for prestaging
 persistence:
@@ -24,17 +24,11 @@ persistence:
   storageClass: ""  # Use default CRC storage
   accessModes:
     - ReadWriteOnce
-  size: 5Gi  # Smaller size for prestaging
+  size: 500Mi  # Smaller size for prestaging
 
-# Redis doesn't require secrets in prestaging
-secrets:
-  create: false
-  name: redis-prestaging-secrets
-
-# Redis environment settings for prestaging
-env:
-  - name: REDIS_LOG_LEVEL
-    value: "notice"
+# Redis password disabled for prestaging simplicity
+redis:
+  password: ""
 
 # Disable autoscaling for prestaging
 autoscaling:
@@ -44,10 +38,36 @@ autoscaling:
 deploymentStrategy:
   type: Recreate
 
-# Enable service monitoring if Prometheus is available
+# Enable Redis metrics exporter for prestaging
+metrics:
+  enabled: true
+  image:
+    repository: oliver006/redis_exporter
+    tag: "v1.45.0"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 50m
+      memory: 32Mi
+    requests:
+      cpu: 5m
+      memory: 8Mi
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    runAsUser: 65534
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
+# Enable service monitoring for prestaging
 serviceMonitor:
-  enabled: false  # Enable when monitoring stack is deployed
-  interval: "60s"
+  enabled: true
+  port: "metrics"          # Redis exporter port
+  path: "/metrics"         # Redis exporter endpoint
+  interval: "30s"          # Scrape frequency
+  scrapeTimeout: "10s"
   labels:
     environment: prestaging
 

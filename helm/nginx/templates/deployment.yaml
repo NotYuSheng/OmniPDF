@@ -69,6 +69,21 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+        {{- if .Values.metrics.enabled }}
+        - name: nginx-exporter
+          image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
+          imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
+          ports:
+            - name: metrics
+              containerPort: 9113
+              protocol: TCP
+          args:
+            - -nginx.scrape-uri=http://localhost:{{ .Values.service.port }}/nginx_status
+          resources:
+            {{- toYaml .Values.metrics.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.metrics.securityContext | nindent 12 }}
+        {{- end }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

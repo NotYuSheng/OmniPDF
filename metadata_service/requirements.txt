@@ -6,3 +6,4 @@ sentence-transformers==4.1.0
 wordcloud==1.9.3
 boto3==1.38.34
 redis==6.2.0
+prometheus-fastapi-instrumentator==7.1.0

@@ -43,6 +43,22 @@ autoscaling:
 # Disable PDB for single replica service  
 podDisruptionBudget:
   enabled: false
+
+# Enable metrics service for prestaging
+service:
+  enabled: true
+  type: ClusterIP
+  port: 8080
+
+# Enable service monitoring for prestaging
+serviceMonitor:
+  enabled: true
+  port: "metrics"
+  path: "/metrics"
+  interval: "30s"
+  scrapeTimeout: "10s"
+  labels:
+    environment: prestaging
 # Istio sidecar injection for service mesh
 podAnnotations:
   sidecar.istio.io/inject: "true"

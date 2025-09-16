@@ -38,10 +38,19 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          # Cleaner is a background Python service, no ports needed
+          {{- if .Values.service.enabled }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            {{- if .Values.service.enabled }}
+            - name: METRICS_PORT
+              value: {{ .Values.service.port | quote }}
+            {{- end }}
             # Additional environment variables
             {{- range .Values.env }}
             - name: {{ .name }}
