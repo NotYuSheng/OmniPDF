@@ -1,5 +1,8 @@
 # OmniPDF
 
+> [!NOTE]  
+> Thank you for visiting! This project is currently a work in progress. Features, documentation, and deployment configurations are actively being developed and may change frequently.
+
 OmniPDF is a PDF analyzer capable of translation, summarization, captioning and conversational capabilities through Retrieval-Augmented-Generation (RAG). 
 
 ## Port Assignments
