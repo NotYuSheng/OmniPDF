@@ -5,37 +5,10 @@
 
 OmniPDF is a PDF analyzer capable of translation, summarization, captioning and conversational capabilities through Retrieval-Augmented-Generation (RAG). 
 
-## Port Assignments
-
-The following port mappings are used across the OmniPDF microservices in both development and production deployments. The architecture uses **nginx as an API gateway** that routes external traffic to backend services, with **standardized port 8000** for all core microservices to simplify service discovery and NetworkPolicy configuration.
-
-> **Note:** In production Kubernetes deployments, services communicate internally via ClusterIP services and are secured with **zero-trust NetworkPolicy** configurations. External access is controlled through **Kubernetes Ingress**, **Istio Service Mesh**, or **OpenShift Routes** that route to the nginx gateway on port 8080.
-
-| Service                   | Description                                               | Port   |
-|---------------------------|-----------------------------------------------------------|--------|
-| **Frontend Services**     |                                                           |        |
-| Streamlit Frontend        | Web UI for user interaction                               | 8501   |
-| Nginx API Gateway         | Proxies requests and handles file uploads                 | 8080   |
-| **Core Processing Services** |                                                        |        |
-| PDF Processor Service     | Main orchestrator - coordinates all processing workflows  | 8000   |
-| PDF Extraction Service    | Extracts tables and images from PDFs using docling        | 8000   |
-| Docling Translation Service | Translates text fields in docling-format JSON           | 8000   |
-| PDF Renderer Service      | Renders translated content onto original PDFs             | 8000   |
-| Embedder Service          | Chunks text and creates embeddings for vector storage     | 8000   |
-| Chat Service              | RAG chat interface using retrieved context chunks         | 8000   |
-| Image Captioner Service   | AI image captioning for extracted images using VLM        | 8000   |
-| Metadata Service          | Document metadata and word cloud generation               | 8000   |
-| Cleaner                   | Event-driven cleanup of expired sessions and files via Redis notifications | N/A    |
-| **AI/ML Services**        |                                                           |        |
-| vLLM Text Model           | Text-only LLM (Eg. Qwen2.5) for chat/translation          | 8000   |
-| vLLM Vision-Language Model | Multimodal VLM (Eg. Qwen2-VL) for image captioning       | 8000   |
-| **Data Services**         |                                                           |        |
-| Redis                     | Session storage and caching                               | 6379   |
-| ChromaDB                  | Vector database for embeddings                            | 8000   |
-| MinIO                     | S3-compatible object storage for files                    | 9000   |
-| MinIO Console             | MinIO web-based Admin UI                                  | 9001   |
-
 ## Architecture
+
+<!-- TODO: Add rendered C4 diagram image here -->
+<!-- ![OmniPDF Architecture](assets/architecture-diagram.png) -->
 
 OmniPDF follows a **microservices architecture** with **centralized orchestration**:
 
@@ -144,20 +117,21 @@ OmniPDF implements comprehensive zero-trust network policies with explicit servi
 
 | Service | **Ingress (Who can call this service)** | **Egress (What this service can call)** |
 |---------|----------------------------------------|----------------------------------------|
-| **nginx** | • Ingress controller (`ingress-nginx` namespace)<br>• frontend | • frontend:8501<br>• pdf-processor-service:8000<br>• DNS resolution |
-| **frontend** | • Ingress controller (`ingress-nginx` namespace) | • nginx:8080<br>• DNS resolution |
-| **pdf-processor-service** | • nginx<br>• frontend | • chat-service:8000<br>• pdf-extraction-service:8000<br>• embedder-service:8000<br>• docling-translation-service:8000<br>• pdf-renderer-service:8000<br>• image-captioner-service:8000<br>• metadata-service:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution |
-| **chat-service** | • pdf-processor-service | • chromadb:8000<br>• redis:6379<br>• minio:9000<br>• DNS resolution<br>• HTTPS (external vLLM) |
-| **embedder-service** | • pdf-processor-service | • chromadb:8000<br>• redis:6379<br>• minio:9000<br>• DNS resolution<br>• HTTPS (model downloads) |
-| **pdf-extraction-service** | • pdf-processor-service | • image-captioner-service:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTPS (docling model downloads) |
-| **docling-translation-service** | • pdf-processor-service | • minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTPS (external translation APIs) |
+| **nginx** | • External traffic (users) | • istio-gateway:80/443<br>• DNS resolution |
+| **istio-gateway** | • nginx | • frontend:8501<br>• pdf-processor-service:8000<br>• DNS resolution |
+| **frontend** | • istio-gateway | • pdf-processor-service:8000<br>• DNS resolution |
+| **pdf-processor-service** | • istio-gateway<br>• frontend | • pdf-extraction-service:8000<br>• docling-translation-service:8000<br>• pdf-renderer-service:8000<br>• embedder-service:8000<br>• chat-service:8000<br>• metadata-service:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution |
+| **pdf-extraction-service** | • pdf-processor-service | • image-captioner-service:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution |
+| **docling-translation-service** | • pdf-processor-service | • minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTP/HTTPS (external vLLM text model) |
 | **pdf-renderer-service** | • pdf-processor-service | • minio:9000<br>• redis:6379<br>• DNS resolution |
-| **image-captioner-service** | • pdf-extraction-service | • DNS resolution<br>• HTTPS (external vLLM VLM) |
-| **metadata-service** | • pdf-processor-service | • chromadb:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTPS (external vLLM) |
+| **embedder-service** | • pdf-processor-service | • chromadb:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution |
+| **chat-service** | • pdf-processor-service | • chromadb:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTP/HTTPS (external vLLM text model) |
+| **image-captioner-service** | • pdf-extraction-service | • DNS resolution<br>• HTTP/HTTPS (external vLLM vision model) |
+| **metadata-service** | • pdf-processor-service | • chromadb:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTP/HTTPS (external vLLM text model) |
 | **cleaner** | *No ingress (background service)* | • minio:9000<br>• chromadb:8000<br>• redis:6379<br>• DNS resolution |
-| **chromadb** | • chat-service<br>• embedder-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
-| **redis** | • pdf-processor-service<br>• pdf-extraction-service<br>• metadata-service<br>• embedder-service<br>• docling-translation-service<br>• chat-service<br>• pdf-renderer-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
-| **minio** | • pdf-processor-service<br>• pdf-extraction-service<br>• metadata-service<br>• docling-translation-service<br>• pdf-renderer-service<br>• embedder-service<br>• chat-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
+| **chromadb** | • embedder-service<br>• chat-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
+| **redis** | • pdf-processor-service<br>• pdf-extraction-service<br>• docling-translation-service<br>• embedder-service<br>• chat-service<br>• pdf-renderer-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
+| **minio** | • pdf-processor-service<br>• pdf-extraction-service<br>• docling-translation-service<br>• pdf-renderer-service<br>• embedder-service<br>• chat-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
 
 #### Network Policy Configuration
 
