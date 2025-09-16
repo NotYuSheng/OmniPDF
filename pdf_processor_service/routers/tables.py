@@ -1,10 +1,10 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 
 from utils.session import validate_session_doc_pair
-from utils.proxy import load_or_create_job
+from utils.proxy import load_or_create_extraction_job
 
 router = APIRouter(prefix="/tables", tags=["tables"])
 logger = logging.getLogger(__name__)
@@ -14,12 +14,9 @@ logger = logging.getLogger(__name__)
 async def get_pdf_tables(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),
-    job_or_response=Depends(load_or_create_job),
+    job = Depends(load_or_create_extraction_job)
 ):
-    if isinstance(job_or_response, Response):
-        return job_or_response
-
-    tables = job_or_response.get("data", {}).get("result", {}).get("tables")
+    tables = job.get("data", {}).get("result", {}).get("tables")
     if tables is None:
         logger.error(f"Could not find 'tables' in job result for doc_id: {doc_id}")
         raise HTTPException(status_code=500, detail="A server error has occurred.")

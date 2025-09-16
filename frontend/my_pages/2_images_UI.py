@@ -50,18 +50,17 @@ async def get_images(doc_id, max_retries=600, delay=1) -> dict:
                     f"Failed to decode JSON from response: {response.text}: {e}"
                 )
                 server_status.error("Received an invalid response from the server.")
-
-            # Use the decoded data for all subsequent checks
-            if "detail" in data:
-                server_status.info(data["detail"])
-                logger.info(f"Info details: {data['detail']}")
-            else:
+                return {"error": "Invalid JSON response from server"}
+            
+            if response.status_code == 200 or response.status_code == 201:
                 server_status.info("Successfully retrieved images")
                 logger.info(f"Image extraction response: {response}")
-
-            if response.status_code == 200:
                 return data  # Success - return the actual data
             elif response.status_code == 202:
+                if "detail" in data:
+                    server_status.info(data["detail"])
+                    logger.info(f"Info details: {data['detail']}")
+                
                 # Still processing, continue polling
                 if attempt < max_retries - 1:
                     image_status.info(
@@ -91,6 +90,9 @@ async def get_images(doc_id, max_retries=600, delay=1) -> dict:
             await asyncio.sleep(delay)
         except Exception as e:
             logger.error(f"Unexpected error on attempt {attempt + 1}: {e}")
+            if attempt == max_retries - 1:
+                raise
+            await asyncio.sleep(delay)
 
     raise TimeoutError("Max retries exceeded")
 
@@ -99,6 +101,11 @@ def display_images(image_response, doc_id=None) -> None:
     """
     Display images extracted from the processed PDF document.
     """
+    # Check if we have a valid response first
+    if not image_response or "error" in image_response:
+        st.error(f"Error in image response: {image_response.get('error', 'Unknown error')}")
+        return
+        
     # Check if we have images in the response
     if "images" in image_response and image_response["images"]:
         image_status.success(
@@ -115,7 +122,9 @@ def display_images(image_response, doc_id=None) -> None:
                 )
                 image_url = f"{PDF_PROCESSOR_URL}{image_path}"
                 logger.info(f"Fetching image from: {image_url}")
-
+                
+                image_bytes = None  # Initialize to handle scope issues
+                        
                 with col1:
                     # Display actual image from URL
                     try:
@@ -147,20 +156,39 @@ def display_images(image_response, doc_id=None) -> None:
 
                 with col2:
                     st.markdown(f"**Image Key:** {image_data['image_key']}")
-                    # Download button
-                    filename = f"image_{i + 1}.png"
-                    st.download_button(
-                        label="Download",
-                        data=image_bytes,
-                        file_name=filename,
-                        mime="image/png",
-                        key=f"{filename}_download_btn_{image_data['image_key']}",
-                    )
-
+                    # Download button - only show if image was successfully loaded
+                    if image_bytes:
+                        filename = f"image_{i+1}.png"
+                        st.download_button(
+                            label="Download",
+                            data=image_bytes,
+                            file_name=filename,
+                            mime="image/png",
+                            key=f"{filename}_download_btn_{image_data['image_key']}"
+                        )
+                    else:
+                        st.error("Image not available for download")
+                
     else:
         logger.info("No images found in the document")
         st.info("No images found in the document")
 
+async def embed_pdf(embed_type: str, doc_id: str) -> dict | None:
+    """
+    Embedding PDF
+    For rag
+    """
+    try:
+        response = await client.post(f"{PDF_PROCESSOR_URL}/embed/{embed_type}/{doc_id}")
+        logger.info(f"Embedding response: {response.text}")
+        return response.json()
+    except httpx.RequestError as e:
+        logger.error(f"Request error during embedding: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Error during embedding: {e}")
+        return None
+    
 
 def describe_image(image_data):
     """
@@ -200,7 +228,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
         st.session_state.expander_states[doc_name] = doc_name in expanded_docs
 
     try:
-        image_responses = []
         # Show loading message
         with st.spinner("Extracting images from document..."):
             for doc_id, data in response_lst:
@@ -232,13 +259,23 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                             f"**Filename:** [{data['filename']}]({data['download_url']})"
                         )  # Download link
                         logger.info(f"Extracting images for document ID: {doc_id}")
+
                         image_response = runner.run(get_images(doc_id=doc_id))
-                        image_responses.append(image_response)
+                        logger.info(f"Image response: {image_response}")
                         display_images(image_response, doc_id)
+
+                        embed_response = runner.run(embed_pdf(embed_type="sentence", doc_id=doc_id))
+                        logger.info(f"Embedding response: {embed_response}")
+                        if embed_response and "error" not in embed_response:
+                            st.toast("Document successfully embedded",
+                                     icon="✅")
+                        else:
+                            st.toast("Error during embedding",
+                                     icon="❌")
+
 
     except TimeoutError as e:
         logger.error(f"Timeout error: {e}")
-
     except httpx.RequestError as e:
         logger.error(f"Network error: {e}")
         st.info(

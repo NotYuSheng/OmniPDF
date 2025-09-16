@@ -2,17 +2,8 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 
-class MetadataRequest(BaseModel):
-    """
-    Request model for metadata API endpoints.
-    """
-    doc_id: str
-
-
-class MetadataResult(BaseModel):
-    """
-    Model for metadata result data.
-    """
+class MetadataData(BaseModel):
+    """Model for metadata content."""
     filename: Optional[str] = None
     summary: Optional[str] = None
     executive_summary: Optional[str] = None
@@ -22,9 +13,13 @@ class MetadataResult(BaseModel):
 
 
 class MetadataResponse(BaseModel):
-    """
-    Response model for metadata endpoints.
-    """
+    """Response model for metadata endpoints."""
     doc_id: str
     status: str
-    result: Optional[MetadataResult] = None
+    metadata: Optional[MetadataData] = None
+
+
+class WordcloudResponse(BaseModel):
+    """Response model for wordcloud endpoint."""
+    doc_id: str
+    top_words: List[str]

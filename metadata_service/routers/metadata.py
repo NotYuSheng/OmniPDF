@@ -1,11 +1,12 @@
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from openai import AsyncOpenAI, APIError
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chunks
 from shared_utils.redis_utils import RedisDocumentFileList
-from shared_utils.s3_utils import save_job, load_job
+from shared_utils.job_status import save_job, load_job, JobType
 import logging
 import os
+from models.metadata import MetadataResponse
 from metadata_service.models.llm_config import (
     ModelConfig,
     PromptTemplates,
@@ -15,8 +16,8 @@ from metadata_service.models.llm_config import (
 router = APIRouter(prefix="/metadata", tags=["metadata"])
 
 logger = logging.getLogger(__name__)
-document_list = RedisDocumentFileList()
 
+document_list = RedisDocumentFileList()
 model_config = ModelConfig()
 prompt_templates = PromptTemplates()
 response_optimizer = ModelResponseOptimizer()
@@ -167,6 +168,7 @@ async def get_title(chunks: list[str], client: AsyncOpenAI):
             )
         )
     title_str = await cascade_query(title_chunks, user_prompt, system_prompt, client)
+
     title_split = title_str.split(":")
     if title_split[0].lower() != "title":
         return "UNKNOWN"
@@ -178,7 +180,6 @@ async def get_keywords(chunks: list[str], client: AsyncOpenAI):
     user_prompt = prompt_templates.get_user_prompt(
         "Identify the Keywords in the given document", PROMPT_PURPOSE[3], r"{context}"
     )
-
     keyword_chunks = []
     for chunk in chunks:
         keyword_chunks.append(
@@ -204,12 +205,14 @@ async def get_filename(doc_id: str):
     return filename
 
 
-async def generate_metadata(doc_id: str, client: AsyncOpenAI):
+async def generate_metadata(doc_id: str):
+    """Generate metadata for a document synchronously."""
+    client = get_openai_client()
     chunks = await get_chunks(doc_id)
     try:
+        # Generate metadata components
         summary = await get_summary(chunks, client)
-        logger.info(summary)
-        metadata = {
+        metadata_result = {
             "filename": await get_filename(doc_id),
             "summary": summary,
             "executive_summary": await get_short_description(summary, client),
@@ -217,13 +220,16 @@ async def generate_metadata(doc_id: str, client: AsyncOpenAI):
             "authors": await get_authors(chunks, client),
             "title": await get_title(chunks, client),
         }
+        
         save_job(
             doc_id=doc_id,
-            job_data=metadata,
+            job_data=metadata_result,
             status="completed",
-            job_type="metadata",
+            job_type=JobType.METADATA,
         )
-        return metadata
+        
+        return metadata_result
+        
     except Exception as e:
         logger.error(f"Error generating metadata for {doc_id}: {e}", exc_info=True)
         error_job = {
@@ -232,30 +238,27 @@ async def generate_metadata(doc_id: str, client: AsyncOpenAI):
             "message": "Failed to download or generate metadata",
         }
         save_job(
-            doc_id=doc_id, job_data=error_job, status="failed", job_type="metadata"
+            doc_id=doc_id, job_data=error_job, status="failed", job_type=JobType.METADATA
         )
+        return None
 
 
-@router.post("/{doc_id}", status_code=202)
-async def submit_pdf(
-    doc_id: str,
-    background_tasks: BackgroundTasks,
-    client: AsyncOpenAI = Depends(get_openai_client),
-):
+@router.post("/{doc_id}", response_model=MetadataResponse, status_code=202)
+async def submit_pdf(doc_id: str, background_tasks: BackgroundTasks):
     save_job(
         doc_id=doc_id,
         job_data={},
         status="processing",
-        job_type="metadata",
+        job_type=JobType.METADATA,
     )
 
-    background_tasks.add_task(generate_metadata, doc_id, client)
-    return None
+    background_tasks.add_task(generate_metadata, doc_id)
+    return MetadataResponse(doc_id=doc_id, status="processing")
 
 
-@router.get("/{doc_id}")
+@router.get("/{doc_id}", response_model=MetadataResponse)
 async def get_status(doc_id: str):
-    job = load_job(doc_id=doc_id, job_type="metadata")
+    job = load_job(doc_id=doc_id, job_type=JobType.METADATA)
     if not job:
         raise HTTPException(status_code=404, detail="Document ID not found")
 
@@ -265,8 +268,8 @@ async def get_status(doc_id: str):
 
     job_data = job.get("data", {})
 
-    return {
-        "doc_id": doc_id,
-        "status": job.get("status", "unknown"),
-        "metadata": job_data,
-    }
+    return MetadataResponse(
+        doc_id=doc_id,
+        status=job.get("status", "unknown"),
+        result=job_data
+    )

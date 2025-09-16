@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from routers import health
-from routers import document, images, session, tables, text_chunks, json_data, embed
+from routers import document, images, session, tables, text_chunks, json_data, embed, chat, metadata, wordcloud, extractor
 from prometheus_fastapi_instrumentator import Instrumentator
 import logging
 
@@ -23,3 +23,7 @@ app.include_router(tables.router)
 app.include_router(text_chunks.router)
 app.include_router(json_data.router)
 app.include_router(embed.router)
+app.include_router(extractor.router)
+app.include_router(chat.router)
+app.include_router(metadata.router)
+app.include_router(wordcloud.router)

@@ -1,12 +1,13 @@
 # For data chunking and embedding
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from typing import List, Dict, Any
 import logging
 import uuid
 
 from models.embed import DataRequest
 from shared_utils.chroma_client import get_chroma_client
+from shared_utils.job_status import save_job, load_job, JobType
 from utils.embed import vectorize_chromadb
 from nltk.tokenize import sent_tokenize
 
@@ -117,25 +118,32 @@ async def token_data_chunking(request: DataRequest) -> List[Dict[str, Any]]:
         raise HTTPException(status_code=500, detail="Chunking failed.")
 
 
-@router.post("/")
-async def sentence_embedder_service(request: DataRequest):
-    "Chunk up and embed data based on sentences into ChromaDB"
-
+async def process_sentence_embedding(request: DataRequest):
+    """Background task to process sentence embedding"""
     try:
         # Extracted data has to be chunked up first
         chunk_data = await token_data_chunking(request)
 
         if not chunk_data:
-            raise HTTPException(
-                status_code=400, detail="No chunks were created from the input text"
+            error_job = {
+                "doc_id": request.doc_id,
+                "status": "error",
+                "message": "No chunks were created from the input text"
+            }
+            save_job(
+                doc_id=request.doc_id,
+                job_data=error_job,
+                status="failed",
+                job_type=JobType.SENTENCEEMBEDDER
             )
+            return
 
         # Once chunking is done, embed into ChromaDB with the specified embedding model
         embed_results = await vectorize_chromadb(
             chunk_data, request.config, TEXTUAL_EMBEDDING_COLLECTION
         )
 
-        return {
+        result_data = {
             "status": "success",
             "doc_id": request.doc_id,
             "chunks_created": len(chunk_data),
@@ -152,9 +160,61 @@ async def sentence_embedder_service(request: DataRequest):
                 for chunk in chunk_data
             ],
         }
+        
+        save_job(
+            doc_id=request.doc_id,
+            job_data=result_data,
+            status="completed",
+            job_type=JobType.SENTENCEEMBEDDER
+        )
+        
     except Exception as e:
-        logger.error(f"PDF embedder service failed: {e}")
-        raise HTTPException(status_code=500, detail="PDF embedder service failed")
+        logger.error(f"Sentence embedding failed: {e}")
+        error_job = {
+            "doc_id": request.doc_id,
+            "status": "error",
+            "message": f"Sentence embedding failed: {str(e)}"
+        }
+        save_job(
+            doc_id=request.doc_id,
+            job_data=error_job,
+            status="failed",
+            job_type=JobType.SENTENCEEMBEDDER
+        )
+
+
+@router.post("/", status_code=202)
+async def submit_sentence_embedding(request: DataRequest, background_tasks: BackgroundTasks):
+    """Submit a document for sentence embedding processing"""
+    save_job(
+        doc_id=request.doc_id,
+        job_data={},
+        status="processing",
+        job_type=JobType.SENTENCEEMBEDDER
+    )
+
+    background_tasks.add_task(process_sentence_embedding, request)
+    return {"doc_id": request.doc_id, "status": "processing"}
+
+
+@router.get("/{doc_id}")
+async def get_sentence_embedding_status(doc_id: str):
+    """Get the status and results of sentence embedding processing"""
+    job = load_job(doc_id=doc_id, job_type=JobType.SENTENCEEMBEDDER)
+    if not job:
+        raise HTTPException(status_code=404, detail="Document ID not found")
+
+    if job.get("status") == "failed":
+        error_message = job.get("data", {}).get("message", "Processing failed")
+        raise HTTPException(status_code=500, detail=error_message)
+    
+    job_data = job.get("data", {})
+    
+    return {
+        "doc_id": doc_id,
+        "status": job.get("status", "unknown"),
+        "result": job_data if job.get("status") == "completed" else None
+    }
 
 
 @router.get("/status/{doc_id}")

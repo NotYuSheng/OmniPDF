@@ -5,7 +5,8 @@ from io import BytesIO
 from fastapi import APIRouter, HTTPException
 from wordcloud import WordCloud
 
-from shared_utils.s3_utils import load_job, upload_fileobj
+from shared_utils.s3_utils import upload_fileobj
+from shared_utils.job_status import load_job, JobType
 from shared_utils.redis_utils import RedisDocumentFileList
 from models.wordcloud import WordcloudResponse
 
@@ -17,7 +18,7 @@ MAX_WORDS = int(os.getenv("WORDCLOUD_MAX_WORDS", "50"))
 
 
 async def concat_text(doc_id: str) -> str:
-    job = load_job(doc_id=doc_id, job_type="extraction")
+    job = load_job(doc_id=doc_id, job_type=JobType.EXTRACTION)
     if not job:
         raise HTTPException(
             status_code=404, detail="Document not found or not processed yet"
@@ -47,7 +48,6 @@ async def get_wordcloud(
 
     wordcloud.generate_from_frequencies(words)
     img_filepath = f"{doc_id}/wordcloud.png"
-
     with BytesIO() as img_file:
         img = wordcloud.to_image()
         img.save(img_file, format="PNG")
@@ -55,5 +55,4 @@ async def get_wordcloud(
         if not upload_fileobj(img_file, img_filepath):
             raise HTTPException(status_code=500, detail="failed to upload file")
     document_files.add(doc_id, img_filepath)
-
     return WordcloudResponse(doc_id=doc_id, top_words=top_words)

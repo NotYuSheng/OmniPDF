@@ -68,44 +68,50 @@ if __name__ == "__main__":
     )
 
     upload_UI = st.Page(
-        page="pages/1_upload_UI.py",
+        page="my_pages/1_upload_UI.py",
         title="Upload PDF",
         icon="📂",
         default=True,  # to set this as the FIRST page upon establishing connection
     )
 
     images_UI = st.Page(
-        page="pages/2_images_UI.py",
+        page="my_pages/2_images_UI.py",
         title="Extract Images",
         icon="🖼️"
     )
 
     tables_UI = st.Page(
-        page="pages/3_tables_UI.py",
+        page="my_pages/3_tables_UI.py",
         title="Extract Tables",
         icon="📋"
     )
 
     wordcloud_UI = st.Page(
-        page="pages/4_wordcloud_UI.py",
+        page="my_pages/4_wordcloud_UI.py",
         title="Word Cloud",
         icon="☁️"
     )
 
     chat_UI = st.Page(
-        page="pages/5_chat_UI.py",
+        page="my_pages/5_chat_UI.py",
         title="Chat",
         icon="💬",
     )
 
     translate_UI = st.Page(
-        page="pages/6_translate_UI.py",
+        page="my_pages/6_translate_UI.py",
         title="Translate",
         icon="📄",
     )
 
+    metadata_UI = st.Page(
+        page="my_pages/7_metadata_UI.py",
+        title="Metadata",
+        icon="📄",
+    )
+
     settings_UI = st.Page(
-        page="pages/10_settings_UI.py",
+        page="my_pages/10_settings_UI.py",
         title="Settings",
         icon="⚙️"
     )
@@ -119,6 +125,7 @@ if __name__ == "__main__":
             tables_UI,
             wordcloud_UI,
             translate_UI,
+            metadata_UI,
             settings_UI,
         ]
     )
