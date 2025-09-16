@@ -69,11 +69,12 @@ docker compose -f docker-compose.gpu.yml up --build
 
 ### Kubernetes/OpenShift (Helm)
 ```bash
-# Deploy individual service
-helm install chat-service ./helm/chat-service --namespace omnipdf
+# Deploy individual service with explicit environment
+helm install chat-service ./helm/chat-service \
+  --values ./helm/chat-service/values-prestaging.yaml \
+  --namespace omnipdf
 
-# Deploy all services
-# Deploy all services using deployment script (includes RBAC as first service)
+# Deploy all services using deployment script
 ./scripts/deploy-helm-charts.sh --all --env prestaging
 
 # Deploy RBAC only (14 individual service roles - should be deployed first)

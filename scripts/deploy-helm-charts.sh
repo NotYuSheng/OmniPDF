@@ -143,16 +143,19 @@ build_values_files() {
         values_files="$values_files -f $shared_env"
     fi
     
-    # 3. Service base values
-    local service_base="helm/$service/values.yaml"
-    if [[ -f "$service_base" ]]; then
-        values_files="$values_files -f $service_base"
-    fi
-    
-    # 4. Service environment values (most specific)
+    # 3. Service environment values (environment-specific deployment)
     local service_env="helm/$service/values-$ENV.yaml"
     if [[ -f "$service_env" ]]; then
         values_files="$values_files -f $service_env"
+    else
+        # Special case for rbac which uses base values.yaml
+        local service_base="helm/$service/values.yaml"
+        if [[ -f "$service_base" ]]; then
+            values_files="$values_files -f $service_base"
+        else
+            print_error "No values file found for $service (expected: $service_env or $service_base)"
+            return 1
+        fi
     fi
     
     echo "$values_files"
