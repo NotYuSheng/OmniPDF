@@ -28,11 +28,11 @@ if "uploaded_files" not in st.session_state:
 FIXED_IMAGE_HEIGHT = 200  # Set your desired fixed height in pixels
 
 client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
-a, b = st.columns([6, 1])
-with a:
+image_col_a, image_col_b = st.columns([6, 1])
+with image_col_a:
     st.header("🖼️ Image Extraction")
 
-with b: 
+with image_col_b:
     # Page-level refresh button
     if st.button("🔄 Refresh All", help="Refresh all"):
         st.rerun()
@@ -118,9 +118,6 @@ async def display_images(expander: DocumentExpander) -> None:
             if retry_key not in st.session_state:
                 st.session_state[retry_key] = False
             
-            if st.button("🔄 Refresh", key=refresh_key, help="Retry image extraction for this document"):
-                st.session_state[retry_key] = True
-        
         with col1:
             st.markdown(f"**Document ID:** {expander.doc_id}")
         
