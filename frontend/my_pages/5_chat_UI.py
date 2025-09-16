@@ -187,7 +187,7 @@ with st.container():
         with btn_col1:
             if st.button("Summarize", key="summary_btn"):
                 runner.run(handle_preset_query(
-                    "Summarize the document", 
+                    "Summarize the contents of this document.", 
                     doc_ids, 
                     "Please select at least one document to summarize."
                 ))
@@ -195,7 +195,7 @@ with st.container():
         with btn_col2:    
             if st.button("Main Topic", key="topic_btn"):
                 runner.run(handle_preset_query(
-                    "What is the main topic?", 
+                    "What is the main topic of this document?", 
                     doc_ids, 
                     "Please select at least one document to analyze."
                 ))
@@ -203,7 +203,7 @@ with st.container():
         with btn_col3:
             if st.button("Key Findings", key="findings_btn"):
                 runner.run(handle_preset_query(
-                    "What are the key findings?", 
+                    "What are the key findings in this document?", 
                     doc_ids, 
                     "Please select at least one document to analyze."
                 ))

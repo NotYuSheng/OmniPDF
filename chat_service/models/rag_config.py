@@ -18,29 +18,19 @@ class EnhancedQueryValidator:
         return [
             # PROCEED_WITH_RAG examples
             {
-                "query": "Describe the CEO's role in the company",
+                "query": "Summarize the contents of this document.",
                 "decision": "PROCEED_WITH_RAG",
-                "reason": "Factual extraction from specific documents",
+                "reason": "Summarization of specific document content",
             },
             {
-                "query": "What are the main findings in the quarterly report?",
+                "query": "What is the main topic of this document?",
+                "decision": "PROCEED_WITH_RAG",
+                "reason": "Factual extraction from specific document",
+            },
+            {
+                "query": "What are the key findings in this document?",
                 "decision": "PROCEED_WITH_RAG",
                 "reason": "Specific document content request",
-            },
-            {
-                "query": "How does the company's revenue compare to last year?",
-                "decision": "PROCEED_WITH_RAG",
-                "reason": "Analytical question requiring document data",
-            },
-            {
-                "query": "List all the safety protocols mentioned in the manual",
-                "decision": "PROCEED_WITH_RAG",
-                "reason": "Factual extraction from specific documents",
-            },
-            {
-                "query": "Summarize the key recommendations from the research paper",
-                "decision": "PROCEED_WITH_RAG",
-                "reason": "Summarization of document content",
             },
             # HANDLE_WITHOUT_RAG examples
             {
@@ -528,7 +518,8 @@ class RAGOptimizer:
             content = chunk.get("content", "")
 
             # Format each chunk
-            chunk_header = f"--- Document Section {i + 1} (Relevance: {chunk.get('similarity_score', 0):.2f}) ---"
+            # chunk_header = f"--- Document Section {i + 1} (Relevance: {chunk.get('similarity_score', 0):.2f}) ---"             chunk_header = f"--- Document Section {i + 1} (Relevance: {chunk.get('similarity_score', 0):.2f}) ---"
+            chunk_header = f"--- Document Section {i + 1} ---"
             formatted_chunk = f"{chunk_header}\n{content}\n"
 
             # Check length constraints
