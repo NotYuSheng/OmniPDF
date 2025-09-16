@@ -1,0 +1,107 @@
+{{/*
+Universal RBAC template for all OmniPDF services
+Generates Role and RoleBinding for each service based on explicit permissions
+*/}}
+
+{{- range $serviceName, $serviceConfig := .Values.rbac }}
+{{- if $serviceConfig.enabled }}
+---
+# Role for {{ $serviceName }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ $.Values.namespace }}
+  name: {{ $.Values.global.resourceNaming.rolePrefix }}{{ $serviceName }}-role
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: {{ $serviceName }}
+    app.kubernetes.io/managed-by: helm
+rules:
+
+{{/* Default permissions for all services */}}
+{{- range $resource, $verbs := $.Values.global.defaultPermissions }}
+- apiGroups: [""]
+  resources: ["{{ $resource }}"]
+  verbs: {{ $verbs | toJson }}
+{{- end }}
+
+{{/* Service-specific call permissions */}}
+{{- if $serviceConfig.canCall }}
+# Service discovery for allowed service calls
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  resourceNames:
+  {{- range $targetService, $allowed := $serviceConfig.canCall }}
+    {{- if $allowed }}
+    - "{{ $targetService }}"           # Can call {{ $targetService }}
+    {{- end }}
+  {{- end }}
+  verbs: ["get", "list"]
+{{- end }}
+
+{{/* Data access permissions */}}
+{{- if $serviceConfig.canAccess }}
+  {{- range $resourceType, $resourceValue := $serviceConfig.canAccess }}
+    {{- if eq $resourceType "secrets" }}
+# Secret access
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames:
+      {{- range $secretName := $resourceValue }}
+    - "{{ $secretName }}"
+      {{- end }}
+  verbs: ["get"]
+    
+    {{- else if eq $resourceType "configmaps" }}
+# ConfigMap access  
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames:
+      {{- range $configName := $resourceValue }}
+    - "{{ $configName }}"
+      {{- end }}
+  verbs: ["get", "watch"]
+    
+    {{- else if eq $resourceType "persistentvolumes" }}
+# Persistent volume access
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  resourceNames:
+      {{- range $pvName := $resourceValue }}
+    - "{{ $pvName }}"
+      {{- end }}
+  verbs: ["get", "list"]
+    
+    {{- else if and (eq $resourceValue true) (or (eq $resourceType "chromadb") (eq $resourceType "minio") (eq $resourceType "redis")) }}
+# Data service access for {{ $resourceType }}
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  resourceNames:
+    - "{{ $resourceType }}"
+  verbs: ["get", "list"]
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+---
+# RoleBinding for {{ $serviceName }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $.Values.global.resourceNaming.rolePrefix }}{{ $serviceName }}-binding
+  namespace: {{ $.Values.namespace }}
+  labels:
+    app.kubernetes.io/name: omnipdf-rbac
+    app.kubernetes.io/component: {{ $serviceName }}
+    app.kubernetes.io/managed-by: helm
+subjects:
+- kind: ServiceAccount
+  name: {{ index $.Values.serviceAccounts $serviceName }}
+  namespace: {{ $.Values.namespace }}
+roleRef:
+  kind: Role
+  name: {{ $.Values.global.resourceNaming.rolePrefix }}{{ $serviceName }}-role
+  apiGroup: rbac.authorization.k8s.io
+
+{{- end }}
+{{- end }}

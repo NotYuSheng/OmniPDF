@@ -1,5 +1,5 @@
-# RBAC Configuration for OmniPDF Services
-# Based on service communication matrix requirements
+# OmniPDF RBAC Configuration - Explicit Service-to-Service Permissions
+# Redesigned for clarity, auditability, and granular control
 
 nameOverride: ""
 fullnameOverride: ""
@@ -9,73 +9,167 @@ namespace: omnipdf
 
 # Service account names (should match Helm release names)
 serviceAccounts:
-  pdfProcessor: "pdf-processor-service"
-  pdfExtraction: "pdf-extraction-service"
-  doclingTranslate: "docling-translation-service"
-  pdfRenderer: "pdf-renderer-service"
-  embedder: "embedder-service"
-  chatService: "chat-service"
-  imageCaptioner: "image-captioner-service"
-  metadataService: "metadata-service"
-  cleaner: "cleaner"
-  frontend: "frontend"
   nginx: "nginx"
-  minio: "minio"
+  frontend: "frontend"
+  pdf-processor-service: "pdf-processor-service"
+  pdf-extraction-service: "pdf-extraction-service"
+  docling-translation-service: "docling-translation-service"
+  pdf-renderer-service: "pdf-renderer-service"
+  embedder-service: "embedder-service"
+  chat-service: "chat-service"
+  image-captioner-service: "image-captioner-service"
+  metadata-service: "metadata-service"
+  cleaner: "cleaner"
+  # Data services
   chromadb: "chromadb"
+  minio: "minio"
   redis: "redis"
 
-# Enable/disable specific RBAC rules
+# Explicit service-to-service access matrix
+# Each service explicitly declares what it can call/access
 rbac:
-  # Core orchestration permissions (pdf-processor-service)
-  pdfProcessor:
+  
+  # API Gateway - Routes external traffic
+  nginx:
     enabled: true
-    # Can call all processing services
-    canCallProcessingServices: true
-    # Can access all data stores
-    canAccessDataStores: true
-    
-  # Processing service permissions (pdf-extraction, docling-translation, embedder, chat)
-  processingServices:
-    enabled: true
-    # Can call AI/ML services
-    canCallAI: true
-    # Limited data store access
-    canAccessDataStores: true
-    
-  # AI/ML service permissions (image-captioner, metadata)
-  aiServices:
-    enabled: true
-    # No outbound service calls to other processing services
-    canCallServices: false
-    # Metadata service needs data store access for metadata generation
-    canAccessDataStores: true
-    
-  # Data services permissions (minio, chromadb, redis)
-  dataServices:
-    enabled: true
-    # No outbound calls needed
-    canCallServices: false
-    
-  # Frontend service permissions
+    canCall:
+      frontend: true                    # UI routing
+      pdf-processor-service: true       # API routing (/api/, /pdf_processor/)
+    canAccess:
+      configmaps: ["nginx-config"]      # Configuration access
+      secrets: ["nginx-secrets"]        # TLS certificates, etc.
+  
+  # Frontend UI - Streamlit application  
   frontend:
     enabled: true
-    # Can only call pdf-processor
-    canCallProcessor: true
-    
-  # Gateway service permissions (nginx)
-  gateway:
+    canCall:
+      nginx: true                       # All backend communication via gateway
+    canAccess:
+      secrets: ["frontend-secrets"]     # UI configuration secrets
+  
+  # Central orchestrator - Coordinates all processing workflows
+  pdf-processor-service:
     enabled: true
-    # Can call frontend and pdf-processor
-    canCallFrontendAndProcessor: true
-    
-  # Cleanup service permissions
+    canCall:
+      # Processing services
+      pdf-extraction-service: true      # Document extraction
+      docling-translation-service: true # Translation workflows
+      embedder-service: true            # Text embedding
+      chat-service: true                # RAG queries
+      pdf-renderer-service: true        # PDF rendering
+      metadata-service: true            # Metadata generation
+    canAccess:
+      # Data stores for coordination
+      minio: true                       # File storage coordination
+      redis: true                       # Session management
+      secrets: ["pdf-processor-secrets"] # Service credentials
+  
+  # Document processing - Extracts content from PDFs
+  pdf-extraction-service:
+    enabled: true
+    canCall:
+      image-captioner-service: true     # Caption extracted images
+    canAccess:
+      minio: true                       # Store extracted content
+      redis: true                       # Document file lists
+      secrets: ["pdf-extraction-secrets"]
+  
+  # AI services - Called by other services, no outbound calls to services
+  docling-translation-service:
+    enabled: true
+    canCall: {}                         # External vLLM only (via customRules)
+    canAccess:
+      secrets: ["docling-translation-secrets"]
+  
+  image-captioner-service:
+    enabled: true  
+    canCall: {}                         # External VLM only (via customRules)
+    canAccess:
+      secrets: ["image-captioner-secrets"]
+  
+  # Embedding service - Stores vectors in ChromaDB
+  embedder-service:
+    enabled: true
+    canCall: {}                         # No service calls (external embedding API via customRules)
+    canAccess:
+      chromadb: true                    # Store embeddings
+      secrets: ["embedder-secrets"]
+  
+  # Chat service - RAG queries using ChromaDB
+  chat-service:
+    enabled: true
+    canCall: {}                         # External vLLM only (via customRules)
+    canAccess:
+      chromadb: true                    # Vector retrieval for RAG
+      secrets: ["chat-secrets"]
+  
+  # Metadata generation - Analyzes documents for metadata
+  metadata-service:
+    enabled: true
+    canCall: {}                         # External LLM only (via customRules)
+    canAccess:
+      chromadb: true                    # Retrieve document chunks
+      minio: true                       # Store/load metadata results
+      secrets: ["metadata-secrets"]
+  
+  # PDF rendering - Overlays translated content
+  pdf-renderer-service:
+    enabled: true
+    canCall: {}                         # External LLM only (via customRules)  
+    canAccess:
+      minio: true                       # Access PDFs for rendering
+      secrets: ["pdf-renderer-secrets"]
+  
+  # Cleanup service - Removes expired data
   cleaner:
     enabled: true
-    # Can access all data stores for cleanup
-    canAccessAllDataStores: true
-    
-  # PDF renderer service permissions
-  pdfRenderer:
+    canCall: {}                         # No service calls needed
+    canAccess:
+      minio: true                       # Delete expired files
+      chromadb: true                    # Delete expired vectors  
+      redis: true                       # Cleanup expired sessions
+      secrets: ["cleaner-secrets"]
+  
+  # Data services - Accept connections, no outbound service calls
+  chromadb:
     enabled: true
-    # Can access minio for file operations
-    canAccessStorage: true
+    canCall: {}                         # Pure data store
+    canAccess:
+      secrets: ["chromadb-secrets"]     # Database credentials
+      persistentvolumes: ["chromadb-data"] # Data persistence
+  
+  minio:
+    enabled: true
+    canCall: {}                         # Pure object storage
+    canAccess:
+      secrets: ["minio-secrets"]        # S3 credentials
+      persistentvolumes: ["minio-data"] # Storage persistence
+  
+  redis:
+    enabled: true
+    canCall: {}                         # Pure session store
+    canAccess:
+      secrets: ["redis-secrets"]        # Redis credentials
+      persistentvolumes: ["redis-data"] # Data persistence
+
+# Global RBAC settings
+global:
+  # Enable RBAC for all services by default
+  rbacEnabled: true
+  
+  # Default resource permissions all services need
+  defaultPermissions:
+    # Basic pod permissions
+    pods: ["get", "list"]
+    # Service discovery
+    services: ["get", "list"]
+    endpoints: ["get", "list"]
+    # Istio service mesh
+    destinationrules: ["get", "list"]
+    virtualservices: ["get", "list"]
+  
+  # Resource naming conventions
+  resourceNaming:
+    secretPrefix: ""                    # No prefix, use service name
+    configMapPrefix: ""                 # No prefix, use service name  
+    rolePrefix: "omnipdf-"              # Prefix for all RBAC roles
