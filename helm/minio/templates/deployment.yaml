@@ -117,7 +117,7 @@ spec:
         - name: data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "minio.fullname" .) }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "minio.pvcName" .) }}
           {{- else }}
           emptyDir: {}
           {{- end }}
