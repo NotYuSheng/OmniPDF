@@ -1,5 +1,5 @@
 # Prestaging environment configuration for embedder-service
-# This file overrides default values.yaml for prestaging deployment in CRC
+# Prestaging environment configuration for embedder-service in CRC
 
 # Use local CRC registry image
 image:

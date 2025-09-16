@@ -6,15 +6,17 @@ CHART_NAME ?= example-service
 CHART_DIR ?= helm/$(CHART_NAME)
 ENV ?= staging
 
-# Service-specific values files
-SERVICE_VALUES_FILE ?= $(CHART_DIR)/values.yaml
+# Service-specific values files (environment-specific only)
 SERVICE_ENV_VALUES_FILE ?= $(CHART_DIR)/values-$(ENV).yaml
+SERVICE_BASE_VALUES_FILE ?= $(CHART_DIR)/values.yaml
 
-# Build values file list (in order of precedence - later files override earlier ones)
-# Order: service-base → service-env (service default → environment specific)
-VALUES_FILES = -f $(SERVICE_VALUES_FILE)
+# Build values file list (prioritize environment-specific, fallback to base for rbac)
 ifneq ($(wildcard $(SERVICE_ENV_VALUES_FILE)),)
-    VALUES_FILES += -f $(SERVICE_ENV_VALUES_FILE)
+    VALUES_FILES = -f $(SERVICE_ENV_VALUES_FILE)
+else ifneq ($(wildcard $(SERVICE_BASE_VALUES_FILE)),)
+    VALUES_FILES = -f $(SERVICE_BASE_VALUES_FILE)
+else
+    $(error No values file found for $(CHART_NAME). Expected: $(SERVICE_ENV_VALUES_FILE) or $(SERVICE_BASE_VALUES_FILE))
 endif
 
 # Default port for port-forwarding (override as needed)
@@ -49,9 +51,9 @@ help:
 	@echo "  make uninstall-all          Uninstall all charts under ./helm/"
 	@echo ""
 	@echo "Values System:"
-	@echo "  Values are applied in order (later values override earlier ones):"
-	@echo "  1. helm/{SERVICE}/values.yaml                - Service default configuration"
-	@echo "  2. helm/{SERVICE}/values-{ENV}.yaml          - Environment-specific overrides (highest priority)"
+	@echo "  Uses explicit environment-specific files only:"
+	@echo "  1. helm/{SERVICE}/values-{ENV}.yaml         - Environment-specific configuration"
+	@echo "  2. helm/{SERVICE}/values.yaml               - Fallback for rbac only"
 	@echo ""
 	@echo "Environment Variables:"
 	@echo "  ENV                         Environment (staging, prestaging, prod) - defaults to 'staging'"
@@ -120,9 +122,13 @@ define deploy-all-charts
 		CHART=$$(basename $$dir); \
 		if [ "$$CHART" != "assets" ]; then \
 			echo "$(1) chart: $$CHART"; \
-			CHART_VALUES="-f helm/$$CHART/values.yaml"; \
 			if [ -f "helm/$$CHART/values-$(ENV).yaml" ]; then \
-				CHART_VALUES="$$CHART_VALUES -f helm/$$CHART/values-$(ENV).yaml"; \
+				CHART_VALUES="-f helm/$$CHART/values-$(ENV).yaml"; \
+			elif [ -f "helm/$$CHART/values.yaml" ]; then \
+				CHART_VALUES="-f helm/$$CHART/values.yaml"; \
+			else \
+				echo "Error: No values file found for $$CHART"; \
+				exit 1; \
 			fi; \
 			helm upgrade --install $$CHART helm/$$CHART \
 				--namespace $(NAMESPACE) \

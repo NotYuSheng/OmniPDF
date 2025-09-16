@@ -1,5 +1,5 @@
 # Prestaging environment configuration for ChromaDB
-# This file overrides default values.yaml for prestaging deployment in CRC
+# Prestaging environment configuration for chromadb service in CRC
 
 # Single replica for prestaging
 replicaCount: 1

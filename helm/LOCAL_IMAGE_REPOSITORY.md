@@ -19,8 +19,8 @@ docker pull ghcr.io/notyusheng/embedder_service:latest
 # Add other services as needed
 ```
 
-### Step 2: Update values.yaml
-Edit `helm/<service-name>/values.yaml`:
+### Step 2: Update environment values file
+Edit `helm/<service-name>/values-{ENV}.yaml` (e.g., `values-prestaging.yaml`):
 ```yaml
 image:
   repository: ghcr.io/notyusheng/chat_service
@@ -90,7 +90,7 @@ docker tag ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136 \
 docker push default-route-openshift-image-registry.apps-crc.testing/omnipdf/chat_service:dev-v0.0.0-6653136
 ```
 
-### Step 5: Update values.yaml
+### Step 5: Update environment values file
 ```yaml
 image:
   repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/chat_service
@@ -107,7 +107,7 @@ cd chat_service/
 docker build -t chat_service:latest .
 ```
 
-### Step 2: Update values.yaml
+### Step 2: Update environment values file
 ```yaml
 image:
   repository: chat_service
@@ -141,7 +141,7 @@ docker tag ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136 \
 docker push harbor.yourdomain.com/omnipdf/chat_service:dev-v0.0.0-6653136
 ```
 
-### Step 4: Update values.yaml
+### Step 4: Update environment values file
 ```yaml
 image:
   repository: harbor.yourdomain.com/omnipdf/chat_service

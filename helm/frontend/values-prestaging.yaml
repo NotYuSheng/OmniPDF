@@ -1,5 +1,5 @@
 # Pre-staging environment configuration for frontend
-# This file overrides default values.yaml for prestaging deployment in CRC
+# Prestaging environment configuration for frontend service in CRC
 
 # Single replica for prestaging
 replicaCount: 1

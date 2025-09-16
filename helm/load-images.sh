@@ -161,7 +161,7 @@ load_image() {
     fi
     
     success "  Image loaded: $image:$tag"
-    echo "  Use in values.yaml:"
+    echo "  Use in values-{ENV}.yaml:"
     echo "    image:"
     echo "      repository: $CRC_REGISTRY/$NAMESPACE/$image"
     echo "      tag: \"$tag\""
@@ -201,7 +201,7 @@ The script will:
 1. Pull images from external registries
 2. Tag them for CRC's internal registry
 3. Push them to CRC registry
-4. Show how to configure Helm values.yaml
+4. Show how to configure Helm environment values files
 
 Environment Variables:
   NAMESPACE    Target namespace (default: omnipdf)
@@ -312,7 +312,7 @@ main() {
     if [[ $success_count -gt 0 ]]; then
         echo ""
         log "Next steps:"
-        echo "1. Update your Helm values.yaml files with the local registry URLs shown above"
+        echo "1. Update your Helm values-{ENV}.yaml files with the local registry URLs shown above"
         echo "2. Deploy with: make install CHART_NAME=<service> ENV=<env>"
         echo "3. Verify with: oc get pods -n $NAMESPACE"
     fi
