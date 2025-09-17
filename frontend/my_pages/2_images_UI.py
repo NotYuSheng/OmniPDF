@@ -112,7 +112,6 @@ async def display_images(expander: DocumentExpander) -> None:
     with expander:
         res = await get_images(expander.doc_id, expander.status)
         if res and res.get("images") and len(res["images"]) > 0:
-            # st.dataframe(res["metadata"])
             st.success(f"Found {len(res['images'])} images in the document")
             # Display each image
             for i, image_data in enumerate(res["images"]):
@@ -167,9 +166,12 @@ async def display_images(expander: DocumentExpander) -> None:
                         else:
                             st.error("Image not available for download")
         else:
-            # Handle cases where no images are found or processing failed
-            if res and "detail" in res:
-                st.warning("Failed to process document for image extraction")
+            # Handle cases where no image is found or processing failed
+            if res is None:
+                st.warning("Failed to process document for image")
+            else:
+                st.info("No image found in document")
+
 
 async def display_all(expanders: list[DocumentExpander]):
     displays = [display_images(expander) for expander in expanders]
