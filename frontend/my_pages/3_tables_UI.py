@@ -22,7 +22,7 @@ with table_col_b:
         st.rerun()
 
 
-async def get_tables(doc_id: str, status_bar, max_retries=600, delay=1):
+async def get_tables(doc_id: str, status_bar, max_retries=600, delay=1) -> dict | None:
     """
     Poll the backend for table extraction results.
     """
