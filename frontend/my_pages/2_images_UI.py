@@ -182,8 +182,8 @@ async def display_all(expanders: list[DocumentExpander]):
         # Get - checks if embedding is done
         embed_response = [display_embedding(expander) for expander in expanders] 
         await asyncio.gather(*embed_response, return_exceptions=True)
-                
-    
+
+
 
 async def embed_pdf(doc_id: str, embed_type: str = "semantic", delay=1) -> dict | None:
     """
