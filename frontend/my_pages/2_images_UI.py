@@ -236,7 +236,7 @@ async def display_embedding(expander: DocumentExpander) -> None:
                 st.dataframe(res)
 
 # Check if embedding is in progress
-async def check_embedding_status(doc_id: str = None, status: str = None, max_retries: int = 100, delay: float = 1.0) -> bool:
+async def check_embedding_status(doc_id: str = None, status = None, max_retries: int = 100, delay: float = 1.0) -> dict | bool:
     for attempt in range(max_retries):
         try:
             response = await client.get(f"{PDF_PROCESSOR_URL}/embed/semantic/{doc_id}")
