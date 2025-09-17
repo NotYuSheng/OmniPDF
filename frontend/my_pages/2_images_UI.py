@@ -124,8 +124,6 @@ async def display_images(expander: DocumentExpander) -> None:
                     image_url = f"{PDF_PROCESSOR_URL}{image_path}"
                     logger.info(f"Fetching image from: {image_url}")
                     
-                    image_bytes = None  # Initialize to handle scope issues
-                            
                     with col1:
                         # Display actual image from URL
                         if "detail" in image_data:
