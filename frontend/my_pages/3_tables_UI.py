@@ -133,8 +133,17 @@ def display_tables(table_response):
 
                     # Display title with page info and copy button
                     if df is not None:
-                        csv_string = df.to_csv(index=False)
-                        st.code(csv_string, language="csv")
+                        try:
+                            csv_string = df.to_csv(index=False)
+                            if csv_string:
+                                st.code(csv_string, language="csv")
+                            else:
+                                st.warning("No data to display as CSV")
+                        except Exception as e:
+                            st.error(f"Error converting to CSV: {e}")
+                            st.write(df)  # Fallback to regular display
+                    else:
+                        st.warning("No DataFrame available")
 
                 with col2:
                     # Metadata display
