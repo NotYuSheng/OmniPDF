@@ -140,7 +140,7 @@ async def handle_preset_query(prompt: str, doc_ids: list[str], error_message: st
                 def response_generator():
                     for word in response.split():
                         yield word + " "
-                        time.sleep(0.05)
+                        time.sleep(0.01)
                 st.write_stream(response_generator)
             else:
                 st.write(response)
