@@ -40,7 +40,7 @@ with b:
 runner = asyncio.Runner()
 
 
-async def get_images(doc_id, status_bar, max_retries=600, delay=1) -> dict:
+async def get_images(doc_id, status_bar, max_retries=600, delay=1) -> dict | None:
     for attempt in range(max_retries):
         try:
             response = await client.get(f"{PDF_PROCESSOR_URL}/images/{doc_id}")
