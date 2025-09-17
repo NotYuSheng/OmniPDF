@@ -38,7 +38,7 @@ async def get_wordcloud(
     doc_id: str,
 ):
     doc_text = await concat_text(doc_id)
-    wordcloud = WordCloud(max_words=MAX_WORDS)
+    wordcloud = WordCloud(max_words=MAX_WORDS, min_word_length=2)
     words = wordcloud.process_text(doc_text)
     top_words = list(
         dict(
