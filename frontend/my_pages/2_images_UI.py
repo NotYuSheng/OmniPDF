@@ -175,7 +175,11 @@ async def display_all(expanders: list[DocumentExpander]):
     displays = [display_images(expander) for expander in expanders]
     await asyncio.gather(*displays, return_exceptions=True)
     with st.spinner("Embedding document for RAG..."):
-        _embed_response = [embed_pdf(expander.doc_id, "semantic") for expander in expanders]
+        # Post - starts embedding, response from embed_pdf is 202
+        embed_start = [embed_pdf(expander.doc_id, "semantic") for expander in expanders]
+        await asyncio.gather(*embed_start, return_exceptions=True)
+
+        # Get - checks if embedding is done
         embed_response = [display_embedding(expander) for expander in expanders] 
         await asyncio.gather(*embed_response, return_exceptions=True)
                 
