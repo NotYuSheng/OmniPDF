@@ -39,7 +39,7 @@ with chat_container:
             st.write(message["content"])
 
 
-client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
+client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies, timeout=300)
 
 async def chat_with_rag(prompt: str, doc_ids: list[str] = None, collection_name: str = "SemanticEmbeds", max_retries: int = 600, delay: int = 1):
     """
