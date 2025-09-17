@@ -38,7 +38,6 @@ with b:
         st.rerun()
 
 image_status = st.empty()
-server_status = st.empty()
 runner = asyncio.Runner()
 
 
@@ -58,7 +57,6 @@ async def get_images(doc_id, status_bar, max_retries=600, delay=1) -> dict:
                 logger.error(
                     f"Failed to decode JSON from response: {response.text}: {e}"
                 )
-                server_status.error("Received an invalid response from the server.")
                 return {"error": "Invalid JSON response from server"}
             
             if response.status_code == 200 or response.status_code == 201:
