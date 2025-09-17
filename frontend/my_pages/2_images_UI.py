@@ -227,7 +227,8 @@ async def display_embedding(expander: DocumentExpander) -> None:
             st.subheader("Embedding Status")
             # Only show result column
             if isinstance(res, dict) and 'result' in res:
-                st.dataframe({'result': res['result']})
+                # Convert to string to avoid Arrow serialization issues
+                st.dataframe(res['result'])
             else:
                 st.dataframe(res)
 
