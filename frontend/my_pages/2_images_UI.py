@@ -168,7 +168,7 @@ async def display_images(expander: DocumentExpander) -> None:
                             st.error("Image not available for download")
         else:
             # Handle cases where no images are found or processing failed
-            if "detail" in res:
+            if res and "detail" in res:
                 st.warning("Failed to process document for image extraction")
 
 async def display_all(expanders: list[DocumentExpander]):
