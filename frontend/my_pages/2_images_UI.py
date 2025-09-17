@@ -228,7 +228,11 @@ async def display_embedding(expander: DocumentExpander) -> None:
         logger.info(f"Embedding status for doc {expander.doc_id}: {res}")
         if res:
             st.subheader("Embedding Status")
-            st.dataframe(res)
+            # Only show result column
+            if isinstance(res, dict) and 'result' in res:
+                st.dataframe({'result': res['result']})
+            else:
+                st.dataframe(res)
 
 # Check if embedding is in progress
 async def check_embedding_status(doc_id: str = None, status: str = None, max_retries: int = 3, delay: float = 1.0) -> bool:
@@ -246,6 +250,7 @@ async def check_embedding_status(doc_id: str = None, status: str = None, max_ret
                 return False
 
             if response.status_code == 200:
+                status.empty()
                 return data
             elif response.status_code == 202:
                 if status:
