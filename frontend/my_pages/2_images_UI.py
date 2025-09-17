@@ -198,8 +198,7 @@ async def embed_pdf(doc_id: str, embed_type: str = "semantic", delay=1) -> dict 
             )
         notifications = st.empty()
         if response.status_code == 200:
-            notifications.info("Document successfully embedded",
-                icon="✅")
+            notifications.empty()
             return data  # Success - return the actual data
         else:
             reason = (
