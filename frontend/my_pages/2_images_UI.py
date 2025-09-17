@@ -37,7 +37,6 @@ with b:
     if st.button("🔄 Refresh All", help="Refresh all"):
         st.rerun()
 
-image_status = st.empty()
 runner = asyncio.Runner()
 
 
