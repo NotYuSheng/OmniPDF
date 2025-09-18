@@ -84,7 +84,6 @@ async def get_images(doc_id, status_bar, max_retries=600, delay=1) -> dict | Non
                 error_msg = data.get("detail", "Processing failed") if data else "Processing failed"
                 status_bar.error(f"Document processing failed: {error_msg}")
                 logger.error(f"Document processing failed for {doc_id}: {error_msg}")
-                return None
             response.raise_for_status()
         except httpx.RequestError as e:
             logger.error(f"Request error on attempt {attempt + 1}: {e}")
@@ -94,7 +93,6 @@ async def get_images(doc_id, status_bar, max_retries=600, delay=1) -> dict | Non
                 continue
             else:
                 status_bar.error("Error Processing your file. Please try re uploading.")
-                return None
         except TimeoutError:
             logger.error(f"Document ID: {doc_id} took too long to process.")
             status_bar.error(
