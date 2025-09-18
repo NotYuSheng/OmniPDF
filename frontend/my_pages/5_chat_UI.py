@@ -69,7 +69,6 @@ async def chat_with_rag(prompt: str, doc_ids: list[str] = None, collection_name:
             
             # Use the decoded data for all subsequent checks
             if "detail" in data:
-                server_status.info(data["detail"])
                 logger.info(f"Info details: {data['detail']}")
             else:
                 logger.info(f"Chat response: {data}")
@@ -87,13 +86,10 @@ async def chat_with_rag(prompt: str, doc_ids: list[str] = None, collection_name:
                 else:
                     raise TimeoutError("Response generation timed out after maximum retries")
             elif response.status_code == 404:
-                server_status.error("Documents not found or not embedded yet")
-                st.error(f"{response.json()}")
                 return "Sorry, the documents you selected haven't been embedded yet. Please go to the Images page and wait for embedding to complete, then try again."
             else:
                 # Handle other HTTP errors
                 logger.error(f"HTTP error {response.status_code}: {response.text}")
-                server_status.error(f"Server error: {response.status_code}")
                 return f"Sorry, there was an error: {response.status_code}"
                 
         except httpx.RequestError as e:
