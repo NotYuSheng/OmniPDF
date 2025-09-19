@@ -63,8 +63,14 @@ async def get_metadata(doc_id: str, status_bar, max_retries=600, delay=1):
 async def display_metadata(expander: DocumentExpander):
     with expander:
         res = await get_metadata(expander.doc_id, expander.status)
-        if res:
+        if res and res.get("metadata"):
             st.dataframe(res["metadata"])
+        else:
+            # Handle cases where no metadata is found or processing failed
+            if res is None:
+                st.warning("Failed to process document for metadata extraction")
+            else:
+                st.info("No metadata found in document")
 
 
 async def display_all(expanders: list[DocumentExpander]):

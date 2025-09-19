@@ -6,6 +6,8 @@ import json
 import os
 from PIL import Image
 from io import BytesIO
+from components.documents import document_multiselect_with_expander, DocumentExpander
+
 
 PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
 logging.basicConfig(level=logging.INFO)
@@ -26,14 +28,19 @@ if "uploaded_files" not in st.session_state:
 FIXED_IMAGE_HEIGHT = 200  # Set your desired fixed height in pixels
 
 client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
+a, b = st.columns([6, 1])
+with a:
+    st.header("🖼️ Image Extraction")
 
-st.header("🖼️ Image Extraction")
-image_status = st.empty()
-server_status = st.empty()
+with b: 
+    # Page-level refresh button
+    if st.button("🔄 Refresh All", help="Refresh all"):
+        st.rerun()
+
 runner = asyncio.Runner()
 
 
-async def get_images(doc_id, max_retries=600, delay=1) -> dict:
+async def get_images(doc_id, status_bar, max_retries=600, delay=1) -> dict | None:
     for attempt in range(max_retries):
         try:
             response = await client.get(f"{PDF_PROCESSOR_URL}/images/{doc_id}")
@@ -49,85 +56,74 @@ async def get_images(doc_id, max_retries=600, delay=1) -> dict:
                 logger.error(
                     f"Failed to decode JSON from response: {response.text}: {e}"
                 )
-                server_status.error("Received an invalid response from the server.")
                 return {"error": "Invalid JSON response from server"}
             
             if response.status_code == 200 or response.status_code == 201:
-                server_status.info("Successfully retrieved images")
-                logger.info(f"Image extraction response: {response}")
+                status_bar.empty()
                 return data  # Success - return the actual data
             elif response.status_code == 202:
-                if "detail" in data:
-                    server_status.info(data["detail"])
-                    logger.info(f"Info details: {data['detail']}")
-                
                 # Still processing, continue polling
                 if attempt < max_retries - 1:
-                    image_status.info(
-                        f"Document still processing... ({(attempt + 1) * delay}s)"
-                    )
-                    data = response.json()
-                    if "detail" in data:
-                        server_status.info(data["detail"])
-                    else:
-                        if len(data) > 100:
-                            server_status.info(str(data)[:50] + "...")
+                    if status_bar:
+                        reason = (
+                            data.get("detail", "in progress") if data else "in progress"
+                        )
+                        status_bar.info(
+                            f"Document still processing... ({(attempt + 1) * delay}s)"
+                            f"\nReason: {reason}"
+                        )
                     await asyncio.sleep(delay)
+                    await asyncio.sleep(0)  # Yield to Streamlit
                     continue
                 else:
                     raise TimeoutError(
                         "Document processing timed out after maximum retries"
                     )
-            else:
-                # Handle other HTTP errors
-                logger.error(f"HTTP error {response.status_code}: {response.text}")
-                response.raise_for_status()
-
+            elif response.status_code == 450:
+                # Processing failed
+                error_msg = data.get("detail", "Processing failed") if data else "Processing failed"
+                status_bar.error(f"Document processing failed: {error_msg}")
+                logger.error(f"Document processing failed for {doc_id}: {error_msg}")
+            response.raise_for_status()
         except httpx.RequestError as e:
             logger.error(f"Request error on attempt {attempt + 1}: {e}")
-            if attempt == max_retries - 1:
-                raise
-            await asyncio.sleep(delay)
-        except Exception as e:
-            logger.error(f"Unexpected error on attempt {attempt + 1}: {e}")
-            if attempt == max_retries - 1:
-                raise
-            await asyncio.sleep(delay)
+            if attempt < max_retries - 1:
+                status_bar.warning(f"Connection error (attempt {attempt + 1}). Retrying...")
+                await asyncio.sleep(delay)
+                continue
+            else:
+                status_bar.error("Error Processing your file. Please try re uploading.")
+        except TimeoutError:
+            logger.error(f"Document ID: {doc_id} took too long to process.")
+            status_bar.error(
+                "Retry limit reached. Please retry by clicking on page on left."
+            )
+            return None
 
     raise TimeoutError("Max retries exceeded")
 
 
-def display_images(image_response, doc_id=None) -> None:
+async def display_images(expander: DocumentExpander) -> None:
     """
     Display images extracted from the processed PDF document.
     """
-    # Check if we have a valid response first
-    if not image_response or "error" in image_response:
-        st.error(f"Error in image response: {image_response.get('error', 'Unknown error')}")
-        return
-        
-    # Check if we have images in the response
-    if "images" in image_response and image_response["images"]:
-        image_status.success(
-            f"Found {len(image_response['images'])} images in the document"
-        )
+    with expander:
+        res = await get_images(expander.doc_id, expander.status)
+        if res and res.get("images") and len(res["images"]) > 0:
+            st.success(f"Found {len(res['images'])} images in the document")
+            # Display each image
+            for i, image_data in enumerate(res["images"]):
+                with st.container():
+                    col1, col2 = st.columns([1, 2], border=True, vertical_alignment="top")
 
-        # Display each image
-        for i, image_data in enumerate(image_response["images"]):
-            with st.container():
-                col1, col2 = st.columns([1, 2], border=True, vertical_alignment="top")
-
-                image_path = (
-                    f"/images/{doc_id}/{image_data['image_key'].split('/')[-1]}"
-                )
-                image_url = f"{PDF_PROCESSOR_URL}{image_path}"
-                logger.info(f"Fetching image from: {image_url}")
-                
-                image_bytes = None  # Initialize to handle scope issues
-                        
-                with col1:
-                    # Display actual image from URL
-                    try:
+                    image_path = (
+                        f"/images/{expander.doc_id}/{image_data['image_key'].split('/')[-1]}"
+                    )
+                    image_url = f"{PDF_PROCESSOR_URL}{image_path}"
+                    logger.info(f"Fetching image from: {image_url}")
+                    
+                    with col1:
+                        # Display actual image from URL
                         if "detail" in image_data:
                             st.error("An error occurred while loading the image.")
                         else:
@@ -150,30 +146,44 @@ def display_images(image_response, doc_id=None) -> None:
                                     use_container_width=True,
                                 )
 
-                    except Exception as e:
-                        logger.error(f"Error loading image {i + 1}: {e}")
-                        st.error(f"Error loading image {i + 1}: {e}")
 
-                with col2:
-                    st.markdown(f"**Image Key:** {image_data['image_key']}")
-                    # Download button - only show if image was successfully loaded
-                    if image_bytes:
-                        filename = f"image_{i+1}.png"
-                        st.download_button(
-                            label="Download",
-                            data=image_bytes,
-                            file_name=filename,
-                            mime="image/png",
-                            key=f"{filename}_download_btn_{image_data['image_key']}"
-                        )
-                    else:
-                        st.error("Image not available for download")
-                
-    else:
-        logger.info("No images found in the document")
-        st.info("No images found in the document")
+                    with col2:
+                        st.markdown(f"**Image Key:** {image_data['image_key']}")
+                        # Download button - only show if image was successfully loaded
+                        if image_bytes:
+                            filename = f"image_{i+1}.png"
+                            st.download_button(
+                                label="Download",
+                                data=image_bytes,
+                                file_name=filename,
+                                mime="image/png",
+                                key=f"{filename}_download_btn_{image_data['image_key']}"
+                            )
+                        else:
+                            st.error("Image not available for download")
+        else:
+            # Handle cases where no image is found or processing failed
+            if res is None:
+                st.warning("Failed to process document for image")
+            else:
+                st.info("No image found in document")
 
-async def embed_pdf(embed_type: str, doc_id: str) -> dict | None:
+
+async def display_all(expanders: list[DocumentExpander]):
+    displays = [display_images(expander) for expander in expanders]
+    await asyncio.gather(*displays, return_exceptions=True)
+    with st.spinner("Embedding document for RAG..."):
+        # Post - starts embedding, response from embed_pdf is 202
+        embed_start = [embed_pdf(expander.doc_id, "semantic") for expander in expanders]
+        await asyncio.gather(*embed_start, return_exceptions=True)
+
+        # Get - checks if embedding is done
+        embed_response = [display_embedding(expander) for expander in expanders] 
+        await asyncio.gather(*embed_response, return_exceptions=True)
+
+
+
+async def embed_pdf(doc_id: str, embed_type: str = "semantic", delay=1) -> dict | None:
     """
     Embedding PDF
     For rag
@@ -181,7 +191,27 @@ async def embed_pdf(embed_type: str, doc_id: str) -> dict | None:
     try:
         response = await client.post(f"{PDF_PROCESSOR_URL}/embed/{embed_type}/{doc_id}")
         logger.info(f"Embedding response: {response.text}")
-        return response.json()
+        try:
+            data = response.json()
+        except json.JSONDecodeError as e:
+            data = {}
+            logger.error(
+                f"Failed to decode JSON from response: {response.text}: {e}"
+            )
+        notifications = st.empty()
+        if response.status_code == 200:
+            notifications.empty()
+            return data  # Success - return the actual data
+        else:
+            reason = (
+                data.get("detail", "in progress") if data else "in progress"
+            )
+            notifications.info(
+                f"Document still processing...\n"
+                f"\nReason: {reason}"
+            )
+            await asyncio.sleep(delay)
+
     except httpx.RequestError as e:
         logger.error(f"Request error during embedding: {e}")
         return None
@@ -189,6 +219,63 @@ async def embed_pdf(embed_type: str, doc_id: str) -> dict | None:
         logger.error(f"Error during embedding: {e}")
         return None
     
+async def display_embedding(expander: DocumentExpander) -> None:
+    with expander:
+
+        res = await check_embedding_status(expander.doc_id, expander.status)
+        logger.info(f"Embedding status for doc {expander.doc_id}: {res}")
+        if res:
+            st.subheader("Embedding Status")
+            # Only show result column
+            if isinstance(res, dict) and 'result' in res:
+                # Convert to string to avoid Arrow serialization issues
+                st.dataframe(res['result'])
+            else:
+                st.dataframe(res)
+
+# Check if embedding is in progress
+async def check_embedding_status(doc_id: str = None, status = None, max_retries: int = 100, delay: float = 1.0) -> dict | bool:
+    for attempt in range(max_retries):
+        try:
+            response = await client.get(f"{PDF_PROCESSOR_URL}/embed/semantic/{doc_id}")
+            
+            try:
+                data = response.json()
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to decode JSON from embedding status response: {response.text}: {e}")
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(delay)
+                    continue
+                return False
+
+            if response.status_code == 200:
+                status.empty()
+                return data
+            elif response.status_code == 202:
+                if status:
+                    reason = data.get("detail", "in progress") if data else "in progress"
+                    status.info(
+                        f"Embedding still processing... ({(attempt + 1) * delay}s)"
+                        f"\nReason: {reason}"
+                    )
+                await asyncio.sleep(delay)
+                continue
+            else:
+                logger.error(f"Failed to get embedding status: {response.status_code}")
+                if "detail" in data:
+                    logger.error(f"Error details: {data['detail']}")
+                    return data.get("detail", False)
+                return False
+        except httpx.RequestError as e:
+            logger.error(f"Request error while checking embedding status (attempt {attempt + 1}): {e}")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(delay)
+                continue
+            return False
+    
+    return False
+
+
 
 def describe_image(image_data):
     """
@@ -204,87 +291,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
     if "expander_states" not in st.session_state:
         st.session_state.expander_states = {}
 
-    response_lst = list(st.session_state.processed_data.items())
-    doc_names = [data["uploaded_filename"] for _, data in response_lst]
-
-    # Initialize expander states for new documents
-    for doc_name in doc_names:
-        if doc_name not in st.session_state.expander_states:
-            st.session_state.expander_states[doc_name] = True
-
-    # Update multiselect based on expander states
-    expanded_docs = st.multiselect(
-        label="Expand documents:",
-        options=doc_names,
-        default=[
-            doc for doc in doc_names if st.session_state.expander_states.get(doc, True)
-        ],
-        help="Choose which documents should be expanded",
-        key="expander_multiselect",
-    )
-
-    # Update session state based on multiselect
-    for doc_name in doc_names:
-        st.session_state.expander_states[doc_name] = doc_name in expanded_docs
-
-    try:
-        # Show loading message
-        with st.spinner("Extracting images from document..."):
-            for doc_id, data in response_lst:
-                if data["uploaded_filename"] in doc_names:
-                    # Create expander and update state when it's clicked
-                    expander_key = f"expander_{data['uploaded_filename']}"
-                    file_lst = st.expander(
-                        label=f"**{data['uploaded_filename']}**",
-                        expanded=st.session_state.expander_states.get(
-                            data["uploaded_filename"], True
-                        ),
-                    )
-
-                    # Update expander state and multiselect when expander is toggled
-                    if not file_lst:  # expander is closed
-                        st.session_state.expander_states[data["uploaded_filename"]] = (
-                            False
-                        )
-                        if data["uploaded_filename"] in expanded_docs:
-                            expanded_docs.remove(data["uploaded_filename"])
-                    else:  # expander is open
-                        st.session_state.expander_states[data["uploaded_filename"]] = (
-                            True
-                        )
-
-                    with file_lst:
-                        st.markdown(f"**Document ID:** {doc_id}")
-                        st.markdown(
-                            f"**Filename:** [{data['filename']}]({data['download_url']})"
-                        )  # Download link
-                        logger.info(f"Extracting images for document ID: {doc_id}")
-
-                        image_response = runner.run(get_images(doc_id=doc_id))
-                        logger.info(f"Image response: {image_response}")
-                        display_images(image_response, doc_id)
-
-                        embed_response = runner.run(embed_pdf(embed_type="sentence", doc_id=doc_id))
-                        logger.info(f"Embedding response: {embed_response}")
-                        if embed_response and "error" not in embed_response:
-                            st.toast("Document successfully embedded",
-                                     icon="✅")
-                        else:
-                            st.toast("Error during embedding",
-                                     icon="❌")
-
-
-    except TimeoutError as e:
-        logger.error(f"Timeout error: {e}")
-    except httpx.RequestError as e:
-        logger.error(f"Network error: {e}")
-        st.info(
-            "There was a problem connecting to the server. Please check your connection and try again."
-        )
-
-    except Exception as e:
-        logger.error(f"Unexpected error in image extraction: {e}")
-        st.error("An unexpected error occurred at image extraction.")
-
+    expanders = document_multiselect_with_expander()
+    runner.run(display_all(expanders))
 else:
     st.info("Please upload and process a PDF first to extract images")
