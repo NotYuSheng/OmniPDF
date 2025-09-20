@@ -14,8 +14,8 @@ router = APIRouter(prefix="/wordcloud", tags=["wordcloud"])
 
 logger = logging.getLogger(__name__)
 document_files = RedisDocumentFileList()
-MAX_WORDS = int(os.getenv("WORDCLOUD_MAX_WORDS", 50))
-MIN_WORD_LEN = int(os.getenv("WORDCLOUD_MIN_WORD_LEN", 2))
+MAX_WORDS = int(os.getenv("WORDCLOUD_MAX_WORDS", "50"))
+MIN_WORD_LEN = int(os.getenv("WORDCLOUD_MIN_WORD_LEN", "2"))
 
 
 async def concat_text(doc_id: str) -> str:
