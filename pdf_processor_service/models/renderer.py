@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, Field
 from typing import Optional, List, Dict
 
 
@@ -22,6 +22,7 @@ class DoclingTranslationResponse(BaseModel):
     pages: Dict
 
 
-class AnnotationResponse(BaseModel):
-    doc_id: str
-    docling: Optional[DoclingTranslationResponse] = None
+class RendererResponse(BaseModel):
+    doc_id: str = Field(min_length=1, description="Document ID")
+    status: str = Field(description="Rendering status")
+    result: Optional[DocumentRendererResponse] = None

@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from routers import health
-from routers import document, images, session, tables, text_chunks, json_data, embed, chat, metadata, wordcloud, extractor
+from routers import document, images, session, tables, text_chunks, json_data, chat, embed, metadata, wordcloud, extractor, translation, renderer
 from prometheus_fastapi_instrumentator import Instrumentator
+
 import logging
 
 # Set up logger
@@ -27,3 +28,5 @@ app.include_router(extractor.router)
 app.include_router(chat.router)
 app.include_router(metadata.router)
 app.include_router(wordcloud.router)
+app.include_router(translation.router)
+app.include_router(renderer.router)

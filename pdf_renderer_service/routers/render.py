@@ -1,22 +1,25 @@
 import pymupdf
 import logging
 import io
-import uuid
 import time
 import httpx
 from collections import defaultdict
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException, Body, BackgroundTasks
 from models.render import DocumentRendererResponse, AnnotationResponse
-from botocore.exceptions import ClientError
 from fastapi.concurrency import run_in_threadpool
 
 from shared_utils.s3_utils import (
     upload_fileobj,
     generate_presigned_url,
 )
+from shared_utils.job_status import save_job, load_job, JobType, handle_job_status
+from shared_utils.redis_utils import RedisDocumentFileList
 
 router = APIRouter(prefix="/render", tags=["render"])
 logger = logging.getLogger(__name__)
+
+# Redis cache for document files
+document_files = RedisDocumentFileList()
 
 
 def redact_and_render(pdf_bytes: bytes, annotations: dict) -> bytes:
@@ -97,72 +100,124 @@ def handle_file(buffer_bytes: bytes, key: str) -> str:
     return url
 
 
-@router.post("/{doc_id}")
-async def pdf_render(doc_url: str, json_data: AnnotationResponse = Body(...)):
-    start_time = time.time()
+async def process_render_job(doc_id: str, doc_url: str, json_data: dict):
+    """
+    Background task to process PDF rendering with translation overlays.
+    """
     try:
+        logger.info(f"Starting render job for doc_id: {doc_id}")
+        start_time = time.time()
+        
+        # Fetch PDF from URL
         async with httpx.AsyncClient() as client:
             pdf_response = await client.get(doc_url)
             pdf_response.raise_for_status()
-    except httpx.HTTPStatusError as e:
-        logger.error(f"HTTP error fetching PDF: {e.response.status_code}")
-        raise HTTPException(
-            422, f"Failed to fetch PDF from {doc_url}: HTTP {e.response.status_code}"
-        )
-    except httpx.RequestError as e:
-        logger.error(f"Request error fetching PDF: {e}")
-        raise HTTPException(422, f"Failed to fetch PDF from {doc_url}: {str(e)}")
-
-    content_length = pdf_response.headers.get("Content-Length")
-    if content_length:
-        size_bytes = int(content_length)
-    else:
-        size_bytes = len(pdf_response.content)
-    original_size = size_bytes / 1024
-    json_data = json_data.model_dump()
-
-    try:
+        
+        content_length = pdf_response.headers.get("Content-Length")
+        if content_length:
+            size_bytes = int(content_length)
+        else:
+            size_bytes = len(pdf_response.content)
+        original_size = size_bytes / 1024
+        
+        # Process the PDF with translation overlays
         output_bytes = await run_in_threadpool(
             redact_and_render, pdf_response.content, json_data
         )
+        
+        file_size = len(output_bytes)
+        rendered_size = file_size / 1024
+        
+        if original_size * 1.3 < rendered_size:
+            logger.warning(
+                f"File is bloated at {((rendered_size - original_size) / original_size) * 100:.2f}%"
+            )
+        
+        logger.info(f"Time to render document: {time.time() - start_time}")
+        logger.info(f"File size: {original_size:.2f} => {file_size / 1024:.2f} KB")
+        logger.info(
+            f"File size: {original_size / 1024:.2f} => {file_size / (1024 * 1024):.2f} MB"
+        )
+        
+        key = f"{doc_id}/rendered.pdf"
+        
+        # Upload to S3
+        presigned_url = await run_in_threadpool(handle_file, output_bytes, key)
+        
+        # Add to document files cache
+        document_files.add(doc_id, key)
+        
+        # Prepare result
+        result = {
+            "doc_id": doc_id,
+            "filename": key,
+            "download_url": presigned_url,
+        }
+        
+        # Save completed job
+        save_job(
+            doc_id=doc_id,
+            job_data=result,
+            status="completed",
+            job_type=JobType.RENDERER
+        )
+        
+        logger.info(f"Render job completed for doc_id: {doc_id}")
+        
     except Exception as e:
-        logger.error("Rendering failed", exc_info=True)
-        raise HTTPException(500, f"PDF processing error {e}")
-
-    file_size = len(output_bytes)
-
-    rendered_size = file_size / 1024
-
-    if original_size * 1.3 < rendered_size:
-        logger.warning(
-            f"File is bloated at {((rendered_size - original_size) / original_size) * 100:.2f}%"
+        logger.error(f"Render job failed for doc_id: {doc_id} - {e}", exc_info=True)
+        save_job(
+            doc_id=doc_id,
+            job_data={},
+            status="failed",
+            job_type=JobType.RENDERER
         )
 
-    logger.info(f"Time to render document: {time.time() - start_time}")
-    logger.info(f"File size: {original_size:.2f} => {file_size / 1024:.2f} KB")
-    logger.info(
-        f"File size: {original_size / 1024:.2f} => {file_size / (1024 * 1024):.2f} MB"
+
+@router.post("/{doc_id}", status_code=202)
+async def pdf_render(
+    doc_id: str, 
+    background_tasks: BackgroundTasks,
+    doc_url: str, 
+    json_data: AnnotationResponse = Body(...)
+):
+    """Submit a PDF for rendering with translation overlays."""
+    logger.info(f"Received render request for doc_id: {doc_id}")
+    
+    # Save initial job status
+    save_job(
+        doc_id=doc_id,
+        job_data={},
+        status="processing",
+        job_type=JobType.RENDERER
     )
-
-    new_doc_id = str(uuid.uuid4())
-    key = f"{new_doc_id}/rendered.pdf"
-
-    try:
-        presigned_url = await run_in_threadpool(handle_file, output_bytes, key)
-
-    except ClientError as e:
-        code = e.response.get("Error", {}).get("Code", "Unknown")
-        logger.error(f"S3 ClientError {code}", exc_info=True)
-        raise HTTPException(502, f"S3 service error ({code})")
-    except RuntimeError as e:
-        # this covers your "upload returned False" path
-        raise HTTPException(500, str(e))
-    except Exception as e:
-        logger.error("Unexpected upload error", exc_info=True)
-        raise HTTPException(500, f"Internal server error {e}")
-
-    return DocumentRendererResponse(
-        doc_id=new_doc_id,
-        filename=key,
-        download_url=presigned_url,
+    
+    # Start background processing
+    background_tasks.add_task(
+        process_render_job,
+        doc_id,
+        doc_url,
+        json_data.model_dump()
     )
+    
+    return {"message": "Render job started", "doc_id": doc_id}
+
+
+@router.get("/{doc_id}", response_model=DocumentRendererResponse)
+async def get_render_result(doc_id: str):
+    """Get the result of a completed render job."""
+    job = load_job(doc_id=doc_id, job_type=JobType.RENDERER)
+    
+    if not job:
+        raise HTTPException(status_code=404, detail="Render job not found")
+    
+    handle_job_status(job, JobType.RENDERER)
+    
+    job_data = job.get("data", {})
+    
+    # Extend expiry time for the rendered files
+    rendered_doc_id = job_data.get("doc_id")
+    if rendered_doc_id:
+        _ = document_files[rendered_doc_id]
+    
+    return DocumentRendererResponse(**job_data)
