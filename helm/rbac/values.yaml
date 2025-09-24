@@ -79,6 +79,8 @@ rbac:
     enabled: true
     canCall: {}                         # External vLLM only (via customRules)
     canAccess:
+      minio: true                       # Store translated JSON + job status
+      redis: true                       # Document file list management
       secrets: ["docling-translation-secrets"]
   
   image-captioner-service:
@@ -93,6 +95,8 @@ rbac:
     canCall: {}                         # No service calls (external embedding API via customRules)
     canAccess:
       chromadb: true                    # Store embeddings
+      minio: true                       # Job status storage
+      redis: true                       # Job status polling
       secrets: ["embedder-secrets"]
   
   # Chat service - RAG queries using ChromaDB
@@ -101,6 +105,8 @@ rbac:
     canCall: {}                         # External vLLM only (via customRules)
     canAccess:
       chromadb: true                    # Vector retrieval for RAG
+      minio: true                       # Future file operations
+      redis: true                       # Future session management
       secrets: ["chat-secrets"]
   
   # Metadata generation - Analyzes documents for metadata
@@ -110,14 +116,16 @@ rbac:
     canAccess:
       chromadb: true                    # Retrieve document chunks
       minio: true                       # Store/load metadata results
+      redis: true                       # Document file list management
       secrets: ["metadata-secrets"]
   
   # PDF rendering - Overlays translated content
   pdf-renderer-service:
     enabled: true
-    canCall: {}                         # External LLM only (via customRules)  
+    canCall: {}                         # External LLM only (via customRules)
     canAccess:
-      minio: true                       # Access PDFs for rendering
+      minio: true                       # Access PDFs for rendering + job status
+      redis: true                       # Document file list management
       secrets: ["pdf-renderer-secrets"]
   
   # Cleanup service - Removes expired data
