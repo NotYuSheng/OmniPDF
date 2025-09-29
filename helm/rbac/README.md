@@ -29,14 +29,13 @@ The RBAC implementation follows the OmniPDF microservices architecture with **ex
 - **Configuration**: Driven by explicit `values.yaml` declarations
 - **Principle**: Each service declares exactly what it can call/access
 
-### Service Coverage (15/15 Complete)
+### Service Coverage (14/14 Complete)
 
-✅ **All services have RBAC coverage:**
+✅ **All services have complete RBAC coverage:**
 
 | Layer | Service | Service Account | Status |
 |-------|---------|----------------|--------|
 | **External** | nginx | `nginx` | ✅ |
-| **Gateway** | istio-gateway | `istio-gateway` | N/A |
 | **Frontend** | frontend | `frontend` | ✅ |
 | **Orchestrator** | pdf-processor-service | `pdf-processor-service` | ✅ |
 | **Processing** | pdf-extraction-service | `pdf-extraction-service` | ✅ |
@@ -78,17 +77,17 @@ pdf-processor-service → [all processing services] → [data stores]
 • vLLM Vision ← image-captioner
 ```
 
-### Current RBAC Configuration Issues
+### RBAC Configuration Status
 
-Based on C4 diagram analysis, current `values.yaml` has missing permissions:
+All services have complete RBAC permissions aligned with C4 diagram requirements:
 
-| Service | Missing Permissions | Required by C4 |
-|---------|-------------------|----------------|
-| **embedder-service** | `minio`, `redis` | ✅ Store job status, file lists |
-| **chat-service** | `minio`, `redis` | ✅ File operations, session management |
-| **docling-translation-service** | `minio`, `redis` | ✅ Store translated JSON, file lists |
-| **pdf-renderer-service** | `redis` | ✅ Session management |
-| **metadata-service** | `redis` | ✅ Document file lists |
+| Service | Data Store Access | Status |
+|---------|-------------------|--------|
+| **embedder-service** | `chromadb`, `minio`, `redis` | ✅ Complete |
+| **chat-service** | `chromadb`, `minio`, `redis` | ✅ Complete |
+| **docling-translation-service** | `minio`, `redis` | ✅ Complete |
+| **pdf-renderer-service** | `minio`, `redis` | ✅ Complete |
+| **metadata-service** | `chromadb`, `minio`, `redis` | ✅ Complete |
 
 ## Configuration Structure
 
@@ -256,49 +255,25 @@ kubectl auth can-i get services/minio \
    - Verify data store access in `canAccess` (minio: true, etc.)
    - Check NetworkPolicy allows traffic (separate concern)
 
-## Required Fixes
+## Validation Commands
 
-To align with C4 diagram, update `values.yaml`:
+Verify RBAC configuration is working correctly:
 
-### Add Missing Data Store Access
-```yaml
-embedder-service:
-  canAccess:
-    minio: true      # ADD: Future job status storage
-    redis: true      # ADD: Document file list management
+### Test Service-to-Service Permissions
+```bash
+# Test data store access
+kubectl auth can-i get services/minio \
+  --as=system:serviceaccount:omnipdf:embedder-service \
+  -n omnipdf
 
-chat-service:
-  canAccess:
-    minio: true      # ADD: File operations
-    redis: true      # ADD: Future session management
+kubectl auth can-i get services/chromadb \
+  --as=system:serviceaccount:omnipdf:chat-service \
+  -n omnipdf
 
-docling-translation-service:
-  canAccess:
-    minio: true      # ADD: Store translated JSON
-    redis: true      # ADD: Document file list management
-
-pdf-renderer-service:
-  canAccess:
-    redis: true      # ADD: Future session management
-
-metadata-service:
-  canAccess:
-    redis: true      # ADD: Document file list management
-```
-
-### Add Missing istio-gateway Service
-```yaml
-serviceAccounts:
-  istio-gateway: "istio-gateway"    # ADD
-
-rbac:
-  istio-gateway:                    # ADD
-    enabled: true
-    canCall:
-      frontend: true
-      pdf-processor-service: true
-    canAccess:
-      secrets: ["istio-gateway-secrets"]
+# Test orchestration permissions
+kubectl auth can-i get services/embedder-service \
+  --as=system:serviceaccount:omnipdf:pdf-processor-service \
+  -n omnipdf
 ```
 
 ## Related Documentation
