@@ -1,7 +1,7 @@
-# OmniPDF Istio Gateway - Default Configuration
-# This provides sensible defaults for the Istio gateway configuration
+# OmniPDF Istio Gateway - Prestaging Environment Configuration
+# This configures your own Istio control plane in CRC environment
 
-# Gateway configuration
+# Gateway configuration for prestaging
 gateway:
   enabled: true
   name: omnipdf-gateway
@@ -14,22 +14,25 @@ gateway:
         name: http
         protocol: HTTP
       hosts:
-        - "*"
+        - "omnipdf-prestaging.apps-crc.testing"
+      # No HTTPS redirect in prestaging for easier testing
     - port:
         number: 443
         name: https  
         protocol: HTTPS
       hosts:
-        - "*"
+        - "omnipdf-prestaging.apps-crc.testing"
       tls:
         mode: SIMPLE
+        # Use CRC default certificates for prestaging
+        credentialName: omnipdf-prestaging-tls
 
-# VirtualService configuration
+# VirtualService for prestaging routing
 virtualService:
   enabled: true
-  name: omnipdf-routes
+  name: omnipdf-prestaging-routes
   hosts:
-    - "*"
+    - "omnipdf-prestaging.apps-crc.testing"
   gateways:
     - omnipdf-gateway
   
@@ -41,10 +44,10 @@ virtualService:
         - uri:
             prefix: "/static/"
         - uri:
-            prefix: "/_stcore/"
+            prefix: "/_stcore/"  # Streamlit core assets
       route:
         - destination:
-            host: frontend.default.svc.cluster.local
+            host: frontend.omnipdf-prestaging.svc.cluster.local
             port:
               number: 8501
       priority: 5
@@ -57,48 +60,163 @@ virtualService:
         uri: "/"
       route:
         - destination:
-            host: pdf-processor-service.default.svc.cluster.local
+            host: pdf-processor-service.omnipdf-prestaging.svc.cluster.local
+            port:
+              number: 8000
+      priority: 10
+    
+    # Legacy routes
+    - match:
+        - uri:
+            prefix: "/pdf_processor/"
+      rewrite:
+        uri: "/"  
+      route:
+        - destination:
+            host: pdf-processor-service.omnipdf-prestaging.svc.cluster.local
             port:
               number: 8000
       priority: 10
 
-# Destination Rules for mTLS
+# mTLS for internal service communication
 destinationRules:
-  enabled: false
-  services: []
+  enabled: true
+  services:
+    - name: frontend.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: pdf-processor-service.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: chat-service.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: embedder-service.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: chromadb.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: redis.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: minio.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: pdf-extraction-service.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: docling-translation-service.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: pdf-renderer-service.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: image-captioner-service.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: metadata-service.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+    - name: cleaner.omnipdf-prestaging.svc.cluster.local
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
 
-# External service entries
+# External services for prestaging vLLM
 serviceEntries:
-  enabled: false
-  entries: []
+  enabled: true
+  entries:
+    - name: prestaging-vllm-text
+      hosts:
+        - "webworkdgx"  # Your external vLLM host
+      ports:
+        - number: 8080
+          name: vllm-qwen3coder
+          protocol: HTTP
+        - number: 8000  
+          name: vllm-alt
+          protocol: HTTP
+      location: MESH_EXTERNAL
+      resolution: DNS
 
-# Sidecar injection configuration
+# Enable sidecar injection for prestaging namespace
 sidecarInjection:
-  enabled: false
-  namespaceLabels: {}
-  podAnnotations: {}
+  enabled: true
+  namespaceLabels:
+    istio-injection: enabled
+  podAnnotations:
+    sidecar.istio.io/inject: "true"
 
-# Environment setting
-environment: default
+# Prestaging environment settings
+environment: prestaging
 
-# Resource configuration
+# Reduced resource requirements for CRC
 resources:
   requests:
-    cpu: 100m
-    memory: 128Mi  
+    cpu: 50m
+    memory: 64Mi  
   limits:
-    cpu: 500m
-    memory: 512Mi
+    cpu: 200m
+    memory: 256Mi
 
-# Network policy configuration
+# Network policy enabled for ingress gateway
 networkPolicy:
-  enabled: false
+  enabled: true
   ingress:
-    enabled: false
-    allowedCallers: []
+    enabled: true
+    allowedCallers:
+      # Nginx - API/UI requests → Istio Gateway
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: nginx
   egress:
-    enabled: false
-    allowDNS: false
+    enabled: true
+    allowDNS: true
     allowHTTPS: false
     allowHTTP: false
-    allowedTargets: []
+    allowedTargets:
+      # Frontend - routes UI requests
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: frontend
+        ports: [8501]
+      # PDF Processor Service - routes API requests
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+        ports: [8000]
+
+# Default service configuration
+service:
+  type: ClusterIP
+  ports:
+    - port: 80
+      name: http
+    - port: 443
+      name: https
+
+# Default serviceAccount configuration  
+serviceAccount:
+  create: false
+  automount: false
+
+# Default ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []

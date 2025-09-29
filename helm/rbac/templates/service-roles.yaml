@@ -62,13 +62,13 @@ rules:
       {{- end }}
   verbs: ["get", "watch"]
     
-    {{- else if eq $resourceType "persistentvolumes" }}
-# Persistent volume access
+    {{- else if eq $resourceType "persistentvolumeclaims" }}
+# Persistent volume claim access
 - apiGroups: [""]
   resources: ["persistentvolumeclaims"]
   resourceNames:
-      {{- range $pvName := $resourceValue }}
-    - "{{ $pvName }}"
+      {{- range $pvcName := $resourceValue }}
+    - "{{ $pvcName }}"
       {{- end }}
   verbs: ["get", "list"]
     

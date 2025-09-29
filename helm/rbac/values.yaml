@@ -142,21 +142,21 @@ rbac:
     canCall: {}                         # Pure data store
     canAccess:
       secrets: ["chromadb-secrets"]     # Database credentials
-      persistentvolumes: ["chromadb-data"] # Data persistence
+      persistentvolumeclaims: ["chromadb-data"] # Data persistence
   
   minio:
     enabled: true
     canCall: {}                         # Pure object storage
     canAccess:
       secrets: ["minio-secrets"]        # S3 credentials
-      persistentvolumes: ["minio-data"] # Storage persistence
+      persistentvolumeclaims: ["minio-data"] # Storage persistence
   
   redis:
     enabled: true
     canCall: {}                         # Pure session store
     canAccess:
       secrets: ["redis-secrets"]        # Redis credentials
-      persistentvolumes: ["redis-data"] # Data persistence
+      persistentvolumeclaims: ["redis-data"] # Data persistence
 
 # Global RBAC settings
 global:
