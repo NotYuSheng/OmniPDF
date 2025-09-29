@@ -32,9 +32,7 @@ rbac:
   # API Gateway - Routes external traffic
   nginx:
     enabled: true
-    canCall:
-      frontend: true                    # UI routing
-      pdf-processor-service: true       # API routing (/pdf_processor/)
+    canCall: {}                         # Routes to istio-gateway (different namespace)
     canAccess:
       configmaps: ["nginx-config"]      # Configuration access
       secrets: ["nginx-secrets"]        # TLS certificates, etc.
@@ -43,7 +41,7 @@ rbac:
   frontend:
     enabled: true
     canCall:
-      nginx: true                       # All backend communication via gateway
+      pdf-processor-service: true       # Direct communication to processor
     canAccess:
       secrets: ["frontend-secrets"]     # UI configuration secrets
   
