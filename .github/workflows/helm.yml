@@ -26,7 +26,7 @@ jobs:
         run: |
           for chart in helm/*/; do
             # Skip directories that aren't Helm charts
-            if [[ "$chart" == "helm/assets/" || "$chart" == "helm/shared-values/" ]]; then
+            if [[ "$chart" == "helm/assets/" ]]; then
               echo "Skipping non-chart directory: $chart"
               continue
             fi

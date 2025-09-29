@@ -95,7 +95,7 @@ lint-all:
 	@echo "Linting all Helm charts under ./helm/..."
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
-		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
+		if [ "$$CHART" != "assets" ]; then \
 			echo "Linting chart: $$CHART"; \
 			helm lint $$dir || exit 1; \
 		else \
@@ -120,7 +120,7 @@ define deploy-all-charts
 	@echo "$(1) all Helm charts under ./helm/ for environment: $(ENV)"
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
-		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
+		if [ "$$CHART" != "assets" ]; then \
 			echo "$(1) chart: $$CHART"; \
 			if [ -f "helm/$$CHART/values-$(ENV).yaml" ]; then \
 				CHART_VALUES="-f helm/$$CHART/values-$(ENV).yaml"; \
@@ -151,7 +151,7 @@ uninstall-all:
 	@echo "Uninstalling all Helm charts under ./helm/..."
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
-		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
+		if [ "$$CHART" != "assets" ]; then \
 			echo "Uninstalling chart: $$CHART"; \
 			helm uninstall $$CHART \
 				--namespace $(NAMESPACE); \

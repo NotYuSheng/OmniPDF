@@ -249,7 +249,7 @@ crc config view
 ./scripts/scan_with_trivy.sh
 
 # Lint all Helm charts
-for chart in helm/*/; do helm lint "$chart"; done
+find helm -maxdepth 1 -type d ! -name 'assets' ! -name 'helm' -exec helm lint {} \;
 ```
 
 ## Development Workflow
