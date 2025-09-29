@@ -1,0 +1,103 @@
+# Pre-staging environment overrides - minimal for disk pressure
+replicaCount: 1
+
+# Pre-staging LLM configuration - External vLLM service on VPN
+llm:
+  baseUrl: "http://100.108.2.57/vllm_qwen2.5/v1"
+  model: "Qwen2.5-14B-Coder-Instruct"  # Model name as served by external vLLM
+
+# Pre-staging resources - minimal for disk pressure
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Disable autoscaling for prestaging due to disk pressure
+autoscaling:
+  enabled: false
+
+# Pre-staging secrets
+secrets:
+  create: false
+  name: metadata-service-secrets
+
+# Pre-staging specific configurations - using local CRC registry
+image:
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/metadata_service
+  tag: "dev-v0.0.3-5d69f89"
+  pullPolicy: Always  # Use local registry image
+
+# Environment variables
+env:
+  - name: LOG_LEVEL
+    value: "INFO"
+  - name: ENVIRONMENT
+    value: "prestaging"
+  - name: ENABLE_METRICS
+    value: "true"
+
+# Network policy disabled for pre-staging flexibility
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # PDF Processor Service - requests metadata generation
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: true  # External vLLM API calls
+    allowHTTP: true   # External vLLM API calls
+    allowedTargets:
+      # ChromaDB - query vectors for metadata generation
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chromadb
+        ports: [8000]
+      # MinIO - stores metadata job status
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: minio
+        ports: [9000]
+      # Redis - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        ports: [6379]
+
+# Pod disruption budget for pre-staging (2 replicas, allow 1 down)
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Moderate deployment strategy for pre-staging (balanced speed/safety)
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    minAvailable: 1
+    maxSurge: 1
+
+# Moderate resource quota for pre-staging testing
+serviceMonitor:
+  enabled: true
+  interval: "20s"           # Between staging and prod intervals
+  scrapeTimeout: "8s"       # Slightly shorter timeout for testing
+  labels:
+    environment: prestaging # Help identify prestaging metrics
+
+# Add toleration for disk pressure to allow scheduling
+tolerations:
+  - key: "node.kubernetes.io/disk-pressure"
+    operator: "Exists"
+    effect: "NoSchedule"
+# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  sidecar.istio.io/proxyCPU: "10m"
+  sidecar.istio.io/proxyMemory: "128Mi"

@@ -1,0 +1,18 @@
+apiVersion: v2
+name: frontend
+description: OmniPDF Frontend - Streamlit web interface for PDF processing and chat
+
+type: application
+version: 0.1.0
+appVersion: "dev-v0.0.3-5d69f89"
+
+# Chart icon for Helm repositories and UIs
+icon: file://../assets/logo.svg
+
+# Keywords for chart search
+keywords:
+  - frontend
+  - streamlit
+  - web-interface
+  - ui
+  - omnipdf

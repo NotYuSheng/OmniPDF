@@ -1,0 +1,131 @@
+# Pre-staging environment configuration for frontend
+# Prestaging environment configuration for frontend service in CRC
+
+# Single replica for prestaging
+replicaCount: 1
+
+# Use local CRC registry image
+image:
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/frontend
+  tag: "dev-v0.0.3-5d69f89"
+  pullPolicy: Always
+
+# Prestaging resource allocation - moderate for web UI
+resources:
+  limits:
+    cpu: 300m
+    memory: 512Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+# Disable autoscaling for prestaging
+autoscaling:
+  enabled: false
+
+# Pre-staging secrets
+secrets:
+  create: false
+  name: frontend-secrets
+
+# Environment variables for prestaging
+env:
+  - name: LOG_LEVEL
+    value: "INFO"
+  - name: ENVIRONMENT
+    value: "prestaging"
+  - name: STREAMLIT_CLIENT_TOOLBAR_MODE
+    value: "minimal"
+
+# Health probes with adjusted timing for prestaging
+startupProbe:
+  enabled: true
+  httpGet:
+    path: /_stcore/health
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 10
+  successThreshold: 1
+
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /_stcore/health
+    port: http
+  initialDelaySeconds: 20
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /_stcore/health
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 2
+  successThreshold: 1
+
+# Enable basic monitoring for prestaging
+serviceMonitor:
+  enabled: false  # Enable when Prometheus is available
+
+# Network policy for prestaging security
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # Istio Gateway - routes UI requests
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: istio-gateway
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets:
+      # PDF Processor Service - requests document metadata + presigned URLs
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+        ports: [8000]
+
+# Pod disruption budget not needed for single replica
+podDisruptionBudget:
+  enabled: false
+
+# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  # Streamlit-specific sidecar configuration
+  sidecar.istio.io/proxyCPU: "10m"
+  sidecar.istio.io/proxyMemory: "128Mi"
+
+# Add toleration for disk pressure to allow scheduling  
+tolerations:
+  - key: "node.kubernetes.io/disk-pressure"
+    operator: "Exists"
+    effect: "NoSchedule"
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8501
+
+serviceAccount:
+  create: false
+  automount: false
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []

@@ -1,0 +1,17 @@
+OmniPDF Redis has been deployed!
+
+Redis is accessible within the cluster at:
+  Service: {{ include "redis.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  Port: {{ .Values.service.port }}
+
+To connect to Redis:
+  kubectl run redis-client --rm -it --image redis:alpine -- redis-cli -h {{ include "redis.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local -p {{ .Values.service.port }}
+
+To test the connection:
+  kubectl run redis-test --rm -it --image redis:alpine -- redis-cli -h {{ include "redis.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local -p {{ .Values.service.port }} ping
+
+Health Check:
+  kubectl --namespace {{ .Release.Namespace }} get pods -l "app.kubernetes.io/name={{ include "redis.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"
+
+View Logs:
+  kubectl --namespace {{ .Release.Namespace }} logs -f deployment/{{ include "redis.fullname" . }}

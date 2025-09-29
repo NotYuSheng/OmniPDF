@@ -22,6 +22,12 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Expose the FastAPI port
+# Create non-root user for security and set permissions
+RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /bin/bash appuser && \
+    chown -R appuser:appuser /app
+
+USER appuser
+
 EXPOSE 8000
 
 CMD ["uvicorn", "image_captioner_service.main:app", "--host", "0.0.0.0", "--port", "8000"]

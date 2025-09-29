@@ -56,3 +56,6 @@ coverage/
 # Code assist tools
 .claude/
 CLAUDE.md
+
+# Istio installation directory (downloaded binaries)
+istio-*/

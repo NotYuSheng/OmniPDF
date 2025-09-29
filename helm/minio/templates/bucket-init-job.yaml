@@ -1,0 +1,80 @@
+{{- if .Values.bucketInit.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "minio.fullname" . }}-bucket-init
+  labels:
+    {{- include "minio.labels" . | nindent 4 }}
+    app.kubernetes.io/component: bucket-init
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "minio.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: bucket-init
+    spec:
+      restartPolicy: OnFailure
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "minio.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: bucket-init
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.bucketInit.image.repository }}:{{ .Values.bucketInit.image.tag }}"
+          imagePullPolicy: {{ .Values.bucketInit.image.pullPolicy }}
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "minio.secretName" . }}
+                  key: MINIO_ROOT_USER
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "minio.secretName" . }}
+                  key: MINIO_ROOT_PASSWORD
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "Setting up MinIO alias..."
+              mc alias set minio-local http://{{ include "minio.fullname" . }}:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+              echo "Waiting for MinIO to be ready..."
+              until mc ready minio-local; do
+                echo "MinIO not ready yet, waiting..."
+                sleep 2
+              done
+              echo "MinIO is healthy, creating buckets..."
+              {{- range .Values.bucketInit.buckets }}
+              echo "Creating bucket: {{ . }}"
+              mc mb --ignore-existing minio-local/{{ . }}
+              {{- end }}
+              {{- if .Values.bucketInit.policies }}
+              echo "Setting bucket policies..."
+              {{- range .Values.bucketInit.policies }}
+              echo "Setting policy for {{ .bucket }}: {{ .policy }}"
+              mc anonymous set {{ .policy }} minio-local/{{ .bucket }}
+              {{- end }}
+              {{- end }}
+              echo "Bucket initialization completed successfully"
+          resources:
+            {{- toYaml .Values.bucketInit.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

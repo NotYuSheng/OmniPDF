@@ -1,0 +1,19 @@
+apiVersion: v2
+name: embedder-service
+description: OmniPDF Embedder Service - Text chunking and embedding with ChromaDB storage
+
+type: application
+version: 0.1.0
+appVersion: "dev-v0.0.3-5d69f89"
+
+# Chart icon for Helm repositories and UIs
+icon: file://../assets/logo.svg
+
+# Keywords for chart search
+keywords:
+  - embedder
+  - embedding
+  - chromadb
+  - vector-store
+  - omnipdf
+

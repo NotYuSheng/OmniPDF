@@ -1,0 +1,100 @@
+# Redis prestaging environment configuration
+
+# Single replica for prestaging
+replicaCount: 1
+
+# Use official Redis image
+image:
+  repository: redis
+  tag: "8.2.1-alpine"
+  pullPolicy: Always
+
+# Reduced resources for prestaging
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 25m
+    memory: 32Mi
+
+# Storage configuration for prestaging
+persistence:
+  enabled: true
+  storageClass: ""  # Use default CRC storage
+  accessModes:
+    - ReadWriteOnce
+  size: 500Mi  # Smaller size for prestaging
+
+# Redis password disabled for prestaging simplicity
+redis:
+  password: ""
+
+# Disable autoscaling for prestaging
+autoscaling:
+  enabled: false
+
+# Use Recreate strategy for single-node
+deploymentStrategy:
+  type: Recreate
+
+# Enable service monitoring for prestaging (Redis built-in metrics)
+serviceMonitor:
+  enabled: true
+  port: "redis"            # Redis main port (6379)
+  path: "/info"            # Redis INFO endpoint (custom scraper needed)
+  interval: "30s"          # Scrape frequency  
+  scrapeTimeout: "10s"
+  labels:
+    environment: prestaging
+
+# Network policy disabled for pre-staging flexibility
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # PDF Processor Service - session validation
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+      # PDF Extraction Service - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-extraction-service
+      # Metadata Service - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
+      # Embedder Service - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: embedder-service
+      # Docling Translation Service - document file list management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: docling-translation-service
+      # Chat Service - future session management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
+      # PDF Renderer Service - future session management
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-renderer-service
+      # Cleaner - clean sessions
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: cleaner
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets: []  # Redis doesn't need to call other services
+
+# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  sidecar.istio.io/proxyCPU: "10m"
+  sidecar.istio.io/proxyMemory: "128Mi"

@@ -1,0 +1,92 @@
+# Pre-staging environment overrides - minimal for disk pressure
+replicaCount: 1
+
+# Pre-staging LLM configuration - External vLLM service on VPN
+
+# Pre-staging resources - minimal for disk pressure
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Disable autoscaling for prestaging due to disk pressure
+autoscaling:
+  enabled: false
+
+# Pre-staging secrets
+secrets:
+  create: false
+  name: nginx-secrets
+
+# Pre-staging specific configurations - using local CRC registry
+image:
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/nginx
+  tag: "dev-v0.0.3-5d69f89"
+  pullPolicy: Always  # Use local registry image
+
+# Environment variables
+env:
+  - name: LOG_LEVEL
+    value: "INFO"
+  - name: ENVIRONMENT
+    value: "prestaging"
+  - name: ENABLE_METRICS
+    value: "true"
+
+# Network policy enabled for external traffic entry point
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers: []  # External traffic entry point - no pod-to-pod ingress
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets:
+      # Istio Gateway - routes API/UI requests to Istio Gateway
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: istio-gateway
+        ports: [80, 443]
+
+# Pod disruption budget for pre-staging (2 replicas, allow 1 down)
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Moderate deployment strategy for pre-staging (balanced speed/safety)
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    minAvailable: 1
+    maxSurge: 1
+
+# Enable nginx built-in stub_status for prestaging
+nginx:
+  enableMetrics: true
+
+serviceMonitor:
+  enabled: true
+  port: "http"              # Nginx main port
+  path: "/nginx_status"     # Nginx stub_status endpoint
+  interval: "20s"           # Between staging and prod intervals
+  scrapeTimeout: "8s"       # Slightly shorter timeout for testing
+  labels:
+    environment: prestaging # Help identify prestaging metrics
+
+# Add toleration for disk pressure to allow scheduling
+tolerations:
+  - key: "node.kubernetes.io/disk-pressure"
+    operator: "Exists"
+    effect: "NoSchedule"
+
+# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  sidecar.istio.io/proxyCPU: "10m"
+  sidecar.istio.io/proxyMemory: "128Mi"

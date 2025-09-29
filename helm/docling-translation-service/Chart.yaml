@@ -1,0 +1,19 @@
+apiVersion: v2
+name: docling-translation-service
+description: OmniPDF Docling Translation Service - Translates docling-style JSON content
+
+type: application
+version: 0.1.0
+appVersion: "dev-v0.0.3-5d69f89"
+
+# Chart icon for Helm repositories and UIs
+icon: file://../assets/logo.svg
+
+# Keywords for chart search
+keywords:
+  - docling
+  - translation
+  - json
+  - content
+  - omnipdf
+

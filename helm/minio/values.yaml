@@ -1,0 +1,160 @@
+# MinIO prestaging environment configuration
+
+# Single replica for prestaging
+replicaCount: 1
+
+# Use official MinIO image
+image:
+  repository: minio/minio
+  tag: "RELEASE.2025-07-23T15-54-02Z"
+  pullPolicy: Always
+
+# Prestaging bucket initialization
+bucketInit:
+  enabled: true
+  image:
+    repository: minio/mc
+    tag: "RELEASE.2025-07-21T05-28-08Z"
+    pullPolicy: Always
+
+# Reduced resources for prestaging
+resources:
+  limits:
+    cpu: 300m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Storage configuration for prestaging
+persistence:
+  enabled: true
+  storageClass: ""  # Use default CRC storage
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi  # Smaller size for prestaging
+
+# MinIO credentials for prestaging (externally managed)
+secrets:
+  create: false
+  name: minio-prestaging-secrets
+
+# Environment-specific settings
+env:
+  - name: MINIO_BROWSER_REDIRECT_URL
+    value: "http://localhost:9001"
+  - name: MINIO_SERVER_URL
+    value: "http://localhost:9000"
+  - name: MINIO_CONSOLE_ADDRESS
+    value: ":9001"
+
+# Disable autoscaling for prestaging
+autoscaling:
+  enabled: false
+
+# Use Recreate strategy for single-node
+deploymentStrategy:
+  type: Recreate
+
+# Enable service monitoring for prestaging
+serviceMonitor:
+  enabled: true               # Enable MinIO built-in metrics
+  port: "minio-api"          # Use MinIO API port  
+  path: "/minio/v2/metrics/cluster"  # MinIO metrics endpoint
+  interval: "30s"             # Scrape every 30 seconds
+  scrapeTimeout: "10s"
+  labels:
+    environment: prestaging
+
+# Network policy disabled for pre-staging flexibility
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+    allowedCallers:
+      # PDF Processor Service - stores PDFs, generates presigned URLs
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-processor-service
+      # PDF Extraction Service - stores extracted images + job status
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-extraction-service
+      # PDF Renderer Service - stores rendered PDFs
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: pdf-renderer-service
+      # Metadata Service - stores metadata job status
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: metadata-service
+      # Docling Translation Service - stores translated JSON + job status
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: docling-translation-service
+      # Embedder Service - future job status storage
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: embedder-service
+      # Chat Service - future job status + file operations
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
+      # Cleaner - delete expired files
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: cleaner
+  egress:
+    enabled: true
+    allowDNS: true
+    allowHTTPS: false
+    allowHTTP: false
+    allowedTargets: []  # MinIO doesn't need to call other services
+
+# Istio sidecar injection for service mesh
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  sidecar.istio.io/proxyCPU: "10m"
+  sidecar.istio.io/proxyMemory: "128Mi"
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 9000
+
+serviceAccount:
+  create: false
+  automount: false
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []
+
+# Pod disruption budget configuration
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+# Health probe configuration
+livenessProbe:
+  enabled: true
+  path: "/minio/health/live"
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  enabled: true
+  path: "/minio/health/ready"
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+startupProbe:
+  enabled: true
+  path: "/minio/health/live"
+  initialDelaySeconds: 15
+  periodSeconds: 5
+  failureThreshold: 10

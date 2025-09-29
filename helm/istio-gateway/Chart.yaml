@@ -1,0 +1,25 @@
+apiVersion: v2
+name: istio-gateway
+description: OmniPDF Istio Gateway - Service mesh ingress for prestaging environment
+type: application
+version: 0.1.0
+appVersion: "1.27.1"
+
+home: https://github.com/NotYuSheng/OmniPDF
+sources:
+  - https://github.com/NotYuSheng/OmniPDF
+
+maintainers:
+  - name: OmniPDF Team
+    
+keywords:
+  - istio
+  - gateway
+  - service-mesh
+  - ingress
+  - omnipdf
+  - prestaging
+
+annotations:
+  category: Networking
+  service.type: ingress-gateway

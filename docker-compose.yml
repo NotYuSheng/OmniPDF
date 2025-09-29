@@ -6,8 +6,6 @@ services:
     container_name: frontend
     env_file:
       - ./frontend/.env
-    ports:
-      - "8501:8501"
 
   pdf_processor_service:
     build:
@@ -104,6 +102,7 @@ services:
       - ./nginx/.env
     depends_on:
       - pdf_processor_service
+      - frontend
 
   redis:
     container_name: redis

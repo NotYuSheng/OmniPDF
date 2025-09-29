@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from routers import health, semantic, sentence
+from prometheus_fastapi_instrumentator import Instrumentator
 import nltk
 import logging
 
@@ -17,6 +18,10 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(root_path="/embedder", lifespan=lifespan)
+
+# Initialize Prometheus metrics
+instrumentator = Instrumentator()
+instrumentator.instrument(app).expose(app)
 
 app.include_router(health.router)
 app.include_router(semantic.router)

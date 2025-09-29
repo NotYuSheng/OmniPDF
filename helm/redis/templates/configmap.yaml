@@ -1,0 +1,11 @@
+{{- if .Values.redis.config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "redis.fullname" . }}-config
+  labels:
+    {{- include "redis.labels" . | nindent 4 }}
+data:
+  redis.conf: |
+    {{- .Values.redis.config | nindent 4 }}
+{{- end }}

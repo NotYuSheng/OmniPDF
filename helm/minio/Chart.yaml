@@ -1,0 +1,18 @@
+apiVersion: v2
+name: minio
+description: OmniPDF MinIO - S3-compatible object storage for files and documents
+
+type: application
+version: 0.1.0
+appVersion: "RELEASE.2024-01-16T16-07-38Z"
+
+# Chart icon for Helm repositories and UIs
+icon: file://../assets/logo.svg
+
+# Keywords for chart search
+keywords:
+  - minio
+  - s3
+  - object-storage
+  - files
+  - omnipdf

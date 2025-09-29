@@ -1,0 +1,18 @@
+apiVersion: v2
+name: pdf-extraction-service
+description: OmniPDF PDF Extraction Service - Extracts tables and images from PDFs using docling
+
+type: application
+version: 0.1.0
+appVersion: "dev-v0.0.3-5d69f89"
+
+# Chart icon for Helm repositories and UIs
+icon: file://../assets/logo.svg
+
+# Keywords for chart search
+keywords:
+  - pdf-extraction
+  - docling
+  - tables
+  - images
+  - omnipdf

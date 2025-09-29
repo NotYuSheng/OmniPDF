@@ -1,0 +1,44 @@
+OmniPDF Frontend has been deployed!
+
+1. Get the application URL by running these commands:
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "frontend.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8501 to use the Streamlit interface"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8501:$CONTAINER_PORT
+
+2. Health Check:
+  kubectl --namespace {{ .Release.Namespace }} get pods -l "app.kubernetes.io/name={{ include "frontend.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"
+
+3. View Logs:
+  kubectl --namespace {{ .Release.Namespace }} logs -f deployment/{{ include "frontend.fullname" . }}
+
+4. Test the Frontend Health:
+  # Port forward first, then:
+  curl http://localhost:8501/_stcore/health
+
+5. Access Streamlit Interface:
+  # Port forward, then open browser to:
+  http://localhost:8501
+
+6. Features Available:
+  - PDF Upload and Processing
+  - Document Chat Interface  
+  - Translation Workflows
+  - Image and Table Extraction
+  - Word Cloud Generation
+  - Settings Management
+
+7. Monitoring:
+  {{- if .Values.serviceMonitor.enabled }}
+  - Metrics are available at: http://{{ include "frontend.fullname" . }}:{{ .Values.service.port }}/metrics
+  - ServiceMonitor is configured for Prometheus scraping
+  {{- else }}
+  - Monitoring is disabled (enable via serviceMonitor.enabled: true)
+  {{- end }}
+
+8. High Availability:
+  {{- if .Values.podDisruptionBudget.enabled }}
+  - PodDisruptionBudget is configured to maintain service availability during cluster maintenance
+  {{- else }}
+  - High availability disabled for dev environment
+  {{- end }}

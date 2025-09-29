@@ -1,7 +1,9 @@
 import logging
 import signal
+import os
 
 from utils.cleaner import setup_redis_watcher_thread
+from utils.metrics import MetricsServer
 
 # Set up logger
 logging.basicConfig(
@@ -11,12 +13,19 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    # Start metrics server
+    metrics_port = int(os.getenv("METRICS_PORT", 8080))
+    metrics_server = MetricsServer(port=metrics_port)
+    metrics_server.start()
+    
     # load the redis watcher
     watcher_thread = setup_redis_watcher_thread()
     logger.info(f"{watcher_thread}")
 
     # Setup Graceful shutdown
     def exit_gracefully(signum, frame):
+        logger.info("Received shutdown signal, stopping services...")
+        metrics_server.stop()
         watcher_thread.stop()
 
     signal.signal(signal.SIGINT, exit_gracefully)

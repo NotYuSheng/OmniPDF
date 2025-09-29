@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 
 from shared_utils.redis_utils import (
     RedisBase,
@@ -10,6 +11,15 @@ from shared_utils.redis_utils import (
 )
 from shared_utils.s3_utils import delete_files
 from shared_utils.chroma_client import get_chroma_client
+from .metrics import (
+    sessions_cleaned_total,
+    documents_cleaned_total,
+    files_deleted_total,
+    chromadb_collections_cleaned_total,
+    redis_events_processed_total,
+    cleanup_duration_seconds,
+    cleanup_errors_total
+)
 
 logger = logging.getLogger(__name__)
 runner = asyncio.Runner()
@@ -41,32 +51,69 @@ async def empty_function(_):
 
 
 async def handle_session_doc_list(prefixed_session_id: str):
-    logger.info(f"deleting session_id: {prefixed_session_id}")
-    prefixed_keys = [
-        document_files.flag_prefixed(doc_id)
-        for doc_id in redis_set_store[prefixed_session_id]
-    ]
-    redis_store.delete_set(prefixed_keys)
-    del redis_set_store[prefixed_session_id]
+    start_time = time.time()
+    try:
+        logger.info(f"deleting session_id: {prefixed_session_id}")
+        prefixed_keys = [
+            document_files.flag_prefixed(doc_id)
+            for doc_id in redis_set_store[prefixed_session_id]
+        ]
+        redis_store.delete_set(prefixed_keys)
+        del redis_set_store[prefixed_session_id]
+        
+        # Track successful session cleanup
+        sessions_cleaned_total.inc()
+        cleanup_duration_seconds.labels(cleanup_type="session").observe(time.time() - start_time)
+        
+    except Exception as e:
+        logger.error(f"Error cleaning session {prefixed_session_id}: {e}")
+        cleanup_errors_total.labels(error_type="session_cleanup").inc()
+        raise
 
 
 async def handle_doc_file_list(prefixed_doc_id: str):
-    logger.info(f"deleting doc file list for doc_id: {prefixed_doc_id}")
-    delete_files(redis_set_store[prefixed_doc_id])
-    doc_id = get_key_from_prefixed(prefixed_doc_id)
-    await clean_chromadb(doc_id)
-    del redis_set_store[prefixed_doc_id]
+    start_time = time.time()
+    try:
+        logger.info(f"deleting doc file list for doc_id: {prefixed_doc_id}")
+        
+        # Get file list and delete files
+        file_list = redis_set_store[prefixed_doc_id]
+        delete_files(file_list)
+        files_deleted_total.inc(len(file_list))
+        
+        # Clean ChromaDB
+        doc_id = get_key_from_prefixed(prefixed_doc_id)
+        await clean_chromadb(doc_id)
+        
+        # Clean Redis
+        del redis_set_store[prefixed_doc_id]
+        
+        # Track successful document cleanup
+        documents_cleaned_total.inc()
+        cleanup_duration_seconds.labels(cleanup_type="document").observe(time.time() - start_time)
+        
+    except Exception as e:
+        logger.error(f"Error cleaning document {prefixed_doc_id}: {e}")
+        cleanup_errors_total.labels(error_type="document_cleanup").inc()
+        raise
 
 
 async def clean_chromadb(doc_id):
     chroma_client = await get_chroma_client()
 
     async def delete_from_collection(collection_name):
-        collection = await chroma_client.get_or_create_collection(name=collection_name)
-        await collection.delete(where={"doc_id": doc_id})
-        logger.info(
-            f"Deleted documents with doc_id '{doc_id}' from collection '{collection_name}'"
-        )
+        try:
+            collection = await chroma_client.get_or_create_collection(name=collection_name)
+            await collection.delete(where={"doc_id": doc_id})
+            logger.info(
+                f"Deleted documents with doc_id '{doc_id}' from collection '{collection_name}'"
+            )
+            # Track successful ChromaDB collection cleanup
+            chromadb_collections_cleaned_total.labels(collection_name=collection_name).inc()
+        except Exception as e:
+            logger.error(f"Error cleaning ChromaDB collection {collection_name}: {e}")
+            cleanup_errors_total.labels(error_type="chromadb_cleanup").inc()
+            raise
 
     # Process all collections concurrently using asyncio.gather
     await asyncio.gather(
@@ -89,8 +136,14 @@ def event_handler(msg):
     )
     if msg["type"] != "pmessage":
         return
+    
     msg_origin = msg["channel"]
+    
+    # Track Redis events processed
     if any(event in msg_origin for event in REMOVAL_EVENTS):
+        event_type = next((event for event in REMOVAL_EVENTS if event in msg_origin), "unknown")
+        redis_events_processed_total.labels(event_type=event_type).inc()
+        
         msg_data: str = msg["data"]
         try:
             flag, key = msg_data.split(SEPERATOR, maxsplit=1)
@@ -98,6 +151,7 @@ def event_handler(msg):
             runner.run(DELETION_PREFIX_CALLBACK_DICT.get(flag, empty_function)(key))
         except ValueError as e:
             logger.warning(f"Skipping deletion due to malformed data. {e}")
+            cleanup_errors_total.labels(error_type="malformed_data").inc()
 
 
 def setup_redis_watcher_thread():

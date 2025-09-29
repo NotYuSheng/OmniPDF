@@ -9,9 +9,25 @@ server {
     proxy_set_header X-NginX-Proxy true;
     proxy_set_header Host $host;
 
+    # Health check endpoint
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
+    }
+
+    # Route frontend UI requests
+    location / {
+        proxy_pass ${FRONTEND_URL}/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400;
+    }
+
+    # Route API requests to PDF processor service
     location /pdf_processor/ {
         proxy_pass ${PDF_PROCESSOR_URL}/;
-
         proxy_connect_timeout 300;
         proxy_send_timeout 300;
         proxy_read_timeout 300;

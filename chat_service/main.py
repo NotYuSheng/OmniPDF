@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from routers import health, chat
+from prometheus_fastapi_instrumentator import Instrumentator
 
 import logging
 
@@ -9,6 +10,10 @@ logging.basicConfig(
 )
 
 app = FastAPI(root_path="/chat")
+
+# Initialize Prometheus metrics
+instrumentator = Instrumentator()
+instrumentator.instrument(app).expose(app)
 
 app.include_router(health.router)
 app.include_router(chat.router)

@@ -11,3 +11,4 @@ requests==2.32.4
 spire-pdf==11.7.0
 openai==1.86.0
 pytest-asyncio==0.25.0
+prometheus-fastapi-instrumentator==7.1.0
