@@ -243,7 +243,7 @@ crc config view
 ./scripts/test-all-services.sh
 
 # Run tests for individual service
-./scripts/test-single-service.sh chat_service
+./scripts/test-single-service.sh chat-service
 
 # Security scanning with Trivy
 ./scripts/scan_with_trivy.sh
