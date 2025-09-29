@@ -120,7 +120,7 @@ define deploy-all-charts
 	@echo "$(1) all Helm charts under ./helm/ for environment: $(ENV)"
 	@for dir in helm/*/; do \
 		CHART=$$(basename $$dir); \
-		if [ "$$CHART" != "assets" ]; then \
+		if [ "$$CHART" != "shared-values" ] && [ "$$CHART" != "assets" ]; then \
 			echo "$(1) chart: $$CHART"; \
 			if [ -f "helm/$$CHART/values-$(ENV).yaml" ]; then \
 				CHART_VALUES="-f helm/$$CHART/values-$(ENV).yaml"; \
