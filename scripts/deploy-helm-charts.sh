@@ -16,7 +16,6 @@ MODE=""
 SERVICE=""
 ACTION="install"
 DRY_RUN=false
-SHARED_VALUES_DIR="helm/shared-values"
 
 # Color output
 RED='\033[0;31m'
@@ -126,32 +125,20 @@ if [[ "$MODE" == "single" && -z "$SERVICE" ]]; then
     exit 1
 fi
 
-# Build values files in correct precedence order
+# Build values files for service deployment
 build_values_files() {
     local service=$1
     local values_files=""
     
-    # 1. Shared base values (most general)
-    local shared_base="$SHARED_VALUES_DIR/common-base.yaml"
-    if [[ -f "$shared_base" ]]; then
-        values_files="-f $shared_base"
-    fi
-    
-    # 2. Shared environment values
-    local shared_env="$SHARED_VALUES_DIR/common-$ENV.yaml"
-    if [[ -f "$shared_env" ]]; then
-        values_files="$values_files -f $shared_env"
-    fi
-    
-    # 3. Service environment values (environment-specific deployment)
+    # Service environment values (environment-specific deployment)
     local service_env="helm/$service/values-$ENV.yaml"
     if [[ -f "$service_env" ]]; then
-        values_files="$values_files -f $service_env"
+        values_files="-f $service_env"
     else
-        # Special case for rbac which uses base values.yaml
+        # Special case for services which use base values.yaml
         local service_base="helm/$service/values.yaml"
         if [[ -f "$service_base" ]]; then
-            values_files="$values_files -f $service_base"
+            values_files="-f $service_base"
         else
             print_error "No values file found for $service (expected: $service_env or $service_base)"
             return 1
