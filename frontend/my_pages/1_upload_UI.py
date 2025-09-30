@@ -1,10 +1,10 @@
-import asyncio
+import streamlit as st
 import logging
+import asyncio
+import httpx
 import os
 import random
-import httpx
-
-import streamlit as st
+from httpx import Cookies
 
 PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
 logging.basicConfig(level=logging.INFO)
@@ -14,8 +14,6 @@ if "processed_data" not in st.session_state or st.session_state.processed_data i
     st.session_state.processed_data = {}
 
 if "httpx_cookies" not in st.session_state:
-    from httpx import Cookies
-
     st.session_state.httpx_cookies = Cookies()
 
 if "uploaded_files" not in st.session_state:
@@ -26,8 +24,7 @@ client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
 
 async def process_pdf(uploaded_file, status_text):
     """
-    Placeholder function for PDF processing
-    In real implementation, this would call your backend API
+    Uploads PDF to backend and stores document metadata in session state.
     """
 
     # Process pdf through PDF_processor endpoint
@@ -41,7 +38,7 @@ async def process_pdf(uploaded_file, status_text):
             f"{PDF_PROCESSOR_URL}/documents/", files=files
         )
         if upload_response.cookies:
-            st.session_state.httpx_cookies = upload_response.cookies
+            st.session_state.httpx_cookies.update(upload_response.cookies)
 
         logger.info(f"Upload PDF response: {upload_response.text}")
 

@@ -26,6 +26,13 @@ services:
       - ./pdf_extraction_service/.env
     depends_on:
       - minio
+    runtime: nvidia
+    environment:
+      # Timezone configuration
+      - TZ=Asia/Singapore
+      # NVIDIA GPU configuration
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
 
   docling_translation_service:
     build:

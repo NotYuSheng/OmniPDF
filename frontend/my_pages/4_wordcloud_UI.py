@@ -1,9 +1,9 @@
-import asyncio
-import os
 import streamlit as st
 import logging
-import json
+import asyncio
 import httpx
+import os
+import json
 from components.documents import document_multiselect_with_expander, DocumentExpander
 
 PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
