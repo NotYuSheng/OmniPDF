@@ -30,7 +30,7 @@ help:
 	@echo ""
 	@echo "Single-service commands:"
 	@echo "  make install                Install chart (CHART_NAME, ENV)"
-	@echo "                              e.g. make install CHART_NAME=chat-service ENV=staging"
+	@echo "                              e.g. make install CHART_NAME=pdf-extraction-service ENV=staging"
 	@echo "  make upgrade                Upgrade chart (CHART_NAME, ENV)"
 	@echo "                              e.g. make upgrade CHART_NAME=embedder-service ENV=prod"
 	@echo "  make uninstall              Uninstall chart (CHART_NAME)"
@@ -39,9 +39,9 @@ help:
 	@echo "                              e.g. make lint CHART_NAME=embedder-service"
 	@echo "  make lint-all               Lint all charts under ./helm/"
 	@echo "  make status                 Show status of Helm release (CHART_NAME)"
-	@echo "                              e.g. make status CHART_NAME=chat-service"
+	@echo "                              e.g. make status CHART_NAME=pdf-extraction-service"
 	@echo "  make port-forward           Port-forward a pod to local machine"
-	@echo "                              e.g. make port-forward CHART_NAME=chat-service LOCAL_PORT=8000 REMOTE_PORT=8000"
+	@echo "                              e.g. make port-forward CHART_NAME=pdf-extraction-service LOCAL_PORT=8000 REMOTE_PORT=8000"
 	@echo ""
 	@echo "Multi-service commands:"
 	@echo "  make install-all            Install all charts (ENV)"
@@ -61,12 +61,12 @@ help:
 	@echo "Development Environment:"
 	@echo "  Use docker-compose for local development:"
 	@echo "    docker-compose up -d                           # Start all services locally"
-	@echo "    docker-compose logs -f chat_service            # View service logs"
+	@echo "    docker-compose logs -f pdf_processor_service   # View service logs"
 	@echo ""
 	@echo "⚠️ IMPORTANT:"
 	@echo "  Avoid underscores (_) in CHART_NAME or release names."
 	@echo "  Use hyphens (-) instead to follow Kubernetes naming conventions (RFC 1123)."
-	@echo "  Example: use chat-service ✅, not chat_service ❌"
+	@echo "  Example: use pdf-extraction-service ✅, not pdf_extraction_service ❌"
 
 ## Install a single Helm chart
 install:
@@ -162,7 +162,7 @@ uninstall-all:
 port-forward:
 ifeq ($(CHART_NAME),example-service)
 	@echo "ERROR: CHART_NAME must be specified. Example usage:"
-	@echo "  make port-forward CHART_NAME=chat-service LOCAL_PORT=3000 REMOTE_PORT=8000"
+	@echo "  make port-forward CHART_NAME=pdf-extraction-service LOCAL_PORT=3000 REMOTE_PORT=8000"
 	@exit 1
 else
 	kubectl --namespace $(NAMESPACE) port-forward \

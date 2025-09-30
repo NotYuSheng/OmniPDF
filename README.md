@@ -3,7 +3,7 @@
 > [!NOTE]  
 > Thank you for visiting! This project is currently a work in progress. Features, documentation, and deployment configurations are actively being developed and may change frequently.
 
-OmniPDF is a PDF analyzer capable of translation, summarization, captioning and conversational capabilities through Retrieval-Augmented-Generation (RAG). 
+OmniPDF is a PDF analyzer capable of translation, summarization, and captioning. 
 
 ## Architecture
 
@@ -12,7 +12,7 @@ OmniPDF is a PDF analyzer capable of translation, summarization, captioning and 
 OmniPDF follows a **microservices architecture** with **centralized orchestration**:
 
 - **pdf-processor-service**: Main hub that coordinates all processing workflows
-- **Processing services**: Specialized services for extraction, translation, rendering, embedding, and chat
+- **Processing services**: Specialized services for extraction, translation, rendering, and embedding
 - **Data layer**: Redis (sessions), ChromaDB (vectors), MinIO (files)
 - **AI/ML layer**: vLLM text and vision-language models
 - **Service mesh layer**: Istio for mTLS, traffic management, and observability (prestaging/staging/production)
@@ -45,14 +45,14 @@ docker compose -f docker-compose.gpu.yml up --build
 ### Kubernetes/OpenShift (Helm)
 ```bash
 # Deploy individual service with explicit environment
-helm install chat-service ./helm/chat-service \
-  --values ./helm/chat-service/values-prestaging.yaml \
+helm install pdf-extraction-service ./helm/pdf-extraction-service \
+  --values ./helm/pdf-extraction-service/values-prestaging.yaml \
   --namespace omnipdf
 
 # Deploy all services using deployment script
 ./scripts/deploy-helm-charts.sh --all --env prestaging
 
-# Deploy RBAC only (14 individual service roles - should be deployed first)
+# Deploy RBAC only (13 individual service roles - should be deployed first)
 ./scripts/deploy-helm-charts.sh --service rbac --env prestaging
 ```
 
@@ -77,8 +77,8 @@ helm install istio-gateway ./helm/istio-gateway \
 helm install rbac ./helm/rbac \
   --namespace omnipdf-prestaging
 
-# 5. Deploy services with Istio sidecars  
-for service in frontend pdf-processor-service chat-service embedder-service chromadb redis minio cleaner pdf-extraction-service docling-translation-service pdf-renderer-service image-captioner-service metadata-service; do
+# 5. Deploy services with Istio sidecars
+for service in frontend pdf-processor-service embedder-service chromadb redis minio cleaner pdf-extraction-service docling-translation-service pdf-renderer-service image-captioner-service metadata-service; do
   helm install $service ./helm/$service \
     --namespace omnipdf-prestaging \
     --values ./helm/$service/values-prestaging.yaml
@@ -99,9 +99,9 @@ OmniPDF implements **defense-in-depth security** with multiple layers:
 
 ### Service Account & RBAC
 - **Individual service accounts** for each service with per-service secret isolation
-- **14 individual RBAC roles** - one role per service aligned with C4 architecture:
+- **13 individual RBAC roles** - one role per service aligned with C4 architecture:
   - `pdf-processor-service-role`, `pdf-extraction-service-role`, `docling-translation-service-role`
-  - `embedder-service-role`, `chat-service-role`, `pdf-renderer-service-role`
+  - `embedder-service-role`, `pdf-renderer-service-role`
   - `image-captioner-service-role`, `metadata-service-role`
   - `minio-role`, `chromadb-role`, `redis-role`
   - `frontend-role`, `nginx-gateway-role`, `cleaner-role`
@@ -119,18 +119,17 @@ OmniPDF implements comprehensive zero-trust network policies with explicit servi
 | **nginx** | • External traffic (users) | • istio-gateway:80/443<br>• DNS resolution |
 | **istio-gateway** | • nginx | • frontend:8501<br>• pdf-processor-service:8000<br>• DNS resolution |
 | **frontend** | • istio-gateway | • pdf-processor-service:8000<br>• DNS resolution |
-| **pdf-processor-service** | • istio-gateway<br>• frontend | • pdf-extraction-service:8000<br>• docling-translation-service:8000<br>• pdf-renderer-service:8000<br>• embedder-service:8000<br>• chat-service:8000<br>• metadata-service:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution |
+| **pdf-processor-service** | • istio-gateway<br>• frontend | • pdf-extraction-service:8000<br>• docling-translation-service:8000<br>• pdf-renderer-service:8000<br>• embedder-service:8000<br>• metadata-service:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution |
 | **pdf-extraction-service** | • pdf-processor-service | • image-captioner-service:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution |
 | **docling-translation-service** | • pdf-processor-service | • minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTP/HTTPS (external vLLM text model) |
 | **pdf-renderer-service** | • pdf-processor-service | • minio:9000<br>• redis:6379<br>• DNS resolution |
 | **embedder-service** | • pdf-processor-service | • chromadb:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution |
-| **chat-service** | • pdf-processor-service | • chromadb:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTP/HTTPS (external vLLM text model) |
 | **image-captioner-service** | • pdf-extraction-service | • DNS resolution<br>• HTTP/HTTPS (external vLLM vision model) |
 | **metadata-service** | • pdf-processor-service | • chromadb:8000<br>• minio:9000<br>• redis:6379<br>• DNS resolution<br>• HTTP/HTTPS (external vLLM text model) |
 | **cleaner** | *No ingress (background service)* | • minio:9000<br>• chromadb:8000<br>• redis:6379<br>• DNS resolution |
-| **chromadb** | • embedder-service<br>• chat-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
-| **redis** | • pdf-processor-service<br>• pdf-extraction-service<br>• docling-translation-service<br>• embedder-service<br>• chat-service<br>• pdf-renderer-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
-| **minio** | • pdf-processor-service<br>• pdf-extraction-service<br>• docling-translation-service<br>• pdf-renderer-service<br>• embedder-service<br>• chat-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
+| **chromadb** | • embedder-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
+| **redis** | • pdf-processor-service<br>• pdf-extraction-service<br>• docling-translation-service<br>• embedder-service<br>• pdf-renderer-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
+| **minio** | • pdf-processor-service<br>• pdf-extraction-service<br>• docling-translation-service<br>• pdf-renderer-service<br>• embedder-service<br>• metadata-service<br>• cleaner | • DNS resolution<br>*No outbound calls* |
 
 #### Network Policy Configuration
 
@@ -152,9 +151,9 @@ OmniPDF implements comprehensive zero-trust network policies with explicit servi
 - **External Connectivity**: Managed external vLLM/AI API access through ServiceEntry (Istio) or HTTPS egress
 
 ### HPA (Horizontal Pod Autoscaler)
-- **9 services** with auto-scaling enabled across 3 tiers:
-  - **Tier 1 (Critical)**: nginx, pdf-processor-service, chat-service - aggressive scaling (60-70% thresholds)
-  - **Tier 2 (Processing)**: pdf-extraction, docling-translation, pdf-renderer - standard scaling (70% thresholds)  
+- **8 services** with auto-scaling enabled across 3 tiers:
+  - **Tier 1 (Critical)**: nginx, pdf-processor-service - aggressive scaling (60-70% thresholds)
+  - **Tier 2 (Processing)**: pdf-extraction, docling-translation, pdf-renderer - standard scaling (70% thresholds)
   - **Tier 3 (Burst)**: embedder-service, image-captioner-service, metadata-service - conservative scaling (70% thresholds)
 - **High availability**: Minimum 1-2 replicas with scaling up to 5-15 replicas based on service tier
 - **Resource optimization**: Proactive scaling for user-facing services, workload-responsive for processing services
@@ -163,13 +162,13 @@ OmniPDF implements comprehensive zero-trust network policies with explicit servi
 
 ```bash
 # Enable NetworkPolicy for production
-helm upgrade chat-service ./helm/chat-service \
+helm upgrade pdf-extraction-service ./helm/pdf-extraction-service \
   --set networkPolicy.enabled=true \
   --namespace omnipdf
 
 # Check service account permissions
 kubectl auth can-i get secrets \
-  --as=system:serviceaccount:omnipdf:chat-service \
+  --as=system:serviceaccount:omnipdf:pdf-extraction-service \
   -n omnipdf
 
 # Monitor HPA status
@@ -239,11 +238,11 @@ crc config view
 ## Testing
 
 ```bash
-# Run all service unit tests (206+ tests across 7 services)
+# Run all service unit tests (180+ tests across 6 services)
 ./scripts/test-all-services.sh
 
 # Run tests for individual service
-./scripts/test-single-service.sh chat-service
+./scripts/test-single-service.sh pdf-extraction-service
 
 # Security scanning with Trivy
 ./scripts/scan_with_trivy.sh

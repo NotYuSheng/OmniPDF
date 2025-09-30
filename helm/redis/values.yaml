@@ -74,10 +74,6 @@ networkPolicy:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: docling-translation-service
-      # Chat Service - future session management
-      - podSelector:
-          matchLabels:
-            app.kubernetes.io/name: chat-service
       # PDF Renderer Service - future session management
       - podSelector:
           matchLabels:

@@ -3,7 +3,7 @@
 # Unified Helm deployment script for OmniPDF
 # Supports both single service and all services deployment
 # Usage: 
-#   ./scripts/deploy-helm-charts.sh --service chat-service --env staging
+#   ./scripts/deploy-helm-charts.sh --service pdf-extraction-service --env staging
 #   ./scripts/deploy-helm-charts.sh --all --env production
 #   ./scripts/deploy-helm-charts.sh --help
 
@@ -39,7 +39,7 @@ USAGE:
     $0 [OPTIONS]
 
 OPTIONS:
-    -s, --service SERVICE    Deploy specific service (e.g., chat-service)
+    -s, --service SERVICE    Deploy specific service (e.g., pdf-extraction-service)
     -a, --all               Deploy all services
     -e, --env ENV           Environment (staging|production|prestaging) [default: staging]
     -n, --namespace NS      Kubernetes namespace [default: omnipdf]
@@ -49,7 +49,7 @@ OPTIONS:
 
 EXAMPLES:
     # Deploy single service to staging
-    $0 --service chat-service --env staging
+    $0 --service pdf-extraction-service --env staging
 
     # Deploy all services to production
     $0 --all --env production
@@ -61,10 +61,10 @@ EXAMPLES:
     $0 --all --env staging --dry-run
 
     # Uninstall service
-    $0 --service chat-service --action uninstall
+    $0 --service pdf-extraction-service --action uninstall
 
 SUPPORTED SERVICES:
-    rbac, chat-service, pdf-processor-service, pdf-extraction-service,
+    rbac, pdf-processor-service, pdf-extraction-service,
     docling-translation-service, pdf-renderer-service, embedder-service,
     image-captioner-service, metadata-service, cleaner, frontend,
     nginx, redis, chromadb, minio
@@ -187,14 +187,13 @@ deploy_all_services() {
     local services=(
         "rbac"
         "redis"
-        "chromadb" 
+        "chromadb"
         "minio"
         "pdf-processor-service"
         "pdf-extraction-service"
         "docling-translation-service"
         "pdf-renderer-service"
         "embedder-service"
-        "chat-service"
         "image-captioner-service"
         "metadata-service"
         "cleaner"

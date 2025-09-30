@@ -56,7 +56,7 @@ oc get gateway,virtualservice,destinationrule,serviceentry -n omnipdf-prestaging
 
 ```bash
 # Deploy services with prestaging values (includes sidecar injection)
-for service in frontend pdf-processor-service chat-service embedder-service chromadb redis minio cleaner pdf-extraction-service docling-translation-service pdf-renderer-service image-captioner-service metadata-service; do
+for service in frontend pdf-processor-service pdf-extraction-service embedder-service chromadb redis minio cleaner pdf-extraction-service docling-translation-service pdf-renderer-service image-captioner-service metadata-service; do
   echo "Deploying $service with Istio sidecar..."
   helm install $service ./helm/$service \
     --namespace omnipdf-prestaging \
@@ -98,7 +98,7 @@ curl -H "Host: omnipdf-prestaging.apps-crc.testing" http://$GATEWAY_HOST/health
 
 # Test internal service communication (should use mTLS)
 oc exec -n omnipdf-prestaging deployment/pdf-processor-service -c pdf-processor-service -- \
-  curl -s http://chat-service:8000/health
+  curl -s http://pdf-extraction-service:8000/health
 ```
 
 ## Architecture Overview
