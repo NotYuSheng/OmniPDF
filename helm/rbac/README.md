@@ -208,7 +208,6 @@ kubectl describe role omnipdf-pdf-processor-service-role -n omnipdf
 Each service accesses only its own secrets:
 - `pdf-processor-secrets`
 - `pdf-extraction-secrets`
-- `embedder-secrets`
 - etc.
 
 ### Data Store Security
