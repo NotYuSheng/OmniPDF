@@ -55,7 +55,6 @@ async def check_backend():
     services = {
         "PDF Processor": os.getenv("PDF_PROCESSOR_URL"),
         "PDF Extractor": os.getenv("PDF_EXTRACTOR_URL"),
-        "Chat Service": os.getenv("CHAT_URL"),
         "Translation Service": os.getenv("DOCLING_TRANSLATION_URL"),
         "Embedder Service": os.getenv("EMBEDDER_URL"),
     }

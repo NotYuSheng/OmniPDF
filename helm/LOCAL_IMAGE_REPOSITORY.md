@@ -14,7 +14,7 @@ OmniPDF Helm charts can work with different types of image repositories:
 ### Step 1: Pull Images from GHCR
 ```bash
 # Pull the required service image
-docker pull ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136
+docker pull ghcr.io/notyusheng/pdf_extraction_service:dev-v0.0.0-6653136
 docker pull ghcr.io/notyusheng/embedder_service:latest
 # Add other services as needed
 ```
@@ -23,13 +23,13 @@ docker pull ghcr.io/notyusheng/embedder_service:latest
 Edit `helm/<service-name>/values-{ENV}.yaml` (e.g., `values-prestaging.yaml`):
 ```yaml
 image:
-  repository: ghcr.io/notyusheng/chat_service
+  repository: ghcr.io/notyusheng/pdf_extraction_service
   tag: "dev-v0.0.0-6653136"
 ```
 
 ### Step 3: Deploy
 ```bash
-make install CHART_NAME=chat-service
+make install CHART_NAME=pdf-extraction-service
 ```
 
 ## Option 2: Using OpenShift CRC Registry (Automated)
@@ -40,10 +40,10 @@ Use the provided `load-images.sh` script to automatically pull images from exter
 
 ```bash
 # Load single image
-./helm/load-images.sh ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136
+./helm/load-images.sh ghcr.io/notyusheng/pdf_extraction_service:dev-v0.0.0-6653136
 
 # Load multiple images
-./helm/load-images.sh ghcr.io/notyusheng/chat_service:v1.0.0 ghcr.io/notyusheng/embedder_service:v1.1.0
+./helm/load-images.sh ghcr.io/notyusheng/pdf_extraction_service:v1.0.0 ghcr.io/notyusheng/embedder_service:v1.1.0
 
 # Load from file (recommended for multiple services)
 ./helm/load-images.sh -f images.txt
@@ -80,20 +80,20 @@ oc new-project omnipdf
 ### Step 4: Pull, Tag, and Push Images
 ```bash
 # Pull from external registry
-docker pull ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136
+docker pull ghcr.io/notyusheng/pdf_extraction_service:dev-v0.0.0-6653136
 
 # Tag for CRC registry
-docker tag ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136 \
-  default-route-openshift-image-registry.apps-crc.testing/omnipdf/chat_service:dev-v0.0.0-6653136
+docker tag ghcr.io/notyusheng/pdf_extraction_service:dev-v0.0.0-6653136 \
+  default-route-openshift-image-registry.apps-crc.testing/omnipdf/pdf_extraction_service:dev-v0.0.0-6653136
 
 # Push to CRC registry
-docker push default-route-openshift-image-registry.apps-crc.testing/omnipdf/chat_service:dev-v0.0.0-6653136
+docker push default-route-openshift-image-registry.apps-crc.testing/omnipdf/pdf_extraction_service:dev-v0.0.0-6653136
 ```
 
 ### Step 5: Update environment values file
 ```yaml
 image:
-  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/chat_service
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/pdf_extraction_service
   pullPolicy: IfNotPresent
   tag: "dev-v0.0.0-6653136"
 ```
@@ -103,14 +103,14 @@ image:
 ### Step 1: Build Images Locally
 ```bash
 # Build from Dockerfile
-cd chat_service/
-docker build -t chat_service:latest .
+cd pdf_extraction_service/
+docker build -t pdf_extraction_service:latest .
 ```
 
 ### Step 2: Update environment values file
 ```yaml
 image:
-  repository: chat_service
+  repository: pdf_extraction_service
   pullPolicy: Never  # Forces use of local images only
   tag: "latest"
 ```
@@ -135,16 +135,16 @@ image:
 docker login harbor.yourdomain.com
 
 # Tag and push
-docker tag ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136 \
-  harbor.yourdomain.com/omnipdf/chat_service:dev-v0.0.0-6653136
+docker tag ghcr.io/notyusheng/pdf_extraction_service:dev-v0.0.0-6653136 \
+  harbor.yourdomain.com/omnipdf/pdf_extraction_service:dev-v0.0.0-6653136
 
-docker push harbor.yourdomain.com/omnipdf/chat_service:dev-v0.0.0-6653136
+docker push harbor.yourdomain.com/omnipdf/pdf_extraction_service:dev-v0.0.0-6653136
 ```
 
 ### Step 4: Update environment values file
 ```yaml
 image:
-  repository: harbor.yourdomain.com/omnipdf/chat_service
+  repository: harbor.yourdomain.com/omnipdf/pdf_extraction_service
   pullPolicy: IfNotPresent
   tag: "dev-v0.0.0-6653136"
 
@@ -205,14 +205,14 @@ kubectl describe secret <secret-name> -n omnipdf
 
 ```bash
 # Check current image configuration
-helm get values chat-service -n omnipdf
+helm get values pdf-extraction-service -n omnipdf
 
 # List available images in local Docker
-docker images | grep chat_service
+docker images | grep pdf_extraction_service
 
 # Check pod image and status
-kubectl describe pod -n omnipdf -l "app.kubernetes.io/name=chat-service"
+kubectl describe pod -n omnipdf -l "app.kubernetes.io/name=pdf-extraction-service"
 
 # Update deployment with new image
-make upgrade CHART_NAME=chat-service
+make upgrade CHART_NAME=pdf-extraction-service
 ```

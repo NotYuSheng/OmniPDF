@@ -6,7 +6,7 @@ This directory contains testing and security scanning utilities for the OmniPDF 
 
 ### 🧪 Unit Testing
 - **`test-single-service.sh`** - Run tests for individual services
-  - Tests a specific service (e.g., `./test-single-service.sh chat_service`)
+  - Tests a specific service (e.g., `./test-single-service.sh pdf_extraction_service`)
   - Fast focused testing for development and debugging
   - Uses Docker Compose to ensure proper service isolation
   - Colored output with detailed test progress reporting
@@ -35,7 +35,7 @@ The unit test script automatically creates and manages its own virtual environme
 ./scripts/test-all-services.sh
 
 # Test specific service - fast individual testing
-./scripts/test-single-service.sh chat_service
+./scripts/test-single-service.sh pdf_extraction_service
 ./scripts/test-single-service.sh image_captioner_service
 
 # Manual venv setup (optional - script does this automatically)
@@ -54,7 +54,7 @@ pip install -r scripts/test-requirements.txt
 ./scripts/scan_with_trivy.sh --type image
 
 # Scan specific service (custom or external)
-./scripts/scan_with_trivy.sh --service chat_service
+./scripts/scan_with_trivy.sh --service pdf_extraction_service
 ./scripts/scan_with_trivy.sh --service "redis:7.4.4-alpine"
 ./scripts/scan_with_trivy.sh --service "chromadb/chroma:1.0.13"
 
@@ -74,11 +74,10 @@ pip install -r scripts/test-requirements.txt
 
 ## Services Covered
 
-### Security Scanning (14 Services)
+### Security Scanning (13 Services)
 
-**Custom OmniPDF Services (10):**
-- **chat_service** - RAG chat with LLM and ChromaDB
-- **pdf_extraction_service** - PDF processing with docling  
+**Custom OmniPDF Services (9):**
+- **pdf_extraction_service** - PDF processing with docling
 - **docling_translation_service** - Translation with LLM
 - **pdf_renderer_service** - PDF rendering with PyMuPDF
 - **embedder_service** - Text embedding with ChromaDB
@@ -128,15 +127,15 @@ sudo apt-get update && sudo apt-get install trivy
 ```
 🧪 OmniPDF Unit Test Runner
 ==========================================
-Testing specific service: chat_service
+Testing specific service: pdf_extraction_service
 🚀 Starting services with docker-compose...
 ✅ Services started
-📦 Testing chat_service
+📦 Testing pdf_extraction_service
 ========== test session starts ==========
-chat_service/tests/test_chat.py::TestChatService::test_basic_chat PASSED [50%]
-chat_service/tests/test_chat.py::TestChatService::test_rag_response PASSED [100%]
+pdf_extraction_service/tests/test_chat.py::TestChatService::test_basic_chat PASSED [50%]
+pdf_extraction_service/tests/test_chat.py::TestChatService::test_rag_response PASSED [100%]
 ========== 20 passed in 2.45s ==========
-✅ chat_service tests PASSED
+✅ pdf_extraction_service tests PASSED
 🎉 All unit tests passed!
 ```
 
@@ -144,13 +143,13 @@ chat_service/tests/test_chat.py::TestChatService::test_rag_response PASSED [100%
 ```
 🧪 OmniPDF Complete Unit Test Suite
 =================================================
-📦 Testing chat_service
-✅ chat_service tests PASSED
+📦 Testing pdf_extraction_service
+✅ pdf_extraction_service tests PASSED
 📦 Testing pdf_extraction_service  
 ✅ pdf_extraction_service tests PASSED
 ...
 📊 COMPLETE UNIT TEST SUMMARY
-chat_service: ✅ PASSED (20 tests passed)
+pdf_extraction_service: ✅ PASSED (20 tests passed)
 pdf_extraction_service: ✅ PASSED (17 tests passed)
 ...
 Final Results: 7/7 services passed
@@ -169,17 +168,17 @@ Output format: table
 Scan type: image
 
 📋 Services to scan: 14 total
-  1. chat_service
+  1. pdf_extraction_service
   2. pdf_extraction_service
   ...
   14. minio/mc:RELEASE.2025-07-21T05-28-08Z
 
 Progress: Scanning service 1/14
-🔍 Scanning chat_service
-✅ chat_service: No vulnerabilities found
+🔍 Scanning pdf_extraction_service
+✅ pdf_extraction_service: No vulnerabilities found
 
 📊 TRIVY SCAN SUMMARY
-chat_service: ✅ CLEAN
+pdf_extraction_service: ✅ CLEAN
 pdf_extraction_service: ✅ CLEAN
 ...
 minio/mc:RELEASE.2025-07-21T05-28-08Z: ✅ CLEAN
@@ -203,7 +202,7 @@ trivy_scan_results/
 ```
 
 **Example files:**
-- `chat_service-report.txt` - Comprehensive security scan results for chat service
+- `pdf_extraction_service-report.txt` - Comprehensive security scan results for extraction service
 - `redis:7.4.4-alpine-scan.log` - Timestamped scan log for Redis
 - `minio_minio:RELEASE.2025-07-23T15-54-02Z-report.txt` - MinIO scan results
 
@@ -226,7 +225,7 @@ Each log file includes:
 
 **Docker image not found:**
 ```bash
-docker build -t omnipdf-chat_service:latest chat_service/
+docker build -t omnipdf-pdf_extraction_service:latest pdf_extraction_service/
 ```
 
 **Trivy not installed:**

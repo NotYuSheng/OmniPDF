@@ -17,16 +17,6 @@ services:
     ports:
       - "8000:8000"
 
-  chat_service:
-    build:
-      context: .
-      dockerfile: ./chat_service/Dockerfile
-    container_name: chat_service
-    env_file:
-      - ./chat_service/.env
-    depends_on:
-      - embedder_service
-
   pdf_extraction_service:
     build:
       context: .

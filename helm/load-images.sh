@@ -4,8 +4,8 @@
 # Usage: ./load-images.sh <external-image-url> [external-image-url] ...
 #
 # Examples:
-#   ./load-images.sh ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136
-#   ./load-images.sh ghcr.io/notyusheng/chat_service:v1.0.0 ghcr.io/notyusheng/embedder_service:v1.1.0
+#   ./load-images.sh ghcr.io/notyusheng/pdf_extraction_service:dev-v0.0.0-6653136
+#   ./load-images.sh ghcr.io/notyusheng/pdf_extraction_service:v1.0.0 ghcr.io/notyusheng/embedder_service:v1.1.0
 
 set -euo pipefail
 
@@ -187,12 +187,12 @@ Options:
   -h, --help         Show this help message
 
 Examples:
-  $0 ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136
-  $0 ghcr.io/notyusheng/chat_service:v1.0.0 ghcr.io/notyusheng/embedder_service:v1.1.0
+  $0 ghcr.io/notyusheng/pdf_extraction_service:dev-v0.0.0-6653136
+  $0 ghcr.io/notyusheng/pdf_extraction_service:v1.0.0 ghcr.io/notyusheng/embedder_service:v1.1.0
   $0 -f images.txt
 
 File format (images.txt):
-  ghcr.io/notyusheng/chat_service:dev-v0.0.0-6653136
+  ghcr.io/notyusheng/pdf_extraction_service:dev-v0.0.0-6653136
   ghcr.io/notyusheng/embedder_service:dev-v0.0.0-6255367
   ghcr.io/notyusheng/pdf_processor_service:latest
   # Comments and empty lines are ignored

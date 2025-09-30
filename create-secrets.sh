@@ -44,9 +44,7 @@ for helm_dir in helm/*/; do
     chart_name=$(basename "$helm_dir")
     if [ "$chart_name" != "assets" ]; then
         # Convert chart name to directory name pattern
-        if [ "$chart_name" = "chat-service" ]; then
-            env_dir="chat_service"
-        elif [ "$chart_name" = "pdf-processor-service" ]; then
+        if [ "$chart_name" = "pdf-processor-service" ]; then
             env_dir="pdf_processor_service"
         elif [ "$chart_name" = "pdf-extraction-service" ]; then
             env_dir="pdf_extraction_service"
@@ -157,4 +155,4 @@ echo ""
 echo "🎉 All secrets created successfully!"
 echo ""
 echo "📋 List of created secrets:"
-oc get secrets -n "$NAMESPACE" | grep -E "(chat-service|pdf-|docling-|embedder-|metadata-|image-captioner-|cleaner|nginx|frontend|minio|redis|chromadb)-secrets" || echo "No service secrets found"
+oc get secrets -n "$NAMESPACE" | grep -E "(pdf-|docling-|embedder-|metadata-|image-captioner-|cleaner|nginx|frontend|minio|redis|chromadb)-secrets" || echo "No service secrets found"

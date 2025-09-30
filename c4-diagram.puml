@@ -12,7 +12,7 @@ System_Boundary(omnipdf, "OmniPDF System - Prestaging (CRC)") {
   System_Boundary(istio_mesh, "Istio Service Mesh") {
     Container(istio_gateway, "Istio Ingress Gateway", "Istio Gateway + Envoy", "Handles ingress traffic into the mesh with advanced routing policies")
     
-    Container(frontend, "Streamlit Frontend", "Python/Streamlit + Envoy Sidecar", "Web UI for document processing and chat interface")
+    Container(frontend, "Streamlit Frontend", "Python/Streamlit + Envoy Sidecar", "Web UI for document processing")
 
     Container(pdf_service, "PDF Processor Service", "FastAPI + Envoy Sidecar", "Main orchestrator - manages sessions, coordinates processing workflows")
 
@@ -21,7 +21,6 @@ System_Boundary(omnipdf, "OmniPDF System - Prestaging (CRC)") {
     Container(pdf_renderer, "PDF Renderer Service", "FastAPI + Envoy Sidecar", "Renders translated content onto PDFs")
 
     Container(embedder, "Embedder Service", "FastAPI + Envoy Sidecar", "Document chunking and embedding generation")
-    Container(chat_service, "Chat Service", "FastAPI + Envoy Sidecar", "RAG chat interface using retrieved context")
     Container(image_captioner, "Image Captioning Service", "FastAPI + Envoy Sidecar", "AI image captioning for extracted images")
 
     Container(metadata_service, "Metadata Service", "FastAPI + Envoy Sidecar", "Document metadata and wordcloud generation")
@@ -34,7 +33,7 @@ System_Boundary(omnipdf, "OmniPDF System - Prestaging (CRC)") {
 }
 
 System_Boundary(external_ai, "External AI Infrastructure") {
-  Container(vllm_text, "vLLM Text Model", "vLLM Server", "External text-only LLM for chat and translation")
+  Container(vllm_text, "vLLM Text Model", "vLLM Server", "External text-only LLM for translation and metadata")
   Container(vllm_vlm, "vLLM Vision-Language Model", "vLLM Server", "External multimodal VLM for image understanding")
 }
 
@@ -56,7 +55,6 @@ Rel(pdf_service, pdf_extraction, "Delegates table and image extraction")
 Rel(pdf_service, docling_translate, "Requests docling translation")
 Rel(pdf_service, pdf_renderer, "Renders previews of extracted content")
 Rel(pdf_service, embedder, "Sends chunking + embedding task")
-Rel(pdf_service, chat_service, "RAG conversations")
 Rel(pdf_service, metadata_service, "Requests metadata generation")
 
 ' File storage operations (mTLS within mesh)
@@ -66,12 +64,10 @@ Rel(pdf_renderer, minio, "Stores rendered PDFs (mTLS)")
 Rel(metadata_service, minio, "Stores metadata job status (mTLS)")
 Rel(docling_translate, minio, "Stores translated JSON + job status (mTLS)")
 Rel(embedder, minio, "Job status storage (mTLS)")
-Rel(chat_service, minio, "Future file operations (mTLS)")
 Rel(pdf_extraction, image_captioner, "Requests image captioning")
 
 ' External AI/ML service communication (HTTP over VPN)
 Rel(docling_translate, vllm_text, "Translation requests (HTTP)")
-Rel(chat_service, vllm_text, "RAG chat requests (HTTP)")
 Rel(metadata_service, vllm_text, "Metadata generation (HTTP)")
 
 ' External VLM communication (HTTP over VPN)
@@ -79,7 +75,6 @@ Rel(image_captioner, vllm_vlm, "Image captioning requests (HTTP)")
 
 ' Vector database operations (mTLS within mesh)
 Rel(embedder, chroma, "Store embeddings (mTLS)")
-Rel(chat_service, chroma, "Query vectors (mTLS)")
 Rel(metadata_service, chroma, "Query vectors for metadata generation (mTLS)")
 
 ' Job status and session management (mTLS within mesh)
@@ -89,7 +84,6 @@ Rel(pdf_renderer, redis, "Document file list management (mTLS)")
 Rel(embedder, redis, "Job status polling (mTLS)")
 Rel(docling_translate, redis, "Document file list management (mTLS)")
 Rel(metadata_service, redis, "Document file list management (mTLS)")
-Rel(chat_service, redis, "Future session management (mTLS)")
 
 ' Cleanup operations (mTLS within mesh)
 Rel(cleaner, minio, "Delete expired files (mTLS)")

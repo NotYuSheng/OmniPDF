@@ -90,10 +90,6 @@ destinationRules:
       trafficPolicy:
         tls:
           mode: ISTIO_MUTUAL
-    - name: chat-service.omnipdf-prestaging.svc.cluster.local
-      trafficPolicy:
-        tls:
-          mode: ISTIO_MUTUAL
     - name: embedder-service.omnipdf-prestaging.svc.cluster.local
       trafficPolicy:
         tls:
