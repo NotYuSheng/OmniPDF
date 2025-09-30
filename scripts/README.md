@@ -74,11 +74,10 @@ pip install -r scripts/test-requirements.txt
 
 ## Services Covered
 
-### Security Scanning (14 Services)
+### Security Scanning (13 Services)
 
-**Custom OmniPDF Services (10):**
-- **pdf_extraction_service** - PDF content extraction with docling
-- **pdf_extraction_service** - PDF processing with docling  
+**Custom OmniPDF Services (9):**
+- **pdf_extraction_service** - PDF processing with docling
 - **docling_translation_service** - Translation with LLM
 - **pdf_renderer_service** - PDF rendering with PyMuPDF
 - **embedder_service** - Text embedding with ChromaDB
