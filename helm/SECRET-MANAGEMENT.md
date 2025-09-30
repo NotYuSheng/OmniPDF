@@ -18,9 +18,8 @@ All OmniPDF secrets follow this naming pattern:
 
 | Service | Secret Name | Keys | Purpose |
 |---------|-------------|------|---------|
-| pdf-extraction-service | `pdf-extraction-service-secrets` | 15 | LLM configuration, Redis URL |
+| pdf-extraction-service | `pdf-extraction-service-secrets` | 6 | PDF processing config |
 | embedder-service | `embedder-service-secrets` | 4 | Embedding models, ChromaDB |
-| pdf-extraction-service | `pdf-extraction-service-secrets` | 5 | PDF processing config |
 | docling-translation-service | `docling-translation-service-secrets` | 7 | Translation settings |
 | pdf-renderer-service | `pdf-renderer-service-secrets` | 5 | PDF rendering config |
 | pdf-processor-service | `pdf-processor-service-secrets` | 8 | Main coordinator settings |
