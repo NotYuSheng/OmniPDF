@@ -79,6 +79,11 @@ networkPolicy:
           matchLabels:
             app.kubernetes.io/name: embedder-service
         ports: [8000]
+      # Chat Service - RAG conversations
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
+        ports: [8000]
       # Metadata Service - requests metadata generation
       - podSelector:
           matchLabels:

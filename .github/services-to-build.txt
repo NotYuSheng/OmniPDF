@@ -4,6 +4,7 @@
 
 # Core Application Services
 frontend
+chat_service
 embedder_service
 pdf_processor_service
 pdf_extraction_service
