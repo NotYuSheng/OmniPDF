@@ -90,6 +90,10 @@ networkPolicy:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: embedder-service
+      # Chat service - queries vectors for RAG
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
       # Metadata service - queries vectors for metadata generation
       - podSelector:
           matchLabels:

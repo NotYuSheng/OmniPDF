@@ -16,6 +16,7 @@ serviceAccounts:
   docling-translation-service: "docling-translation-service"
   pdf-renderer-service: "pdf-renderer-service"
   embedder-service: "embedder-service"
+  chat-service: "chat-service"
   image-captioner-service: "image-captioner-service"
   metadata-service: "metadata-service"
   cleaner: "cleaner"
@@ -52,6 +53,7 @@ rbac:
       pdf-extraction-service: true      # Document extraction
       docling-translation-service: true # Translation workflows
       embedder-service: true            # Text embedding
+      chat-service: true                # RAG queries
       pdf-renderer-service: true        # PDF rendering
       metadata-service: true            # Metadata generation
     canAccess:
@@ -94,6 +96,16 @@ rbac:
       minio: true                       # Job status storage
       redis: true                       # Job status polling
       secrets: ["embedder-secrets"]
+  
+  # Chat service - RAG queries using ChromaDB
+  chat-service:
+    enabled: true
+    canCall: {}                         # External vLLM only (via customRules)
+    canAccess:
+      chromadb: true                    # Vector retrieval for RAG
+      minio: true                       # Future file operations
+      redis: true                       # Future session management
+      secrets: ["chat-secrets"]
   
   # Metadata generation - Analyzes documents for metadata
   metadata-service:

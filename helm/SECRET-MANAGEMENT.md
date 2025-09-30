@@ -9,7 +9,7 @@ Secrets in OmniPDF are stored in the cluster's etcd database (not in files) and 
 ## Secret Structure
 
 All OmniPDF secrets follow this naming pattern:
-- **Name**: `{service-name}-secrets` (e.g., `pdf-extraction-service-secrets`)
+- **Name**: `{service-name}-secrets` (e.g., `chat-service-secrets`)
 - **Type**: `Opaque` 
 - **Namespace**: `omnipdf`
 - **Encoding**: Base64 (not encrypted)
@@ -18,7 +18,7 @@ All OmniPDF secrets follow this naming pattern:
 
 | Service | Secret Name | Keys | Purpose |
 |---------|-------------|------|---------|
-| pdf-extraction-service | `pdf-extraction-service-secrets` | 15 | LLM configuration, Redis URL |
+| chat-service | `chat-service-secrets` | 15 | LLM configuration, Redis URL |
 | embedder-service | `embedder-service-secrets` | 4 | Embedding models, ChromaDB |
 | pdf-extraction-service | `pdf-extraction-service-secrets` | 5 | PDF processing config |
 | docling-translation-service | `docling-translation-service-secrets` | 7 | Translation settings |
@@ -44,10 +44,10 @@ oc get secrets -n omnipdf | grep -v "dockercfg\|token\|helm"
 ### Inspect Secret Structure
 ```bash
 # Show secret keys and sizes (no values)
-oc describe secret pdf-extraction-service-secrets -n omnipdf
+oc describe secret chat-service-secrets -n omnipdf
 
 # Show complete secret with Base64 encoded values
-oc get secret pdf-extraction-service-secrets -n omnipdf -o yaml
+oc get secret chat-service-secrets -n omnipdf -o yaml
 ```
 
 ### Decode Secret Values
@@ -55,7 +55,7 @@ oc get secret pdf-extraction-service-secrets -n omnipdf -o yaml
 #### Single Value
 ```bash
 # Decode specific key
-oc get secret pdf-extraction-service-secrets -n omnipdf -o jsonpath='{.data.OPENAI_API_KEY}' | base64 -d
+oc get secret chat-service-secrets -n omnipdf -o jsonpath='{.data.OPENAI_API_KEY}' | base64 -d
 
 # Example output: lm-studio
 ```
@@ -63,7 +63,7 @@ oc get secret pdf-extraction-service-secrets -n omnipdf -o jsonpath='{.data.OPEN
 #### All Values
 ```bash
 # Decode all keys in a secret
-oc get secret pdf-extraction-service-secrets -n omnipdf -o json | jq -r '.data | to_entries[] | "\(.key): \(.value | @base64d)"'
+oc get secret chat-service-secrets -n omnipdf -o json | jq -r '.data | to_entries[] | "\(.key): \(.value | @base64d)"'
 
 # Example output:
 # OPENAI_API_KEY: lm-studio
@@ -74,7 +74,7 @@ oc get secret pdf-extraction-service-secrets -n omnipdf -o json | jq -r '.data |
 ### View Secrets Inside Running Pods
 ```bash
 # See how secrets appear as environment variables
-oc exec -n omnipdf deployment/pdf-extraction-service -- env | grep -E "OPENAI_|REDIS_|MODEL_"
+oc exec -n omnipdf deployment/chat-service -- env | grep -E "OPENAI_|REDIS_|MODEL_"
 
 # Check specific service environment
 oc exec -n omnipdf deployment/embedder-service -- env | sort
@@ -87,8 +87,8 @@ oc exec -n omnipdf deployment/embedder-service -- env | sort
 #### From .env File (Recommended)
 ```bash
 # Create secret from service .env file
-oc create secret generic pdf-extraction-service-secrets \
-    --from-env-file=pdf_extraction_service/.env \
+oc create secret generic chat-service-secrets \
+    --from-env-file=chat_service/.env \
     -n omnipdf
 ```
 
@@ -106,32 +106,32 @@ oc create secret generic my-secret \
 #### Method 1: Interactive Edit
 ```bash
 # Opens secret in editor (values are Base64 encoded)
-oc edit secret pdf-extraction-service-secrets -n omnipdf
+oc edit secret chat-service-secrets -n omnipdf
 ```
 
 #### Method 2: Patch Single Value
 ```bash
 # Update single key (encode value first)
-oc patch secret pdf-extraction-service-secrets -n omnipdf \
+oc patch secret chat-service-secrets -n omnipdf \
     --patch='{"data":{"OPENAI_API_KEY":"'$(echo -n "new-api-key" | base64)'"}}'
 ```
 
 #### Method 3: Replace Entire Secret
 ```bash
 # Delete and recreate (recommended for multiple changes)
-oc delete secret pdf-extraction-service-secrets -n omnipdf
-oc create secret generic pdf-extraction-service-secrets \
-    --from-env-file=pdf_extraction_service/.env \
+oc delete secret chat-service-secrets -n omnipdf
+oc create secret generic chat-service-secrets \
+    --from-env-file=chat_service/.env \
     -n omnipdf
 
 # Restart pods to pick up new values
-oc rollout restart deployment/pdf-extraction-service -n omnipdf
+oc rollout restart deployment/chat-service -n omnipdf
 ```
 
 ### Delete Secrets
 ```bash
 # Delete specific secret
-oc delete secret pdf-extraction-service-secrets -n omnipdf
+oc delete secret chat-service-secrets -n omnipdf
 
 # Delete multiple secrets
 oc delete secret secret1 secret2 secret3 -n omnipdf
@@ -146,10 +146,10 @@ Secrets are mounted as environment variables using `envFrom`:
 # In deployment template
 spec:
   containers:
-  - name: pdf-extraction-service
+  - name: chat-service
     envFrom:
     - secretRef:
-        name: pdf-extraction-service-secrets
+        name: chat-service-secrets
 ```
 
 ### Automatic Availability
@@ -161,7 +161,7 @@ All secret keys become environment variables inside the pod:
 ### Pod Restart Required
 When secrets are updated, pods must be restarted to see new values:
 ```bash
-oc rollout restart deployment/pdf-extraction-service -n omnipdf
+oc rollout restart deployment/chat-service -n omnipdf
 ```
 
 ## Secret Creation Process
@@ -188,7 +188,7 @@ create_secret_from_env() {
 }
 
 # Create secrets for all services
-create_secret_from_env "pdf-extraction-service" "pdf_extraction_service/.env"
+create_secret_from_env "chat-service" "chat_service/.env"
 create_secret_from_env "embedder-service" "embedder_service/.env"
 # ... etc
 ```
@@ -233,22 +233,22 @@ Warning: Failed to pull image: manifest unknown
 #### Environment Variables Missing in Pod
 ```bash
 # Check if secret is properly referenced
-oc get deployment pdf-extraction-service -n omnipdf -o yaml | grep -A5 envFrom
+oc get deployment chat-service -n omnipdf -o yaml | grep -A5 envFrom
 
 # Check pod environment
-oc exec deployment/pdf-extraction-service -n omnipdf -- env | grep MY_VAR
+oc exec deployment/chat-service -n omnipdf -- env | grep MY_VAR
 ```
 
 ### Debugging Commands
 ```bash
 # Check secret exists and has data
-oc get secret pdf-extraction-service-secrets -n omnipdf -o yaml
+oc get secret chat-service-secrets -n omnipdf -o yaml
 
 # Verify pod can access secrets
-oc exec deployment/pdf-extraction-service -n omnipdf -- printenv | grep -E "API_KEY|URL"
+oc exec deployment/chat-service -n omnipdf -- printenv | grep -E "API_KEY|URL"
 
 # Check deployment configuration
-oc describe deployment pdf-extraction-service -n omnipdf | grep -A10 Environment
+oc describe deployment chat-service -n omnipdf | grep -A10 Environment
 
 # View recent events
 oc get events -n omnipdf --sort-by=.metadata.creationTimestamp

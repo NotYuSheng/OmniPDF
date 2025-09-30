@@ -96,6 +96,10 @@ networkPolicy:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: embedder-service
+      # Chat Service - future job status + file operations
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: chat-service
       # Cleaner - delete expired files
       - podSelector:
           matchLabels:
