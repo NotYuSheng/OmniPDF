@@ -11,8 +11,7 @@ Based on the C4 diagram external AI connections, only these services should have
 | Service | LLM Type | Purpose | Implementation |
 |---------|----------|---------|----------------|
 | `docling-translation-service` | vLLM Text | Translation requests | External HTTP/HTTPS |
-| `metadata-service` | vLLM Text | Metadata generation | External HTTP/HTTPS |
-| `metadata-service` | vLLM Text | Metadata generation | `allowLLMService` section |
+| `metadata-service` | vLLM Text | Metadata generation | External HTTP/HTTPS + Legacy `allowLLMService` |
 | `image-captioner-service` | vLLM VLM | Image captioning | External HTTP/HTTPS |
 
 ### ❌ Services that Should NOT Have LLM Access
@@ -61,7 +60,6 @@ networkPolicy:
 
 ### External AI Communication
 - `docling-translation-service` → `vllm_text` (HTTP/HTTPS)
-- `metadata-service` → `vllm_text` (HTTP/HTTPS)  
 - `metadata-service` → `vllm_text` (HTTP/HTTPS)
 - `image-captioner-service` → `vllm_vlm` (HTTP/HTTPS)
 
