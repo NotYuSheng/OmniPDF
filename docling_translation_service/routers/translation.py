@@ -21,6 +21,7 @@ document_files = RedisDocumentFileList()
 
 LLM_URL = os.getenv("LLM_URL")
 TOKEN = os.getenv("LLM_API_TOKEN")
+LLM_MODEL = os.getenv("LLM_MODEL")
 
 LLM_CONCURRENCY = int(os.getenv("LLM_CONCURRENCY", "5"))
 semaphore = Semaphore(LLM_CONCURRENCY)
@@ -52,7 +53,7 @@ async def translate(prompt, source_lang=None, target_lang="English"):
                         "Authorization": f"Bearer {TOKEN}",
                     },
                     json={
-                        "model": "qwen2.5",
+                        "model": LLM_MODEL,
                         "messages": [
                             {"role": "system", "content": system_prompt},
                             {"role": "user", "content": prompt},
