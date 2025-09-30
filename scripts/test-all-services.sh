@@ -18,8 +18,7 @@ echo "================================================="
 
 # Services with unit tests
 SERVICES=(
-    "chat_service"
-    "pdf_extraction_service" 
+    "pdf_extraction_service"
     "docling_translation_service"
     "pdf_renderer_service"
     "embedder_service"

@@ -22,7 +22,6 @@ if "httpx_cookies" not in st.session_state:
     st.session_state.httpx_cookies = Cookies()
 # Backend
 PDF_PROCESSOR_URL = os.getenv("PDF_PROCESSOR_URL")
-CHAT_URL = os.getenv("CHAT_URL")
 
 
 if __name__ == "__main__":
@@ -52,7 +51,7 @@ if __name__ == "__main__":
             margin: 1rem 0;
         }
         
-        .chat-container {
+        .message-container {
             background-color: #f8f9fa;
             padding: 1rem;
             border-radius: 10px;
@@ -92,12 +91,6 @@ if __name__ == "__main__":
         icon="☁️"
     )
 
-    chat_UI = st.Page(
-        page="my_pages/5_chat_UI.py",
-        title="Chat",
-        icon="💬",
-    )
-
     translate_UI = st.Page(
         page="my_pages/6_translate_UI.py",
         title="Translate",
@@ -120,7 +113,6 @@ if __name__ == "__main__":
     pg = st.navigation(
         pages=[
             upload_UI,
-            chat_UI,
             images_UI,
             tables_UI,
             wordcloud_UI,

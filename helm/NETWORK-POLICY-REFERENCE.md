@@ -11,7 +11,7 @@ Based on the C4 diagram external AI connections, only these services should have
 | Service | LLM Type | Purpose | Implementation |
 |---------|----------|---------|----------------|
 | `docling-translation-service` | vLLM Text | Translation requests | External HTTP/HTTPS |
-| `chat-service` | vLLM Text | RAG chat requests | External HTTP/HTTPS |
+| `metadata-service` | vLLM Text | Metadata generation | External HTTP/HTTPS |
 | `metadata-service` | vLLM Text | Metadata generation | `allowLLMService` section |
 | `image-captioner-service` | vLLM VLM | Image captioning | External HTTP/HTTPS |
 
@@ -42,7 +42,7 @@ networkPolicy:
         ports: [8000]
 ```
 
-**Used by:** `chat-service`, `image-captioner-service`, `embedder-service`, `cleaner`, `frontend`
+**Used by:** `metadata-service`, `image-captioner-service`, `embedder-service`, `cleaner`, `frontend`
 
 ### 2. Legacy `allowLLMService` Section
 ```yaml
@@ -61,14 +61,14 @@ networkPolicy:
 
 ### External AI Communication
 - `docling-translation-service` → `vllm_text` (HTTP/HTTPS)
-- `chat-service` → `vllm_text` (HTTP/HTTPS)  
+- `metadata-service` → `vllm_text` (HTTP/HTTPS)  
 - `metadata-service` → `vllm_text` (HTTP/HTTPS)
 - `image-captioner-service` → `vllm_vlm` (HTTP/HTTPS)
 
 ### Internal Service Communication (mTLS within Istio mesh)
 - All services → `redis` (session validation)
 - Multiple services → `minio` (file storage)
-- `embedder-service`, `chat-service`, `cleaner` → `chromadb` (vector operations and cleanup)
+- `embedder-service`, `metadata-service`, `cleaner` → `chromadb` (vector operations and cleanup)
 - `cleaner` → All storage services (cleanup)
 
 ## Security Principles

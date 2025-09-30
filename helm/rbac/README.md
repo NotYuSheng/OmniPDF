@@ -29,7 +29,7 @@ The RBAC implementation follows the OmniPDF microservices architecture with **ex
 - **Configuration**: Driven by explicit `values.yaml` declarations
 - **Principle**: Each service declares exactly what it can call/access
 
-### Service Coverage (14/14 Complete)
+### Service Coverage (13/13 Complete)
 
 ✅ **All services have complete RBAC coverage:**
 
@@ -42,7 +42,6 @@ The RBAC implementation follows the OmniPDF microservices architecture with **ex
 | **Processing** | docling-translation-service | `docling-translation-service` | ✅ |
 | **Processing** | pdf-renderer-service | `pdf-renderer-service` | ✅ |
 | **Processing** | embedder-service | `embedder-service` | ✅ |
-| **Processing** | chat-service | `chat-service` | ✅ |
 | **AI/ML** | image-captioner-service | `image-captioner-service` | ✅ |
 | **AI/ML** | metadata-service | `metadata-service` | ✅ |
 | **Data** | chromadb | `chromadb` | ✅ |
@@ -66,14 +65,14 @@ pdf-processor-service → [all processing services] → [data stores]
 
 **Data Access Patterns:**
 ```
-• ChromaDB ← embedder, chat, metadata, cleaner
-• MinIO ← pdf-processor, extraction, renderer, translation, embedder, chat, metadata, cleaner  
-• Redis ← pdf-processor, extraction, translation, embedder, chat, renderer, metadata, cleaner
+• ChromaDB ← embedder, metadata, cleaner
+• MinIO ← pdf-processor, extraction, renderer, translation, embedder, metadata, cleaner
+• Redis ← pdf-processor, extraction, translation, embedder, renderer, metadata, cleaner
 ```
 
 **External API Calls:**
 ```
-• vLLM Text ← docling-translation, chat, metadata
+• vLLM Text ← docling-translation, metadata
 • vLLM Vision ← image-captioner
 ```
 
@@ -84,7 +83,6 @@ All services have complete RBAC permissions aligned with C4 diagram requirements
 | Service | Data Store Access | Status |
 |---------|-------------------|--------|
 | **embedder-service** | `chromadb`, `minio`, `redis` | ✅ Complete |
-| **chat-service** | `chromadb`, `minio`, `redis` | ✅ Complete |
 | **docling-translation-service** | `minio`, `redis` | ✅ Complete |
 | **pdf-renderer-service** | `minio`, `redis` | ✅ Complete |
 | **metadata-service** | `chromadb`, `minio`, `redis` | ✅ Complete |
@@ -119,7 +117,6 @@ pdf-processor-service:
     docling-translation-service: true
     pdf-renderer-service: true
     embedder-service: true
-    chat-service: true
     metadata-service: true
   canAccess:
     # Data coordination
@@ -210,14 +207,14 @@ kubectl describe role omnipdf-pdf-processor-service-role -n omnipdf
 
 Each service accesses only its own secrets:
 - `pdf-processor-secrets`
-- `pdf-extraction-secrets` 
-- `chat-secrets`
+- `pdf-extraction-secrets`
+- `embedder-secrets`
 - etc.
 
 ### Data Store Security
 
 Data stores accept connections from authorized services only:
-- **ChromaDB**: embedder, chat, metadata, cleaner
+- **ChromaDB**: embedder, metadata, cleaner
 - **MinIO**: All services that store/retrieve files
 - **Redis**: All services using sessions/file lists
 
@@ -267,7 +264,7 @@ kubectl auth can-i get services/minio \
   -n omnipdf
 
 kubectl auth can-i get services/chromadb \
-  --as=system:serviceaccount:omnipdf:chat-service \
+  --as=system:serviceaccount:omnipdf:metadata-service \
   -n omnipdf
 
 # Test orchestration permissions
