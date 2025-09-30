@@ -50,14 +50,7 @@ if __name__ == "__main__":
             padding: 1rem;
             margin: 1rem 0;
         }
-        
-        .message-container {
-            background-color: #f8f9fa;
-            padding: 1rem;
-            border-radius: 10px;
-            margin: 0.5rem 0;
-        }
-        
+
         .stTabs [data-baseweb="tab-list"] {
             gap: 2rem;
         }
