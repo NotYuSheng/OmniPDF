@@ -64,7 +64,7 @@ async def get_pdf_rendering(
     
     return render_response
 
-@router.get("/{doc_id}/rendered.pdf", response_model=RendererResponse)
+@router.get("/{doc_id}/rendered.pdf")
 async def get_pdf_rendered_file(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),

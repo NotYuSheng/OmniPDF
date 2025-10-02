@@ -48,5 +48,6 @@ showSidebarNavigation = true
 
 [server]
 maxUploadSize = 200
-
 runOnSave = true
+enableCORS = false
+enableXsrfProtection = false

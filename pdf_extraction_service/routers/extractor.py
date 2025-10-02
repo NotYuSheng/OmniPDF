@@ -147,9 +147,15 @@ async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
 
 @router.post("/extract", response_model=ExtractResponse, status_code=202)
 async def submit_pdf(doc_id: str, download_url: str, background_tasks: BackgroundTasks):
-    save_job(doc_id = doc_id, 
-             job_data = {}, 
-             status = "processing", 
+    # Check if job already exists to prevent duplicate processing
+    existing_job = load_job(doc_id=doc_id, job_type=JobType.EXTRACTION)
+    if existing_job:
+        logger.info(f"Job already exists for doc_id: {doc_id}, status: {existing_job.get('status')}")
+        return ExtractResponse(doc_id=doc_id, status=existing_job.get("status", "processing"))
+
+    save_job(doc_id = doc_id,
+             job_data = {},
+             status = "processing",
              job_type = JobType.EXTRACTION
              )
 

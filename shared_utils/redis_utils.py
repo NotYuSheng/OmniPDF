@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 REDIS_URL = environ["REDIS_URL"]
 EXPIRY_DAY = timedelta(days=1)
-EXPIRY_HOUR = timedelta(hours=1)
+EXPIRY_HOUR = timedelta(hours=3)  # Extended to 3 hours for long-running translation jobs
 SEPERATOR = ":"
 
 

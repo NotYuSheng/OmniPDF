@@ -19,5 +19,5 @@ async def get_pdf_text_chunks(
     texts = job.get("data", {}).get("result", {}).get("texts")
     if texts is None:
         logger.error(f"Could not find 'texts' in job result for doc_id: {doc_id}")
-        raise HTTPException(status_code=500, detail="A server error has occurred.")
+        raise HTTPException(status_code=404, detail="Text chunks not found for this document.")
     return JSONResponse(content=texts)

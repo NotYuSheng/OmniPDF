@@ -287,4 +287,5 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
         st.error("An unexpected error occurred at image extraction.")
 
 else:
-    st.info("Please upload and process a PDF first to extract images")
+    st.info("📤 No documents have been processed yet. Please upload and process a PDF first!")
+    st.markdown("Go to the **Upload PDF** page to get started.")
