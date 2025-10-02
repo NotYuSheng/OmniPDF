@@ -49,5 +49,8 @@ showSidebarNavigation = true
 [server]
 maxUploadSize = 200
 runOnSave = true
-enableCORS = false
-enableXsrfProtection = false
+
+# Enable CORS with allowed origins for security
+# Set STREAMLIT_CORS_ALLOWED_ORIGINS env var to configure allowed origins
+enableCORS = true
+enableXsrfProtection = true

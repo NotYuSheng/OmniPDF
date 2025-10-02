@@ -1,4 +1,17 @@
 services:
+  nginx:
+    container_name: nginx
+    build: 
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./nginx/.env
+    depends_on:
+      - pdf_processor_service
+      - frontend
+
   frontend:
     build:
       context: .
@@ -14,8 +27,6 @@ services:
     container_name: pdf_processor_service
     env_file:
       - ./pdf_processor_service/.env
-    ports:
-      - "8000:8000"
 
   pdf_extraction_service:
     build:
@@ -87,19 +98,6 @@ services:
         - ./cleaner/.env
       depends_on:
         - redis
-
-  nginx:
-    container_name: nginx
-    build: 
-      context: .
-      dockerfile: ./nginx/Dockerfile
-    ports:
-      - "8080:8080"
-    env_file:
-      - ./nginx/.env
-    depends_on:
-      - pdf_processor_service
-      - frontend
 
   redis:
     container_name: redis
