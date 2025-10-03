@@ -2,6 +2,10 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
+# Build argument for version (set during build time)
+ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION}
+
 ENV PYTHONPATH=/app/frontend:/app/shared_utils
 
 RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
