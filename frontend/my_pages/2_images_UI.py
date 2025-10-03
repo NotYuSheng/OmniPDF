@@ -207,20 +207,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
         if doc_name not in st.session_state.expander_states:
             st.session_state.expander_states[doc_name] = True
 
-    # Update multiselect based on expander states
-    expanded_docs = st.multiselect(
-        label="Expand documents:",
-        options=doc_names,
-        default=[
-            doc for doc in doc_names if st.session_state.expander_states.get(doc, True)
-        ],
-        help="Choose which documents should be expanded",
-        key="expander_multiselect",
-    )
-
-    # Update session state based on multiselect
-    for doc_name in doc_names:
-        st.session_state.expander_states[doc_name] = doc_name in expanded_docs
 
     try:
         # Show loading message
@@ -236,17 +222,11 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         ),
                     )
 
-                    # Update expander state and multiselect when expander is toggled
+                    # Update expander state when expander is toggled
                     if not file_lst:  # expander is closed
-                        st.session_state.expander_states[data["uploaded_filename"]] = (
-                            False
-                        )
-                        if data["uploaded_filename"] in expanded_docs:
-                            expanded_docs.remove(data["uploaded_filename"])
+                        st.session_state.expander_states[data["uploaded_filename"]] = False
                     else:  # expander is open
-                        st.session_state.expander_states[data["uploaded_filename"]] = (
-                            True
-                        )
+                        st.session_state.expander_states[data["uploaded_filename"]] = True
 
                     with file_lst:
                         logger.info(f"Extracting images for document ID: {doc_id}")
