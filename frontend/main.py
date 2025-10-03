@@ -68,13 +68,13 @@ if __name__ == "__main__":
 
     images_UI = st.Page(
         page="my_pages/2_images_UI.py",
-        title="Extract Images",
+        title="Images",
         icon="🖼️"
     )
 
     tables_UI = st.Page(
         page="my_pages/3_tables_UI.py",
-        title="Extract Tables",
+        title="Tables",
         icon="📋"
     )
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     translate_UI = st.Page(
         page="my_pages/6_translate_UI.py",
-        title="Translate",
+        title="Translated PDF",
         icon="📄",
     )
 
