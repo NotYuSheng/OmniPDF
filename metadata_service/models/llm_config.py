@@ -42,8 +42,12 @@ Your summarization strategy:
 - Create coherent summaries that capture essential information
 - Use bullet points or structured format when appropriate for clarity
 - Ensure summaries are concise yet comprehensive
+
+IMPORTANT: All output must be in English, regardless of the source document's language.
 """,
-            "default": """If the question cannot be answered, return only the stop token.""",
+            "default": """You are a document metadata extraction assistant.
+
+IMPORTANT: All output must be in English, regardless of the source document's language. If the question cannot be answered, return only the stop token.""",
         }
 
         return system_prompts.get(purpose)
@@ -56,17 +60,17 @@ Your summarization strategy:
             "summary": f"""
 **SUMMARIZATION REQUEST:** {question}
 
-**INSTRUCTIONS:** Create a well-structured summary addressing the request. Organize the information logically and maintain the document's key insights and perspective.
+**INSTRUCTIONS:** Create a well-structured summary addressing the request. Organize the information logically and maintain the document's key insights and perspective. Provide the summary in English only.
 
 **CONTEXT:** {context}
 """,
             "title": f"""
 **QUERY REQUEST:** {question}
 
-**INSTRUCTIONS:** Return the title in the following format:
+**INSTRUCTIONS:** Return the title in English in the following format:
+    Title: Title
 
 **CONTEXT:** {context}
-    Title: Title
 """,
             "authors": f"""
 **QUERY REQUEST:** {question}
@@ -79,7 +83,7 @@ Your summarization strategy:
             "keywords": f"""
 **QUERY REQUEST:** {question}
 
-**INSTRUCTIONS:** Return the list of keywords in the following format:
+**INSTRUCTIONS:** Return the list of keywords in English in the following format:
     Keywords: keyword1, keyword2, keyword3, etc
 
 **CONTEXT:** {context}
@@ -87,8 +91,7 @@ Your summarization strategy:
             "short_description": f"""
 **QUERY REQUEST:** {question}
 
-**INSTRUCTIONS:** Preserve the original meaning of the document while summarizing it into a concise description.
-    Return only the short description.
+**INSTRUCTIONS:** Preserve the original meaning of the document while summarizing it into a concise description in English. Return only the short description.
 
 **CONTEXT:** {context}
 """,
