@@ -57,7 +57,6 @@ async def get_tables(doc_id, max_retries=600, delay=1) -> dict:
 
 
             if response.status_code == 200 or response.status_code == 201:
-                server_status.info("Successfully retrieved tables")
                 logger.info(f"Table extraction response: {response}")
                 return response.json()  # Success - return the actual data
             elif response.status_code == 202:
@@ -136,7 +135,6 @@ def display_tables(table_response, doc_id=None):
     """
     # Check if we have tables in the response
     if table_response:
-        table_status.success(f"Found {len(table_response)} tables in the document")
         for i, table_data in enumerate(table_response):
             with st.container():
                 col1, col2 = st.columns([2, 1], border=True)
@@ -248,10 +246,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         )
 
                     with file_lst:
-                        st.markdown(f"**Document ID:** {doc_id}")
-                        st.markdown(
-                            f"**Filename:** [{data['filename']}]({data['download_url']})"
-                        )  # Download link
                         logger.info(f"Extracting tables for document ID: {doc_id}")
                         table_response = runner.run(get_tables(doc_id=doc_id))
                         display_tables(table_response, doc_id=doc_id)

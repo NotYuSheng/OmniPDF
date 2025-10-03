@@ -53,7 +53,6 @@ async def get_images(doc_id, max_retries=600, delay=1) -> dict:
                 return {"error": "Invalid JSON response from server"}
             
             if response.status_code == 200 or response.status_code == 201:
-                server_status.info("Successfully retrieved images")
                 logger.info(f"Image extraction response: {response}")
                 return data  # Success - return the actual data
             elif response.status_code == 202:
@@ -108,10 +107,6 @@ def display_images(image_response, doc_id=None) -> None:
         
     # Check if we have images in the response
     if "images" in image_response and image_response["images"]:
-        image_status.success(
-            f"Found {len(image_response['images'])} images in the document"
-        )
-
         # Display each image
         for i, image_data in enumerate(image_response["images"]):
             with st.container():
@@ -254,10 +249,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         )
 
                     with file_lst:
-                        st.markdown(f"**Document ID:** {doc_id}")
-                        st.markdown(
-                            f"**Filename:** [{data['filename']}]({data['download_url']})"
-                        )  # Download link
                         logger.info(f"Extracting images for document ID: {doc_id}")
 
                         image_response = runner.run(get_images(doc_id=doc_id))
@@ -267,8 +258,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                         embed_response = runner.run(embed_pdf(embed_type="sentence", doc_id=doc_id))
                         logger.info(f"Embedding response: {embed_response}")
                         if embed_response and "error" not in embed_response:
-                            st.toast("Document successfully embedded",
-                                     icon="✅")
+                            pass  # Successfully embedded
                         else:
                             st.toast("Error during embedding",
                                      icon="❌")

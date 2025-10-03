@@ -164,8 +164,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
     else:
         for doc_id, data in response_lst:
             with st.expander(f"📄 {data['uploaded_filename']}", expanded=True):
-                st.markdown(f"**Document ID:** `{doc_id}`")
-
                 runner = asyncio.Runner()
                 translation_data = runner.run(get_translation_status(doc_id))
 
