@@ -332,6 +332,10 @@ uploaded_files = st.file_uploader(
 )
 
 if uploaded_files:
+    # Initialize translation settings in session state if not exists
+    if "translation_settings" not in st.session_state:
+        st.session_state.translation_settings = {}
+
     # Create a list of uploaded files for selection
     file_options = [file.name for file in uploaded_files]
 
@@ -341,37 +345,48 @@ if uploaded_files:
         default=file_options,  # By default, select all uploaded files
     )
 
-    # Translation configuration
+    # Translation configuration per file
     st.markdown("---")
     st.subheader("🌐 Translation Settings")
+    st.markdown("Configure translation settings for each file individually:")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        source_lang = st.selectbox(
-            "Source Language",
-            options=list(LANGUAGES.keys()),
-            format_func=lambda x: LANGUAGES[x],
-            key="upload_source_lang",
-            index=0,  # Default to "Auto-detect"
-            help="Select source language for automatic detection or specify a language"
-        )
+    # Create translation settings for each selected file
+    for file_name in selection:
+        with st.expander(f"📄 {file_name}", expanded=True):
+            col1, col2 = st.columns(2)
 
-    with col2:
-        target_lang = st.selectbox(
-            "Target Language",
-            options=list(LANGUAGES.keys()),
-            format_func=lambda x: LANGUAGES[x],
-            key="upload_target_lang",
-            index=1,  # Default to "English"
-            help="Select target language for translation"
-        )
+            # Initialize default values if not already set
+            if file_name not in st.session_state.translation_settings:
+                st.session_state.translation_settings[file_name] = {
+                    "source_lang": "auto",
+                    "target_lang": "en"
+                }
 
-    st.info(f"🌐 Translation: {LANGUAGES[source_lang]} → {LANGUAGES[target_lang]}")
+            with col1:
+                source_lang = st.selectbox(
+                    "Source Language",
+                    options=list(LANGUAGES.keys()),
+                    format_func=lambda x: LANGUAGES[x],
+                    key=f"source_lang_{file_name}",
+                    index=list(LANGUAGES.keys()).index(st.session_state.translation_settings[file_name]["source_lang"]),
+                    help="Select source language for automatic detection or specify a language"
+                )
+                st.session_state.translation_settings[file_name]["source_lang"] = source_lang
+
+            with col2:
+                target_lang = st.selectbox(
+                    "Target Language",
+                    options=list(LANGUAGES.keys()),
+                    format_func=lambda x: LANGUAGES[x],
+                    key=f"target_lang_{file_name}",
+                    index=list(LANGUAGES.keys()).index(st.session_state.translation_settings[file_name]["target_lang"]),
+                    help="Select target language for translation"
+                )
+                st.session_state.translation_settings[file_name]["target_lang"] = target_lang
+
+            st.info(f"🌐 Translation: {LANGUAGES[source_lang]} → {LANGUAGES[target_lang]}")
 
     st.markdown("---")
-
-    # Translation is always enabled
-    translation_enabled = True
 
     # Check if files are selected and process button is clicked
     if st.button("Process PDF", type="primary"):
@@ -392,11 +407,16 @@ if uploaded_files:
                     file for file in uploaded_files if file.name == file_name
                 )
 
+                # Get translation settings for this specific file
+                file_translation = st.session_state.translation_settings.get(file_name, {})
+                file_source_lang = file_translation.get("source_lang", "auto")
+                file_target_lang = file_translation.get("target_lang", "en")
+
                 # Create an expander for each file
                 file_expander = st.expander(f"📄 {file_name}", expanded=True)
 
-                # Always pass translation settings
-                await process_pdf(file_to_process, file_expander, source_lang, target_lang)
+                # Pass file-specific translation settings
+                await process_pdf(file_to_process, file_expander, file_source_lang, file_target_lang)
 
         asyncio.run(_process_files())
 
