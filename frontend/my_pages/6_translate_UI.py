@@ -16,12 +16,10 @@ if "processed_data" not in st.session_state or st.session_state.processed_data i
 if "httpx_cookies" not in st.session_state:
     st.session_state.httpx_cookies = Cookies()
 
-client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies, timeout=300.0)
-
 st.header("🌐 Translation")
 
 
-async def get_translation_status(doc_id: str) -> dict:
+async def get_translation_status(doc_id: str, client: httpx.AsyncClient) -> dict:
     """Get translation status for a document."""
     try:
         response = await client.get(f"{PDF_PROCESSOR_URL}/translation/{doc_id}")
@@ -36,7 +34,7 @@ async def get_translation_status(doc_id: str) -> dict:
         return {"status": "error", "error": str(e)}
 
 
-async def get_renderer_status(doc_id: str) -> dict:
+async def get_renderer_status(doc_id: str, client: httpx.AsyncClient) -> dict:
     """Get renderer status for a document."""
     try:
         response = await client.get(f"{PDF_PROCESSOR_URL}/renderer/{doc_id}")
@@ -51,7 +49,7 @@ async def get_renderer_status(doc_id: str) -> dict:
         return {"status": "error", "error": str(e)}
 
 
-async def trigger_renderer(doc_id: str) -> dict:
+async def trigger_renderer(doc_id: str, client: httpx.AsyncClient) -> dict:
     """Trigger rendering for a translated document."""
     try:
         response = await client.post(f"{PDF_PROCESSOR_URL}/renderer/{doc_id}")
@@ -82,7 +80,7 @@ def display_translation_info(translation_data: dict):
             st.metric("Images", len(result.get("pictures", [])))
 
 
-def display_rendered_pdf(doc_id: str, filename: str, runner: asyncio.Runner):
+def display_rendered_pdf(doc_id: str, filename: str, runner: asyncio.Runner, client: httpx.AsyncClient):
     """Display rendered PDF with download and preview options."""
     # Server-side URL for fetching PDF (internal service communication)
     server_pdf_url = f"{PDF_PROCESSOR_URL}/renderer/{doc_id}/rendered.pdf"
@@ -117,7 +115,7 @@ def display_rendered_pdf(doc_id: str, filename: str, runner: asyncio.Runner):
         st.markdown(f"[Download Translated PDF]({client_pdf_url})")
 
 
-def display_renderer_section(doc_id: str, filename: str, renderer_data: dict, runner: asyncio.Runner):
+def display_renderer_section(doc_id: str, filename: str, renderer_data: dict, runner: asyncio.Runner, client: httpx.AsyncClient):
     """Display renderer status and controls."""
     status = renderer_data.get("status")
 
@@ -125,7 +123,7 @@ def display_renderer_section(doc_id: str, filename: str, renderer_data: dict, ru
         st.info("💡 Generate a translated PDF with the translated text overlaid on the original document.")
         if st.button("🎨 Generate Translated PDF", key=f"render_{doc_id}", use_container_width=True):
             with st.spinner("Generating translated PDF..."):
-                trigger_result = runner.run(trigger_renderer(doc_id))
+                trigger_result = runner.run(trigger_renderer(doc_id, client))
                 if trigger_result.get("status") == "success":
                     st.success("✅ Generation started! Refreshing...")
                     st.rerun()
@@ -138,13 +136,13 @@ def display_renderer_section(doc_id: str, filename: str, renderer_data: dict, ru
             st.rerun()
 
     elif status == "completed":
-        display_rendered_pdf(doc_id, filename, runner)
+        display_rendered_pdf(doc_id, filename, runner, client)
 
     elif status == "failed":
         st.error("❌ PDF generation failed")
         if st.button("🔄 Retry", key=f"retry_{doc_id}"):
             with st.spinner("Retrying..."):
-                trigger_result = runner.run(trigger_renderer(doc_id))
+                trigger_result = runner.run(trigger_renderer(doc_id, client))
                 if trigger_result.get("status") == "success":
                     st.success("✅ Restarted! Refreshing...")
                     st.rerun()
@@ -165,7 +163,8 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
         for doc_id, data in response_lst:
             with st.expander(f"📄 {data['uploaded_filename']}", expanded=True):
                 runner = asyncio.Runner()
-                translation_data = runner.run(get_translation_status(doc_id))
+                client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies, timeout=300.0)
+                translation_data = runner.run(get_translation_status(doc_id, client))
 
                 status = translation_data.get("status")
 
@@ -183,8 +182,8 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                     display_translation_info(translation_data)
 
                     # Check and display renderer section
-                    renderer_data = runner.run(get_renderer_status(doc_id))
-                    display_renderer_section(doc_id, data['uploaded_filename'], renderer_data, runner)
+                    renderer_data = runner.run(get_renderer_status(doc_id, client))
+                    display_renderer_section(doc_id, data['uploaded_filename'], renderer_data, runner, client)
 
                 elif status == "failed":
                     st.error("❌ Translation failed")
