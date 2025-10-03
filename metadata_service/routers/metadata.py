@@ -26,7 +26,7 @@ OPENAI_MODEL_NAME = model_config.model_name
 SUMMARY_LENGTH = int(os.getenv("SUMMARY_LENGTH", "500"))
 SHORT_DSECRIPTION_LENGTH = int(os.getenv("SHORT_DSECRIPTION_LENGTH", "20"))
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", "8"))
-PROMPT_PURPOSE = ["default", "summary", "title", "keywords", "authors"]
+PROMPT_PURPOSE = ["default", "summary", "title", "keywords", "authors", "short_description"]
 
 
 async def get_model_response(system_prompt: str, user_prompt: str, client: AsyncOpenAI):
@@ -95,8 +95,8 @@ async def get_summary(chunks: list[str], client: AsyncOpenAI):
 async def get_short_description(summary: str, client: AsyncOpenAI):
     system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
     user_prompt = prompt_templates.get_user_prompt(
-        f"Return a short description of the document, up to {SHORT_DSECRIPTION_LENGTH} words. Return only the short description.",
-        PROMPT_PURPOSE[1],
+        f"Return a short description of the document, up to {SHORT_DSECRIPTION_LENGTH} words.",
+        PROMPT_PURPOSE[5],
         summary,
     )
 
