@@ -1,17 +1,30 @@
+import logging
+import os
+from enum import Enum
+
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from openai import AsyncOpenAI, APIError
+
 from shared_utils.openai_client import get_openai_client
 from shared_utils.chroma_client import get_chunks
 from shared_utils.redis_utils import RedisDocumentFileList
 from shared_utils.job_status import save_job, load_job, JobType
-import logging
-import os
 from models.metadata import MetadataResponse
 from metadata_service.models.llm_config import (
     ModelConfig,
     PromptTemplates,
     ModelResponseOptimizer,
 )
+
+class PromptPurpose(str, Enum):
+    """Enum for prompt purposes to avoid magic indices."""
+    DEFAULT = "default"
+    SUMMARY = "summary"
+    TITLE = "title"
+    KEYWORDS = "keywords"
+    AUTHORS = "authors"
+    SHORT_DESCRIPTION = "short_description"
+
 
 router = APIRouter(prefix="/metadata", tags=["metadata"])
 
@@ -26,7 +39,6 @@ OPENAI_MODEL_NAME = model_config.model_name
 SUMMARY_LENGTH = int(os.getenv("SUMMARY_LENGTH", "500"))
 SHORT_DSECRIPTION_LENGTH = int(os.getenv("SHORT_DSECRIPTION_LENGTH", "20"))
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", "8"))
-PROMPT_PURPOSE = ["default", "summary", "title", "keywords", "authors", "short_description"]
 
 
 async def get_model_response(system_prompt: str, user_prompt: str, client: AsyncOpenAI):
@@ -76,10 +88,10 @@ async def get_model_response(system_prompt: str, user_prompt: str, client: Async
 
 
 async def get_summary(chunks: list[str], client: AsyncOpenAI):
-    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
+    system_prompt = prompt_templates.get_system_prompt(PromptPurpose.SUMMARY)
     user_prompt = prompt_templates.get_user_prompt(
         f"Prepare a single paragraph summary of up to {SUMMARY_LENGTH} words. Return only the summary.",
-        PROMPT_PURPOSE[1],
+        PromptPurpose.SUMMARY,
         r"{context}",
     )
     summaries = []
@@ -93,10 +105,10 @@ async def get_summary(chunks: list[str], client: AsyncOpenAI):
 
 
 async def get_short_description(summary: str, client: AsyncOpenAI):
-    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[1])
+    system_prompt = prompt_templates.get_system_prompt(PromptPurpose.SUMMARY)
     user_prompt = prompt_templates.get_user_prompt(
         f"Return a short description of the document, up to {SHORT_DSECRIPTION_LENGTH} words.",
-        PROMPT_PURPOSE[5],
+        PromptPurpose.SHORT_DESCRIPTION,
         summary,
     )
 
@@ -130,9 +142,9 @@ async def cascade_query(
 
 
 async def get_authors(chunks: list[str], client: AsyncOpenAI):
-    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
+    system_prompt = prompt_templates.get_system_prompt(PromptPurpose.DEFAULT)
     user_prompt = prompt_templates.get_user_prompt(
-        "Identify the Authors in the given document", PROMPT_PURPOSE[4], r"{context}"
+        "Identify the Authors in the given document", PromptPurpose.AUTHORS, r"{context}"
     )
 
     author_chunks = []
@@ -155,9 +167,9 @@ async def get_authors(chunks: list[str], client: AsyncOpenAI):
 
 
 async def get_title(chunks: list[str], client: AsyncOpenAI):
-    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
+    system_prompt = prompt_templates.get_system_prompt(PromptPurpose.DEFAULT)
     user_prompt = prompt_templates.get_user_prompt(
-        "Identify the title in the given document", PROMPT_PURPOSE[2], r"{context}"
+        "Identify the title in the given document", PromptPurpose.TITLE, r"{context}"
     )
 
     title_chunks = []
@@ -176,9 +188,9 @@ async def get_title(chunks: list[str], client: AsyncOpenAI):
 
 
 async def get_keywords(chunks: list[str], client: AsyncOpenAI):
-    system_prompt = prompt_templates.get_system_prompt(PROMPT_PURPOSE[0])
+    system_prompt = prompt_templates.get_system_prompt(PromptPurpose.DEFAULT)
     user_prompt = prompt_templates.get_user_prompt(
-        "Identify the Keywords in the given document", PROMPT_PURPOSE[3], r"{context}"
+        "Identify the Keywords in the given document", PromptPurpose.KEYWORDS, r"{context}"
     )
     keyword_chunks = []
     for chunk in chunks:
