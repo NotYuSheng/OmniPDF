@@ -3,6 +3,7 @@ import logging
 import os
 
 from httpx import Cookies
+from version import __version__
 
 # Logger
 logging.basicConfig(level=logging.INFO)
@@ -36,14 +37,14 @@ if __name__ == "__main__":
             text-align: center;
             margin-bottom: 2rem;
         }
-        
+
         .metric-card {
             background-color: #f0f2f6;
             padding: 1rem;
             border-radius: 10px;
             margin: 0.5rem 0;
         }
-        
+
         .image-container {
             border: 2px solid #e6e6e6;
             border-radius: 10px;
@@ -53,6 +54,11 @@ if __name__ == "__main__":
 
         .stTabs [data-baseweb="tab-list"] {
             gap: 2rem;
+        }
+
+        /* Disable sidebar collapse button */
+        [data-testid="collapsedControl"] {
+            display: none;
         }
     </style>
     """,
@@ -114,4 +120,12 @@ if __name__ == "__main__":
             settings_UI,
         ]
     )
+
+    # Add version number to sidebar footer
+    st.sidebar.markdown("---")
+    st.sidebar.markdown(
+        f"<div style='text-align: center; color: #666; font-size: 0.8em;'>v{__version__}</div>",
+        unsafe_allow_html=True
+    )
+
     pg.run()
