@@ -154,7 +154,8 @@ def display_tables(table_response, doc_id=None):
                     else:
                         st.warning("Could not parse table data.")
 
-                    # Display title with page info and copy button
+                    # Display CSV format
+                    st.text("CSV Format")
                     csv_string = df.to_csv(index=False)
                     st.code(csv_string, language="csv")
 
