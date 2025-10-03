@@ -20,24 +20,16 @@ def document_multiselect_with_expander():
 
 class DocumentMultiSelect():
     def __init__(self):
-        # Update multiselect based on expander states
+        # Initialize expander states for all documents
         self.doc_names = get_document_names()
-        self.multiselect = st.multiselect(
-            label="Expand documents:",
-            options=self.doc_names,
-            default=[
-                doc for doc in self.doc_names if st.session_state.expander_states.get(doc, True)
-            ],
-            help="Choose which documents should be expanded",
-            key="expander_multiselect",
-        )
-        
-        # Update session state based on multiselect
+
+        # Initialize expander states for new documents
         for doc_name in self.doc_names:
-            st.session_state.expander_states[doc_name] = doc_name in self.multiselect
+            if doc_name not in st.session_state.expander_states:
+                st.session_state.expander_states[doc_name] = True
 
     def __contains__(self, item):
-        return item in self.multiselect
+        return True  # All documents are always included
 
 
 class DocumentExpander():
