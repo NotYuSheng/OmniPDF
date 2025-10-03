@@ -67,9 +67,6 @@ async def display_metadata(expander: DocumentExpander):
             metadata = res["metadata"]
 
             # Display metadata fields in a structured way
-            if metadata.get("filename"):
-                st.markdown(f"**Filename:** {metadata['filename']}")
-
             if metadata.get("title"):
                 st.markdown(f"**Title:** {metadata['title']}")
 
