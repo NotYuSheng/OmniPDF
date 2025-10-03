@@ -1,8 +1,10 @@
-import streamlit as st
+import html
 import logging
 import os
 
+import streamlit as st
 from httpx import Cookies
+
 from version import __version__
 
 # Logger
@@ -59,6 +61,12 @@ if __name__ == "__main__":
         /* Disable sidebar collapse button */
         [data-testid="collapsedControl"] {
             display: none;
+        }
+
+        .version-footer {
+            text-align: center;
+            color: #666;
+            font-size: 0.8em;
         }
     </style>
     """,
@@ -124,7 +132,7 @@ if __name__ == "__main__":
     # Add version number to sidebar footer
     st.sidebar.markdown("---")
     st.sidebar.markdown(
-        f"<div style='text-align: center; color: #666; font-size: 0.8em;'>v{__version__}</div>",
+        f"<div class='version-footer'>v{html.escape(__version__)}</div>",
         unsafe_allow_html=True
     )
 
