@@ -47,7 +47,7 @@ showSidebarNavigation = true
 
 
 [server]
-maxUploadSize = 200
+maxUploadSize = 100 # Aligned with nginx client_max_body_size (100M)
 runOnSave = true
 
 # Enable CORS with allowed origins for security
