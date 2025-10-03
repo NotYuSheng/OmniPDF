@@ -1,7 +1,7 @@
-import asyncio
-import os
 import streamlit as st
 import logging
+import asyncio
+import os
 import json
 import httpx
 from components.documents import document_multiselect_with_expander, DocumentExpander
@@ -63,8 +63,37 @@ async def get_metadata(doc_id: str, status_bar, max_retries=600, delay=1):
 async def display_metadata(expander: DocumentExpander):
     with expander:
         res = await get_metadata(expander.doc_id, expander.status)
-        if res:
-            st.dataframe(res["metadata"])
+        if res and res.get("metadata"):
+            metadata = res["metadata"]
+
+            # Display metadata fields in a structured way
+            if metadata.get("filename"):
+                st.markdown(f"**Filename:** {metadata['filename']}")
+
+            if metadata.get("title"):
+                st.markdown(f"**Title:** {metadata['title']}")
+
+            if metadata.get("authors"):
+                authors = metadata["authors"]
+                if isinstance(authors, list):
+                    st.markdown(f"**Authors:** {', '.join(authors)}")
+                else:
+                    st.markdown(f"**Authors:** {authors}")
+
+            if metadata.get("executive_summary"):
+                st.markdown("**Executive Summary:**")
+                st.info(metadata["executive_summary"])
+
+            if metadata.get("summary"):
+                st.markdown("**Full Summary:**")
+                st.text_area("Summary", metadata["summary"], height=200, disabled=True, label_visibility="collapsed")
+
+            if metadata.get("keywords"):
+                keywords = metadata["keywords"]
+                if isinstance(keywords, list):
+                    st.markdown(f"**Keywords:** {', '.join(keywords)}")
+                else:
+                    st.markdown(f"**Keywords:** {keywords}")
 
 
 async def display_all(expanders: list[DocumentExpander]):
@@ -81,4 +110,5 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
     runner.run(display_all(expanders))
 
 else:
-    st.info("Please upload and process a PDF first to extract images")
+    st.info("📤 No documents have been processed yet. Please upload and process a PDF first!")
+    st.markdown("Go to the **Upload PDF** page to get started.")

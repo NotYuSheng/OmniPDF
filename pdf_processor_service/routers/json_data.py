@@ -10,7 +10,7 @@ router = APIRouter(prefix="/json_data", tags=["json_data"])
 logger = logging.getLogger(__name__)
 
 
-@router.get("/{doc_id}", response_class=StreamingResponse, status_code=200)
+@router.get("/{doc_id}", response_class=StreamingResponse)
 async def get_json(
     doc_id: str, json_name: str, _validated: bool = Depends(validate_session_doc_pair)
 ):

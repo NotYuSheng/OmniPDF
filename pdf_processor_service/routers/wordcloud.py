@@ -59,7 +59,7 @@ async def get_pdf_wordcloud(
     )
 
 
-@router.get("/{doc_id}/wordcloud.png", response_class=StreamingResponse)
+@router.get("/{doc_id}/wordcloud.png")
 async def get_pdf_wordcloud_image(
     doc_id: str,
     _validated: bool = Depends(validate_session_doc_pair),

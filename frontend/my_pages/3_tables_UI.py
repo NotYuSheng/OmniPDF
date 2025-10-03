@@ -1,10 +1,14 @@
 import streamlit as st
-import pandas as pd
 import logging
 import asyncio
 import httpx
-import json
 import os
+import json
+import pandas as pd
+
+PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 if 'processed_data' not in st.session_state or st.session_state.processed_data is None:
     st.session_state.processed_data = {}
@@ -15,10 +19,6 @@ if 'httpx_cookies' not in st.session_state:
 
 if 'uploaded_files' not in st.session_state:
     st.session_state.uploaded_files = None
-
-PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 if "processed_data" not in st.session_state or st.session_state.processed_data is None:
     st.session_state.processed_data = {}
@@ -258,7 +258,7 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
 
     except TimeoutError as e:
         logger.error(f"Timeout error: {e}")
-        st.info("The document is taking longer than expected to process. Please try again later.")
+        st.info("The document is taking longer than expected to process. Please wait.")
         
     except httpx.RequestError as e:
         logger.error(f"Network error: {e}")
@@ -269,4 +269,5 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
         st.error("An unexpected error occurred")
         
 else:
-    st.info("Please upload and process a PDF first to extract tables")
+    st.info("📤 No documents have been processed yet. Please upload and process a PDF first!")
+    st.markdown("Go to the **Upload PDF** page to get started.")

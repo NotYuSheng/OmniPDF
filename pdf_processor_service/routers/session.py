@@ -13,7 +13,7 @@ from models.session import SessionResponse
 router = APIRouter(prefix="/session", tags=["session"])
 
 
-@router.post("/")
+@router.post("/", status_code=201)
 async def set_session(
     response: Response,
     session_storage: SessionStorage = Depends(get_session_storage),
@@ -34,11 +34,10 @@ async def get_session_status(
     return SessionResponse(session_id=session_id, valid_session=valid_session)
 
 
-@router.delete("/")
+@router.delete("/", status_code=204)
 async def end_session(
     response: Response,
     session_id: str = Depends(get_session_id),
     session_storage: SessionStorage = Depends(get_session_storage),
 ):
     delete_session(response, session_id, session_storage)
-    return {"message": "Session ended successfully"}

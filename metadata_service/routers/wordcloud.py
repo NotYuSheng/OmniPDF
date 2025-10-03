@@ -27,7 +27,7 @@ async def concat_text(doc_id: str) -> str:
     if job.get("status") == "processing":
         raise HTTPException(
             status_code=202,
-            detail="The document is still being processed. Please try again later.",
+            detail="The document is still being processed. Please wait.",
         )
     texts = job.get("data", {}).get("result", {}).get("texts", [])
     text_list = [entry.get("text", "") or entry.get("orig", "") for entry in texts]

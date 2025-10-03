@@ -1,13 +1,32 @@
-FROM python:3.13-slim
+FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 
 WORKDIR /app
 
 ENV PYTHONPATH=/app/pdf_extraction_service:/app/shared_utils
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
+# Install Python 3.13 and build dependencies
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    build-essential \
+    wget \
+    curl \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y python3.13 python3.13-dev python3.13-venv \
+    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.13 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create symbolic links
+RUN ln -sf /usr/bin/python3.13 /usr/bin/python && \
+    ln -sf /usr/bin/python3.13 /usr/bin/python3
 
 COPY pdf_extraction_service/requirements.txt .
 
+# Install PyTorch with CUDA support first
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cu124
+
+# Install remaining requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY shared_utils ./shared_utils

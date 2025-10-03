@@ -1,9 +1,9 @@
-import asyncio
-import os
 import streamlit as st
 import logging
-import json
+import asyncio
 import httpx
+import os
+import json
 from components.documents import document_multiselect_with_expander, DocumentExpander
 
 PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
@@ -101,4 +101,5 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
     runner.run(display_all(expanders))
 
 else:
-    st.info("Please upload and process a PDF first to extract images")
+    st.info("📤 No documents have been processed yet. Please upload and process a PDF first!")
+    st.markdown("Go to the **Upload PDF** page to get started.")

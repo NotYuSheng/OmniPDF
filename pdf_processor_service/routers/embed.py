@@ -16,7 +16,7 @@ if not EMBED_URL:
     raise ValueError("EMBED_URL is not set")
 
 
-@router.post("/{embed_type}/{doc_id}")
+@router.post("/{embed_type}/{doc_id}", status_code=202)
 async def text_embed_proxy(
     embed_type: Literal["sentence", "semantic"],
     doc_id: str,

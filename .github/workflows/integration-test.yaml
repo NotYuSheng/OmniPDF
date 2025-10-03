@@ -44,19 +44,24 @@ jobs:
             echo "✓ Created $(dirname "$f")/.env"
           done
 
-      - name: Test each *_service individually
+      - name: Test each service from services-to-test.txt
         run: |
-          echo "=== Getting all services from docker-compose.yml ==="
-          ALL_SERVICES=$(docker compose config --services)
-          SERVICE_LIST=$(echo "$ALL_SERVICES" | grep "_service$" || echo "")
-          
-          if [ -z "$SERVICE_LIST" ]; then
-            echo "No *_service services found in docker-compose.yml"
-            echo "Available services: $ALL_SERVICES"
+          echo "=== Reading services from .github/services-to-test.txt ==="
+
+          if [ ! -f ".github/services-to-test.txt" ]; then
+            echo "Error: .github/services-to-test.txt not found"
             exit 1
           fi
-          
-          echo "Found *_service services: $SERVICE_LIST"
+
+          # Read services from file, ignore comments and blank lines
+          SERVICE_LIST=$(grep -v '^#' .github/services-to-test.txt | grep -v '^$' | tr '\n' ' ')
+
+          if [ -z "$SERVICE_LIST" ]; then
+            echo "No services found in .github/services-to-test.txt"
+            exit 1
+          fi
+
+          echo "Found services to test: $SERVICE_LIST"
           echo "=== Initial disk space ==="
           df -h
           
@@ -136,7 +141,7 @@ jobs:
             exit 1
           fi
           
-          echo "All *_service services passed individual testing!"
+          echo "All services from services-to-test.txt passed individual testing!"
 
       - name: Service health checks completed
         run: |

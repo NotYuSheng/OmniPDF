@@ -4,6 +4,7 @@ import logging
 import time
 import io
 import json
+import os
 
 from models.extractor import ExtractResponse
 from shared_utils.job_status import save_job, load_job, JobType
@@ -25,6 +26,10 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 logger = logging.getLogger(__name__)
 document_files = RedisDocumentFileList()
 
+# Read GPU configuration from environment
+USE_GPU = os.getenv("USE_GPU", "false").lower() == "true"
+logger.info(f"GPU acceleration enabled: {USE_GPU}")
+
 async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
     start_time = time.time()
 
@@ -34,8 +39,16 @@ async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
     opts.generate_table_images = False
     opts.generate_page_images = True
 
+    # Configure accelerator based on USE_GPU environment variable
+    if USE_GPU:
+        accelerator_device = AcceleratorDevice.AUTO
+        logger.info("Using GPU acceleration (AUTO mode)")
+    else:
+        accelerator_device = AcceleratorDevice.CPU
+        logger.info("Using CPU only (GPU disabled)")
+
     opts.accelerator_options = AcceleratorOptions(
-        num_threads=4, device=AcceleratorDevice.AUTO
+        num_threads=4, device=accelerator_device
     )
 
     try:
@@ -134,9 +147,15 @@ async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
 
 @router.post("/extract", response_model=ExtractResponse, status_code=202)
 async def submit_pdf(doc_id: str, download_url: str, background_tasks: BackgroundTasks):
-    save_job(doc_id = doc_id, 
-             job_data = {}, 
-             status = "processing", 
+    # Check if job already exists to prevent duplicate processing
+    existing_job = load_job(doc_id=doc_id, job_type=JobType.EXTRACTION)
+    if existing_job:
+        logger.info(f"Job already exists for doc_id: {doc_id}, status: {existing_job.get('status')}")
+        return ExtractResponse(doc_id=doc_id, status=existing_job.get("status", "processing"))
+
+    save_job(doc_id = doc_id,
+             job_data = {},
+             status = "processing",
              job_type = JobType.EXTRACTION
              )
 

@@ -95,7 +95,7 @@ async def proxy_post(url: str, body: dict):
         )
 
 
-async def load_or_create_extraction_job(doc_id: str) -> dict | Response:
+async def load_or_create_extraction_job(doc_id: str, is_get_request: bool = True) -> dict | Response:
     job_type = JobType.EXTRACTION
     job = load_job(doc_id=doc_id, job_type=job_type)
     if not job:
@@ -108,15 +108,15 @@ async def load_or_create_extraction_job(doc_id: str) -> dict | Response:
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
             raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
 
-    handle_job_status(job, job_type)
+    handle_job_status(job, job_type, is_get_request=is_get_request)
     return job
 
 
-async def load_or_create_metadata_job(doc_id: str, session_id: str = Depends(get_session_id)) -> dict | Response:
+async def load_or_create_metadata_job(doc_id: str, session_id: str = Depends(get_session_id), is_get_request: bool = True) -> dict | Response:
     job_type = JobType.METADATA
     job = load_job(doc_id=doc_id, job_type=job_type)
     if not job:
-        _pre_req_job = await load_or_create_sentence_embedder_job(doc_id, session_id)
+        _pre_req_job = await load_or_create_sentence_embedder_job(doc_id, session_id, is_get_request=False)
         response = await proxy_post(f"{METADATA_URL}/metadata/{doc_id}", body={})
         if response.status_code == 202:
             raise_processing_error(job_type)
@@ -124,12 +124,12 @@ async def load_or_create_metadata_job(doc_id: str, session_id: str = Depends(get
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
             raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
 
-    handle_job_status(job, job_type)
+    handle_job_status(job, job_type, is_get_request=is_get_request)
     return job
 
 
 async def load_or_create_semantic_embedder_job(
-    doc_id: str, session_id: str = Depends(get_session_id)
+    doc_id: str, session_id: str = Depends(get_session_id), is_get_request: bool = True
 ) -> dict | Response:
     """Load existing semantic embedding job or create a new one if it doesn't exist"""
     job_type = JobType.SEMANTICEMBEDDER
@@ -163,12 +163,12 @@ async def load_or_create_semantic_embedder_job(
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
             raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
 
-    handle_job_status(job, job_type)
+    handle_job_status(job, job_type, is_get_request=is_get_request)
     return job
 
 
 async def load_or_create_sentence_embedder_job(
-    doc_id: str, session_id: str = Depends(get_session_id)
+    doc_id: str, session_id: str = Depends(get_session_id), is_get_request: bool = True
 ) -> dict | Response:
     """Load existing sentence embedding job or create a new one if it doesn't exist"""
     job_type = JobType.SENTENCEEMBEDDER
@@ -202,25 +202,44 @@ async def load_or_create_sentence_embedder_job(
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
             raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
 
-    handle_job_status(job, job_type)
+    handle_job_status(job, job_type, is_get_request=is_get_request)
     return job
 
 
 async def load_or_create_translation_job(
-    doc_id: str, 
-    source_lang: str = "", 
-    target_lang: str = ""
+    doc_id: str,
+    source_lang: str = "",
+    target_lang: str = "",
+    is_get_request: bool = True
 ) -> dict | Response:
-    """Load existing translation job or create a new one if it doesn't exist"""
+    """Load existing translation job or create a new one if it doesn't exist.
+
+    Note: Translation jobs should only be created via explicit POST requests with
+    source_lang and target_lang. GET requests will raise 404 if job doesn't exist.
+    """
     job_type = JobType.TRANSLATION
     job = load_job(doc_id=doc_id, job_type=job_type)
     if not job:
+        # Translation requires explicit source/target languages
+        # Don't auto-create on GET requests or with empty languages
+        if is_get_request:
+            raise HTTPException(
+                status_code=404,
+                detail="Translation not found. Please submit a translation request first."
+            )
+
+        if not source_lang or not target_lang:
+            raise HTTPException(
+                status_code=400,
+                detail="source_lang and target_lang are required to create a translation job."
+            )
+
         # Ensure extraction is complete first
-        extraction_job = await load_or_create_extraction_job(doc_id)
-        
+        extraction_job = await load_or_create_extraction_job(doc_id, is_get_request=False)
+
         # Get the extraction result to send to translation service
         extraction_result = extraction_job.get("data", {}).get("result", {})
-        
+
         # Prepare request body for translation service
         translation_request = {
             "doc_id": doc_id,
@@ -236,28 +255,29 @@ async def load_or_create_translation_job(
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
             raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
 
-    handle_job_status(job, job_type)
+    handle_job_status(job, job_type, is_get_request=is_get_request)
     return job
 
 
 async def load_or_create_render_job(
-    doc_id: str
+    doc_id: str,
+    is_get_request: bool = True
 ) -> dict | Response:
     """Load existing render job or create a new one if it doesn't exist"""
     job_type = JobType.RENDERER
-    
+
     # First check if we have a local job for this render request
     job = load_job(doc_id=doc_id, job_type=job_type)
     if not job:
         # Ensure translation is complete first
-        translation_job = await load_or_create_translation_job(doc_id)
-        
+        translation_job = await load_or_create_translation_job(doc_id, is_get_request=False)
+
         # Get the translation result to send to renderer service
         translation_result = translation_job.get("data", {})
-        
+
         # Generate the document URL for the renderer
         doc_url = generate_presigned_url(f"{doc_id}/original.pdf")
-        
+
         # Prepare request body for renderer service
         render_request = {
             "doc_id": doc_id,
@@ -272,12 +292,12 @@ async def load_or_create_render_job(
             logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
             raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
 
-    handle_job_status(job, job_type)
+    handle_job_status(job, job_type, is_get_request=is_get_request)
     return job
 
 
 async def concat_text(doc_id: str) -> str:
-    job = await load_or_create_extraction_job(doc_id)
+    job = await load_or_create_extraction_job(doc_id, is_get_request=False)
 
     texts = job.get("data", {}).get("result", {}).get("texts", [])
     text_list = [entry.get("text", "") or entry.get("orig", "") for entry in texts]

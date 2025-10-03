@@ -55,7 +55,12 @@ def get_object_stream(key: str):
     try:
         response = s3_client.get_object(Bucket=S3_BUCKET, Key=key)
         return response["Body"]
-    except (BotoCoreError, ClientError) as e:
+    except ClientError as e:
+        # NoSuchKey is common during polling, don't log as error
+        if e.response.get("Error", {}).get("Code") != "NoSuchKey":
+            logger.exception(f"Failed to get object stream from S3: {e}")
+        raise
+    except BotoCoreError as e:
         logger.exception(f"Failed to get object stream from S3: {e}")
         raise
 

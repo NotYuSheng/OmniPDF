@@ -19,9 +19,11 @@ async def submit_pdf_for_translation(
     doc_id: str,
     request: TranslationRequest,
     _validated: bool = Depends(validate_session_doc_pair),
-    job: dict = Depends(load_or_create_extraction_job)
 ):
     """Submit a PDF for translation processing."""
+    # Ensure extraction is complete first (will raise 202 if still processing)
+    job = await load_or_create_extraction_job(doc_id, is_get_request=False)
+
     # Get the extraction result to send to translation service
     extraction_result = job.get("data", {}).get("result", {})
     
@@ -45,13 +47,19 @@ async def get_pdf_translation(
     """Get translation results for a processed PDF."""
     # Extract result from job data
     job_data = job.get("data", {})
-    
+
+    # Extract source and target languages from job metadata
+    source_lang = job.get("source_lang")
+    target_lang = job.get("target_lang")
+
     # Convert the job data to our response model
     translation_response = TranslationResponse(
         doc_id=doc_id,
         status=job.get("status", "unknown"),
+        source_lang=source_lang,
+        target_lang=target_lang,
         result=job_data if job.get("status") == "completed" and job_data else None
     )
-    
+
     return translation_response
 

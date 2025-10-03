@@ -1,0 +1,11 @@
+# This file defines all the containers that will be tested by `.github/workflows/integration-test.yml`
+# All FastAPI Services should be defined here
+
+# Core Application Services
+embedder_service
+pdf_processor_service
+# pdf_extraction_service # Currently disabled due to gpu config in `docker-compose.yml` messing with integration test
+pdf_renderer_service
+docling_translation_service
+image_captioner_service
+metadata_service

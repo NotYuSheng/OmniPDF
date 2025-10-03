@@ -19,5 +19,5 @@ async def get_pdf_tables(
     tables = job.get("data", {}).get("result", {}).get("tables")
     if tables is None:
         logger.error(f"Could not find 'tables' in job result for doc_id: {doc_id}")
-        raise HTTPException(status_code=500, detail="A server error has occurred.")
+        raise HTTPException(status_code=404, detail="Tables not found for this document.")
     return JSONResponse(content=tables)
