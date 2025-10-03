@@ -16,6 +16,8 @@ services:
     build:
       context: .
       dockerfile: ./frontend/Dockerfile
+      args:
+        APP_VERSION: ${APP_VERSION:-dev}
     container_name: frontend
     env_file:
       - ./frontend/.env
