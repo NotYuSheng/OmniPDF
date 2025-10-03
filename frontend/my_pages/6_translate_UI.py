@@ -180,7 +180,6 @@ if "processed_data" in st.session_state and st.session_state.processed_data:
                     st.info("⏳ Translation is currently processing...")
 
                 elif status == "completed":
-                    st.success("✅ Translation completed!")
                     display_translation_info(translation_data)
 
                     # Check and display renderer section

@@ -4,6 +4,7 @@ import asyncio
 import httpx
 import os
 import json
+import html
 from components.documents import document_multiselect_with_expander, DocumentExpander
 
 PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
@@ -83,8 +84,15 @@ async def display_wordcloud(expander: DocumentExpander):
         if res:
             img = await get_wordcloud_image(expander.doc_id)
             st.image(img)
-            markdown_list = [f"- {word}" for word in res["top_words"]]
-            st.markdown("\n".join(markdown_list))
+
+            # Display top words as styled pills
+            st.markdown("**Top Words:**")
+            pills_html = '<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; margin-bottom: 20px;">'
+            for word in res["top_words"]:
+                escaped_word = html.escape(word)
+                pills_html += f'<span style="background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.3); color: inherit; padding: 6px 14px; border-radius: 16px; font-size: 13px; font-weight: 400; display: inline-block;">{escaped_word}</span>'
+            pills_html += '</div>'
+            st.markdown(pills_html, unsafe_allow_html=True)
 
 
 async def display_all(expanders: list[DocumentExpander]):

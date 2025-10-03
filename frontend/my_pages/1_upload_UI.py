@@ -345,11 +345,8 @@ if uploaded_files:
     # Create a list of uploaded files for selection
     file_options = [file.name for file in uploaded_files]
 
-    selection = st.multiselect(
-        "Choose files to process:",
-        options=file_options,
-        default=file_options,  # By default, select all uploaded files
-    )
+    # Select all uploaded files by default
+    selection = file_options
 
     # Translation configuration per file
     st.markdown("---")

@@ -150,7 +150,10 @@ def display_images(image_response, doc_id=None) -> None:
                         st.error(f"Error loading image {i + 1}: {e}")
 
                 with col2:
-                    st.markdown(f"**Image Key:** {image_data['image_key']}")
+                    # Display AI-generated caption if available
+                    if 'caption' in image_data and image_data['caption']:
+                        st.markdown(f"**Caption:** {image_data['caption']}")
+
                     # Download button - only show if image was successfully loaded
                     if image_bytes:
                         filename = f"image_{i+1}.png"

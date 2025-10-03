@@ -151,12 +151,13 @@ def display_tables(table_response, doc_id=None):
                     # Show dataframe
                     if df is not None:
                         st.dataframe(df, use_container_width=True)
+
+                        # Display CSV format
+                        st.text("CSV Format")
+                        csv_string = df.to_csv(index=False)
+                        st.code(csv_string, language="csv")
                     else:
                         st.warning("Could not parse table data.")
-
-                    # Display title with page info and copy button
-                    csv_string = df.to_csv(index=False)
-                    st.code(csv_string, language="csv")
 
                 with col2:
                     # Metadata display
