@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies)
 
 runner = asyncio.Runner()
-# WIP - this file is not fully functional yet
 st.header("☁️ Word Cloud")
 
 
