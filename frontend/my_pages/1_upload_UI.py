@@ -336,6 +336,12 @@ if uploaded_files:
     if "translation_settings" not in st.session_state:
         st.session_state.translation_settings = {}
 
+    # Prune stale translation settings for removed files
+    current_file_names = {f.name for f in uploaded_files}
+    stale_files = set(st.session_state.translation_settings.keys()) - current_file_names
+    for file_name in stale_files:
+        del st.session_state.translation_settings[file_name]
+
     # Create a list of uploaded files for selection
     file_options = [file.name for file in uploaded_files]
 
