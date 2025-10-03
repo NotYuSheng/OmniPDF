@@ -86,12 +86,7 @@ def load_job(doc_id: str, job_type: JobType) -> Optional[dict]:
         job = json.loads(raw_job.read().decode("utf-8"))
         # Extend Expiry for document file list
         document_files[doc_id]
-        return {
-            "doc_id": doc_id,
-            "status": job.get("status", "unknown"),
-            "type": job.get("type", "unknown"),
-            "data": job.get("data", None),
-        }
+        return job
     except ClientError as e:
         # NoSuchKey is expected during polling before job is created
         if e.response.get("Error", {}).get("Code") == "NoSuchKey":
