@@ -3,7 +3,6 @@ import logging
 import asyncio
 import httpx
 import os
-import base64
 from httpx import Cookies
 
 PDF_PROCESSOR_URL = os.environ["PDF_PROCESSOR_URL"]
@@ -81,17 +80,13 @@ def display_translation_info(translation_data: dict):
 
 
 def display_rendered_pdf(doc_id: str, filename: str, runner: asyncio.Runner, client: httpx.AsyncClient):
-    """Display rendered PDF with download and preview options."""
+    """Display download button for rendered PDF."""
     # Server-side URL for fetching PDF (internal service communication)
     server_pdf_url = f"{PDF_PROCESSOR_URL}/renderer/{doc_id}/rendered.pdf"
-
-    # Client-side URL for browser downloads (through nginx gateway)
-    client_pdf_url = f"/pdf_processor/renderer/{doc_id}/rendered.pdf"
 
     try:
         pdf_response = runner.run(client.get(server_pdf_url))
         if pdf_response.status_code == 200:
-            # Download button at the top
             st.download_button(
                 label="📥 Download Translated PDF",
                 data=pdf_response.content,
@@ -100,19 +95,11 @@ def display_rendered_pdf(doc_id: str, filename: str, runner: asyncio.Runner, cli
                 key=f"download_{doc_id}",
                 use_container_width=True
             )
-
-            # Preview section
-            with st.expander("👁️ Preview PDF", expanded=False):
-                base64_pdf = base64.b64encode(pdf_response.content).decode('utf-8')
-                pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="600px" type="application/pdf"></iframe>'
-                st.markdown(pdf_display, unsafe_allow_html=True)
         else:
             st.error(f"Failed to load PDF (HTTP {pdf_response.status_code})")
-            st.markdown(f"[Try direct download]({client_pdf_url})")
     except Exception as e:
         logger.error(f"Error fetching rendered PDF: {e}")
-        st.error("Error loading PDF. Try the download link below:")
-        st.markdown(f"[Download Translated PDF]({client_pdf_url})")
+        st.error(f"Error loading PDF: {e}")
 
 
 def display_renderer_section(doc_id: str, filename: str, renderer_data: dict, runner: asyncio.Runner, client: httpx.AsyncClient):
