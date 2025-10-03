@@ -1,6 +1,7 @@
 import streamlit as st
 import logging
 import os
+import html
 
 from httpx import Cookies
 from version import __version__
@@ -124,7 +125,7 @@ if __name__ == "__main__":
     # Add version number to sidebar footer
     st.sidebar.markdown("---")
     st.sidebar.markdown(
-        f"<div style='text-align: center; color: #666; font-size: 0.8em;'>v{__version__}</div>",
+        f"<div style='text-align: center; color: #666; font-size: 0.8em;'>v{html.escape(__version__)}</div>",
         unsafe_allow_html=True
     )
 
