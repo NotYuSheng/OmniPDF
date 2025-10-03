@@ -99,7 +99,7 @@ def display_rendered_pdf(doc_id: str, filename: str, runner: asyncio.Runner, cli
             st.error(f"Failed to load PDF (HTTP {pdf_response.status_code})")
     except Exception as e:
         logger.error(f"Error fetching rendered PDF: {e}")
-        st.error(f"Error loading PDF: {e}")
+        st.error("An error occurred while trying to load the PDF.")
 
 
 def display_renderer_section(doc_id: str, filename: str, renderer_data: dict, runner: asyncio.Runner, client: httpx.AsyncClient):
