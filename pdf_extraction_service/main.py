@@ -8,6 +8,10 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 
+# Enable DEBUG logging for docling to see more detailed processing information
+logging.getLogger("docling").setLevel(logging.DEBUG)
+logging.getLogger("docling_core").setLevel(logging.DEBUG)
+
 app = FastAPI(root_path="/pdf_extraction")
 
 # Initialize Prometheus metrics
