@@ -18,8 +18,6 @@ if "httpx_cookies" not in st.session_state:
 if "uploaded_files" not in st.session_state:
     st.session_state.uploaded_files = None
 
-client = httpx.AsyncClient(cookies=st.session_state.httpx_cookies, timeout=300.0)  # 5 minute timeout for long translations
-
 # Language options for translation
 LANGUAGES = {
     "auto": "Auto-detect",
@@ -38,7 +36,7 @@ LANGUAGES = {
 }
 
 
-async def check_job_status(doc_id: str, endpoint: str):
+async def check_job_status(doc_id: str, endpoint: str, client: httpx.AsyncClient):
     """Check the status of a specific job."""
     try:
         response = await client.get(f"{PDF_PROCESSOR_URL}/{endpoint}/{doc_id}")
@@ -56,7 +54,7 @@ async def check_job_status(doc_id: str, endpoint: str):
         return "error"
 
 
-async def poll_processing_status(doc_id: str, status_container, progress_text, source_lang="", target_lang="", max_attempts=120, delay=2):
+async def poll_processing_status(doc_id: str, status_container, progress_text, client: httpx.AsyncClient, source_lang="", target_lang="", delay=2):
     """
     Poll the backend for processing status and update the UI.
 
@@ -93,24 +91,24 @@ async def poll_processing_status(doc_id: str, status_container, progress_text, s
     translation_triggered = False
     renderer_triggered = False
 
-    for attempt in range(max_attempts):
+    while True:
         all_complete = True
         status_lines = []
 
         # STAGE 1: Check extraction status
-        extraction_status = await check_job_status(doc_id, "extractor")
+        extraction_status = await check_job_status(doc_id, "extractor", client)
         stages["extraction"]["status"] = extraction_status
 
         # STAGE 2: After extraction completes, check embedding and translation concurrently
         if extraction_status == "completed":
             # Check embedding status
-            embedding_status = await check_job_status(doc_id, "embed/sentence")
+            embedding_status = await check_job_status(doc_id, "embed/sentence", client)
             stages["embedding"]["status"] = embedding_status
 
             # Check/trigger translation (concurrent with embedding)
             if "translation" in stages:
                 if not translation_triggered:
-                    translation_status = await check_job_status(doc_id, "translation")
+                    translation_status = await check_job_status(doc_id, "translation", client)
 
                     # If translation not started, trigger it
                     if translation_status == "not_started":
@@ -143,13 +141,13 @@ async def poll_processing_status(doc_id: str, status_container, progress_text, s
                     stages["translation"]["status"] = translation_status
                 else:
                     # Already triggered, just check status
-                    translation_status = await check_job_status(doc_id, "translation")
+                    translation_status = await check_job_status(doc_id, "translation", client)
                     stages["translation"]["status"] = translation_status
 
             # STAGE 3: Concurrent processing after stage 2 completes
             # Metadata: Check after embedding completes (translation can still be running)
             if embedding_status == "completed":
-                metadata_status = await check_job_status(doc_id, "metadata")
+                metadata_status = await check_job_status(doc_id, "metadata", client)
                 stages["metadata"]["status"] = metadata_status
 
             # Renderer: Check/trigger after translation completes (embedding can still be running)
@@ -157,7 +155,7 @@ async def poll_processing_status(doc_id: str, status_container, progress_text, s
                 translation_status = stages["translation"]["status"]
                 if translation_status == "completed":
                     if not renderer_triggered:
-                        renderer_status = await check_job_status(doc_id, "renderer")
+                        renderer_status = await check_job_status(doc_id, "renderer", client)
 
                         # If renderer not started, trigger it
                         if renderer_status == "not_started":
@@ -189,7 +187,7 @@ async def poll_processing_status(doc_id: str, status_container, progress_text, s
                         stages["renderer"]["status"] = renderer_status
                     else:
                         # Already triggered, just check status
-                        renderer_status = await check_job_status(doc_id, "renderer")
+                        renderer_status = await check_job_status(doc_id, "renderer", client)
                         stages["renderer"]["status"] = renderer_status
 
         # Build status display grouped by stage
@@ -261,29 +259,36 @@ async def poll_processing_status(doc_id: str, status_container, progress_text, s
 
         await asyncio.sleep(delay)
 
-    status_container.warning("⚠️ Processing timeout. Some stages may still be running.")
-    progress_text.empty()
-    return False
-
 
 async def process_pdf(uploaded_file, file_expander, source_lang="", target_lang=""):
     """
     Uploads PDF to backend and stores document metadata in session state.
     Optionally triggers translation if languages are specified.
     """
-
     # Process pdf through PDF_processor endpoint
     try:
-        # Upload the PDF document
+        # Upload the PDF document with longer timeout for file upload
         logger.info(f"Uploading PDF: {uploaded_file}")
         bytes_data = uploaded_file.getvalue()  # bytes
         files = {"file": (uploaded_file.name, bytes_data, "application/pdf")}
 
-        upload_response = await client.post(
+        upload_client = httpx.AsyncClient(
+            cookies=st.session_state.httpx_cookies,
+            timeout=httpx.Timeout(connect=10.0, read=120.0, write=120.0, pool=10.0)
+        )
+        upload_response = await upload_client.post(
             f"{PDF_PROCESSOR_URL}/documents/", files=files
         )
+        await upload_client.aclose()
         if upload_response.cookies:
             st.session_state.httpx_cookies.update(upload_response.cookies)
+
+        # Create polling client AFTER upload to ensure it has the latest session cookies
+        # Use longer read timeout (120s) to handle translation/renderer trigger requests for large PDFs
+        poll_client = httpx.AsyncClient(
+            cookies=st.session_state.httpx_cookies,
+            timeout=httpx.Timeout(connect=10.0, read=120.0, write=10.0, pool=10.0)
+        )
 
         logger.info(f"Upload PDF response: {upload_response.text}")
 
@@ -312,17 +317,20 @@ async def process_pdf(uploaded_file, file_expander, source_lang="", target_lang=
 
             # Poll for processing status with spinner
             with st.spinner("Processing document..."):
-                await poll_processing_status(doc_id, status_container, progress_text, source_lang, target_lang)
+                await poll_processing_status(doc_id, status_container, progress_text, poll_client, source_lang, target_lang)
 
     except Exception as e:
         with file_expander:
             st.error(f"❌ Error processing PDF: {uploaded_file.name}")
         logger.error(f"Error processing PDF: {e}")
+    finally:
+        # Close the client after processing
+        await poll_client.aclose()
 
 
 
 
-st.markdown('<h1 class="main-header">🦸 OmniPDF</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">🔍 OmniPDF</h1>', unsafe_allow_html=True)
 st.header("📁 Upload PDF")
 uploaded_files = st.file_uploader(
     "Choose a PDF file",
