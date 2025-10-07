@@ -1,5 +1,5 @@
 import asyncio
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Response
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 import logging
 import time
 import io
@@ -30,7 +30,7 @@ document_files = RedisDocumentFileList()
 USE_GPU = os.getenv("USE_GPU", "false").lower() == "true"
 logger.info(f"GPU acceleration enabled: {USE_GPU}")
 
-async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 1.0):
+async def process_pdf(doc_id: str, presign_url: str, img_scale: float = 2.0):
     start_time = time.time()
 
     opts = PdfPipelineOptions()
@@ -164,24 +164,18 @@ async def submit_pdf(doc_id: str, download_url: str, background_tasks: Backgroun
 
 
 @router.get("/{doc_id}", response_model=ExtractResponse)
-async def get_status(doc_id: str, response: Response):
+async def get_status(doc_id: str):
     job = load_job(doc_id=doc_id, job_type=JobType.EXTRACTION)
     if not job:
         raise HTTPException(status_code=404, detail="Document ID not found")
 
-    job_status = job.get("status", "unknown")
-
-    if job_status == "failed":
+    if job.get("status") == "failed":
         error_message = job.get("data", {}).get("message", "Processing failed")
         raise HTTPException(status_code=500, detail=error_message)
 
     job_data = job.get("data", {})
     result = job_data.get("result", None)
 
-    # Return 202 Accepted if still processing, 200 OK if completed
-    if job_status == "processing":
-        response.status_code = 202
-
     return ExtractResponse(
-        doc_id=doc_id, status=job_status, result=result
+        doc_id=doc_id, status=job.get("status", "unknown"), result=result
     )
