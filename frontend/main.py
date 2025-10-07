@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 # Page configuration
 st.set_page_config(
     page_title="OmniPDF",
-    page_icon="🦸",
+    page_icon="🔍",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -110,12 +110,6 @@ if __name__ == "__main__":
         icon="📄",
     )
 
-    settings_UI = st.Page(
-        page="my_pages/10_settings_UI.py",
-        title="Settings",
-        icon="⚙️"
-    )
-
     # To go between the different pages
     pg = st.navigation(
         pages=[
@@ -125,12 +119,10 @@ if __name__ == "__main__":
             wordcloud_UI,
             translate_UI,
             metadata_UI,
-            settings_UI,
         ]
     )
 
     # Add version number to sidebar footer
-    st.sidebar.markdown("---")
     st.sidebar.markdown(
         f"<div class='version-footer'>v{html.escape(__version__)}</div>",
         unsafe_allow_html=True
