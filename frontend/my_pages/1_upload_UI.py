@@ -277,7 +277,7 @@ async def process_pdf(uploaded_file, file_expander, source_lang="", target_lang=
 
 
 
-st.markdown('<h1 class="main-header">🦸 OmniPDF</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">🌐 OmniPDF</h1>', unsafe_allow_html=True)
 st.header("📁 Upload PDF")
 uploaded_files = st.file_uploader(
     "Choose a PDF file",
