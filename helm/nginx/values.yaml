@@ -19,11 +19,11 @@ autoscaling:
 # Pre-staging secrets
 secrets:
   create: false
-  name: nginx-secrets
+  name: ""
 
 # Pre-staging specific configurations - using local CRC registry
 image:
-  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/nginx
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf-prestaging/nginx
   tag: "dev-v0.0.3-5d69f89"
   pullPolicy: Always  # Use local registry image
 
@@ -35,6 +35,15 @@ env:
     value: "prestaging"
   - name: ENABLE_METRICS
     value: "true"
+
+# OpenShift-compatible security context
+podSecurityContext: {}
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
 
 # Network policy enabled for external traffic entry point
 networkPolicy:
@@ -56,7 +65,7 @@ networkPolicy:
 
 # Pod disruption budget for pre-staging (2 replicas, allow 1 down)
 podDisruptionBudget:
-  enabled: true
+  enabled: false
   minAvailable: 1
 
 # Moderate deployment strategy for pre-staging (balanced speed/safety)
