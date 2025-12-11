@@ -61,33 +61,19 @@ async def poll_processing_status(doc_id: str, status_container, progress_text, s
     Poll the backend for processing status and update the UI.
 
     Processing stages:
-    - Stage 1 (Sequential): Extraction
-    - Stage 2 (Concurrent): Embedding + Translation (both depend only on extraction)
-    - Stage 3 (Concurrent): Metadata (depends on embedding) + Renderer (depends on translation)
+    - Stage 1: Extraction
+    - Stage 2: Translation (if requested)
+    - Stage 3: Renderer (if translation requested)
     """
-    # Define processing stages with their dependencies
-    stage_1 = {
+    # Define processing stages
+    stages = {
         "extraction": {"name": "📄 PDF Extraction", "endpoint": "extractor", "status": "pending", "stage": 1}
     }
 
-    stage_2 = {
-        "embedding": {"name": "🔤 Text Embedding", "endpoint": "embed/sentence", "status": "pending", "stage": 2},
-    }
-
-    # Add translation to stage 2 if requested (concurrent with embedding)
+    # Add translation and renderer if requested
     if source_lang and target_lang:
-        stage_2["translation"] = {"name": "🌐 Translation", "endpoint": "translation", "status": "pending", "stage": 2}
-
-    stage_3 = {
-        "metadata": {"name": "📊 Metadata Generation", "endpoint": "metadata", "status": "pending", "stage": 3}
-    }
-
-    # Add renderer to stage 3 if translation is enabled (concurrent with metadata)
-    if source_lang and target_lang:
-        stage_3["renderer"] = {"name": "📑 PDF Rendering", "endpoint": "renderer", "status": "pending", "stage": 3}
-
-    # Combine all stages
-    stages = {**stage_1, **stage_2, **stage_3}
+        stages["translation"] = {"name": "🌐 Translation", "endpoint": "translation", "status": "pending", "stage": 2}
+        stages["renderer"] = {"name": "📑 PDF Rendering", "endpoint": "renderer", "status": "pending", "stage": 3}
 
     # Track if translation and renderer have been triggered
     translation_triggered = False
@@ -101,107 +87,91 @@ async def poll_processing_status(doc_id: str, status_container, progress_text, s
         extraction_status = await check_job_status(doc_id, "extractor")
         stages["extraction"]["status"] = extraction_status
 
-        # STAGE 2: After extraction completes, check embedding and translation concurrently
-        if extraction_status == "completed":
-            # Check embedding status
-            embedding_status = await check_job_status(doc_id, "embed/sentence")
-            stages["embedding"]["status"] = embedding_status
+        # STAGE 2: After extraction completes, trigger translation if requested
+        if extraction_status == "completed" and "translation" in stages:
+            if not translation_triggered:
+                translation_status = await check_job_status(doc_id, "translation")
 
-            # Check/trigger translation (concurrent with embedding)
-            if "translation" in stages:
-                if not translation_triggered:
-                    translation_status = await check_job_status(doc_id, "translation")
+                # If translation not started, trigger it
+                if translation_status == "not_started":
+                    try:
+                        logger.info(f"Submitting translation for doc_id={doc_id}, source={source_lang}, target={target_lang}")
 
-                    # If translation not started, trigger it
-                    if translation_status == "not_started":
+                        url = f"{PDF_PROCESSOR_URL}/translation/{doc_id}"
+                        payload = {"source_lang": source_lang, "target_lang": target_lang}
+                        logger.info(f"POST URL: {url}, payload: {payload}")
+
+                        response = await client.post(url, json=payload)
+                        logger.info(f"Translation POST response: {response.status_code}")
+
+                        if response.status_code in [200, 201]:
+                            translation_status = "completed"
+                            logger.info(f"Translation completed successfully for {doc_id}")
+                        elif response.status_code == 202:
+                            translation_status = "processing"
+                            logger.info(f"Translation processing for {doc_id}")
+                        else:
+                            logger.error(f"Translation returned unexpected status {response.status_code}")
+                            translation_status = "failed"
+
+                        translation_triggered = True
+                    except Exception as e:
+                        logger.error(f"Error submitting translation: {type(e).__name__}: {e}", exc_info=True)
+                        translation_status = "failed"
+                        translation_triggered = True
+
+                stages["translation"]["status"] = translation_status
+            else:
+                # Already triggered, just check status
+                translation_status = await check_job_status(doc_id, "translation")
+                stages["translation"]["status"] = translation_status
+
+        # STAGE 3: After translation completes, trigger renderer
+        if "renderer" in stages and "translation" in stages:
+            translation_status = stages["translation"]["status"]
+            if translation_status == "completed":
+                if not renderer_triggered:
+                    renderer_status = await check_job_status(doc_id, "renderer")
+
+                    # If renderer not started, trigger it
+                    if renderer_status == "not_started":
                         try:
-                            logger.info(f"Submitting translation for doc_id={doc_id}, source={source_lang}, target={target_lang}")
+                            logger.info(f"Submitting renderer for doc_id={doc_id}")
 
-                            url = f"{PDF_PROCESSOR_URL}/translation/{doc_id}"
-                            payload = {"source_lang": source_lang, "target_lang": target_lang}
-                            logger.info(f"POST URL: {url}, payload: {payload}")
+                            url = f"{PDF_PROCESSOR_URL}/renderer/{doc_id}"
+                            logger.info(f"POST URL: {url}")
 
-                            response = await client.post(url, json=payload)
-                            logger.info(f"Translation POST response: {response.status_code}")
+                            response = await client.post(url)
+                            logger.info(f"Renderer POST response: {response.status_code}")
 
                             if response.status_code in [200, 201]:
-                                translation_status = "completed"
-                                logger.info(f"Translation completed successfully for {doc_id}")
+                                renderer_status = "completed"
+                                logger.info(f"Renderer completed successfully for {doc_id}")
                             elif response.status_code == 202:
-                                translation_status = "processing"
-                                logger.info(f"Translation processing for {doc_id}")
+                                renderer_status = "processing"
+                                logger.info(f"Renderer processing for {doc_id}")
                             else:
-                                logger.error(f"Translation returned unexpected status {response.status_code}")
-                                translation_status = "failed"
+                                logger.error(f"Renderer returned unexpected status {response.status_code}")
+                                renderer_status = "failed"
 
-                            translation_triggered = True
+                            renderer_triggered = True
                         except Exception as e:
-                            logger.error(f"Error submitting translation: {type(e).__name__}: {e}", exc_info=True)
-                            translation_status = "failed"
-                            translation_triggered = True
+                            logger.error(f"Error submitting renderer: {type(e).__name__}: {e}", exc_info=True)
+                            renderer_status = "failed"
+                            renderer_triggered = True
 
-                    stages["translation"]["status"] = translation_status
+                    stages["renderer"]["status"] = renderer_status
                 else:
                     # Already triggered, just check status
-                    translation_status = await check_job_status(doc_id, "translation")
-                    stages["translation"]["status"] = translation_status
+                    renderer_status = await check_job_status(doc_id, "renderer")
+                    stages["renderer"]["status"] = renderer_status
 
-            # STAGE 3: Concurrent processing after stage 2 completes
-            # Metadata: Check after embedding completes (translation can still be running)
-            if embedding_status == "completed":
-                metadata_status = await check_job_status(doc_id, "metadata")
-                stages["metadata"]["status"] = metadata_status
-
-            # Renderer: Check/trigger after translation completes (embedding can still be running)
-            if "renderer" in stages and "translation" in stages:
-                translation_status = stages["translation"]["status"]
-                if translation_status == "completed":
-                    if not renderer_triggered:
-                        renderer_status = await check_job_status(doc_id, "renderer")
-
-                        # If renderer not started, trigger it
-                        if renderer_status == "not_started":
-                            try:
-                                logger.info(f"Submitting renderer for doc_id={doc_id}")
-
-                                url = f"{PDF_PROCESSOR_URL}/renderer/{doc_id}"
-                                logger.info(f"POST URL: {url}")
-
-                                response = await client.post(url)
-                                logger.info(f"Renderer POST response: {response.status_code}")
-
-                                if response.status_code in [200, 201]:
-                                    renderer_status = "completed"
-                                    logger.info(f"Renderer completed successfully for {doc_id}")
-                                elif response.status_code == 202:
-                                    renderer_status = "processing"
-                                    logger.info(f"Renderer processing for {doc_id}")
-                                else:
-                                    logger.error(f"Renderer returned unexpected status {response.status_code}")
-                                    renderer_status = "failed"
-
-                                renderer_triggered = True
-                            except Exception as e:
-                                logger.error(f"Error submitting renderer: {type(e).__name__}: {e}", exc_info=True)
-                                renderer_status = "failed"
-                                renderer_triggered = True
-
-                        stages["renderer"]["status"] = renderer_status
-                    else:
-                        # Already triggered, just check status
-                        renderer_status = await check_job_status(doc_id, "renderer")
-                        stages["renderer"]["status"] = renderer_status
-
-        # Build status display grouped by stage
-        stage_1_lines = []
-        stage_2_lines = []
-        stage_3_lines = []
+        # Build status display
         current_stages = []
 
         for stage_key, stage_info in stages.items():
             status = stage_info["status"]
             name = stage_info["name"]
-            stage_num = stage_info["stage"]
 
             # Format status line
             if status == "completed":
@@ -220,22 +190,7 @@ async def poll_processing_status(doc_id: str, status_container, progress_text, s
                 line = f"❓ {name}"
                 all_complete = False
 
-            # Group by stage
-            if stage_num == 1:
-                stage_1_lines.append(line)
-            elif stage_num == 2:
-                stage_2_lines.append(line)
-            elif stage_num == 3:
-                stage_3_lines.append(line)
-
-        # Build final status display with stage grouping
-        status_lines = ["**Stage 1 - Extraction:**"] + stage_1_lines
-        if stage_2_lines:
-            status_lines.append("\n**Stage 2 - Concurrent Processing:**")
-            status_lines.extend(stage_2_lines)
-        if stage_3_lines:
-            status_lines.append("\n**Stage 3 - Final Processing:**")
-            status_lines.extend(stage_3_lines)
+            status_lines.append(line)
 
         # Update the status display
         status_container.markdown("**Processing Status:**\n\n" + "\n\n".join(status_lines))
@@ -322,7 +277,7 @@ async def process_pdf(uploaded_file, file_expander, source_lang="", target_lang=
 
 
 
-st.markdown('<h1 class="main-header">🦸 OmniPDF</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">🌐 OmniPDF</h1>', unsafe_allow_html=True)
 st.header("📁 Upload PDF")
 uploaded_files = st.file_uploader(
     "Choose a PDF file",

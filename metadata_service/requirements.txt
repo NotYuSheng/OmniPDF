@@ -1,9 +1,0 @@
-fastapi==0.115.12
-uvicorn==0.34.3
-openai==1.86.0
-chromadb==1.0.13
-sentence-transformers==4.1.0
-wordcloud==1.9.3
-boto3==1.38.34
-redis==6.2.0
-prometheus-fastapi-instrumentator==7.1.0

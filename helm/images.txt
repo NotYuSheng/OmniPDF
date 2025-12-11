@@ -1,20 +1,15 @@
-# OmniPDF Container Images
+# OmniPDF Translate - Minimal Release Container Images
 # Add your external image URLs here, one per line
 # Comments (lines starting with #) and empty lines are ignored
 
-# Core Application Services
+# Core Translation Services (Minimal Release)
 ghcr.io/notyusheng/frontend:dev-v0.0.3-5d69f89
-ghcr.io/notyusheng/embedder_service:dev-v0.0.3-5d69f89
 ghcr.io/notyusheng/pdf_processor_service:dev-v0.0.3-5d69f89
 ghcr.io/notyusheng/pdf_extraction_service:dev-v0.0.3-5d69f89
 ghcr.io/notyusheng/pdf_renderer_service:dev-v0.0.3-5d69f89
 ghcr.io/notyusheng/docling_translation_service:dev-v0.0.3-5d69f89
-ghcr.io/notyusheng/image_captioner_service:dev-v0.0.3-5d69f89
-ghcr.io/notyusheng/metadata_service:dev-v0.0.3-5d69f89
-ghcr.io/notyusheng/cleaner:dev-v0.0.3-5d69f89
 ghcr.io/notyusheng/nginx:dev-v0.0.3-5d69f89
 
-# Standard Services from Docker Hub
-docker.io/library/redis:8.2.1-alpine
-docker.io/minio/minio:RELEASE.2025-07-23T15-54-02Z
-docker.io/chromadb/chroma:1.0.20
+# Infrastructure Services (Already in CRC or public registries)
+# docker.io/library/redis:8.2.1-alpine - Using public image directly
+# docker.io/minio/minio:RELEASE.2025-07-23T15-54-02Z - Using public image directly

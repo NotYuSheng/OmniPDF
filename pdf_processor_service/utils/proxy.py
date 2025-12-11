@@ -12,9 +12,7 @@ from shared_utils.job_status import load_job, handle_job_status, raise_processin
 logger = logging.getLogger(__name__)
 
 EXTERNAL_ENDPOINT = os.environ["EXTERNAL_ENDPOINT"]
-METADATA_URL = os.environ["METADATA_URL"]
 EXTRACTION_URL = os.environ["EXTRACTION_URL"]
-EMBED_URL = os.environ["EMBED_URL"]
 TRANSLATION_URL = os.environ["TRANSLATION_URL"]
 RENDERER_URL = os.environ["RENDERER_URL"]
 
@@ -102,100 +100,6 @@ async def load_or_create_extraction_job(doc_id: str, is_get_request: bool = True
         presign_url = generate_presigned_url(f"{doc_id}/original.pdf")
         param = {"doc_id": doc_id, "download_url": presign_url}
         response = await proxy_post(f"{EXTRACTION_URL}?{urlencode(param)}", body=None)
-        if response.status_code == 202:
-            raise_processing_error(job_type)
-        else:
-            logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
-            raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
-
-    handle_job_status(job, job_type, is_get_request=is_get_request)
-    return job
-
-
-async def load_or_create_metadata_job(doc_id: str, session_id: str = Depends(get_session_id), is_get_request: bool = True) -> dict | Response:
-    job_type = JobType.METADATA
-    job = load_job(doc_id=doc_id, job_type=job_type)
-    if not job:
-        _pre_req_job = await load_or_create_sentence_embedder_job(doc_id, session_id, is_get_request=False)
-        response = await proxy_post(f"{METADATA_URL}/metadata/{doc_id}", body={})
-        if response.status_code == 202:
-            raise_processing_error(job_type)
-        else:
-            logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
-            raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
-
-    handle_job_status(job, job_type, is_get_request=is_get_request)
-    return job
-
-
-async def load_or_create_semantic_embedder_job(
-    doc_id: str, session_id: str = Depends(get_session_id), is_get_request: bool = True
-) -> dict | Response:
-    """Load existing semantic embedding job or create a new one if it doesn't exist"""
-    job_type = JobType.SEMANTICEMBEDDER
-    job = load_job(doc_id=doc_id, job_type=job_type)
-    if not job:
-        # Get text content using existing concat_text function
-        text_content = await concat_text(doc_id)
-
-        # Prepare request body for semantic embedder
-        embedder_request = {
-            "doc_id": doc_id,
-            "session_id": session_id,
-            "text": text_content,
-            "config": {
-                "chunk_size": 512,
-                "overlap": 50,
-                "embedding_model": "all-MiniLM-L6-v2",
-                "breakpoint_threshold_type": "percentile",
-                "breakpoint_threshold_amount": 90.0,
-                "min_chunk_size": 100,
-                "max_chunk_size": 1000,
-                "store_in_chroma": True,
-            },
-            "pages_info": [],
-        }
-
-        response = await proxy_post(f"{EMBED_URL}/semantic/", body=embedder_request)
-        if response.status_code == 202:
-            raise_processing_error(job_type)
-        else:
-            logger.error(f"Post to {job_type} returned HTTP code {response.status_code}")
-            raise HTTPException(status_code=500, detail=f"{job_type} has returned an unexpected response.")
-
-    handle_job_status(job, job_type, is_get_request=is_get_request)
-    return job
-
-
-async def load_or_create_sentence_embedder_job(
-    doc_id: str, session_id: str = Depends(get_session_id), is_get_request: bool = True
-) -> dict | Response:
-    """Load existing sentence embedding job or create a new one if it doesn't exist"""
-    job_type = JobType.SENTENCEEMBEDDER
-    job = load_job(doc_id=doc_id, job_type=job_type)
-    if not job:
-        # Get text content using existing concat_text function
-        text_content = await concat_text(doc_id)
-
-        # Prepare request body for sentence embedder
-        embedder_request = {
-            "doc_id": doc_id,
-            "session_id": session_id,
-            "text": text_content,
-            "config": {
-                "chunk_size": 512,
-                "overlap": 50,
-                "embedding_model": "all-MiniLM-L6-v2",
-                "breakpoint_threshold_type": "percentile",
-                "breakpoint_threshold_amount": 90.0,
-                "min_chunk_size": 100,
-                "max_chunk_size": 1000,
-                "store_in_chroma": True,
-            },
-            "pages_info": [],
-        }
-
-        response = await proxy_post(f"{EMBED_URL}/sentence/", body=embedder_request)
         if response.status_code == 202:
             raise_processing_error(job_type)
         else:

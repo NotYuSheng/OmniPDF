@@ -19,11 +19,11 @@ autoscaling:
 # Pre-staging secrets
 secrets:
   create: false
-  name: pdf-renderer-service-secrets
+  name: ""
 
 # Pre-staging specific configurations - using local CRC registry
 image:
-  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf/pdf_renderer_service
+  repository: default-route-openshift-image-registry.apps-crc.testing/omnipdf-prestaging/pdf_renderer_service
   tag: "dev-v0.0.3-5d69f89"
   pullPolicy: Always  # Use local registry image
 
@@ -65,7 +65,7 @@ networkPolicy:
 
 # Pod disruption budget for pre-staging (2 replicas, allow 1 down)
 podDisruptionBudget:
-  enabled: true
+  enabled: false
   minAvailable: 1
 
 # Moderate deployment strategy for pre-staging (balanced speed/safety)

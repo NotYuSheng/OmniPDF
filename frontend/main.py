@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 # Page configuration
 st.set_page_config(
     page_title="OmniPDF",
-    page_icon="🦸",
+    page_icon="🌐",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -80,52 +80,17 @@ if __name__ == "__main__":
         default=True,  # to set this as the FIRST page upon establishing connection
     )
 
-    images_UI = st.Page(
-        page="my_pages/2_images_UI.py",
-        title="Images",
-        icon="🖼️"
-    )
-
-    tables_UI = st.Page(
-        page="my_pages/3_tables_UI.py",
-        title="Tables",
-        icon="📋"
-    )
-
-    wordcloud_UI = st.Page(
-        page="my_pages/4_wordcloud_UI.py",
-        title="Word Cloud",
-        icon="☁️"
-    )
-
     translate_UI = st.Page(
         page="my_pages/6_translate_UI.py",
         title="Translated PDF",
         icon="📄",
     )
 
-    metadata_UI = st.Page(
-        page="my_pages/7_metadata_UI.py",
-        title="Metadata",
-        icon="📄",
-    )
-
-    settings_UI = st.Page(
-        page="my_pages/10_settings_UI.py",
-        title="Settings",
-        icon="⚙️"
-    )
-
     # To go between the different pages
     pg = st.navigation(
         pages=[
             upload_UI,
-            images_UI,
-            tables_UI,
-            wordcloud_UI,
             translate_UI,
-            metadata_UI,
-            settings_UI,
         ]
     )
 

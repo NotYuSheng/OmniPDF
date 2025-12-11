@@ -117,6 +117,7 @@ podAnnotations:
 service:
   type: ClusterIP
   port: 9000
+  consolePort: 9001
 
 serviceAccount:
   create: false
